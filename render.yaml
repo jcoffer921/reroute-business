@@ -17,13 +17,13 @@ services:
       python manage.py migrate --noinput
 
     # Start Django with Gunicorn; Render injects $PORT
-    startCommand: gunicorn reroute_business.reroute.wsgi:application --bind 0.0.0.0:$PORT
+    startCommand: gunicorn reroute_business.wsgi:application --bind 0.0.0.0:$PORT
 
     envVars:
       - key: PYTHON_VERSION
         value: 3.12
       - key: DJANGO_SETTINGS_MODULE
-        value: reroute_business.reroute.settings
+        value: reroute_business.settings
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG
