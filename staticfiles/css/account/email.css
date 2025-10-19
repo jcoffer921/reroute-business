@@ -1,0 +1,95 @@
+.account-settings-wrapper {
+    max-width: 650px;
+    margin: 4rem auto;
+    padding: 5rem 2rem;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    font-family: 'Inter', sans-serif;
+}
+
+.account-settings-wrapper h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.email-list {
+    margin-bottom: 2rem;
+}
+
+.email-entry {
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background-color: #fafafa;
+    display: flex;
+    flex-direction: column;
+}
+
+.email-entry span {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.email-entry em,
+.email-entry strong {
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.email-entry form {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+}
+
+.email-entry button {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #f2f2f2;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.email-entry button:hover {
+    background-color: #ddd;
+}
+
+form[action*="account_email"] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+input[type="email"] {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+button[name="action_add"] {
+    background-color: #4285f4;
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button[name="action_add"]:hover {
+    background-color: #3367d6;
+}
+
+h3 {
+    font-size: 1.2rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}

@@ -1,0 +1,65 @@
+:root {
+  --primary-blue: #6495ED;
+  --secondary-indigo: #5B21B6;
+  --accent-cyan: #00DFD8;
+  --contrast-navy: #0F172A;
+  --neutral-gray: #F3F4F6;
+
+  --font-main: 'Inter', sans-serif;
+}
+
+/* Global Resets */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--neutral-gray);
+  color: var(--contrast-navy);
+  line-height: 1.6;
+}
+
+/* Headings */
+h1, h2, h3 {
+  color: var(--contrast-navy);
+}
+
+/* Buttons */
+.btn {
+  background-color: var(--primary-blue);
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.btn:hover {
+  background-color: var(--secondary-indigo);
+}
+
+/* Links */
+a {
+  color: var(--accent-cyan);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* Utility Classes */
+.bg-primary { background-color: var(--primary-blue); }
+.bg-indigo { background-color: var(--secondary-indigo); }
+.bg-cyan { background-color: var(--accent-cyan); }
+.bg-navy { background-color: var(--contrast-navy); }
+.bg-neutral { background-color: var(--neutral-gray); }
+
+.text-primary { color: var(--primary-blue); }
+.text-indigo { color: var(--secondary-indigo); }
+.text-cyan { color: var(--accent-cyan); }
+.text-navy { color: var(--contrast-navy); }
+.text-neutral { color: var(--neutral-gray); }

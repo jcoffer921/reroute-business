@@ -1,6 +1,6 @@
 # resources/views.py
 from django.shortcuts import render
-from reroute_business.blog.models import BlogPost
+from blog.models import BlogPost
 
 
 def resource_list(request):

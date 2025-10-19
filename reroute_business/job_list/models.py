@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from reroute_business.core.models import Skill
+from core.models import Skill
 
 EXPERIENCE_LEVELS = [
     ('entry', 'Entry-level'),

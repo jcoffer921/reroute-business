@@ -1,0 +1,102 @@
+/* ============================
+   Saved Jobs Page Styles
+   ============================ */
+
+.saved-jobs-hero {
+    background: linear-gradient(135deg, #59aaec, #9bceec);
+    /* background-color: #0F172A; /* rich navy blue */
+    color: #F3F4F6; /* rich navy blue for contrast */
+    margin: 0 auto;
+    padding: 10rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.saved-jobs-hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.saved-jobs-hero h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    color: #F3F4F6;
+}
+
+.saved-jobs-hero p {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #F3F4F6;
+}
+
+.saved-jobs-wrapper {
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  max-width: 800px;
+  margin: 2rem auto;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.saved-job-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.saved-job-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.saved-job-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.saved-job-card h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.saved-job-card p {
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+.unsave-job-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  transition: transform 0.2s;
+}
+
+.unsave-job-btn:hover {
+  transform: scale(1.1);
+}
+
+.unsave-job-btn svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #ef4444; /* red-500 */
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

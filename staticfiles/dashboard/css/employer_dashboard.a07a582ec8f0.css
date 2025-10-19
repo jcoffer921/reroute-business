@@ -1,0 +1,252 @@
+.employer-hero {
+    background: linear-gradient(135deg, #0F172A, #345dbd);
+    /* background-color: #0F172A; /* rich navy blue */
+    color: #F3F4F6; /* rich navy blue for contrast */
+    margin: 0 auto;
+    padding: 10rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.employer-hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.employer-hero h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    color: #F3F4F6;
+}
+
+.employer-hero p {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #F3F4F6;
+}
+
+/* === General Layout === */
+.employer-dashboard {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #f7f8fa;
+}
+
+/* === Header === */
+.dashboard-header {
+  margin-bottom: 2rem;
+}
+
+.dashboard-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.dashboard-subtitle {
+  font-size: 1.2rem;
+  color: #555;
+}
+
+/* === Job Listings Table === */
+.job-listings {
+  margin-bottom: 3rem;
+}
+
+.job-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.job-table th,
+.job-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.job-table th {
+  background: #f0f2f5;
+  font-weight: 600;
+}
+
+.left-actions {
+  display: flex;
+  align-items: center;
+}
+
+.right-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-create-job {
+  background-color: #2563eb;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.btn-create-job:hover {
+  background-color: #1e40af;
+}
+
+.sort-control {
+  float: right;
+  margin-top: -2rem;
+}
+
+.badge-success {
+  background-color: #d1fae5;
+  color: #065f46;
+  padding: 0.3rem 0.7rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.badge-secondary {
+  background-color: #e5e7eb;
+  color: #374151;
+  padding: 0.3rem 0.7rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+/* === Analytics Cards === */
+.analytics-section {
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.analytics-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.analytics-card {
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem 1.25rem;
+  width: 220px;
+  text-align: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  flex-grow: 1;
+}
+
+.icon-circle {
+  width: 40px;
+  height: 40px;
+  background-color: #e0f2f1;
+  color: #00695c;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 0.75rem auto;
+  font-size: 1.1rem;
+}
+
+.analytics-value {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.analytics-label {
+  font-size: 0.95rem;
+  color: #4b5563;
+  margin-top: 0.25rem;
+}
+
+.text-green {
+  color: #10b981;
+}
+
+/* === Matcher === */
+.matcher {
+  margin-bottom: 3rem;
+}
+
+.matcher-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.matcher-card {
+  width: 100px;
+  text-align: center;
+}
+
+.profile-pic {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* === Notification & Interview Panels === */
+.notifications-interviews {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.notification-box,
+.interview-box {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid #ddd;
+}
+
+.notification-box h3,
+.interview-box h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+/* === Links === */
+.analytics-link,
+.view-all-link {
+  text-align: right;
+  display: block;
+  margin-top: 0.75rem;
+  font-weight: 500;
+}
+
+.analytics-link a,
+.view-all-link {
+  color: #4f46e5;
+  text-decoration: none;
+}
+
+.analytics-link a:hover,
+.view-all-link:hover {
+  text-decoration: underline;
+}

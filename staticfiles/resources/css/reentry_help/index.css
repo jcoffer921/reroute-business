@@ -1,0 +1,43 @@
+/* ===== Reentry Help — Polished Cards ===== */
+
+/* Hero */
+.rehelp-hero { position: relative; background: linear-gradient(135deg, #0F172A, #345dbd); color: #fff; padding: 4.5rem 1.5rem 3rem; overflow: hidden; }
+.rehelp-hero-inner { max-width: 1100px; margin: 0 auto; text-align: left; position: relative; z-index: 1; }
+.rehelp-hero-icon { display: inline-block; margin-bottom: .6rem; opacity: .95; }
+.rehelp-hero h1 { margin: 0 0 .25rem; font-size: clamp(2.2rem, 4.8vw, 3.1rem); font-weight: 900; }
+.rehelp-subtext { margin-top: .1rem; }
+
+@media (max-width: 640px){
+  .rehelp-hero { padding: 3.5rem 1rem 2.25rem; }
+}
+.rehelp-subtext { margin: 0; color: #e6e9f2; max-width: 720px; }
+.rehelp-hero-bg { position: absolute; inset: 0; pointer-events: none; opacity: .25; background-image:
+  radial-gradient(circle at 20% 10%, rgba(255,255,255,.25) 0 2px, transparent 2px),
+  radial-gradient(circle at 80% 40%, rgba(255,255,255,.25) 0 2px, transparent 2px),
+  radial-gradient(circle at 40% 80%, rgba(255,255,255,.25) 0 2px, transparent 2px);
+  background-size: 140px 140px;
+}
+
+/* Section */
+.rehelp-section { background: linear-gradient(180deg, #f6f9ff 0%, #ffffff 60%); padding: 2.8rem 1.5rem; }
+.rehelp-inner { max-width: 1200px; margin: 0 auto; }
+.rehelp-section h2 { text-align: center; margin: 0 0 .5rem; font-size: clamp(2rem, 4vw, 2.6rem); font-weight: 900; color: #0F172A; }
+.rehelp-section-subtext { text-align: center; color: #6b7280; margin: 0 0 2rem; }
+
+.rehelp-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; align-items: stretch; }
+@media (max-width: 900px){ .rehelp-cards { grid-template-columns: 1fr; } }
+
+.rehelp-card { display: flex; flex-direction: column; background: #fff; border: 1px solid #e6ecfb; border-radius: 16px; padding: 1.25rem; box-shadow: 0 6px 18px rgba(10,34,80,.06); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+.rehelp-card:hover { transform: translateY(-6px); border-color: rgba(100,149,237,.5); box-shadow: 0 16px 36px rgba(10,34,80,.12); }
+.rehelp-card-icon { margin-bottom: .5rem; width: 48px; height: 48px; border-radius: 12px; background: rgba(100,149,237,.12); display: inline-flex; align-items: center; justify-content: center; }
+.rehelp-card h3 { margin: .15rem 0 .25rem; font-size: 1.35rem; font-weight: 900; color: #0F172A; }
+.rehelp-card p { margin: 0 0 .9rem; color: #334155; }
+.rehelp-actions { margin-top: auto; }
+
+.btn-pill { display: inline-block; padding: .6rem 1.1rem; background: #6495ED; color: #fff; border-radius: 999px; text-decoration: none; font-weight: 800; box-shadow: 0 8px 22px rgba(100,149,237,.35); }
+.btn-pill:hover { background: #5a86d6; }
+
+/* CTA */
+.rehelp-cta { background: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%); padding: 2.2rem 1.5rem; }
+.rehelp-cta-inner { max-width: 900px; margin: 0 auto; text-align: center; }
+.rehelp-cta h3 { margin: 0 0 .6rem; font-size: clamp(1.5rem, 3vw, 1.9rem); font-weight: 900; color: #0F172A; }

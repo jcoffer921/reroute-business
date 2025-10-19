@@ -1,0 +1,75 @@
+/* Subscription card styles */
+.subscription-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  margin-bottom: 24px;
+}
+
+.subscription-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.status-pill {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1;
+  color: #fff;
+}
+.status-pill.active { background: #28a745; }
+.status-pill.inactive { background: #6c757d; }
+
+.subscription-body .field-row {
+  display: flex;
+  gap: 12px;
+  padding: 6px 0;
+}
+.field-label {
+  color: #6b7280;
+  width: 140px;
+}
+.field-value { color: #111827; }
+
+.subscription-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+.subscription-actions .inline-form { display: inline; }
+
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-primary[aria-disabled="true"], .btn-primary[data-disabled="true"] {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.note { margin-top: 12px; color: #374151; }
+.note.warning { color: #b45309; }
+
+/* Mini back link to settings */
+.settings-mini-nav { margin-top: 6px; }
+.mini-link { color: #2563eb; text-decoration: none; }
+.mini-link:hover { text-decoration: underline; }
+

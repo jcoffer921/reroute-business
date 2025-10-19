@@ -6,10 +6,10 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
-from reroute_business.job_list.models import Job
-from reroute_business.core.models import Skill
-from reroute_business.core.utils.analytics import track_event
-from reroute_business.profiles.models import EmployerProfile
+from job_list.models import Job
+from core.models import Skill
+from core.utils.analytics import track_event
+from profiles.models import EmployerProfile
 
 # Show jobs posted by this employer
 @login_required

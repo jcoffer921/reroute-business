@@ -10,8 +10,8 @@ from django.contrib.auth.models import User
 from django.db.models import JSONField
 
 # NOTE: If these imports live under a different app, update imports accordingly
-from reroute_business.profiles.constants import USER_STATUS_CHOICES, YES_NO
-from reroute_business.core.models import Skill
+from profiles.constants import USER_STATUS_CHOICES, YES_NO
+from core.models import Skill
 
 
 class UserProfile(models.Model):

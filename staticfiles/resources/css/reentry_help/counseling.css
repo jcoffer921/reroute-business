@@ -1,0 +1,57 @@
+/* ===== Counseling & Mental Health — Redesigned ===== */
+
+/* Hero */
+.cs-hero { position: relative; background: linear-gradient(135deg, #0F172A, #345dbd); color: #fff; padding: 5rem 1.5rem 3.2rem; overflow: hidden; }
+.cs-hero-inner { max-width: 1100px; margin: 0 auto; text-align: center; position: relative; z-index: 1; }
+.cs-hero-icon { display: inline-block; margin-bottom: .6rem; opacity: .95; }
+.cs-hero h1 { margin: 0 0 .35rem; font-size: clamp(2.1rem, 4.6vw, 3rem); font-weight: 900; }
+.cs-subtext { margin: 0 auto; color: #e6e9f2; max-width: 760px; }
+.cs-hero-bg { position: absolute; inset: 0; pointer-events: none; opacity: .25; background-image:
+  radial-gradient(circle at 20% 10%, rgba(255,255,255,.25) 0 2px, transparent 2px),
+  radial-gradient(circle at 80% 40%, rgba(255,255,255,.25) 0 2px, transparent 2px),
+  radial-gradient(circle at 40% 80%, rgba(255,255,255,.25) 0 2px, transparent 2px);
+  background-size: 140px 140px;
+}
+
+/* Sections */
+.cs-section { padding: 2.4rem 1.5rem; background: linear-gradient(180deg, #f6f9ff 0%, #ffffff 60%); }
+.cs-inner { max-width: 1200px; margin: 0 auto; }
+.cs-section h2 { text-align: center; margin: 0 0 1.1rem; font-size: clamp(1.7rem, 3.2vw, 2.1rem); font-weight: 900; color: #0F172A; }
+
+/* Card grid */
+.cs-card-grid { display: grid; gap: 1.1rem; }
+.cs-card-grid.cs-3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 1100px){ .cs-card-grid.cs-3 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px){ .cs-card-grid.cs-3 { grid-template-columns: 1fr; } }
+
+.cs-card { display: flex; flex-direction: column; background: #fff; border: 1px solid #e6ecfb; border-radius: 16px; padding: 1.2rem; box-shadow: 0 6px 18px rgba(10,34,80,.06); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+.cs-card.small { padding: 1rem; }
+.cs-card:hover { transform: translateY(-6px); border-color: rgba(100,149,237,.5); box-shadow: 0 16px 36px rgba(10,34,80,.12); }
+.cs-card-icon { margin-bottom: .5rem; width: 48px; height: 48px; border-radius: 12px; background: rgba(100,149,237,.12); display: inline-flex; align-items: center; justify-content: center; }
+.cs-card h3 { margin: .1rem 0 .2rem; font-size: 1.18rem; font-weight: 900; color: #0F172A; }
+.cs-card p { margin: 0 0 .8rem; color: #334155; }
+.cs-actions { margin-top: auto; }
+.btn-pill { display: inline-block; padding: .55rem 1rem; background: #6495ED; color: #fff; border-radius: 999px; text-decoration: none; font-weight: 800; box-shadow: 0 8px 22px rgba(100,149,237,.35); }
+.btn-pill:hover { background: #5a86d6; }
+
+/* Highlight 988 */
+.cs-highlight { display: grid; grid-template-columns: auto 1fr; gap: .8rem; align-items: center; background: #fff; border: 2px solid rgba(100,149,237,.35); border-radius: 16px; padding: 1rem; box-shadow: 0 10px 30px rgba(10,34,80,.1); margin-bottom: 1rem; }
+.cs-highlight-icon { width: 56px; height: 56px; border-radius: 14px; background: rgba(100,149,237,.12); display: inline-flex; align-items: center; justify-content: center; }
+.cs-highlight h3 { margin: 0 0 .2rem; font-size: 1.25rem; font-weight: 900; color: #0F172A; }
+.cs-highlight p { margin: 0 0 .5rem; color: #334155; }
+
+/* Tips */
+.cs-tips { background: #fff; }
+.cs-tips-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; }
+@media (max-width: 900px){ .cs-tips-grid { grid-template-columns: 1fr; } }
+.cs-tip { display: grid; grid-template-columns: auto 1fr; gap: .5rem; align-items: start; padding: .8rem 1rem; border: 1px solid #e6ecfb; border-radius: 12px; background: #f7faff; }
+.cs-tip-icon { width: 28px; height: 28px; border-radius: 999px; background: rgba(22,163,74,.12); display: inline-flex; align-items: center; justify-content: center; }
+
+/* Footer */
+.cs-footer { background: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%); padding: 2.2rem 1.5rem; }
+.cs-footer-inner { max-width: 1100px; margin: 0 auto; text-align: center; border: 1px solid #e6ecfb; border-radius: 16px; background: #fff; padding: 1.2rem; box-shadow: 0 6px 18px rgba(10,34,80,.06); }
+.cs-footer h3 { margin: 0 0 .5rem; font-size: 1.25rem; font-weight: 900; color: #0F172A; }
+.cs-sources { list-style: none; padding: 0; margin: 0 0 .4rem; display: flex; flex-wrap: wrap; gap: .6rem 1rem; justify-content: center; }
+.cs-sources a { color: #2563eb; text-decoration: none; font-weight: 700; font-size: .95rem; }
+.cs-sources a:hover { text-decoration: underline; }
+.cs-updated { margin: .5rem 0 0; color: #6b7280; font-size: .9rem; }

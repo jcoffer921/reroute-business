@@ -1,0 +1,193 @@
+.skill-category {
+  margin-bottom: 1.5rem;
+}
+.skill-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.skill-btn {
+  padding: 0.4rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background: #f8f8f8;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.skill-btn:hover {
+  background: #e0e0e0;
+}
+.selected-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+/* --- Suggested tags (unified) --- */
+.skill-tag,
+.btn-skill-tag {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  margin: 0.4rem 0.5rem 0 0;
+  background-color: #f0f4ff;
+  border: 1px solid #a2b4ff;
+  border-radius: 999px;              /* fully pill */
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.15s ease, transform 0.06s ease;
+}
+
+/* Hover effect */
+.skill-tag:hover,
+.btn-skill-tag:hover {
+  background-color: #4f7cff;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(79,124,255,.25);
+  transform: translateY(-1px);
+}
+
+/* 🔁 IMPORTANT: reflect JS’s `active` class (not `.selected`) */
+.skill-tag.active,
+.btn-skill-tag.active {
+  background-color: #003e80;
+  color: #fff;
+  border-color: #00336a;
+}
+
+/* --- Selected chips (the ones shown under “Selected:”) --- */
+.selected-skill-preview { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.25rem; }
+.selected-skill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: 0.4rem 0.8rem;
+  background-color: #d0e3ff;
+  border: 1px solid #4f7cff;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: #0b2545;
+}
+
+.selected-skill-tag .remove-skill {
+  font-weight: 700;
+  opacity: .9;
+  cursor: pointer;
+}
+.selected-skill-tag .remove-skill:hover { color: #d20000; }
+
+.remove-btn {
+  background: none;
+  border: none;
+  color: #333;
+  margin-left: 0.5rem;
+  cursor: pointer;
+}
+
+/* Custom Skill Input spacing */
+.custom-skill-box {
+  margin-top: 1.5rem;
+}
+
+.custom-skill-input {
+  margin: 2rem 0 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.skill-tag.selected {
+  background-color: #007bff;
+  color: white;
+  border: none;
+}
+
+.skill-pill {
+  display: inline-block;
+  background-color: #e0f0ff;
+  color: #333;
+  padding: 6px 10px;
+  margin: 4px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  border: 1px solid #b3d7ff;
+  position: relative;
+}
+
+.skill-pill button.remove-tag {
+  background: none;
+  border: none;
+  color: #555;
+  margin-left: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.skill-pill button.remove-tag:hover {
+  color: red;
+}
+
+/* Containers */
+.skill-tag-wrapper { display:flex; flex-wrap:wrap; gap: .5rem; margin-bottom: 1rem; }
+
+.btn-skill-tag.selected {
+  background-color: #003e80;
+}
+
+#selectedSkillsDisplay .tag {
+  background-color: #009df9;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.85rem;
+  margin-right: 0.25rem;
+}
+
+/* Align selected section nicely */
+#activeSkills {
+  margin-top: 1rem;
+}
+
+/* Style the Add button */
+#addCustomSkillBtn {
+  padding: 0.5rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 2px solid #4f7cff;
+  background-color: white;
+  color: #4f7cff;
+  border-radius: 30px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+/* Hover and focus effect */
+#addCustomSkillBtn:hover,
+#addCustomSkillBtn:focus {
+  background-color: #4f7cff;
+  color: white;
+  box-shadow: 0 4px 12px rgba(79, 124, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Optional: icon inside button */
+#addCustomSkillBtn i {
+  margin-right: 6px;
+}
+
+/* Optional: when at cap, disable unselected suggestions visually */
+.skill-tag[disabled],
+.btn-skill-tag[disabled] {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* Improve keyboard focus visibility for all interactive pills/buttons */
+.skill-tag:focus-visible,
+.btn-skill-tag:focus-visible,
+.selected-skill-tag:focus-visible,
+.add-row:focus-visible,
+.form-navigation .btn:focus-visible {
+  outline: 3px solid #99c2ff;
+  outline-offset: 2px;
+}

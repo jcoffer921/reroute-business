@@ -1,0 +1,41 @@
+/* ===== Tech Courses (Learn Tech Skills Online) ===== */
+.tech-hero {
+  position: relative;
+  padding: 4rem 1.5rem 3rem;
+  background: linear-gradient(180deg, #f3f8ff 0%, #ffffff 70%);
+}
+.tech-hero-inner { max-width: 1100px; margin: 0 auto; text-align: center; }
+.tech-hero h1 { margin: 0 0 .5rem; font-size: clamp(2rem, 4vw, 2.75rem); font-weight: 900; color: #0F172A; }
+.tech-subtext { color: #6b7280; margin: 0 0 1rem; }
+.tech-cta-row { display: inline-flex; gap: .6rem; align-items: center; margin-top: .25rem; }
+
+.btn-pill { display: inline-block; padding: .7rem 1.2rem; border-radius: 999px; text-decoration: none; font-weight: 800; }
+.btn-pill { background: #6495ED; color: #fff; box-shadow: 0 8px 20px rgba(100,149,237,0.35); }
+.btn-pill:hover { background: #5a86d6; }
+.btn-pill.outline { background: transparent; color: #6495ED; border: 2px solid #6495ED; box-shadow: none; }
+.btn-pill.outline:hover { background: rgba(100,149,237,0.08); }
+
+.tech-bg-pattern {
+  position: absolute; inset: 0; pointer-events: none; opacity: .25; background-image:
+    radial-gradient( circle at 20% 10%, #cfe0ff 0 2px, transparent 2px),
+    radial-gradient( circle at 80% 40%, #cfe0ff 0 2px, transparent 2px),
+    radial-gradient( circle at 40% 80%, #cfe0ff 0 2px, transparent 2px);
+  background-size: 120px 120px;
+}
+
+.tech-section { padding: 2.5rem 1.5rem; }
+.tech-section-inner { max-width: 1100px; margin: 0 auto; }
+.tech-section h2 { text-align: center; margin: 0 0 1.25rem; font-size: clamp(1.6rem, 3vw, 2rem); font-weight: 900; color: #0F172A; }
+
+.resource-grid { display: grid; gap: 1rem; }
+.resource-grid.two-col { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 900px){ .resource-grid.two-col { grid-template-columns: 1fr; } }
+
+.resource-card { display: flex; gap: .85rem; align-items: flex-start; background: #fff; border: 1px solid #e6ecfb; border-radius: 14px; padding: 1rem; box-shadow: 0 6px 18px rgba(10,34,80,.06); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+.resource-card:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(10,34,80,.12); border-color: rgba(100,149,237,.5); }
+.res-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(100,149,237,.12); display: inline-flex; align-items: center; justify-content: center; flex: 0 0 48px; }
+.res-body h3 { margin: 0 0 .25rem; font-size: 1.1rem; color: #0F172A; }
+.res-body p { margin: 0 0 .6rem; color: #334155; }
+.learn-btn { display: inline-block; padding: .45rem .9rem; border-radius: 999px; background: #6495ED; color: #fff; text-decoration: none; font-weight: 700; }
+.learn-btn:hover { background: #5a86d6; }
+

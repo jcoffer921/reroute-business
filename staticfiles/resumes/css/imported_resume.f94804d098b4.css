@@ -1,0 +1,124 @@
+.imported-resume-wrapper {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 7rem 1rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  font-family: "Helvetica Neue", Helvetica, Lato, sans-serif;
+  color: #333;
+}
+
+.resume-section {
+  margin-bottom: 2.5rem;
+}
+
+/* 🔹 Formatted Resume Block */
+.formatted-resume {
+  line-height: 1.7;
+  white-space: normal;
+}
+
+.formatted-resume h3 {
+  font-size: 1.2rem;
+  margin-top: 1.5rem;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.3rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.formatted-resume ul {
+  list-style-type: disc;
+  padding-left: 1.8rem;
+  margin-top: 0.5rem;
+}
+
+.formatted-resume li {
+  margin-bottom: 0.4rem;
+  line-height: 1.6;
+}
+
+/* 🔹 Inline Skill List */
+.extracted-skills-list {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+}
+
+.extracted-skills-list li {
+  margin-bottom: 0.3rem;
+}
+
+/* Optional: Add section title spacing */
+.resume-section h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  color: #1a1a1a;
+  font-weight: bold;
+}
+
+.resume-import-wrapper {
+  max-width: 900px;
+  margin: 4rem auto;
+  padding: 7rem 2rem;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.04);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.ai-summary-card {
+  margin-top: 3rem;
+  background-color: #f5f9ff;
+  padding: 2rem;
+  border: 1px solid #d8e5f5;
+  border-radius: 10px;
+}
+
+.ai-summary-card h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+  color: #003366;
+}
+
+.ai-summary-content {
+  line-height: 1.7;
+  font-size: 1rem;
+  white-space: pre-wrap;
+}
+
+.ai-summary-content strong {
+  font-size: 1.1rem;
+  color: #002244;
+  display: block;
+  margin-top: 1.6rem;
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ai-summary-content ul,
+.ai-summary-content ol {
+  margin-left: 1.2rem;
+  padding-left: 1rem;
+  margin-top: 0.5rem;
+}
+
+.ai-summary-content li {
+  margin-bottom: 0.3rem;
+}
+
+.uploaded-file-info {
+  background: #f0f4f8;
+  padding: 0.75rem 1rem;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.uploaded-file-info a {
+  color: #003366;
+  font-weight: 600;
+  text-decoration: none;
+}

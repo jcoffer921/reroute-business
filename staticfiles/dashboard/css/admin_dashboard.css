@@ -1,0 +1,394 @@
+.admin-hero {
+    background: linear-gradient(135deg, #0F172A, #5d8dfd);
+    color: #F3F4F6; /* rich navy blue for contrast */
+    padding: 10rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.admin-hero h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    color: #F3F4F6;
+}
+
+.admin-hero p {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    color: #F3F4F6;
+}
+
+/* ===== Admin Dashboard Styles ===== */
+.admin-dashboard {
+  padding: 30px;
+  font-family: 'Inter', sans-serif;
+  background: #f9fafb;
+  color: #1a1a1a;
+}
+
+.admin-dashboard section {
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+/* Page Header */
+.admin-dashboard h1 {
+  font-size: 2rem;
+  margin-bottom: 25px;
+  font-weight: 700;
+  color: #0d6efd;
+}
+
+.admin-dashboard h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #f3f4f6;
+  padding-bottom: 8px;
+}
+
+.admin-dashboard ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.admin-dashboard ul li {
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.admin-dashboard ul li:last-child {
+  border-bottom: none;
+}
+
+/* Management Links */
+.admin-dashboard .management-links a {
+  display: block;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  color: #0d6efd;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.admin-dashboard .management-links a:hover {
+  background: #e9ecef;
+  text-decoration: none;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.stat-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.stat-box__label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  opacity: 0.95;
+}
+
+.stat-box__value {
+  display: block;
+  font-size: 2rem;
+  margin-top: 6px;
+  line-height: 1;
+}
+
+/* Color Variants */
+.stat-box--users {
+  background: linear-gradient(135deg, #0d6efd 0%, #3a86ff 100%);
+  color: #fff;
+}
+
+.stat-box--employers {
+  background: linear-gradient(135deg, #0aa2c0 0%, #17a2b8 100%);
+  color: #fff;
+}
+
+.stat-box--jobs {
+  background: linear-gradient(135deg, #198754 0%, #2bb673 100%);
+  color: #fff;
+}
+
+.stat-box--applications {
+  background: linear-gradient(135deg, #fd7e14 0%, #ff9800 100%);
+  color: #fff;
+}
+
+.stat-box--resumes {
+  background: linear-gradient(135deg, #6f42c1 0%, #8b5cf6 100%);
+  color: #fff;
+}
+
+.stat-box--flagged {
+  background: linear-gradient(135deg, #dc3545 0%, #ef476f 100%);
+  color: #fff;
+}
+
+.stat-box--users .stat-box__label,
+.stat-box--employers .stat-box__label,
+.stat-box--jobs .stat-box__label,
+.stat-box--applications .stat-box__label,
+.stat-box--resumes .stat-box__label,
+.stat-box--flagged .stat-box__label {
+  opacity: 0.9;
+}
+
+.stat-box--users .stat-box__value,
+.stat-box--employers .stat-box__value,
+.stat-box--jobs .stat-box__value,
+.stat-box--applications .stat-box__value,
+.stat-box--resumes .stat-box__value,
+.stat-box--flagged .stat-box__value {
+  color: #fff;
+}
+
+/* Charts Section */
+canvas {
+  background: #fff;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  max-width: 100%;
+  box-sizing: border-box; /* prevent overflow from padding */
+  height: 240px; /* compact default height */
+}
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 15px;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+}
+
+th, td {
+  border-bottom: 1px solid #eee;
+  padding: 12px 16px;
+  text-align: left;
+}
+
+th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+  color: #333;
+}
+
+tr:hover {
+  background: #f9f9f9;
+}
+
+/* Links */
+a {
+  color: #0d6efd;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Section Titles */
+.admin-dashboard h2 {
+  margin-top: 40px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #111;
+}
+
+/* Charts Grid */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* mobile/tablet: stack */
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+.charts-grid section {
+  min-width: 360px; /* allow smaller on narrow screens */
+}
+
+@media (min-width: 980px) {
+  .charts-grid {
+    grid-template-columns: repeat(2, minmax(420px, 1fr)); /* desktop: 2-up with min width */
+    align-items: stretch;
+  }
+  .charts-grid .grid-span-2 { grid-column: 1 / -1; }
+}
+
+.charts-grid canvas {
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px; /* consistent inner padding so charts breathe */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  width: 100%;
+  height: 280px; /* clearer readability (250–300px target) */
+}
+
+/* Smaller chart helper */
+.chart-sm { height: 280px !important; max-width: 100%; }
+
+/* Carousel charts sizing */
+.charts-carousel__slide canvas { height: 220px !important; }
+.charts-carousel__slide .plotly-chart { height: 220px !important; }
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  .admin-dashboard { padding: 16px; }
+  .charts-grid { gap: 12px; }
+  .charts-grid canvas { height: 180px; padding: 12px; }
+  .charts-grid .plotly-chart { height: 180px; padding: 12px; }
+}
+
+@media (min-width: 700px) {
+  .charts-grid { grid-template-columns: 1fr 1fr; } /* two-up */
+}
+
+@media (min-width: 1200px) {
+  .charts-grid canvas { height: 260px; }
+  .charts-grid .plotly-chart { height: 260px; }
+}
+
+/* Table wrapper for mobile scroll */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Charts Carousel */
+.charts-carousel {
+  position: relative;
+  margin-bottom: 32px;
+}
+.charts-carousel__viewport {
+  overflow: hidden;
+  border-radius: 12px;
+}
+.charts-carousel__track {
+  display: flex;
+  transition: transform 0.3s ease;
+  will-change: transform;
+}
+.charts-carousel__slide {
+  flex: 0 0 100%;
+}
+.charts-carousel canvas, .charts-carousel .plotly-chart {
+  margin: 0; /* avoid extra height inside slides */
+  width: 100%;
+  height: 240px;
+}
+
+/* Carousel navigation */
+.charts-carousel__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #0d6efd;
+  color: #fff;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(13,110,253,0.35);
+}
+.charts-carousel__nav:hover { background: #0b5ed7; }
+.charts-carousel__nav--prev { left: 8px; }
+.charts-carousel__nav--next { right: 8px; }
+
+.charts-carousel__dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.charts-carousel__dots button {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: #cfd4da;
+  cursor: pointer;
+}
+.charts-carousel__dots button[aria-selected="true"] {
+  background: #0d6efd;
+  box-shadow: 0 0 0 2px rgba(13,110,253,0.15);
+}
+
+@media (max-width: 600px) {
+  .charts-carousel canvas, .charts-carousel .plotly-chart { height: 200px; }
+}
+@media (min-width: 1200px) {
+  .charts-carousel canvas, .charts-carousel .plotly-chart { height: 260px; }
+}
+
+/* Modal styles */
+.rr-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.rr-modal.open { display: flex; }
+.rr-modal__dialog {
+  position: relative;
+  z-index: 1001;
+  background: #fff;
+  width: calc(100% - 32px);
+  max-width: 420px;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.rr-modal__actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+.rr-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  border: 0;
+  cursor: pointer;
+}
