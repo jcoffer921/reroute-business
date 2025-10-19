@@ -5,6 +5,7 @@ services:
     env: python
     plan: starter
     autoDeploy: true
+    rootDir: reroute_business
 
     # Install deps + build static assets
     buildCommand: |
