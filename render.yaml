@@ -4,7 +4,6 @@ services:
     env: python
     plan: starter
     autoDeploy: true
-    rootDir: reroute_business
 
     buildCommand: |
       pip install --upgrade pip
