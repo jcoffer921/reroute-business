@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% load static %}
+{% load profile_extras %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'dashboard/css/saved_jobs.css' %}">
+<script src="{% static 'dashboard/js/saved_jobs.js' %}" defer></script>
+
+<section class="saved-jobs-hero">
+  <div class="saved-jobs-hero-content">
+    <h1>My Jobs</h1>
+    <p class="hero-sub">Easily track and manage the jobs you’ve saved and applied for.</p>
+
+    <!-- Tabs -->
+    <nav class="jobs-tabs" aria-label="Job Lists">
+      <a class="tab {% if active_tab == 'saved' %}active{% endif %}" href="?tab=saved">Saved Jobs</a>
+      <a class="tab {% if active_tab == 'applied' %}active{% endif %}" href="?tab=applied">Applied Jobs</a>
+      <a class="tab {% if active_tab == 'archived' %}active{% endif %}" href="?tab=archived">Archived</a>
+    </nav>
+  </div>
+</section>
+
+<div class="saved-jobs-wrapper">
+
+  {% if active_tab == 'saved' %}
+    {% if saved_jobs %}
+      <div class="saved-job-list">
+        {% for saved in saved_jobs %}
+          {% with job=saved.job %}
+          <article class="saved-job-card" data-job-id="{{ job.id }}">
+            <header class="job-header">
+              {% with logo=job.employer|employer_logo_url %}
+              <a class="company-logo" href="{{ job.employer|employer_public_url }}" aria-label="Employer profile">
+                {% if logo %}
+                  <img src="{{ logo }}" alt="{{ job.employer.username }} logo">
+                {% else %}
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="11" rx="2" fill="#f9fafb" stroke="#e5e7eb"/><path d="M9 8V7a3 3 0 0 1 6 0v1" stroke="#cbd5e1" fill="none"/><path d="M7 12h10" stroke="#cbd5e1"/></svg>
+                {% endif %}
+              </a>
+              {% endwith %}
+              <div class="job-info">
+                <h2 class="job-title"><a href="{% url 'job_detail' job.id %}">{{ job.title }}</a></h2>
+                <div class="job-meta-row">{{ job.employer.username }} · {{ job.location }}</div>
+                <div class="job-tags">
+                  <span class="tag">{{ job.get_job_type_display }}</span>
+                  {% if job.experience_level %}<span class="tag">{{ job.get_experience_level_display }}</span>{% endif %}
+                  {% if 'remote' in job.location|lower %}<span class="tag">Remote</span>{% endif %}
+                </div>
+              </div>
+            </header>
+
+            <div class="job-extra">
+              <div class="pay">
+                <span class="pay-label">Pay</span>
+                <span class="pay-value">
+                  {% if job.salary_type == 'hour' and job.hourly_min and job.hourly_max %}
+                    ${{ job.hourly_min }}–${{ job.hourly_max }} / hr
+                  {% elif job.salary_min and job.salary_max %}
+                    ${{ job.salary_min }}k–${{ job.salary_max }}k / yr
+                  {% else %}
+                    Not listed
+                  {% endif %}
+                </span>
+              </div>
+              <div class="posted">Posted {{ job.created_at|timesince }} ago</div>
+            </div>
+
+            <footer class="job-actions">
+              <form method="post" action="{% url 'apply_to_job' job.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Apply Now</button>
+              </form>
+              <form method="post" action="{% url 'toggle_saved_job' %}">
+                {% csrf_token %}
+                <input type="hidden" name="job_id" value="{{ job.id }}">
+                <button type="submit" class="btn btn-outline">Remove</button>
+              </form>
+              <form method="post" action="{% url 'dashboard:archive_saved_job' %}" class="js-archive-form">
+                {% csrf_token %}
+                <input type="hidden" name="job_id" value="{{ job.id }}">
+                <button type="submit" class="btn btn-outline" title="Move to Archived">Archive</button>
+              </form>
+            </footer>
+          </article>
+          {% endwith %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-box">
+        <div class="empty-illustration" aria-hidden="true">
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bookmark icon">
+            <path d="M7 3h10a1 1 0 0 1 1 1v17l-6-3-6 3V4a1 1 0 0 1 1-1z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <h3>You haven’t saved any jobs yet</h3>
+        <p>Browse opportunities and bookmark jobs you like.</p>
+        <a class="btn btn-primary" href="{% url 'opportunities' %}">Browse Jobs</a>
+      </div>
+    {% endif %}
+
+  {% elif active_tab == 'applied' %}
+    {% if applied_jobs %}
+      <div class="saved-job-list">
+        {% for app in applied_jobs %}
+          {% with job=app.job %}
+          <article class="saved-job-card" data-job-id="{{ job.id }}">
+            <header class="job-header">
+              {% with logo=job.employer|employer_logo_url %}
+              <a class="company-logo" href="{{ job.employer|employer_public_url }}" aria-label="Employer profile">
+                {% if logo %}
+                  <img src="{{ logo }}" alt="{{ job.employer.username }} logo">
+                {% else %}
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="11" rx="2" fill="#f9fafb" stroke="#e5e7eb"/><path d="M9 8V7a3 3 0 0 1 6 0v1" stroke="#cbd5e1" fill="none"/><path d="M7 12h10" stroke="#cbd5e1"/></svg>
+                {% endif %}
+              </a>
+              {% endwith %}
+              <div class="job-info">
+                <h2 class="job-title"><a href="{% url 'job_detail' job.id %}">{{ job.title }}</a></h2>
+                <div class="job-meta-row">{{ job.employer.username }} · {{ job.location }}</div>
+                <div class="job-tags">
+                  <span class="tag">{{ job.get_job_type_display }}</span>
+                  {% if job.experience_level %}<span class="tag">{{ job.get_experience_level_display }}</span>{% endif %}
+                </div>
+              </div>
+            </header>
+
+            <div class="job-extra">
+              <div class="status-pill status-{{ app.status }}">{{ app.get_status_display }}</div>
+              <div class="posted">Applied {{ app.submitted_at|timesince }} ago</div>
+            </div>
+
+            <footer class="job-actions">
+              <a class="btn btn-outline" href="{% url 'job_detail' job.id %}">View Job</a>
+            </footer>
+          </article>
+          {% endwith %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-box">
+        <div class="empty-illustration" aria-hidden="true">
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Document icon">
+            <path d="M7 3h6l4 4v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke="#cbd5e1" stroke-width="1.5" fill="#f8fafc"/>
+            <path d="M13 3v4h4" stroke="#cbd5e1" stroke-width="1.5"/>
+            <path d="M8 12h8M8 16h8M8 8h3" stroke="#94a3b8" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <h3>No applications yet</h3>
+        <p>Apply to jobs you like and manage them here.</p>
+        <a class="btn btn-primary" href="{% url 'opportunities' %}">Browse Jobs</a>
+      </div>
+    {% endif %}
+
+  {% else %}
+    {% if archived_jobs %}
+      <div class="saved-job-list">
+        {% for rec in archived_jobs %}
+          {% with job=rec.job %}
+          <article class="saved-job-card">
+            <header class="job-header">
+              {% with logo=job.employer|employer_logo_url %}
+              <a class="company-logo" href="{{ job.employer|employer_public_url }}" aria-label="Employer profile">
+                {% if logo %}
+                  <img src="{{ logo }}" alt="{{ job.employer.username }} logo">
+                {% else %}
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="11" rx="2" fill="#f9fafb" stroke="#e5e7eb"/><path d="M9 8V7a3 3 0 0 1 6 0v1" stroke="#cbd5e1" fill="none"/><path d="M7 12h10" stroke="#cbd5e1"/></svg>
+                {% endif %}
+              </a>
+              {% endwith %}
+              <div class="job-info">
+                <h2 class="job-title"><a href="{% url 'job_detail' job.id %}">{{ job.title }}</a></h2>
+                <div class="job-meta-row">{{ job.employer.username }} · {{ job.location }}</div>
+              </div>
+            </header>
+
+            <div class="job-extra">
+              <div class="posted">Archived {{ rec.archived_at|timesince }} ago</div>
+            </div>
+
+            <footer class="job-actions">
+              <form method="post" action="{% url 'dashboard:unarchive_job' %}" class="js-unarchive-form">
+                {% csrf_token %}
+                <input type="hidden" name="job_id" value="{{ job.id }}">
+                <button type="submit" class="btn btn-outline">Unarchive</button>
+              </form>
+              <a class="btn btn-primary" href="{% url 'job_detail' job.id %}">View Job</a>
+            </footer>
+          </article>
+          {% endwith %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-box">
+        <div class="empty-illustration" aria-hidden="true">
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Folder icon">
+            <path d="M3 7a2 2 0 0 1 2-2h3l2 2h9a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+            <path d="M3 10h18" stroke="#94a3b8" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <h3>No archived jobs</h3>
+        <p>When you archive a job, it will show up here.</p>
+      </div>
+    {% endif %}
+  {% endif %}
+
+</div>
+{% endblock %}

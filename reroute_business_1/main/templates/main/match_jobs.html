@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}ReRoute | Job Matches{% endblock %}
+{% block content %}
+<section class="job-matches">
+  <div class="container">
+    <h2>Available Opportunities</h2>
+    {% if jobs %}
+      <ul>
+        {% for job in jobs %}
+        <li class="job-card">
+          <h3>{{ job.title }}</h3>
+          <p><strong>Description:</strong> {{ job.description }}</p>
+          <p><strong>Tags:</strong> {{ job.tags }}</p>
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No jobs available right now.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Matches — {{ job.title }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'dashboard/css/employer_job_matches.css' %}">
+
+<div class="job-matches-section container">
+  <header class="matches-header">
+    <h1>Top Matches for This Posting</h1>
+    <p class="subtitle">Candidates best aligned with your job requirements.</p>
+    <div class="header-actions">
+      <a href="{% url 'dashboard:employer' %}" class="btn btn-outline back-btn">Back to Dashboard</a>
+    </div>
+  </header>
+
+  {% if items %}
+    <div class="match-grid">
+      {% for it in items %}
+        <article class="match-card">
+          <div class="match-card-top">
+            <h3 class="candidate-name">
+              <a href="{% url 'profiles:public_profile' it.user.username %}">{{ it.user.first_name|default:it.user.username }}</a>
+            </h3>
+            <div class="score-wrap" title="Match score">
+              <span class="score-badge">{{ it.score }}%</span>
+              <div class="score-bar">
+                <div class="score-fill" style="width: {{ it.score|floatformat:0 }}%;"></div>
+              </div>
+            </div>
+          </div>
+
+          {% with skills=it.profile.skills.all %}
+            {% if skills %}
+              <div class="skills-row">
+                {% for s in skills|slice:':6' %}
+                  <span class="skill-tag">{{ s.name }}</span>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+
+          <div class="card-actions">
+            <a href="{% url 'profiles:public_profile' it.user.username %}" class="btn btn-sm btn-secondary">View Profile</a>
+            <button type="button" class="btn btn-sm btn-primary" title="Invite to apply (coming soon)" disabled>Invite to Apply</button>
+            <button type="button" class="btn btn-sm btn-outline" title="Save this candidate" disabled>Save Candidate</button>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-matches">
+      <div class="empty-icon" aria-hidden="true">🔎</div>
+      <h3>No matches yet</h3>
+      <p>Keep checking back as new candidates join ReRoute.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

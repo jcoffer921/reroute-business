@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Confirm E‑mail Address" %} | ReRoute{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/account/verification.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container narrow center">
+  <h2>{% trans "Confirm your email" %}</h2>
+
+  {% if confirmation %}
+    <p>
+      {% blocktrans with email=confirmation.email_address.email %}
+        Please confirm that <strong>{{ email }}</strong> belongs to your account.
+      {% endblocktrans %}
+    </p>
+
+    <form method="post" action="{% url 'account_confirm_email' confirmation.key %}" class="verify-actions">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary">{% trans "Confirm email" %}</button>
+    </form>
+  {% else %}
+    <div class="notice success">
+      {% trans "This confirmation link is invalid or has expired." %}
+    </div>
+    <p>
+      {% url 'resend_verification' as resend_url %}
+      {% blocktrans %}Please request a new verification link from <a href="{{ resend_url }}">Resend verification</a>.{% endblocktrans %}
+    </p>
+  {% endif %}
+
+  <div class="helper-links">
+    <a href="{% url 'login' %}">{% trans "Back to Login" %}</a>
+  </div>
+</div>
+{% endblock %}
+

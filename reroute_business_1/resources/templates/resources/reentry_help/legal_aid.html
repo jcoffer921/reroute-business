@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Legal Aid | ReRoute{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'resources/css/reentry_help/legal_aid.css' %}">
+
+<!-- Hero -->
+<section class="la-hero">
+  <div class="la-hero-inner">
+    <h1>Legal Aid That Works for You</h1>
+    <p class="la-subtext">Know your rights. Clear your record. Access support for housing, employment, family, and more — all in one place.</p>
+  </div>
+  <div class="la-hero-bg" aria-hidden="true"></div>
+</section>
+
+<!-- Category Cards -->
+<section class="la-section">
+  <div class="la-inner">
+    <div class="la-cards">
+      <!-- Expungement -->
+      <article class="la-card">
+        <div class="la-card-icon" aria-hidden="true">
+          <!-- eraser/clean slate icon -->
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 15l6-6 6 6-4 4H7l-4-4z" stroke="#0F172A" stroke-width="1.6"/></svg>
+        </div>
+        <h2>Expungement & Record Clearing</h2>
+        <p>See if you qualify to seal or clear your record. Start with trusted programs.</p>
+        <div class="la-actions">
+          <a class="btn-pill" target="_blank" href="https://www.nacdl.org/Content/Second-Chance-Resources">NACDL</a>
+          <a class="btn-pill" target="_blank" href="https://cleanslateinitiative.org/">Clean Slate</a>
+          <a class="btn-pill" target="_blank" href="https://www.pardons.org">Pardons</a>
+        </div>
+      </article>
+
+      <!-- Housing & Employment Rights -->
+      <article class="la-card">
+        <div class="la-card-icon" aria-hidden="true">
+          <!-- shield/rights icon -->
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l7 3v5c0 5.25-3.5 8.75-7 10-3.5-1.25-7-4.75-7-10V6l7-3z" stroke="#0F172A" stroke-width="1.6"/></svg>
+        </div>
+        <h2>Housing & Employment Rights</h2>
+        <p>Fair Chance laws protect applicants with records. Learn your rights before you apply.</p>
+        <div class="la-actions">
+          <a class="btn-pill" target="_blank" href="https://www.nelp.org/explore-the-issues/workers-with-records/">Employment (NELP)</a>
+          <a class="btn-pill" target="_blank" href="https://www.hud.gov/program_offices/fair_housing_equal_opp">Housing (HUD)</a>
+        </div>
+      </article>
+
+      <!-- Family & Child Support -->
+      <article class="la-card">
+        <div class="la-card-icon" aria-hidden="true">
+          <!-- family icon -->
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="2.5" stroke="#0F172A"/><circle cx="16" cy="8" r="2.5" stroke="#0F172A"/><path d="M2 20a6 6 0 0 1 12 0M10 20a6 6 0 0 1 12 0" stroke="#6495ED" stroke-width="1.6"/></svg>
+        </div>
+        <h2>Family, Child Support & Custody</h2>
+        <p>Find guidance for visitation rights, child support, and family reconnection.</p>
+        <div class="la-actions">
+          <a class="btn-pill" target="_blank" href="https://www.lawhelp.org">Find Help Near You</a>
+          <a class="btn-pill" target="_blank" href="https://www.childsupport.state.pa.us/">PA Child Support</a>
+        </div>
+      </article>
+
+      <!-- Free Legal Aid Orgs -->
+      <article class="la-card">
+        <div class="la-card-icon" aria-hidden="true">
+          <!-- hands/help icon -->
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 12l4 4 6-6" stroke="#16a34a" stroke-width="1.8" stroke-linecap="round"/><path d="M4 12a8 8 0 0 1 16 0v4a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-4z" stroke="#0F172A" stroke-width="1.6"/></svg>
+        </div>
+        <h2>Free Legal Aid</h2>
+        <p>Local organizations offering clinics, advice, and representation.</p>
+        <div class="la-actions">
+          <a class="btn-pill" target="_blank" href="https://plsephilly.org">PLSE</a>
+          <a class="btn-pill" target="_blank" href="https://lasp.org/">LASP</a>
+          <a class="btn-pill" target="_blank" href="https://jlusa.org">JLUSA</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Accordion -->
+<section class="la-section">
+  <div class="la-inner">
+    <h2 class="la-h2">Common Questions</h2>
+    <div class="la-accordion" id="laAccordion">
+      <div class="la-acc-item">
+        <button class="la-acc-toggle" aria-expanded="false">
+          <span class="la-acc-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="#6495ED" stroke-width="1.6"/><path d="M12 16h0" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/><path d="M9.8 10.5a2.2 2.2 0 1 1 3.9 1.5c-.5.5-1 .8-1.2 1.4" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </span>
+          <span class="la-acc-title">Can I get hired with a felony?</span>
+          <span class="la-acc-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="la-acc-panel" hidden>
+          <p>Yes. Many employers practice second-chance hiring. In some states/cities, “Ban the Box” and Fair Chance laws limit when employers can ask about records.</p>
+        </div>
+      </div>
+
+      <div class="la-acc-item">
+        <button class="la-acc-toggle" aria-expanded="false">
+          <span class="la-acc-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="#6495ED" stroke-width="1.6"/><path d="M12 16h0" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/><path d="M9.8 10.5a2.2 2.2 0 1 1 3.9 1.5c-.5.5-1 .8-1.2 1.4" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </span>
+          <span class="la-acc-title">Can I be denied housing?</span>
+          <span class="la-acc-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="la-acc-panel" hidden>
+          <p>It depends on local laws and housing type. Public housing policies vary, but denials cannot always be based solely on a record. Check local guidance and appeal options.</p>
+        </div>
+      </div>
+
+      <div class="la-acc-item">
+        <button class="la-acc-toggle" aria-expanded="false">
+          <span class="la-acc-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="#6495ED" stroke-width="1.6"/><path d="M12 16h0" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/><path d="M9.8 10.5a2.2 2.2 0 1 1 3.9 1.5c-.5.5-1 .8-1.2 1.4" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </span>
+          <span class="la-acc-title">Can I get custody of my kids again?</span>
+          <span class="la-acc-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="la-acc-panel" hidden>
+          <p>Often yes, with time and documentation. Courts consider the child’s best interest. Start by consulting a family law attorney or clinic in your area.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if related_articles %}
+  <section class="related-articles">
+    <h2>Related Articles</h2>
+    <ul class="related-article-list">
+      {% for article in related_articles %}
+        <li>
+          <h4><a href="{% url 'blog_detail' slug=article.slug %}">{{ article.title }}</a></h4>
+          <p>{{ article.content|truncatewords:25 }}</p>
+          <small>{{ article.created_at|date:"F j, Y" }}</small>
+        </li>
+      {% endfor %}
+    </ul>
+      <a href="{% url 'blog_list' %}?category={{ post.category }}">View All Legal Articles →</a>
+  </section>
+{% endif %}
+
+<!-- CTA Banner -->
+<section class="la-cta">
+  <div class="la-cta-inner">
+    <div class="la-cta-left">
+      <h3>Need more help with your specific situation?</h3>
+      <p>Our team can help point you to the right resources.</p>
+    </div>
+    <div class="la-cta-right">
+      <a href="{% url 'contact' %}" class="btn-pill la-support-btn" aria-label="Talk to a Support Specialist">
+        <!-- chat icon -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 7a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v5a4 4 0 0 1-4 4h-5l-4 4v-4H8a4 4 0 0 1-4-4V7z" stroke="#fff" stroke-width="1.8"/></svg>
+        <span>Talk to a Support Specialist</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'resources/js/reentry_help/legal_aid.js' %}" defer></script>
+{% endblock %}

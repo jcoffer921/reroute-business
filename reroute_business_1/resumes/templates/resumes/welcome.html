@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'resumes/css/welcome.css' %}">
+
+
+<div class="welcome-wrapper">
+  <div class="welcome-hero">
+    <div class="hero-overlay">
+      <div class="hero-content">
+        <h1>Let's Get Started</h1>
+        <p class="subtitle">Ready to create your resume? Choose how you want to begin.</p>
+        <div class="hero-buttons">
+          <a href="{% url 'resumes:resume_contact_info' %}" class="btn btn-primary"> Create a Resume</a>
+          <a href="{% url 'resumes:resume_upload_page' %}" class="btn btn-secondary"> Import Existing Resume</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>  
+
+
+{% endblock %}

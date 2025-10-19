@@ -1,0 +1,48 @@
+/* === Experience Step Custom Styling === */
+
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.form-check-input {
+  transform: scale(1.2);
+  margin-top: 0;
+}
+
+.form-check-label {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.form-text {
+  display: block;
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: -0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+textarea.form-control {
+  min-height: 120px;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 0.95rem;
+  background: #fcfcfc;
+}
+
+/* Consistent look for the "Add" buttons across steps */
+.add-row {
+  background-color: #1e3a8a;
+  color: #fff;
+  padding: 0.55rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color .2s ease, transform .06s ease;
+}
+.add-row:hover { background-color: #163a73; }
+.add-row:active { transform: translateY(1px); }

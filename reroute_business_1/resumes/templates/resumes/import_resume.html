@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Resume Parser{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'resumes/css/import_resume.css' %}">
+
+<div class="resume-upload-wrapper">
+  <h2 class="page-title">Import Your Resume</h2>
+
+  <form id="resumeUploadForm" enctype="multipart/form-data" class="upload-form">
+    {% csrf_token %}
+    <label for="resume_file" class="upload-box">
+      <img src="{% static 'resumes/img/document-icon.svg' %}" alt="Upload Icon" class="upload-icon">
+      <p>Upload Your Resume</p>
+      <p class="file-note">PDF, DOCX, or DOC (max 10MB)</p>
+      <input type="file" name="file" id="resume_file" required>
+    </label>
+    <p id="selected-file" class="selected-file-name"></p>
+    <div class="upload-actions">
+      <label class="skip-parse">
+        <input type="checkbox" id="upload_only">
+        Just upload the file (no parsing)
+      </label>
+      <button type="submit" class="submit-btn">Continue</button>
+    </div>
+  </form>
+</div>
+
+<!-- 🔄 Loading Modal -->
+<div id="loading-modal" class="loading-modal">
+  <div class="loading-content">
+    <p id="loading-message">Reviewing your resume…</p>
+    <div class="spinner"></div>
+  </div>
+</div>
+
+<script>
+  const uploadUrl = "{% url 'resumes:parse_resume_upload' %}";
+  const uploadOnlyUrl = "{% url 'resumes:upload_resume_only' %}";
+</script>
+<script src="{% static 'resumes/js/import_resume.js' %}"></script>
+{% endblock %}

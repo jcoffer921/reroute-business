@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Verify Your Email | ReRoute{% endblock %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/account/verification.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container narrow center">
+  <h2>Check your email</h2>
+  <p>We sent a verification link to:</p>
+  <p class="target-email">{{ email }}</p>
+  <p>Please click the link in that email to verify your address and finish setting up your account.</p>
+
+  <div class="helper-links">
+    <a href="{% url 'resend_verification' %}">Resend verification</a>
+    <span class="sep">·</span>
+    {% if is_employer %}
+      <a href="{% url 'employer_login' %}">Employer Login</a>
+    {% else %}
+      <a href="{% url 'login' %}">User Login</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/blog_detail.css' %}">
+
+<div class="blog-post-container">
+  <h1>{{ post.title }}</h1>
+  <em>{{ post.created_at|date:"F j, Y" }}</em>
+
+  <div class="blog-post-body">
+    {{ post.content|safe }}
+  </div>
+
+  <br>
+  <a href="{% url 'blog_list' %}?category={{ post.category }}">← Back to {{ post.category|title }} Articles</a>
+</div>
+{% endblock %}
+

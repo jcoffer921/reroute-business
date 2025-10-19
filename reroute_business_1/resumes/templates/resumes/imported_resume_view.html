@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load static %}
+{% load resume_filters %}
+{% block title %}Review Imported Resume{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'resumes/css/imported_resume.css' %}">
+
+<div class="imported-resume-wrapper">
+  <h2>📄 Review & Edit Imported Resume</h2>
+
+  <!-- Editor toolbar -->
+  <div class="editor-toolbar" data-update-url="{% url 'resumes:update_imported_resume' resume.id %}" data-discard-url="{% url 'resumes:discard_imported_resume' resume.id %}">
+    <div class="left">
+      <button type="button" class="rr-btn rr-btn-secondary" id="undoBtn" disabled>Undo</button>
+      <button type="button" class="rr-btn rr-btn-secondary" id="redoBtn" disabled>Redo</button>
+      <button type="button" class="rr-btn rr-btn-secondary" id="resetBtn">Reset</button>
+    </div>
+    <div class="right">
+      {% if resume.file %}
+      <a class="rr-btn rr-btn-secondary" href="{{ resume.file.url }}" target="_blank" rel="noopener">Download Original</a>
+      {% endif %}
+      <button type="button" class="rr-btn rr-btn-secondary" id="saveDraftBtn">Save Changes</button>
+      <form method="post" action="{% url 'resumes:imported_resume' resume.id %}" style="display:inline-block;">
+        {% csrf_token %}
+        <button type="submit" class="rr-btn rr-btn-primary">Save to Profile</button>
+      </form>
+      <button type="button" class="rr-btn rr-btn-secondary danger" id="discardBtn">Discard</button>
+    </div>
+  </div>
+
+  <!-- Editor only (live preview removed for now) -->
+  <div class="resume-grid">
+    <div class="col-left">
+      <!-- Draggable section order -->
+      <div id="editor" class="editable-resume" data-resume-id="{{ resume.id }}">
+
+        <!-- Summary -->
+        <section id="section-summary" class="resume-section draggable" draggable="true" data-section="summary">
+          <div class="section-header"><span class="drag-handle" aria-hidden="true">⋮⋮</span><h3>Summary</h3></div>
+          <div id="field-summary" class="editable" contenteditable="true" data-field="summary">{{ resume.summary|default:ai_summary_snippet }}</div>
+        </section>
+
+        <!-- Experience -->
+        {% with exps=resume.experience_entries.all %}
+        {% if exps %}
+        <section id="section-experience" class="resume-section draggable" draggable="true" data-section="experience">
+          <div class="section-header"><span class="drag-handle" aria-hidden="true">⋮⋮</span><h3>Work Experience</h3><button type="button" class="mini-btn add-exp">Add</button></div>
+          <ul class="clean-list" id="experienceList">
+            {% for e in exps %}
+              <li class="editable-row" data-model="experience" data-id="{{ e.id }}">
+                <div class="row-line">
+                  <span class="drag-handle" aria-hidden="true">⋮</span>
+                  <span class="inline editable" contenteditable="true" data-field="job_title">{{ e.job_title }}</span>
+                  —
+                  <span class="inline editable" contenteditable="true" data-field="company">{{ e.company }}</span>
+                  <span class="inline muted">(</span>
+                  <span class="inline editable" contenteditable="true" data-field="dates">{{ e.dates|normalize_dates }}</span>
+                  <span class="inline muted">)</span>
+                  <button type="button" class="remove-row" title="Remove">×</button>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Education -->
+        {% with edus=resume.education_entries.all %}
+        {% if edus %}
+        <section id="section-education" class="resume-section draggable" draggable="true" data-section="education">
+          <div class="section-header"><span class="drag-handle" aria-hidden="true">⋮⋮</span><h3>Education</h3><button type="button" class="mini-btn add-edu">Add</button></div>
+          <ul class="clean-list" id="educationList">
+            {% for ed in edus %}
+              <li class="editable-row" data-model="education" data-id="{{ ed.id }}">
+                <div class="row-line">
+                  <span class="drag-handle" aria-hidden="true">⋮</span>
+                  <span class="inline editable" contenteditable="true" data-field="degree">{{ ed.degree|default:"Education/Training" }}</span>
+                  —
+                  <span class="inline editable" contenteditable="true" data-field="school_name">{{ ed.school_name }}</span>
+                  <span class="inline muted">(</span>
+                  <span class="inline editable" contenteditable="true" data-field="graduation_year">{{ ed.graduation_year }}</span>
+                  <span class="inline muted">)</span>
+                  <button type="button" class="remove-row" title="Remove">×</button>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Skills -->
+        {% with skills=resume.skills.all %}
+        {% if skills %}
+        <section id="section-skills" class="resume-section draggable" draggable="true" data-section="skills">
+          <div class="section-header"><span class="drag-handle" aria-hidden="true">⋮⋮</span><h3>Skills</h3><button type="button" class="mini-btn add-skill">Add</button></div>
+          <ul class="skills-list" id="skillsList">
+            {% for s in skills %}
+              <li class="skill-pill editable" contenteditable="true" data-model="skill" data-id="{{ s.id }}" data-field="name">{{ s.name|title }}<button type="button" class="remove-row small" title="Remove">×</button></li>
+            {% endfor %}
+          </ul>
+        </section>
+        {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+
+  </div>
+  
+  <!-- Developer raw section (moved below editor) -->
+  <details class="raw-section">
+    <summary>View Raw Data (Developers Only)</summary>
+    {% if extracted_json_pretty %}
+      <h4>Extracted JSON</h4>
+      <pre class="raw-text-block">{{ extracted_json_pretty }}</pre>
+    {% endif %}
+    {% if resume.raw_text %}
+      <h4>Raw Extracted Resume Text</h4>
+      <pre class="raw-text-block">{{ resume.raw_text }}</pre>
+    {% endif %}
+  </details>
+
+  <!-- Bottom actions (duplicate for mobile) -->
+  <div class="actions-row mobile-only">
+    <button type="button" class="rr-btn rr-btn-secondary" id="saveDraftBtn2">Save Changes</button>
+    <form method="post" action="{% url 'resumes:imported_resume' resume.id %}">
+      {% csrf_token %}
+      <button type="submit" class="rr-btn rr-btn-primary">Save to Profile</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  window.RR_RESUME = { id: {{ resume.id }} };
+  window.RR_CSRF = (document.cookie.match(/(?:^|; )csrftoken=([^;]+)/)||[])[1] || '';
+</script>
+<script src="{% static 'resumes/js/imported_resume_editor.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ReRoute | Checkout (Placeholder){% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}"> {# reuse card styles #}
+<link rel="stylesheet" href="{% static 'css/pricing.css' %}"> {# reuse plan list styles #}
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}"> {# minor checkout polish #}
+
+<section class="settings-hero">
+  <div class="settings-hero-content">
+    <h1>Checkout</h1>
+    <p>Preview your plan before continuing. Billing is not yet connected.</p>
+  </div>
+</section>
+
+<div class="settings-container">
+  <div class="settings-section">
+    <div class="settings-card" role="region" aria-labelledby="heading-checkout">
+      <div class="settings-card__head">
+        <h3 id="heading-checkout" class="settings-card__title">{{ plan_name }} Plan</h3>
+      </div>
+
+      {% if plan_features %}
+      <hr class="plan-divider">
+      <h4 class="checkout-subtitle">What’s included</h4>
+      <ul class="plan-features">
+        {% for item in plan_features %}
+          {% if item|slice":1" == "✅" %}
+            {% with text=item|slice:"2:" %}
+            <li class="with-icon">
+              <span class="feat-icon ok" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+              </span>
+              <span class="feat-text">{{ text }}</span>
+            </li>
+            {% endwith %}
+          {% elif item|slice":1" == "❌" %}
+            {% with text=item|slice:"2:" %}
+            <li class="with-icon">
+              <span class="feat-icon no" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6l-12 12" />
+                </svg>
+              </span>
+              <span class="feat-text">{{ text }}</span>
+            </li>
+            {% endwith %}
+          {% else %}
+            <li>{{ item }}</li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <div class="kv">
+        <div class="kv__row">
+          <div class="kv__label">Price</div>
+          <div class="kv__value">{{ plan_price }}</div>
+        </div>
+        <div class="kv__row">
+          <div class="kv__label">Per Hire</div>
+          <div class="kv__value">{{ plan_per_hire }}</div>
+        </div>
+        <div class="kv__row">
+          <div class="kv__label">Status</div>
+          <div class="kv__value">
+            <span class="pill pill--warn">Placeholder</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card__actions settings-card__actions--footer">
+        <a href="{% url 'pricing' %}?tab=employer" class="btn btn-secondary">Back to Pricing</a>
+        <button class="btn btn-primary" disabled title="Billing integration pending">Continue</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

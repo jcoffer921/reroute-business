@@ -1,0 +1,114 @@
+/* Signup — aligned with login look & feel */
+
+/* Card */
+.signup-container{
+  max-width: 560px;
+  margin: 56px auto;
+  padding: 28px 24px;               /* was 10rem 2rem — way too tall */
+  background:#fff;
+  border-radius:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.06);
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+}
+.auth-title{
+  text-align:center;
+  font-weight:800;
+  font-size:28px;
+  color:#111827;
+  margin:0 0 18px;
+}
+
+/* Layout */
+.two-col{ display:flex; gap:14px; margin-bottom:8px; }
+.two-col .form-group{ flex:1; }
+@media (max-width:640px){ .two-col{ flex-direction:column; } }
+
+.form-group{ margin-bottom:14px; }
+.label-row{ display:flex; justify-content:space-between; align-items:center; }
+.micro-hint{ font-size:12px; color:#6b7280; }
+
+/* Inputs */
+.input,
+input[type="text"], input[type="email"], input[type="password"]{
+  width:100%;
+  padding:12px 14px;
+  font-size:16px;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  background:#f9fafb;
+  box-sizing:border-box;
+  margin-top:6px;
+}
+input:focus, .input:focus{
+  outline:none;
+  border-color:#2563eb;             /* brand primary */
+  box-shadow:0 0 0 3px rgba(37,99,235,.15);
+}
+
+/* Position the toggle INSIDE the input on the right */
+.pwd-wrap { position: relative; }
+
+/* Make room inside the input so text doesn't overlap the toggle */
+.pwd-wrap .input,
+.pwd-wrap input[type="password"] {
+  padding-right: 132px; /* room for “Show Password” */
+}
+
+/* The “Show Password” text – not a button */
+.pwd-toggle-text {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #6b7280;         /* neutral */
+  cursor: pointer;        /* feels clickable without being a button */
+  user-select: none;
+}
+
+/* Light up on hover/focus (no heavy button look) */
+.pwd-toggle-text:hover,
+.pwd-toggle-text:focus {
+  color: #2563eb;         /* your brand accent */
+  text-decoration: underline;
+  outline: none;
+}
+
+/* Optional: narrower phones—shorter label to avoid wrapping */
+@media (max-width: 360px) {
+  .pwd-wrap .input { padding-right: 110px; }
+  .pwd-toggle-text { font-size: 13px; }
+}
+
+/* Hints & errors */
+.field-hint{ margin-top:6px; font-size:12.5px; color:#6b7280; }
+.field-error{ margin-top:6px; color:#b91c1c; font-size:13px; }
+.error-box{
+  background:#fff1f2; color:#b91c1c;
+  padding:12px 14px; border-radius:10px; margin-bottom:12px; font-size:14px;
+}
+
+/* CTA */
+.submit-btn{
+  width:100%;
+  padding:14px 20px;
+  border:0; border-radius:9999px;   /* pill */
+  background:#2563eb; color:#fff; font-weight:700; font-size:16px;
+  cursor:pointer; transition:transform .02s ease, background .15s ease;
+  margin-top:10px;
+}
+.submit-btn:hover{ background:#1d4ed8; }
+.submit-btn:disabled{ opacity:.6; cursor:not-allowed; }
+
+/* Secondary actions */
+.secondary-actions{ margin-top:16px; text-align:center; }
+.secondary-actions p{ margin:6px 0; }
+.secondary-actions .muted{ color:#6b7280; }
+
+/* Focused error state when JS tags the input */
+.has-error{ border-color:#b91c1c !important; box-shadow:0 0 0 3px rgba(185,28,28,.08) !important; }
+
+/* Mobile */
+@media (max-width:480px){
+  .signup-container{ margin:40px 12px; padding:24px 16px; }
+}

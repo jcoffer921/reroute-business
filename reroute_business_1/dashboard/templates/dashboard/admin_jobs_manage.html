@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'dashboard/css/admin_dashboard.css' %}">
+
+<div class="admin-dashboard">
+  <h1>Manage Jobs</h1>
+
+  <section>
+    <form method="get" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+      <input type="text" name="q" value="{{ q }}" placeholder="Search title, employer, location" style="flex:1; min-width:220px; padding:8px 10px; border:1px solid #ddd; border-radius:8px;" />
+      <select name="status" style="padding:8px 10px; border:1px solid #ddd; border-radius:8px;">
+        <option value="">All</option>
+        <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+        <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option>
+        <option value="flagged" {% if status == 'flagged' %}selected{% endif %}>Flagged</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Filter</button>
+      <a href="{% url 'dashboard:admin' %}" class="btn btn-secondary">Back to Dashboard</a>
+    </form>
+  </section>
+
+  <div class="table-responsive">
+    <table>
+      <tr>
+        <th>Title</th>
+        <th>Employer</th>
+        <th>Location</th>
+        <th>Active</th>
+        <th>Flagged</th>
+        <th>Posted</th>
+        <th>Actions</th>
+      </tr>
+      {% for job in jobs %}
+      <tr>
+        <td>{{ job.title }}</td>
+        <td>{{ job.employer.username }}</td>
+        <td>{{ job.location }}</td>
+        <td>{% if job.is_active %}Yes{% else %}No{% endif %}</td>
+        <td>{% if job.is_flagged %}⚠️{% else %}—{% endif %}</td>
+        <td>{% if job.created_at %}{{ job.created_at|date:"M d, Y" }}{% else %}—{% endif %}</td>
+        <td>
+          <form method="post" action="{% url 'dashboard:admin_job_toggle_active' job.id %}" class="js-confirm" data-message="Toggle active for this job?" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="link-button">{% if job.is_active %}Deactivate{% else %}Activate{% endif %}</button>
+          </form>
+          |
+          <a href="{% url 'admin:job_list_job_change' job.id %}">Open in Admin</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7">No jobs found.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+<!-- Modal reused from admin dashboard for confirmations -->
+<div id="confirmModal" class="rr-modal" aria-hidden="true">
+  <div class="rr-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+    <h3 id="confirmModalTitle">Please Confirm</h3>
+    <p id="confirmModalMessage">Are you sure?</p>
+    <div class="rr-modal__actions">
+      <button type="button" id="confirmCancel" class="btn btn-secondary">Cancel</button>
+      <button type="button" id="confirmOk" class="btn btn-primary">Confirm</button>
+    </div>
+  </div>
+  <button type="button" class="rr-modal__backdrop" aria-label="Close"></button>
+  </div>
+<script src="{% static 'dashboard/js/admin_dashboard.js' %}"></script>
+{% endblock %}

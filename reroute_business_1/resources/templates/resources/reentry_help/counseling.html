@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Counseling Services | ReRoute{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'resources/css/reentry_help/counseling.css' %}">
+
+<!-- Hero -->
+<section class="cs-hero">
+  <div class="cs-hero-inner">
+    <div class="cs-hero-icon" aria-hidden="true">
+      <!-- Heart/Support icon -->
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 21s-6.5-4.2-8.5-7.2C1.5 10.6 3 7 6.3 7c1.8 0 2.9 1 3.7 2 .8-1 1.9-2 3.7-2C17 7 18.5 8.6 20.5 13.8 18.5 16.8 12 21 12 21z" stroke="#fff" stroke-width="1.6"/></svg>
+    </div>
+    <h1>Counseling & Mental Health Support</h1>
+    <p class="cs-subtext">Find crisis support, counseling, and community resources to support your reentry.</p>
+  </div>
+  <div class="cs-hero-bg" aria-hidden="true"></div>
+</section>
+
+<!-- Philadelphia Services -->
+<section class="cs-section">
+  <div class="cs-inner">
+    <h2>Philadelphia Services</h2>
+    <div class="cs-card-grid cs-3">
+      <article class="cs-card">
+        <div class="cs-card-icon" aria-hidden="true">
+          <!-- City/Building icon -->
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="3" width="16" height="18" rx="2" stroke="#0F172A" stroke-width="1.6"/><path d="M8 7h3M8 11h3M8 15h3M13 7h3M13 11h3M13 15h3" stroke="#6495ED" stroke-width="1.6"/></svg>
+        </div>
+        <h3>Philadelphia DBHIDS</h3>
+        <p>City department for behavioral health and intellectual disability services.</p>
+        <div class="cs-actions"><a class="btn-pill" target="_blank" rel="noopener" href="https://dbhids.org/">Visit Site →</a></div>
+      </article>
+
+      <article class="cs-card">
+        <div class="cs-card-icon" aria-hidden="true">
+          <!-- Hands/Support -->
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 12l4 4 6-6" stroke="#16a34a" stroke-width="1.8" stroke-linecap="round"/><path d="M4 12a8 8 0 0 1 16 0v4a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-4z" stroke="#0F172A" stroke-width="1.6"/></svg>
+        </div>
+        <h3>Community Behavioral Health (CBH)</h3>
+        <p>Managed care for Medicaid behavioral health services in Philadelphia.</p>
+        <div class="cs-actions"><a class="btn-pill" target="_blank" rel="noopener" href="https://cbhphilly.org/">Visit Site →</a></div>
+      </article>
+
+      <article class="cs-card">
+        <div class="cs-card-icon" aria-hidden="true">
+          <!-- Group/People -->
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="9" r="2.5" stroke="#0F172A"/><circle cx="16" cy="9" r="2.5" stroke="#0F172A"/><path d="M2 20a6 6 0 0 1 12 0M10 20a6 6 0 0 1 12 0" stroke="#6495ED" stroke-width="1.6"/></svg>
+        </div>
+        <h3>Institute for Community Justice</h3>
+        <p>Reentry services with counseling and peer support groups.</p>
+        <div class="cs-actions"><a class="btn-pill" target="_blank" rel="noopener" href="https://www.phillyrebirth.org/">Visit Site →</a></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Tips -->
+<section class="cs-section cs-tips">
+  <div class="cs-inner">
+    <h2>Tips for Getting Started</h2>
+    <div class="cs-tips-grid">
+      <div class="cs-tip">
+        <span class="cs-tip-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12l5 5 11-11" stroke="#16a34a" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <p>If insured by Medicaid in Philly, call CBH to ask about covered providers.</p>
+      </div>
+      <div class="cs-tip">
+        <span class="cs-tip-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12l5 5 11-11" stroke="#16a34a" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <p>Ask about sliding‑scale or free counseling options and payment plans.</p>
+      </div>
+      <div class="cs-tip">
+        <span class="cs-tip-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12l5 5 11-11" stroke="#16a34a" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <p>Bring ID and any discharge or referral paperwork if you have it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sources Footer -->
+<section class="cs-footer">
+  <div class="cs-footer-inner">
+    <h3>Sources</h3>
+    <ul class="cs-sources">
+      <li><a href="https://dbhids.org/" target="_blank" rel="noopener">DBHIDS</a></li>
+      <li><a href="https://cbhphilly.org/" target="_blank" rel="noopener">CBH</a></li>
+      <li><a href="https://www.phillyrebirth.org/" target="_blank" rel="noopener">ICJ</a></li>
+    </ul>
+    <p class="cs-updated">Last updated September 2025. Links and services may change.</p>
+  </div>
+</section>
+{% endblock %}

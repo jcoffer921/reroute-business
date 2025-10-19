@@ -1,0 +1,68 @@
+/* Catalog page styles — aligned with site palette */
+:root {
+  --accent: #6495ED;
+}
+
+.org-hero {
+  text-align: center;
+  padding: 48px 16px 24px;
+}
+.org-hero h1 {
+  margin: 0 0 8px;
+}
+.org-hero .subhead { color: #555; margin: 0 0 20px; }
+
+.search-form { max-width: 1000px; margin: 0 auto; }
+.search-row {
+  display: grid;
+  grid-template-columns: 1fr 220px 160px 120px auto;
+  gap: 12px;
+}
+.search-row input,
+.search-row select { padding: 12px 14px; border: 1px solid #ddd; border-radius: 10px; }
+.btn-primary { background: var(--accent); color: #fff; border: none; padding: 12px 18px; border-radius: 10px; cursor: pointer; }
+.btn-primary:hover { filter: brightness(0.95); }
+.btn-outline { background: transparent; color: #fff; border: 1px solid #fff; padding: 10px 16px; border-radius: 999px; cursor: not-allowed; opacity: 0.9; }
+
+.org-grid { padding: 24px 16px 56px; }
+.cards { display: grid; gap: 18px; grid-template-columns: repeat(3, 1fr); max-width: 1200px; margin: 0 auto; }
+
+.org-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 14px;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+.org-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+
+.logo-wrap { height: 140px; display: flex; align-items: center; justify-content: center; background: #f7f9fc; }
+.logo-wrap img { max-height: 80px; max-width: 80%; object-fit: contain; }
+
+.org-info { padding: 14px 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.org-name { font-size: 1.05rem; margin: 0; line-height: 1.2; }
+.org-category { font-size: 0.85rem; background: rgba(100,149,237,0.12); color: #2b5dbb; padding: 6px 10px; border-radius: 999px; white-space: nowrap; }
+
+.overlay {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.4); opacity: 0; transition: opacity 180ms ease-in-out;
+}
+.org-card:hover .overlay { opacity: 1; }
+
+.pagination { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 18px; }
+.page-link { color: var(--accent); text-decoration: none; padding: 8px 12px; border-radius: 8px; border: 1px solid #e5e7eb; }
+.page-link:hover { background: #f3f6ff; }
+.page-status { color: #666; }
+
+.empty-state { text-align: center; color: #666; padding: 40px 0; }
+
+@media (max-width: 1024px) {
+  .search-row { grid-template-columns: 1fr 200px 1fr 100px auto; }
+  .cards { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 720px) {
+  .search-row { grid-template-columns: 1fr; }
+  .cards { grid-template-columns: 1fr; }
+}
+

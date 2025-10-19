@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Interview Prep | ReRoute{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'resources/css/job_tools/interview_prep.css' %}">
+
+<!-- Hero -->
+<section class="ip-hero">
+  <div class="ip-hero-inner">
+    <div class="ip-hero-icon" aria-hidden="true">
+      <!-- Microphone icon -->
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="9" y="3" width="6" height="10" rx="3" fill="#6495ED" opacity=".25"/>
+        <rect x="9" y="3" width="6" height="10" rx="3" stroke="#6495ED" stroke-width="1.6"/>
+        <path d="M6 11a6 6 0 0 0 12 0M12 17v4" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h1>Ace Your Next Interview</h1>
+    <p class="ip-subtext">Whether it's your first time or you're getting back into the workforce, we've got you covered with tips, examples, and encouragement.</p>
+  </div>
+  <div class="ip-hero-bg" aria-hidden="true"></div>
+</section>
+
+<!-- What to Expect -->
+<section class="ip-section">
+  <div class="ip-inner">
+    <h2>What to Expect</h2>
+    <div class="ip-cards">
+      <article class="ip-card">
+        <div class="ip-card-icon" aria-hidden="true">
+          <!-- Person icon -->
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="8" r="3" stroke="#0F172A" stroke-width="1.6"/>
+            <path d="M4 19a8 8 0 0 1 16 0" stroke="#6495ED" stroke-width="1.6"/>
+          </svg>
+        </div>
+        <p>Be ready to introduce yourself clearly and positively.</p>
+      </article>
+      <article class="ip-card">
+        <div class="ip-card-icon" aria-hidden="true">
+          <!-- Clipboard icon -->
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="5" width="12" height="14" rx="2" stroke="#0F172A" stroke-width="1.6"/>
+            <path d="M9 9h6M9 12h6" stroke="#6495ED" stroke-width="1.6"/>
+          </svg>
+        </div>
+        <p>Expect questions about experience, skills, and handling challenges.</p>
+      </article>
+      <article class="ip-card">
+        <div class="ip-card-icon" aria-hidden="true">
+          <!-- Growth arrow icon -->
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 16l5-5 4 4 7-7" stroke="#6495ED" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p>Be honest and highlight growth, work ethic, and value.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Common Interview Questions (Accordion) -->
+<section class="ip-section">
+  <div class="ip-inner">
+    <h2>Common Interview Questions</h2>
+    <div class="ip-accordion" id="ipAccordion">
+      <div class="acc-item">
+        <button class="acc-toggle" aria-expanded="false">
+          <span class="acc-icon" aria-hidden="true">
+            <!-- Q icon -->
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="#6495ED" stroke-width="1.6"/><path d="M12 16h0" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/><path d="M9.8 10.5a2.2 2.2 0 1 1 3.9 1.5c-.5.5-1 .8-1.2 1.4" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </span>
+          <span class="acc-title">Tell me about yourself.</span>
+          <span class="acc-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="acc-panel" hidden>
+          <p>Keep it short. Share your strengths, relevant experience, and why you're excited to contribute.</p>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-toggle" aria-expanded="false">
+          <span class="acc-icon" aria-hidden="true">
+            <!-- Chat icon -->
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 7a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v5a4 4 0 0 1-4 4h-5l-4 4v-4H8a4 4 0 0 1-4-4V7z" stroke="#0F172A" stroke-width="1.6"/></svg>
+          </span>
+          <span class="acc-title">Why should we hire you?</span>
+          <span class="acc-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="acc-panel" hidden>
+          <p>Show your reliability, teamwork, and results. Tie your skills to the role's needs.</p>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-toggle" aria-expanded="false">
+          <span class="acc-icon" aria-hidden="true">
+            <!-- Info icon -->
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="#0F172A" stroke-width="1.6"/><path d="M12 8h.01M11 11h2v5h-2z" stroke="#6495ED" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </span>
+          <span class="acc-title">Can you explain your gap in employment?</span>
+          <span class="acc-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="acc-panel" hidden>
+          <p>Be honest, take ownership, and emphasize what you've learned and how you're ready now.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Do's & Don'ts -->
+<section class="ip-section">
+  <div class="ip-inner">
+    <h2>Do's & Don'ts</h2>
+    <div class="ip-dosdonts">
+      <article class="ip-dd-card do">
+        <div class="dd-head">
+          <span class="dd-icon" aria-hidden="true">
+            <!-- Check icon -->
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12l5 5 11-11" stroke="#16a34a" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <h3>Do</h3>
+        </div>
+        <ul>
+          <li>Practice your answers ahead of time</li>
+          <li>Dress in clean, simple clothes</li>
+          <li>Be honest and confident</li>
+          <li>Follow up after the interview</li>
+        </ul>
+      </article>
+
+      <article class="ip-dd-card dont">
+        <div class="dd-head">
+          <span class="dd-icon" aria-hidden="true">
+            <!-- X icon -->
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l12 12M18 6l-12 12" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <h3>Don't</h3>
+        </div>
+        <ul>
+          <li>Apologize for your past</li>
+          <li>Talk negatively about others</li>
+          <li>Interrupt or rush answers</li>
+          <li>Leave without asking questions</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="ip-cta">
+  <div class="ip-cta-inner">
+    <h3>Practice with our Interview Tools</h3>
+    <div class="cta-actions">
+      <a href="{% url 'job_tools_index' %}" class="btn-pill">Explore More Job Prep Resources</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'resources/js/job_tools/interview_prep.js' %}" defer></script>
+{% endblock %}

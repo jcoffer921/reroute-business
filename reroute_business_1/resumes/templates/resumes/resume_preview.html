@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Resume Preview{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'resumes/css/resume_preview.css' %}">
+
+<div class="resume-preview-wrapper">
+  <h2>Resume Preview</h2>
+
+  <section class="preview-section">
+    <h3>Contact</h3>
+    <p>
+      <strong>{{ resume.full_name|default:resume.user.get_full_name|default:resume.user.username }}</strong><br>
+      {{ contact_info.email|default:resume.user.email }}<br>
+      {% if contact_info.phone %}{{ contact_info.phone }}{% endif %}
+      {% if contact_info.city or contact_info.state %}
+        {% if contact_info.phone %} — {% endif %}
+        {{ contact_info.city }}{% if contact_info.city and contact_info.state %}, {% endif %}{{ contact_info.state }}
+      {% endif %}
+    </p>
+  </section>
+
+  {% if education_entries %}
+  <section class="preview-section">
+    <h3>Education</h3>
+    <ul>
+      {% for edu in education_entries %}
+        <li>
+          {% if edu.school_name %}
+            {{ edu.degree|default:"Education/Training" }} — {{ edu.school_name }} {% if edu.graduation_year %}({{ edu.graduation_year }}){% endif %}
+          {% else %}
+            {{ edu.degree|default:"Education/Training" }} — {{ edu.school }}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  {% if experience_entries %}
+  <section class="preview-section">
+    <h3>Experience</h3>
+    <ul>
+      {% for exp in experience_entries %}
+        <li>
+          {% if exp.dates %}
+            <strong>{{ exp.job_title }}</strong> at {{ exp.company }} — {{ exp.dates }}
+          {% else %}
+            <strong>{{ exp.job_title }}</strong> at {{ exp.company }}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  {% with skills=skills %}
+    {% if skills %}
+      <section class="preview-section">
+        <h3>Skills</h3>
+        <div class="skills-list">
+          {% for s in skills %}<span class="skill-pill">{{ s.name }}</span>{% endfor %}
+        </div>
+      </section>
+    {% endif %}
+  {% endwith %}
+
+  <div class="preview-actions">
+    <a class="btn" href="{% url 'resumes:created_resume_view' resume.id %}">View Full Resume</a>
+    <a class="btn btn-primary" href="{% url 'resumes:download_resume' resume.id %}">Download PDF</a>
+  </div>
+
+  <!-- Live Style Preview (matches Created Resume page) -->
+  <section class="preview-section" style="margin-top: 16px;">
+    <h3>Style Preview</h3>
+    <div id="stylePreview" data-preview-url="{% url 'resumes:preview_style' resume.id %}" data-set-url="{% url 'resumes:set_resume_template' resume.id %}">
+      <label for="tpl" style="font-weight:600;">Style:</label>
+      <select id="tpl" name="template" class="form-control" style="max-width: 220px; display:inline-block; margin-left:.5rem;">
+        {% for key,label in resume.TEMPLATE_CHOICES %}
+          <option value="{{ key }}" {% if resume.template == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <div style="margin-top:.5rem; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden;">
+        <iframe id="stylePreviewFrame" title="Resume Style Preview" style="width:100%;height:520px;border:0;" src="{% url 'resumes:preview_style' resume.id %}?template={{ resume.template }}"></iframe>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="{% static 'resumes/js/resume_preview.js' %}"></script>
+<script>
+  // Live style preview + persist choice (same behavior as created view)
+  document.addEventListener('DOMContentLoaded', () => {
+    const wrap = document.getElementById('stylePreview');
+    const select = document.getElementById('tpl');
+    const frame = document.getElementById('stylePreviewFrame');
+    if (!wrap || !select || !frame) return;
+    const previewUrl = wrap.dataset.previewUrl;
+    const setUrl = wrap.dataset.setUrl;
+    const csrftoken = (document.cookie.match(/(?:^|; )csrftoken=([^;]+)/)||[])[1];
+    select.addEventListener('change', () => {
+      const choice = select.value;
+      frame.src = `${previewUrl}?template=${encodeURIComponent(choice)}`;
+      fetch(setUrl, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': decodeURIComponent(csrftoken || ''), 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `template=${encodeURIComponent(choice)}`
+      }).catch(() => {});
+    });
+  });
+</script>
+{% endblock %}

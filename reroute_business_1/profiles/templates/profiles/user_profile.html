@@ -1,0 +1,620 @@
+{% extends "base.html" %}
+{% load static %}
+{% load profile_extras %}
+
+{% block title %}ReRoute | Profile{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/employer_public_profile.css' %}">
+<link rel="stylesheet" href="{% static 'css/public_profile.css' %}">
+
+<!-- Hero (owner view) -->
+<div class="employer-public" data-user="{{ user.username }}">
+  <section class="hero">
+    {% if profile.background_image %}
+      <div class="hero-bg" style="background-image: url('{{ profile.background_image.url }}?v={{ profile.background_image|file_version }}');"></div>
+    {% elif profile.profile_picture %}
+      <div class="hero-bg" style="background-image: url('{{ profile.profile_picture.url }}?v={{ profile.profile_picture|file_version }}');"></div>
+    {% else %}
+      <div class="hero-bg hero-bg--color"></div>
+      <div class="hero-watermark" style="background-image: url('{% static 'images/reroute-trans-logo.png' %}');"></div>
+    {% endif %}
+    <div class="hero-gradient"></div>
+    <div class="hero-content">
+      <div class="hero-logo-wrap">
+        {% if profile.profile_picture %}
+          <img class="hero-logo" style="border-radius:50%" src="{{ profile.profile_picture.url }}?v={{ profile.profile_picture|file_version }}" alt="{{ user.username }} avatar">
+        {% else %}
+          <div class="hero-logo hero-logo--initials" style="border-radius:50%" aria-hidden="true">{{ user|initials }}</div>
+        {% endif %}
+        <button type="button" class="logo-edit-hint" data-open-avatar>
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 20h9" stroke="#111827" stroke-width="1.5"/><path d="M16.5 3.5l4 4-9 9H7.5v-4l9-9z" stroke="#111827" stroke-width="1.5"/></svg>
+          Edit Photo
+        </button>
+      </div>
+      <div class="hero-text">
+        <h1 class="hero-name" data-profile-full-name>
+          {% with full=user.get_full_name %}{% if full %}{{ full }}{% else %}@{{ user.username }}{% endif %}{% endwith %}
+        </h1>
+        {% if profile.verified %}
+          <span class="hero-verified hero-verified--sm">Verified</span>
+        {% endif %}
+        <div class="hero-sub">User ID: {{ profile.user_uid|stringformat:"s" }}</div>
+      </div>
+      <div class="hero-meta-right">
+        <div><span class="label">Date Joined</span> {{ user.date_joined|date:"M j, Y" }}</div>
+        <div><span class="label">Status</span> {{ profile.account_status|capfirst }}</div>
+      </div>
+      <button type="button" class="hero-edit-hint" data-open-bg>
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 20h9" stroke="#111827" stroke-width="1.5"/><path d="M16.5 3.5l4 4-9 9H7.5v-4l9-9z" stroke="#111827" stroke-width="1.5"/></svg>
+        Change Background
+      </button>
+    </div>
+  </section>
+</div>
+
+<!-- Who You Are (clean, simple, directly under hero) -->
+<section class="section profile-bio">
+  <div class="info-header">
+    <h2 class="section-title">Who You Are</h2>
+    {% if user == request.user %}
+      <button class="edit-btn" type="button" onclick="toggleBioEdit()">Edit Bio</button>
+    {% endif %}
+  </div>
+
+  <!-- Bio Display (no card, no gradient) -->
+  <p id="bioPreview" class="bio">
+    {% if profile.bio %}
+      {{ profile.bio }}
+    {% else %}
+      <em>No bio yet.</em>
+    {% endif %}
+  </p>
+
+  {% if user == request.user %}
+    <!-- Hidden form for editing bio -->
+    <form id="editBioForm" method="POST" action="{% url 'update_bio' %}" style="display: none;">
+      {% csrf_token %}
+      <textarea name="bio" rows="4" cols="50">{{ profile.bio }}</textarea><br>
+      <div class="form-actions" style="margin-top: .5rem;">
+        <button type="button" class="cancel-btn" onclick="toggleBioEdit()">Cancel</button>
+        <button type="submit" class="save-btn">Save</button>
+      </div>
+    </form>
+  {% endif %}
+</section>
+
+<div class="mini-nav-container">
+
+  <hr class="section-sep">
+
+  <!-- Profile Picture Modal (moved outside; used by click-to-edit) -->
+  <div id="profilePicModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000;">
+    <div style="background: #fff; margin: 6% auto; padding: 20px; width: min(420px, 92vw); text-align: center; border-radius: 12px;">
+      <h3>Update Profile Picture</h3>
+      <img id="previewImage" src="" style="width: 100%; height: auto; margin-bottom: 10px; display:none;" alt="Avatar preview" />
+      <form id="profilePicForm" method="POST" enctype="multipart/form-data" action="{% url 'update_profile_picture' %}">
+        {% csrf_token %}
+        <input type="file" id="modalPicInput" name="profile_picture" accept="image/*" />
+        <div class="form-actions" style="margin-top:12px;">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-secondary" data-close-avatar>Cancel</button>
+        </div>
+      </form>
+      <form method="post" action="{% url 'remove_profile_picture' %}" style="margin-top:8px;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-secondary">Remove Photo</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Personal Info -->
+  <section class="section">
+    <div class="info-header">
+      <h3 class="section-title">Personal Info</h3>
+      <button class="edit-btn" data-panel-open="#slideEditor" type="button">Edit</button>
+    </div>
+    <div class="info-grid">
+      <div class="info-item">
+        <strong>First Name:</strong>
+        <span>{{ profile.firstname }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Last Name:</strong>
+        <span>{{ profile.lastname }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Email:</strong>
+        <span>{{ profile.personal_email }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Phone:</strong>
+        <span>{{ profile.phone_number }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Location:</strong>
+        <span>{{ profile.city }}, {{ profile.state }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Date of Birth:</strong>
+        <span>{{ profile.birthdate|date:"F j, Y" }}</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-sep">
+
+  <!-- Employment Info -->
+  <section class="section">
+    <div class="info-header">
+      <h3 class="section-title">Employment Info</h3>
+      <button class="edit-btn" data-panel-open="#employmentSlideEditor" type="button">Edit</button>
+    </div>
+    <div class="info-grid">
+      <div class="info-item">
+        <strong>Work in US:</strong>
+        <span>{{ profile.get_work_in_us_display }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Sponsorship Needed:</strong>
+        <span>{{ profile.get_sponsorship_needed_display }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Disability:</strong>
+        <span>{{ profile.get_disability_display }}</span>
+      </div>
+      <div class="info-item">
+        <strong>LGBTQ+:</strong>
+        <span>{{ profile.get_lgbtq_display }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Gender:</strong>
+        <span>{{ profile.gender }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Veteran:</strong>
+        <span>{{ profile.get_veteran_status_display }}</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-sep">
+
+  <!-- Emergency Contact -->
+  <section class="section">
+    <div class="info-header">
+      <h3 class="section-title">Emergency Contact</h3>
+      <button class="edit-btn" data-panel-open="#emergencySlidePanel" type="button">Edit</button>
+    </div>
+    <div class="info-grid">
+      <div class="info-item">
+        <strong>First Name:</strong>
+        <span>{{ profile.emergency_contact_firstname }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Last Name:</strong>
+        <span>{{ profile.emergency_contact_lastname }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Relationship:</strong>
+        <span>{{ profile.emergency_contact_relationship }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Phone:</strong>
+        <span>{{ profile.emergency_contact_phone }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Email:</strong>
+        <span>{{ profile.emergency_contact_email }}</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-sep">
+
+  <!-- Demographics -->
+  <section class="section">
+    <div class="info-header">
+      <h3 class="section-title">Demographics</h3>
+      <button class="edit-btn" data-panel-open="#demographicsSlidePanel" type="button">Edit</button>
+    </div>
+    <div class="info-grid">
+      <div class="info-item">
+        <strong>Gender:</strong>
+        <span>{{ profile.gender }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Ethnicity:</strong>
+        <span>{{ profile.ethnicity }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Disability:</strong>
+        <span>{{ profile.get_disability_display }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Disability Explanation:</strong>
+        <span>{{ profile.disability_explanation }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Veteran Status:</strong>
+        <span>{{ profile.get_veteran_status_display }}</span>
+      </div>
+      <div class="info-item">
+        <strong>Veteran Explanation:</strong>
+        <span>{{ profile.veteran_explanation }}</span>
+      </div>
+    </div>
+  </section>
+
+  {# --- Skills Section --- #}
+  <section class="section">
+    <div class="info-header">
+      <h3 class="section-title">Skills</h3>
+      {% if is_owner %}<button class="edit-btn" data-panel-open="#skillsSlidePanel" type="button">Edit</button>{% endif %}
+    </div>
+
+    {% if resume and resume.skills %}
+      <ul class="skill-list">
+        {% for skill in resume.skills.all %}
+          <li class="skill-item">{{ skill.name }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No skills added yet.{% if is_owner %} Click “Edit” to add your skills.{% endif %}</p>
+    {% endif %}
+  </section>
+
+
+  <!-- Slide-In Editor -->
+  <!-- Background Image Modal -->
+  <div id="bgModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:1000;">
+    <div style="background:#fff; margin:6% auto; padding:20px; width:min(560px,92vw); border-radius:12px;">
+      <h3>Update Background Image</h3>
+      <img id="bgPreview" src="" style="width:100%; height:auto; margin:10px 0; display:none;" alt="Background preview">
+      <form id="bgForm" method="post" enctype="multipart/form-data" action="{% url 'profiles:update_profile_background' %}">
+        {% csrf_token %}
+        <input type="file" id="bgFileInput" name="background_image" accept="image/*">
+        <div class="form-actions" style="margin-top:12px;">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-secondary" data-close-bg>Cancel</button>
+        </div>
+      </form>
+      <form method="post" action="{% url 'profiles:remove_profile_background' %}" style="margin-top:8px;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-secondary">Remove Background</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="slideEditor" class="slide-panel">
+    <form id="personalSlideForm" method="POST" action="{% url 'update_personal_info' %}" data-profile-form="personal">
+      {% csrf_token %}
+      <h3>Edit Personal Info</h3>
+      <hr>
+
+      <label for="firstname">First Name</label>
+      <input type="text" id="firstname" name="firstname" value="{{ profile.firstname }}">
+
+      <label for="lastname">Last Name</label>
+      <input type="text" id="lastname" name="lastname" value="{{ profile.lastname }}">
+
+      <label for="personal_email">Email</label>
+      <input type="email" id="personal_email" name="personal_email" value="{{ profile.personal_email }}">
+
+      <label for="phone_number">Phone</label>
+      <input type="text" id="phone_number" name="phone_number" value="{{ profile.phone_number }}">
+
+      <label for="city">City</label>
+      <input type="text" id="city" name="city" value="{{ profile.city }}">
+
+      <label for="state">State</label>
+      <select id="state" name="state">
+        <option value="">Select a state</option>
+        {% for abbr, name in US_STATES %}
+          <option value="{{ abbr }}" {% if profile.state == abbr %}selected{% endif %}>{{ name }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="birthdate">Date of Birth</label>
+      <input type="date" id="birthdate" name="birthdate" value="{{ profile.birthdate|date:"Y-m-d" }}">
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" data-panel-close>Cancel</button>
+        <button type="submit" class="save-btn">
+          <span class="btn-text">Save</span>
+          <span class="spinner" style="display:none;"></span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Employment Info Slide Panel -->
+  <div id="employmentSlideEditor" class="slide-panel">
+    <form id="employmentSlideForm" action="{% url 'update_employment_info' %}" method="post" data-profile-form="employment">
+      {% csrf_token %}
+      <h3 class="panel-title">Edit Employment Information</h3>
+
+      <hr>
+
+      <!-- US Work Auth -->
+      <div class="form-group">
+        <span>Are you authorized to work in the US?</span>
+        <div class="btn-toggle-group" data-name="authorized_us">
+          <button type="button" data-value="yes">Yes</button>
+          <button type="button" data-value="no">No</button>
+          <button type="button" data-value="decline">Decline to state</button>
+        </div>
+        <input type="hidden" name="authorized_us" value="{{ profile.work_in_us }}">
+      </div>
+
+      <!-- Sponsorship -->
+      <div class="form-group">
+        <span>Will you now or in the future require sponsorship for employment visa status?</span>
+        <div class="btn-toggle-group" data-name="sponsorship_needed">
+          <button type="button" data-value="yes">Yes</button>
+          <button type="button" data-value="no">No</button>
+          <button type="button" data-value="decline">Decline to state</button>
+        </div>
+        <input type="hidden" name="sponsorship_needed" value="{{ profile.sponsorship_needed }}">
+      </div>
+
+      <!-- Disability -->
+      <div class="form-group">
+        <span>Do you have a disability?</span>
+        <div class="btn-toggle-group" data-name="disability">
+          <button type="button" data-value="yes">Yes</button>
+          <button type="button" data-value="no">No</button>
+          <button type="button" data-value="decline">Decline to state</button>
+        </div>
+        <input type="hidden" name="disability" value="{{ profile.disability }}">
+      </div>
+
+      <!-- LGBTQ+ -->
+      <div class="form-group">
+        <span>Do you identify as LGBTQ+?</span>
+        <div class="btn-toggle-group" data-name="lgbtq">
+          <button type="button" data-value="yes">Yes</button>
+          <button type="button" data-value="no">No</button>
+          <button type="button" data-value="decline">Decline to state</button>
+        </div>
+        <input type="hidden" name="lgbtq" value="{{ profile.lgbtq }}">
+      </div>
+
+      <!-- Gender -->
+      <div class="form-group">
+        <span>What is your gender?</span>
+        <div class="btn-toggle-group" data-name="gender">
+          <button type="button" data-value="male">Male</button>
+          <button type="button" data-value="female">Female</button>
+          <button type="button" data-value="nonbinary">Non-Binary</button>
+          <button type="button" data-value="decline">Decline to state</button>
+        </div>
+        <input type="hidden" name="gender" value="{{ profile.gender }}">
+      </div>
+
+      <!-- Veteran -->
+      <div class="form-group">
+        <span>Are you a veteran?</span>
+        <div class="btn-toggle-group" data-name="veteran_status">
+          <button type="button" data-value="yes">Yes</button>
+          <button type="button" data-value="no">No</button>
+          <button type="button" data-value="decline">Decline to state</button>
+        </div>
+        <input type="hidden" name="veteran_status" value="{{ profile.veteran_status }}">
+      </div>
+
+      <div class="form-group">
+        <span>Do you have a disability?</span>
+        <div class="btn-toggle-group" data-name="disability">
+          <button type="button" data-value="yes">Yes</button>
+          <button type="button" data-value="no">No</button>
+          <button type="button" data-value="decline">Decline to state</button>
+        </div>
+        <input type="hidden" name="disability" value="{{ profile.disability }}">
+      </div>
+
+      <!-- BUTTONS -->
+      <div class="slide-panel-actions">
+        <button type="button" class="btn-secondary" data-panel-close>Cancel</button>
+        <button type="submit" class="btn-primary">
+          <span class="btn-text">Save</span>
+          <span class="spinner" style="display:none;"></span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div id="emergencySlidePanel" class="slide-panel">
+    <form method="POST" action="{% url 'update_emergency_contact' %}" data-profile-form="emergency">
+      {% csrf_token %}
+      <h3>Edit Emergency Contact</h3>
+      <hr>
+
+      <label for="emergency_contact_firstname">Contact First Name</label>
+      <input type="text" id="emergency_contact_firstname" name="emergency_contact_firstname"
+            value="{{ profile.emergency_contact_firstname }}">
+
+      <label for="emergency_contact_lastname">Contact Last Name</label>
+      <input type="text" id="emergency_contact_lastname" name="emergency_contact_lastname"
+            value="{{ profile.emergency_contact_lastname }}">
+
+      <label for="emergency_contact_relationship">Relationship</label>
+      <input type="text" id="emergency_contact_relationship" name="emergency_contact_relationship"
+            value="{{ profile.emergency_contact_relationship }}">
+
+      <label for="emergency_contact_phone">Phone</label>
+      <input type="text" id="emergency_contact_phone" name="emergency_contact_phone"
+            value="{{ profile.emergency_contact_phone }}">
+
+      <label for="emergency_contact_email">Email</label>
+      <input type="email" id="emergency_contact_email" name="emergency_contact_email"
+            value="{{ profile.emergency_contact_email }}">
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" data-panel-close>Cancel</button>
+        <button type="submit" class="save-btn">Save</button>
+      </div>
+    </form>
+  </div>
+
+
+  <div id="demographicsSlidePanel" class="slide-panel">
+    <form method="POST" action="{% url 'update_demographics' %}" data-profile-form="demographics">
+      {% csrf_token %}
+      <h3>Edit Demographics</h3>
+      <hr>
+
+      <label for="gender">Gender</label>
+      <select name="gender" id="gender">
+        <option value="">Select gender</option>
+        <option value="male" {% if profile.gender == "male" %}selected{% endif %}>Male</option>
+        <option value="female" {% if profile.gender == "female" %}selected{% endif %}>Female</option>
+        <option value="nonbinary" {% if profile.gender == "nonbinary" %}selected{% endif %}>Non-binary</option>
+        <option value="prefer_not_to_say" {% if profile.gender == "prefer_not_to_say" %}selected{% endif %}>Prefer not to say</option>
+      </select>
+
+
+      <label for="ethnicity">Ethnicity</label>
+      <select id="ethnicity" name="ethnicity">
+        <option value="">Select an ethnicity</option>
+        {% for value, name in ETHNICITY_CHOICES %}
+          <option value="{{ value }}" {% if profile.ethnicity == value %}selected{% endif %}>{{ name }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="disability_explanation">Disability Explanation</label>
+      <textarea id="disability_explanation" name="disability_explanation">{{ profile.disability_explanation }}</textarea>
+
+      <label for="veteran_explanation">Veteran Explanation</label>
+      <textarea id="veteran_explanation" name="veteran_explanation">{{ profile.veteran_explanation }}</textarea>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" data-panel-close>Cancel</button>
+        <button type="submit" class="save-btn">Save</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Skills Slide Panel -->
+  <div id="skillsSlidePanel" class="slide-panel">
+    <form method="POST" action="{% url 'update_skills' %}" id="skillsSlideForm" data-profile-form="skills">
+      {% csrf_token %}
+      <h3>Edit Skills</h3>
+      <hr>
+
+      <!-- Input Field -->
+      <label for="skillInput">Add a Skill</label>
+      <input type="text" id="skillInput" placeholder="Add a skill" autocomplete="off">
+      <div id="suggestions" class="dropdown-list"></div>
+
+      <!-- Hidden fields for backend -->
+      <input type="hidden" name="add_skills" id="addSkillsInput">
+      <input type="hidden" name="remove_skills" id="removeSkillsInput">
+
+      <!-- Holds all current skill tags -->
+      <div id="selectedSkills" class="selected-skills-container mt-3 flex flex-wrap gap-2">
+        <!-- Chips will be injected here by JS -->
+      </div>
+
+      <div class="suggested-skills">
+        <h4>Suggested Skills</h4>
+        <div id="suggestedSkillsContainer" class="suggested-skills-container"></div>
+      </div>
+      <div class="refresh-btn-container">
+        <button id="refreshSuggestionsBtn" type="button" class="refresh-btn">↻ Refresh</button>
+      </div>
+
+
+      <!-- Tag container -->
+      <div id="skillTagContainer"></div>
+
+      <!-- Buttons -->
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" data-panel-close>Cancel</button>
+        <button type="submit" class="save-btn">Save</button>
+      </div>
+    </form>
+  </div>
+
+
+
+
+</div>
+
+
+<script src="{% static 'js/employer_public_profile.js' %}"></script>
+<script src="{% static 'js/profile_panels.js' %}" defer></script>
+<script src="{% static 'js/profile_media_modals.js' %}" defer></script>
+<script type="application/json" id="skillData">
+  {{ skills_json|safe }}
+</script>
+<script>
+/* Fallback: only runs if the external profile_panels.js did NOT load.
+   It wires slide-panel open/close using data attributes or aria-controls. */
+(function () {
+  if (window.__profilePanelsLoaded) return; // external JS already active
+
+  // --- helpers ---
+  function openPanel(sel) {
+    const p = document.querySelector(sel);
+    if (!p) { console.warn('Panel not found:', sel); return; }
+    p.classList.add('open');              // your CSS can respond to .open
+    p.classList.add('visible');           // or .visible (covers both)
+    p.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('no-scroll');
+    const first = p.querySelector('input,select,textarea,button,[tabindex]:not([tabindex="-1"])');
+    if (first) first.focus({ preventScroll: true });
+  }
+  function closePanel(el) {
+    const p = el.closest('.slide-panel') || el;
+    if (!p) return;
+    p.classList.remove('open', 'visible');
+    p.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('no-scroll');
+  }
+
+  // Map legacy IDs → panel IDs if data attributes are missing
+  const idMap = {
+    '#editSlideTrigger':        '#slideEditor',
+    '#editEmploymentTrigger':   '#employmentSlideEditor',
+    '#editEmergencyTrigger':    '#emergencySlidePanel',
+    '#editDemographicsTrigger': '#demographicsSlidePanel',
+    '#editSkillsTrigger':       '#skillsSlidePanel',
+  };
+  Object.entries(idMap).forEach(([btnSel, panelSel]) => {
+    const btn = document.querySelector(btnSel);
+    if (btn && !btn.hasAttribute('data-panel-open') && !btn.hasAttribute('aria-controls')) {
+      btn.setAttribute('data-panel-open', panelSel); // add hook if missing
+      btn.type = btn.type || 'button';               // avoid accidental form submits
+    }
+  });
+
+  // Openers: [data-panel-open] OR [aria-controls]
+  document.addEventListener('click', function (e) {
+    const opener = e.target.closest('[data-panel-open],[aria-controls]');
+    if (opener) {
+      e.preventDefault();
+      const targetSel = opener.getAttribute('data-panel-open') || ('#' + opener.getAttribute('aria-controls'));
+      if (targetSel) openPanel(targetSel);
+      return;
+    }
+    // Closers: any element with [data-panel-close]
+    const closer = e.target.closest('[data-panel-close]');
+    if (closer) {
+      e.preventDefault();
+      closePanel(closer);
+    }
+  });
+
+  // Esc closes any open panel
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.slide-panel.open, .slide-panel.visible').forEach(closePanel);
+    }
+  });
+
+  // Mark fallback as active
+  window.__profilePanelsLoaded = true;
+})();
+</script>
+{% endblock %}

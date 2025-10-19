@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ category }} Articles{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/category.css' %}">
+{% endblock %}
+
+{% block content %}
+
+
+  <div class="blog-category-container">
+    <h1>{{ category|title }} Articles</h1>
+    <div class="blog-filter-bar">
+      <form method="get">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search posts...">
+        <button type="submit">Go</button>
+      </form>
+    </div>
+    <ul class="blog-category-list">
+      {% for post in posts %}
+        <li class="blog-category-item">
+          <h3><a href="{% url 'blog_detail' slug=post.slug %}">{{ post.title }}</a></h3>
+          <p>{{ post.content|truncatewords:30 }}</p>
+          <small>{{ post.created_at|date:"F j, Y" }}</small>
+        </li>
+      {% empty %}
+        <p>No posts found in this category.</p>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}
+

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Step 4: Skills{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'resumes/css/steps.css' %}">
+<link rel="stylesheet" href="{% static 'resumes/css/steps/skills.css' %}">
+
+<div class="resume-builder">
+  <div class="resume-form-panel">
+    <h2>Step 4: Skills</h2>
+
+    <form method="post" id="skillsForm">
+      {% csrf_token %}
+
+      <!-- Hidden input with comma-separated skills -->
+      <textarea name="selected_skills" id="skills_input" hidden>{{ initial_skills|join:"," }}</textarea>
+
+
+      <!-- 🔹 Predefined Skill Tags -->
+      <div id="skillTagContainer" class="skill-tag-wrapper">
+        {% for skill in suggested_skills|slice:":20" %}
+          <button type="button" class="btn-skill-tag skill-tag" data-skill="{{ skill }}">
+            {{ skill }}
+          </button>
+        {% endfor %}
+      </div>
+
+      <!-- 🔹 Custom Skill Entry -->
+      <div class="custom-skill-box mt-3">
+        <label for="customSkillInput">Add a Custom Skill</label>
+        <div class="d-flex gap-2">
+          <input type="text" id="customSkillInput" class="form-control" placeholder="Press Enter to add Skill">
+        </div>
+      </div>
+
+      <!-- 🔹 Display of Selected Skills -->
+      <div id="activeSkills" class="mt-4">
+        <label>Selected:</label>
+        <div id="selectedSkillsDisplay" class="selected-skill-preview">
+          <span class="text-muted">None</span>
+        </div>
+      </div>
+
+      <!-- 🔹 Certifications (optional) -->
+      <div class="mt-4">
+        <label for="certificationsInput">Certifications (optional)</label>
+        <textarea id="certificationsInput" name="certifications" class="form-control" rows="3" placeholder="One per line, e.g.\nOSHA 10\nServSafe"></textarea>
+      </div>
+
+      <!-- 🔹 Navigation Buttons -->
+      <div class="form-navigation d-flex justify-between mt-4">
+        <a href="{% url 'resumes:resume_experience_step' %}" class="btn btn-secondary">Back</a>
+        <button type="submit" class="btn btn-primary">Next</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="{% static 'resumes/js/steps.js' %}"></script>
+<script src="{% static 'resumes/js/skills_step.js' %}?v=1001"></script>
+{% endblock %}

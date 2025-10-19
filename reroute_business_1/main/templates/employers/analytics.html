@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Employer Analytics{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'dashboard/css/admin_dashboard.css' %}">
+
+<section class="admin-hero">
+  <div class="admin-hero-content">
+    <h1>Employer Analytics</h1>
+    <p>Interactive metrics for your jobs and applicants</p>
+  </div>
+  <div style="margin-top:8px">
+    <a href="{% url 'dashboard:employer' %}" class="btn btn-secondary btn-sm">Back to Employer Dashboard</a>
+  </div>
+</section>
+
+<div class="admin-dashboard">
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-box__label">Jobs Posted</div>
+      <div class="stat-box__value">{{ total_jobs }}</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-box__label">Active Jobs</div>
+      <div class="stat-box__value">{{ active_jobs }}</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-box__label">Applications</div>
+      <div class="stat-box__value">{{ total_applications }}</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-box__label">Jobs Filled</div>
+      <div class="stat-box__value">{{ jobs_filled }}</div>
+    </div>
+  </div>
+
+  <div class="section-header" style="justify-content: space-between; align-items:center; margin-top: 1rem;">
+    <h2 style="margin:0;">Charts</h2>
+    <form method="get" style="display:flex; gap:8px; align-items:center;">
+      <label for="time_range">Range:</label>
+      <select id="time_range" name="time_range" onchange="this.form.submit()">
+        <option value="7d" {% if time_range == '7d' %}selected{% endif %}>7 days</option>
+        <option value="30d" {% if time_range == '30d' %}selected{% endif %}>30 days</option>
+        <option value="all" {% if time_range == 'all' %}selected{% endif %}>All time</option>
+      </select>
+    </form>
+  </div>
+
+  <div class="charts-grid">
+    <section>
+      <h2>Applications per Job</h2>
+      <div id="appsPerJob" class="chart-sm"></div>
+    </section>
+    <section>
+      <h2>Applications Over Time</h2>
+      <div id="appsOverTime" class="chart-sm"></div>
+    </section>
+    <section class="grid-span-2">
+      <h2>Application Status Breakdown</h2>
+      <div id="statusBreakdown" class="chart-sm"></div>
+    </section>
+  </div>
+
+  <section style="margin-top:1rem;">
+    <h2>Recent Jobs</h2>
+    <div class="table-responsive">
+      <table>
+        <tr>
+          <th>Title</th>
+          <th>Status</th>
+          <th>Created</th>
+        </tr>
+        {% for j in jobs %}
+        <tr>
+          <td>{{ j.title }}</td>
+          <td>{{ j.is_active|yesno:"Active,Inactive" }}</td>
+          <td>{{ j.created_at|date:"M d, Y" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3">No jobs yet.</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+  </section>
+</div>
+
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<script>
+  // Bootstrap datasets from the view
+  window.chartBootstrap = {{ chart_bootstrap|default:'{}'|safe }};
+
+  (function () {
+    const data = window.chartBootstrap || {};
+    const baseLayout = { margin: { l: 40, r:20, t:20, b:40 }, paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)' };
+    const baseConfig = { displayModeBar: 'hover', responsive: true, scrollZoom: true };
+
+    // Applications per Job (bar)
+    const apj = data.applications_per_job || { labels: [], data: [] };
+    Plotly.newPlot('appsPerJob', [{ type: 'bar', x: apj.labels, y: apj.data, marker: { color: '#2563eb' } }], { ...baseLayout, xaxis: { automargin: true }, yaxis: { gridcolor: 'rgba(0,0,0,0.05)' } }, baseConfig);
+
+    // Applications over time (line)
+    const aot = data.applications_over_time || { labels: [], data: [] };
+    Plotly.newPlot('appsOverTime', [{ type: 'scatter', mode: 'lines', x: aot.labels, y: aot.data, line: { color: '#16a34a' }, fill: 'tozeroy', fillcolor: 'rgba(22,163,74,0.15)' }], { ...baseLayout, hovermode: 'x unified' }, baseConfig);
+
+    // Status breakdown (pie)
+    const sb = data.status_breakdown || { labels: [], data: [] };
+    Plotly.newPlot('statusBreakdown', [{ type: 'pie', labels: sb.labels, values: sb.data, textinfo: 'label+percent', hoverinfo: 'label+value+percent', marker: { colors: ['#2563eb','#22c1dc','#16a34a','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#94a3b8'] } }], { ...baseLayout }, baseConfig);
+  })();
+</script>
+{% endblock %}

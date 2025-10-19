@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Matcher — All Jobs{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'dashboard/css/employer_dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'employers/css/dashboard.css' %}">
+
+<div class="employer-dashboard container">
+  <section class="card" style="margin-top:1rem;">
+    <div class="section-header" style="justify-content: space-between; align-items:center;">
+      <h2 style="margin:0;">Matcher — All Jobs</h2>
+      <a href="{% url 'dashboard:employer' %}" class="btn btn-secondary btn-sm">Back to Dashboard</a>
+    </div>
+
+    {% if job_blocks %}
+      {% for block in job_blocks %}
+        {% with j=block.job candidates=block.candidates %}
+        <div class="card" style="margin-top:1rem;">
+          <div class="section-header" style="justify-content: space-between; align-items:center;">
+            <h3 style="margin:0;">{{ j.title }}</h3>
+            <a href="{% url 'dashboard:employer_job_matches' j.id %}" class="btn btn-sm btn-outline">View only this job</a>
+          </div>
+
+          {% if candidates %}
+            <div class="candidate-strip">
+              {% for it in candidates %}
+                {% with p=it.profile u=it.user %}
+                <a class="candidate-card" href="{% url 'profiles:public_profile' u.username %}" title="View {{ u.username }}'s profile">
+                  <div class="avatar-outer">
+                    {% if p.profile_picture %}
+                      <img class="avatar-sm" src="{{ p.profile_picture.url }}" alt="{{ u.username }} profile picture">
+                    {% else %}
+                      <span class="avatar-sm initials" aria-hidden="true">
+                        {% with fn=u.first_name ln=u.last_name %}
+                          {% if fn or ln %}{{ fn|slice:':1' }}{{ ln|slice:':1' }}{% else %}{{ u.username|slice:':2' }}{% endif %}
+                        {% endwith %}
+                      </span>
+                    {% endif %}
+                  </div>
+                  <div class="c-meta">
+                    <div class="c-top">
+                      <div class="c-name">{% if u.get_full_name %}{{ u.get_full_name }}{% else %}{{ u.username }}{% endif %}</div>
+                      <span class="score-badge" aria-label="Match score">{{ it.score }}%</span>
+                    </div>
+                    <div class="c-snippet">
+                      {% if p.bio %}
+                        {{ p.bio|truncatewords:10 }}
+                      {% else %}
+                        {% for sk in p.skills.all %}{% if forloop.first %}{{ sk.name|title }}{% endif %}{% empty %}<span class="muted">—</span>{% endfor %}
+                      {% endif %}
+                    </div>
+                  </div>
+                </a>
+                {% endwith %}
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state">No matches yet. Candidates will appear here once they apply.</div>
+          {% endif %}
+        </div>
+        {% endwith %}
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">No jobs found.</div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .candidate-strip { display:flex; gap:.75rem; padding: .5rem .75rem 1rem; }
+  .candidate-card { display:flex; align-items:center; gap:.6rem; padding:.5rem .6rem; background:#fff; border:1px solid #e5e7eb; border-radius:10px; text-decoration:none; color:inherit; min-width: 0; }
+  .candidate-card:hover { border-color:#d1d5db; box-shadow:0 2px 8px rgba(0,0,0,.04); }
+  .avatar-outer { flex-shrink:0; }
+  .avatar-sm { width:40px; height:40px; border-radius:50%; object-fit:cover; display:inline-block; }
+  .avatar-sm.initials { display:inline-flex; align-items:center; justify-content:center; background:#eef2ff; color:#1e3a8a; font-weight:700; }
+  .c-meta { display:flex; flex-direction:column; line-height:1.25; min-width:0; }
+  .c-top { display:flex; align-items:center; gap:.4rem; min-width:0; }
+  .c-name { font-weight:600; font-size:.95rem; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 16ch; }
+  .c-snippet { color:#6b7280; font-size:.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 28ch; }
+  .score-badge { display:inline-flex; align-items:center; justify-content:center; padding:2px 6px; border-radius:999px; font-size:.75rem; font-weight:700; background:#e6f7ec; color:#166534; border:1px solid #bbf7d0; }
+  .muted { color:#9ca3af; }
+  @media (max-width: 640px){ .candidate-card { padding:.45rem; } .c-snippet{ display:none; } }
+</style>
+{% endblock %}

@@ -1,0 +1,26 @@
+{# Partial content for the applicants modal #}
+{% if error %}
+  <h3 id="modalTitle">Applicants</h3>
+  <p class="text-muted">{{ error }}</p>
+{% elif job %}
+  <h3 id="modalTitle">Applicants — {{ job.title }}</h3>
+  {% if applications %}
+    <ul class="applicants-list">
+      {% for app in applications %}
+        <li class="applicant-item">
+          <div class="applicant-name">{{ app.applicant.get_full_name|default:app.applicant.username }}</div>
+          <div class="applicant-meta">
+            <span class="badge">{{ app.get_status_display }}</span>
+            <span class="date">{{ app.submitted_at|date:"M d, Y" }}</span>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-muted">No applications yet.</p>
+  {% endif %}
+{% else %}
+  <h3 id="modalTitle">Applicants</h3>
+  <p class="text-muted">Job not found.</p>
+{% endif %}
+

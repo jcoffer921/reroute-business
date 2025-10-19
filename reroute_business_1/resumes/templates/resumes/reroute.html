@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  {% load resume_filters %}
+  <head>
+    <title>ReRoute Resume</title>
+    <style>
+      @page { margin: 24px; }
+      body{font-family: Lato, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif; color:#222;}
+      .wrap{max-width:800px;margin:0 auto;}
+      header{border-bottom:3px solid #003660;padding-bottom:8px;margin-bottom:16px;}
+      h1{font-family: Rokkitt, Georgia, serif;font-size:28px;margin:0 0 2px;}
+      .subtitle{font-family: Rokkitt, Georgia, serif;color:#335e7e;margin:0 0 8px;}
+      .meta{font-size:12px;color:#444;margin:0;}
+      h3{font-size:14px;color:#003660;margin:18px 0 6px;border-bottom:1px solid #c8d1db;padding-bottom:3px;}
+      ul{margin:6px 0 10px 18px;}
+      /* ReRoute style: plain skills text */
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>{{ resume.full_name|default:resume.user.get_full_name|default:resume.user.username }}</h1>
+        <p class="subtitle">Job Seeker | Ready to Work</p>
+        <p class="meta">{{ resume.user.email }}</p>
+        {% with ci=resume.contact_info %}
+          {% if ci %}
+            {% if ci.phone or ci.city or ci.state %}
+              <p class="meta">
+                {% if ci.phone %}{{ ci.phone }}{% endif %}
+                {% if ci.city or ci.state %}
+                  {% if ci.phone %} — {% endif %}
+                  {{ ci.city }}{% if ci.city and ci.state %}, {% endif %}{{ ci.state }}
+                {% endif %}
+              </p>
+            {% endif %}
+          {% endif %}
+        {% endwith %}
+      </header>
+
+      {% if resume.summary %}
+        <p>{{ resume.summary }}</p>
+      {% endif %}
+
+      {% if resume.experiences.all or resume.experience_entries.all %}
+        <h3>Work Experience</h3>
+        {% with entries=resume.experiences.all %}
+          {% if entries %}
+            {% for e in entries %}
+              <p>
+                <strong>{{ e.job_title }}</strong> — {{ e.company }}
+                {% if e.currently_work_here %}
+                  ({{ e.start_date|date:"b Y" }} – Present)
+                {% elif e.end_date %}
+                  ({{ e.start_date|date:"b Y" }} – {{ e.end_date|date:"b Y" }})
+                {% endif %}
+              </p>
+              {% if e.description %}
+                <ul>
+                  {% for line in e.description.splitlines %}
+                    {% if line %}<li>{{ line|strip_bullet }}</li>{% endif %}
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            {% for e in resume.experience_entries.all %}
+              <p><strong>{{ e.job_title }}</strong> — {{ e.company }} {% if e.dates %}({{ e.dates }}){% endif %}</p>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      {% endif %}
+
+      {% if resume.education.all or resume.education_entries.all %}
+        <h3>Education</h3>
+        {% with edus=resume.education.all %}
+          {% if edus %}
+            {% for ed in edus %}
+              <p><strong>{{ ed.degree|default:"Education/Training" }}</strong> — {{ ed.school }}</p>
+            {% endfor %}
+          {% else %}
+            {% for ed in resume.education_entries.all %}
+              <p><strong>{{ ed.degree|default:"Education/Training" }}</strong> — {{ ed.school_name }} {% if ed.graduation_year %}({{ ed.graduation_year }}){% endif %}</p>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      {% endif %}
+
+      {% with skills=resume.skills.all %}
+        {% if skills %}
+          <h3>Key Skills</h3>
+          <p>{% for s in skills %}{{ s.name|title }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+        {% endif %}
+      {% endwith %}
+
+      {% if resume.certifications %}
+        <h3>Certifications</h3>
+        <ul>
+          {% for cert in resume.certifications.splitlines %}
+            {% if cert %}<li>{{ cert }}</li>{% endif %}
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </body>
+  </html>

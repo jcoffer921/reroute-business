@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="420" viewBox="0 0 320 420" role="img" aria-labelledby="title desc">
+  <title id="title">Resume Preview Placeholder</title>
+  <desc id="desc">A simple placeholder graphic representing a resume document.</desc>
+  <defs>
+    <linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f5f7fa"/>
+      <stop offset="100%" stop-color="#e4e7eb"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="288" height="388" rx="12" fill="url(#g)" stroke="#cfd7df"/>
+  <rect x="40" y="60" width="200" height="16" rx="4" fill="#a0aec0"/>
+  <rect x="40" y="92" width="160" height="12" rx="3" fill="#cbd5e0"/>
+  <rect x="40" y="116" width="240" height="8" rx="3" fill="#e2e8f0"/>
+  <rect x="40" y="136" width="220" height="8" rx="3" fill="#e2e8f0"/>
+  <rect x="40" y="156" width="180" height="8" rx="3" fill="#e2e8f0"/>
+  <rect x="40" y="196" width="200" height="14" rx="4" fill="#a0aec0"/>
+  <rect x="40" y="222" width="240" height="8" rx="3" fill="#e2e8f0"/>
+  <rect x="40" y="242" width="230" height="8" rx="3" fill="#e2e8f0"/>
+  <rect x="40" y="262" width="180" height="8" rx="3" fill="#e2e8f0"/>
+  <rect x="40" y="302" width="120" height="14" rx="4" fill="#a0aec0"/>
+  <rect x="40" y="328" width="200" height="8" rx="3" fill="#e2e8f0"/>
+  <rect x="40" y="348" width="150" height="8" rx="3" fill="#e2e8f0"/>
+</svg>

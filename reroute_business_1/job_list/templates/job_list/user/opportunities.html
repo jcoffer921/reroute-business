@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load static %}
+{% load profile_extras %}
+
+{% block title %}Job Opportunities{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'user/css/job_list.css' %}">
+
+<!-- Full-width hero (outside the form) with primary search inside -->
+<section class="opportunities-hero">
+  <div class="opportunities-hero-content">
+    <h1>Explore Job Opportunities</h1>
+    <p class="hero-sub">Discover full-time, part-time, and second-chance hiring opportunities near you.</p>
+    <p class="hero-coming-soon">Jobs Coming Soon.</p>
+    <form method="get" action="{% url 'opportunities' %}" id="jobFilterForm" class="search-filter-form">
+      <div class="search-bar search-bar--inline">
+        <input type="text" name="q" placeholder="Job title, keywords" value="{{ q }}" aria-label="Job title or keywords">
+        <input type="text" name="zip" placeholder="Location (ZIP)" value="{{ user_zip }}" aria-label="Location by ZIP">
+        <button type="submit" class="btn btn-primary">Search</button>
+        <button type="button" class="mobile-filter-toggle" onclick="toggleFilters()">Filters</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Filters + Results -->
+<div class="opportunities-wrapper">
+  <div class="container">
+    <div class="container">
+      <!-- Filters + Job List -->
+      <div class="layout-grid">
+        <!-- Filters Sidebar -->
+        <aside class="filters-sidebar" id="filtersSidebar">
+          <div class="filters-card">
+            <h3 class="filters-title">Job Type</h3>
+            <div class="pill-group">
+              <label class="pill">
+                <input type="checkbox" name="type" value="full_time" {% if 'full_time' in selected_job_types %}checked{% endif %}>
+                <span>Full-Time</span>
+              </label>
+              <label class="pill">
+                <input type="checkbox" name="type" value="part_time" {% if 'part_time' in selected_job_types %}checked{% endif %}>
+                <span>Part-Time</span>
+              </label>
+              <label class="pill">
+                <input type="checkbox" name="type" value="internship" {% if 'internship' in selected_job_types %}checked{% endif %}>
+                <span>Internship</span>
+              </label>
+              <label class="pill">
+                <input type="checkbox" name="type" value="contract" {% if 'contract' in selected_job_types %}checked{% endif %}>
+                <span>Contract</span>
+              </label>
+            </div>
+            <hr>
+
+            <h3 class="filters-title">Location</h3>
+            <div class="radio-group">
+              <label class="radio-pill">
+                <input type="radio" name="preset_zip" value="" {% if not selected_preset_zip %}checked{% endif %}>
+                <span>Any</span>
+              </label>
+              <label class="radio-pill">
+                <input type="radio" name="preset_zip" value="19104" {% if selected_preset_zip == '19104' %}checked{% endif %}>
+                <span>Philadelphia</span>
+              </label>
+              <label class="radio-pill">
+                <input type="radio" name="preset_zip" value="00000" {% if selected_preset_zip == '00000' %}checked{% endif %}>
+                <span>Remote</span>
+              </label>
+            </div>
+            <hr>
+
+            <h3 class="filters-title">Radius</h3>
+            <select name="radius" class="radius-select">
+              <option value="10" {% if radius == 10 %}selected{% endif %}>10 miles</option>
+              <option value="25" {% if radius == 25 %}selected{% endif %}>25 miles</option>
+              <option value="50" {% if radius == 50 %}selected{% endif %}>50 miles</option>
+            </select>
+
+            <!-- Future filters (disabled for now) -->
+            <hr>
+            <h3 class="filters-title">More Filters</h3>
+            <label class="filters-title" style="font-weight:600; font-size:.95rem;">Salary Range (Coming Soon)</label>
+            <input type="range" min="0" max="200" value="100" disabled>
+            <div class="pill-group" aria-disabled="true">
+              <label class="pill"><input type="checkbox" disabled><span>Entry</span></label>
+              <label class="pill"><input type="checkbox" disabled><span>Mid</span></label>
+              <label class="pill"><input type="checkbox" disabled><span>Senior</span></label>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Job Listings -->
+        <div class="job-list" id="jobResults">
+          {% include 'job_list/user/_jobs_list.html' %}
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script>
+  const toggleSaveUrl = "{% url 'toggle_saved_job' %}";
+  const csrfToken = "{{ csrf_token }}";
+</script>
+<script src="{% static 'user/js/job_list.js' %}"></script>
+
+{% endblock %}

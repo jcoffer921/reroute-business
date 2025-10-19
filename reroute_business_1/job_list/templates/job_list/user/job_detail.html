@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+{% load profile_extras %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'user/css/job_details.css' %}">
+
+<div class="job-detail-container">
+
+  <!-- Job header -->
+  <div class="job-header">
+    {% with emp=job.employer %}
+      {% with logo=emp|employer_logo_url %}
+        <a href="{{ emp|employer_public_url }}">
+          {% if logo %}
+            <img src="{{ logo }}" alt="{{ emp|employer_company }} logo" class="company-logo">
+          {% else %}
+            <img src="{% static 'img/company-placeholder.svg' %}" alt="Company" class="company-logo">
+          {% endif %}
+        </a>
+      {% endwith %}
+    {% endwith %}
+    <h1 class="job-title">{{ job.title }}</h1>
+    <p class="meta-info">
+      <a href="{{ job.employer|employer_public_url }}">{{ job.employer.username }}</a>
+      · {{ job.location }} · Posted {{ job.created_at|timesince }} ago
+    </p>
+  </div>
+
+  <!-- Highlight boxes -->
+  <div class="job-info-boxes">
+
+    <div class="info-box">
+      <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <!-- Circle -->
+        <circle cx="12" cy="12" r="10" stroke="#528ee2" stroke-width="2" fill="none"/>
+        <!-- Dollar Sign - Centered more precisely -->
+        <text x="12" y="13.5"
+              text-anchor="middle"
+              dominant-baseline="middle"
+              font-size="14"
+              font-family="Arial, sans-serif"
+              fill="#528ee2"
+              font-weight="bold">$</text>
+      </svg>
+      <div>
+        <p class="info-title">Salary</p>
+        <p class="info-detail">
+          ${{ job.salary_min }} - ${{ job.salary_max }}
+          {% if job.salary_type == 'hour' %}per hour{% else %}per year{% endif %}
+        </p>
+      </div>
+    </div>
+
+    <!-- Job Type: Stop Clock -->
+    <div class="info-box">
+      <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <circle cx="12" cy="12" r="10" stroke-width="2" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 6v6l3 3" />
+      </svg>
+      <div>
+        <p class="info-title">Job Type</p>
+        <p class="info-detail">{{ job.get_job_type_display }}</p>
+      </div>
+    </div>
+
+    <!-- Position: Couch Icon (custom shape) -->
+    <div class="info-box">
+      <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 12V8a4 4 0 014-4h8a4 4 0 014 4v4M4 12h16M4 12v4h16v-4" />
+      </svg>
+      <div>
+        <p class="info-title">Position</p>
+        <p class="info-detail">{{ job.position }}</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Description -->
+  <div class="job-section">
+    <h2>Description</h2>
+    <p>{{ job.description|linebreaks }}</p>
+  </div>
+
+  <!-- Requirements -->
+  <div class="job-section">
+    <h2>Requirements</h2>
+    <p>{{ job.requirements|linebreaks }}</p>
+  </div>
+
+  <!-- CTA -->
+  <div class="apply-now-wrapper">
+    <form method="post" action="{% url 'apply_to_job' job.id %}" onsubmit="return confirmApply();">
+      {% csrf_token %}
+      <button class="apply-button" type="submit">Apply Now</button>
+    </form>
+  </div>
+
+</div>
+<script src="{% static 'user/js/job_details.js' %}"></script>{% endblock %}

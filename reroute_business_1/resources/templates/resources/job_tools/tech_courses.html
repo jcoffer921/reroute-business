@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Tech Courses | ReRoute Resources{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'resources/css/job_tools/tech_courses.css' %}">
+
+<!-- Hero / Header -->
+<section class="tech-hero">
+  <div class="tech-hero-inner">
+    <h1>Learn Tech Skills Online</h1>
+    <p class="tech-subtext">Beginner‑friendly, self‑paced courses. Most are free; some offer financial aid or scholarships.</p>
+    <div class="tech-cta-row">
+      <a href="{% url 'resource_list' %}" class="btn-pill outline">Back to Resources</a>
+      <a href="#foundations" class="btn-pill">Start Learning</a>
+    </div>
+  </div>
+  <div class="tech-bg-pattern" aria-hidden="true"></div>
+  </section>
+
+<!-- Foundations (Free) -->
+<section id="foundations" class="tech-section">
+  <div class="tech-section-inner">
+    <h2>Foundations (Free)</h2>
+    <div class="resource-grid two-col">
+      <!-- freeCodeCamp -->
+      <article class="resource-card">
+        <div class="res-icon" aria-hidden="true">
+          <!-- Code brackets icon -->
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 8l-4 4 4 4M16 8l4 4-4 4" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="res-body">
+          <h3>freeCodeCamp</h3>
+          <p>Full free curriculum: HTML/CSS, JS, Front End, Back End, Python, and more.</p>
+          <a href="https://www.freecodecamp.org/" target="_blank" rel="noopener" class="learn-btn">Learn More →</a>
+        </div>
+      </article>
+
+      <!-- CS50 -->
+      <article class="resource-card">
+        <div class="res-icon" aria-hidden="true">
+          <!-- Graduation cap -->
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4L3 8l9 4 9-4-9-4z" fill="#6495ED" opacity=".2"/>
+            <path d="M12 4L3 8l9 4 9-4-9-4z" stroke="#6495ED" stroke-width="1.6"/>
+          </svg>
+        </div>
+        <div class="res-body">
+          <h3>Harvard CS50</h3>
+          <p>Computer science fundamentals, web, Python, AI; free to audit.</p>
+          <a href="https://cs50.harvard.edu/" target="_blank" rel="noopener" class="learn-btn">Learn More →</a>
+        </div>
+      </article>
+
+      <!-- Odin Project -->
+      <article class="resource-card">
+        <div class="res-icon" aria-hidden="true">
+          <!-- Hammer/tool icon (abstract) -->
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 14l6 6M10 8l6 6" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="res-body">
+          <h3>The Odin Project</h3>
+          <p>Free, project‑based web development path.</p>
+          <a href="https://www.theodinproject.com/" target="_blank" rel="noopener" class="learn-btn">Learn More →</a>
+        </div>
+      </article>
+
+      <!-- Khan Academy -->
+      <article class="resource-card">
+        <div class="res-icon" aria-hidden="true">
+          <!-- Lightbulb icon -->
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3a6 6 0 0 0-3 11.2V17h6v-2.8A6 6 0 0 0 12 3z" stroke="#0F172A" stroke-width="1.6"/>
+          </svg>
+        </div>
+        <div class="res-body">
+          <h3>Khan Academy</h3>
+          <p>Programming basics and algorithms.</p>
+          <a href="https://www.khanacademy.org/computing" target="_blank" rel="noopener" class="learn-btn">Learn More →</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Career Certificates -->
+<section id="certificates" class="tech-section">
+  <div class="tech-section-inner">
+    <h2>Career Certificates</h2>
+    <div class="resource-grid two-col">
+      <!-- Google Career Certificates -->
+      <article class="resource-card">
+        <div class="res-icon" aria-hidden="true">
+          <!-- Badge icon -->
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="7" stroke="#6495ED" stroke-width="1.6"/>
+            <path d="M12 8v4l3 1" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="res-body">
+          <h3>Google Career Certificates</h3>
+          <p>IT Support, UX, Data Analytics, and more. Financial aid via Coursera.</p>
+          <a href="https://grow.google/certificates/" target="_blank" rel="noopener" class="learn-btn">Learn More →</a>
+        </div>
+      </article>
+
+      <!-- Coursera -->
+      <article class="resource-card">
+        <div class="res-icon" aria-hidden="true">
+          <!-- Layers icon -->
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4l8 4-8 4-8-4 8-4zm0 8l8 4-8 4-8-4 8-4z" stroke="#0F172A" stroke-width="1.6"/>
+          </svg>
+        </div>
+        <div class="res-body">
+          <h3>Coursera</h3>
+          <p>Many professional certificates with financial aid.</p>
+          <a href="https://www.coursera.org/financial-aid" target="_blank" rel="noopener" class="learn-btn">Learn More →</a>
+        </div>
+      </article>
+
+      <!-- edX -->
+      <article class="resource-card">
+        <div class="res-icon" aria-hidden="true">
+          <!-- Columns icon -->
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="5" y="6" width="3" height="12" rx="1" fill="#6495ED" opacity=".25"/>
+            <rect x="10.5" y="6" width="3" height="12" rx="1" fill="#6495ED" opacity=".25"/>
+            <rect x="16" y="6" width="3" height="12" rx="1" fill="#6495ED" opacity=".25"/>
+            <rect x="5" y="6" width="3" height="12" rx="1" stroke="#6495ED"/>
+            <rect x="10.5" y="6" width="3" height="12" rx="1" stroke="#6495ED"/>
+            <rect x="16" y="6" width="3" height="12" rx="1" stroke="#6495ED"/>
+          </svg>
+        </div>
+        <div class="res-body">
+          <h3>edX</h3>
+          <p>University courses with free audit options.</p>
+          <a href="https://www.edx.org/" target="_blank" rel="noopener" class="learn-btn">Learn More →</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

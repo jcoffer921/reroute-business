@@ -1,0 +1,20 @@
+/* Checkout page minor polish to align with pricing */
+.checkout-subtitle {
+  margin: 8px 0 6px;
+  color: #0f172a;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+/* Reuse .plan-features styling from pricing.css for consistency */
+.settings-card .plan-features { margin-top: 6px; }
+
+/* Match primary/secondary button colors used on pricing */
+.settings-card .btn-primary { background: #22c1dc; }
+.settings-card .btn-primary:hover { background: #1aaec6; }
+.settings-card .btn-secondary { background: #0ea5e9; color: #fff; }
+.settings-card .btn-secondary:hover { background: #0284c7; }
+
+/* Keep content width comfortable on checkout */
+.settings-container { max-width: 900px; }
+

@@ -1,0 +1,147 @@
+<!-- templates/main/about_us.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %}ReRoute | About Us{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/about_us.css' %}">
+
+<section class="about-hero">
+  <div class="about-hero-content">
+    <h1>Raising the bar for second chances</h1>
+    <p>ABOUT US</p>
+  </div>
+</section>
+
+
+<section class="bubble-team-section">
+  <h2 class="team-heading">Meet the Founders</h2>
+
+  <div class="bubble-wrapper">
+
+    <div class="bubble-with-caption" id="bubble1">
+      <div class="bubble">
+        <img src="{% static 'images/team/jason.jpg' %}" alt="Jason">
+      </div>
+      <div class="bubble-caption">
+        <h4>Jason Coffer | CTO</h4>
+        <p>Technical co-founder. Leads software development and product architecture at ReRoute. Jason attends
+          Pennsylvania State University, where he is studying Software Engineering and Computer Science. Born and raised 
+          in Philadelphia, he is passionate about using technology to create social impact to help improve the lives of those
+          in underrepresented communities.
+        </p>
+      </div>
+    </div>
+
+
+    <div class="bubble-with-caption" id="bubble2">
+      <div class="bubble">
+        <img src="{% static 'images/team/jackson.jpg' %}" alt="Jackson">
+      </div>
+      <div class="bubble-caption">
+        <h4>Jackson Miller | CMO</h4>
+        <p>Marketing strategist. A gifted storyteller and content creator, he leads our branding efforts and works 
+          to dismantle stigma around reentry through powerful media campaigns. Jackson attended the Hampton University
+          and is now a freelance Social Media and Brand Strategist Consultant. He is also in the process of starting his
+          own affordable clothing line geared towards helping people express themselves through fashion.
+        </p>
+      </div>
+    </div>
+
+    <div class="bubble-with-caption" id="bubble3">
+      <div class="bubble">
+        <img src="{% static 'images/team/derrick.jpg' %}" alt="Derrick">
+      </div>
+      <div class="bubble-caption">
+        <h4>Derrick Melvin | COO</h4>
+        <p>Business strategist. With a sharp eye for sustainability and scalability, he makes sure ReRoute grows 
+          responsibly while staying aligned with its mission to serve justice-impacted individuals. Derrick is also a
+          full-time student at Howard University, studying Economics and Sports Administration. He also looks forward
+          to practicing law and is passionate about community development.
+        </p>
+      </div>
+    </div>
+</section>
+
+<section class="about-story">
+  <div class="story-container">
+    <h2>Our Story</h2>
+    <p>
+      ReRoute began with a simple yet urgent belief: people returning from incarceration deserve more than judgment — they deserve opportunity. Rooted in the communities of Philadelphia 
+      and New Jersey, our team has witnessed firsthand how systemic gaps impact those trying to rebuild their lives. We refuse to stand by while thousands face these challenges every 
+      day. ReRoute exists to dismantle the stigma surrounding reentry by building a bridge back to dignity, opportunity, and long-term success.
+    </p>
+    <p>
+      What started as a daydream has grown into a platform helping dozens of users craft resumes, apply to jobs, and reclaim their voice — and this is just the beginning.
+    </p>
+  </div>
+</section>
+
+
+<!-- Mission & Quote Section -->
+<section class="about-mission">
+  <div class="mission-overlay"></div>
+  <div class="mission-content">
+    <h2>Our Mission</h2>
+    <p class="mission-text">
+      At ReRoute, we're driven to reduce recidivism by building real, lasting pathways to careers in tech, personal confidence, and community contribution. 
+      We recognize that the transition from incarceration to freedom is more than a legal release — it's a personal rebirth.  
+      <br><br>
+      Through access to hands-on training, mental health support, mentorship, and job-ready tools, we aim to empower individuals not just to reenter society — but to lead in it.  
+      <br><br>
+      We believe everyone deserves more than a second chance. They deserve a real shot at a future they can be proud of.
+    </p>
+    <blockquote class="mission-quote">
+      <span class="quote-line">|</span>
+      <em>“We believe everyone deserves a second chance - and the tools to make it count.”</em>
+    </blockquote>
+  </div>
+</section>
+
+<!-- Core Values Grid -->
+<section class="about-values">
+  <h2 class="values-heading">What We Stand For</h2>
+  <div class="value-grid">
+    <div class="value-box">
+      <h3>Empowerment</h3>
+      <p>We help justice-impacted individuals regain control of their future through skills and support.</p>
+    </div>
+    <div class="value-box">
+      <h3>Equity</h3>
+      <p>We build systems that level the playing field, not reinforce the barriers.</p>
+    </div>
+    <div class="value-box">
+      <h3>Access</h3>
+      <p>We open doors to real jobs, mentors, and tools that lead to sustainable careers.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Call To Action -->
+<section class="about-cta">
+  <h2>Be Part of the Movement</h2>
+  <p>
+    Whether you're an ally, employer, mentor, or someone who needs a fresh start — ReRoute is here for you.
+  </p>
+  <div class="cta-buttons">
+    <a href="/signup/" class="btn-primary">Get Started</a>
+    <a href="/contact/" class="btn-secondary">Contact Us</a>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('a.bio-link').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      document.querySelector(this.getAttribute('href')).scrollIntoView({
+        behavior: 'smooth'
+      });
+    });
+  });
+</script>
+<script src="{% static 'js/about_us.js' %}"></script>
+
+{% endblock %}
+

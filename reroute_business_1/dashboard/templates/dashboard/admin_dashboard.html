@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'dashboard/css/admin_dashboard.css' %}">
+
+<section class="admin-hero">
+  <div class="admin-hero-content">
+    <h1>Welcome, Admin!</h1>
+  </div>
+</section>
+
+<div class="admin-dashboard">
+  
+  <!-- Quick Stats -->
+  <div class="stats-grid">
+    <div class="stat-box stat-box--users">
+      <div class="stat-box__label">Users</div>
+      <div class="stat-box__value">{{ user_count }}</div>
+    </div>
+    <div class="stat-box stat-box--employers">
+      <div class="stat-box__label">Employers</div>
+      <div class="stat-box__value">{{ employer_count }}</div>
+    </div>
+    <div class="stat-box stat-box--jobs">
+      <div class="stat-box__label">Jobs</div>
+      <div class="stat-box__value">{{ job_count }}</div>
+    </div>
+    <div class="stat-box stat-box--applications">
+      <div class="stat-box__label">Applications</div>
+      <div class="stat-box__value">{{ application_count }}</div>
+    </div>
+    <div class="stat-box stat-box--resumes">
+      <div class="stat-box__label">Resumes</div>
+      <div class="stat-box__value">{{ resume_count }}</div>
+    </div>
+    <div class="stat-box stat-box--flagged">
+      <div class="stat-box__label">Flagged Items</div>
+      <div class="stat-box__value">{{ flagged_jobs|length }}</div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <h2>Analytics (Last 30 Days)</h2>
+  <div class="charts-carousel" role="region" aria-label="Analytics charts">
+    <div class="charts-carousel__viewport">
+      <div class="charts-carousel__track">
+        <div class="charts-carousel__slide" role="group" aria-roledescription="slide" aria-label="Users chart">
+          <div id="usersChart" class="plotly-chart"></div>
+        </div>
+        <div class="charts-carousel__slide" role="group" aria-roledescription="slide" aria-label="Jobs chart">
+          <div id="jobsChart" class="plotly-chart"></div>
+        </div>
+        <div class="charts-carousel__slide" role="group" aria-roledescription="slide" aria-label="Applications chart">
+          <div id="applicationsChart" class="plotly-chart"></div>
+        </div>
+        <div class="charts-carousel__slide" role="group" aria-roledescription="slide" aria-label="Employers chart">
+          <div id="employersChart" class="plotly-chart"></div>
+        </div>
+      </div>
+    </div>
+    <button class="charts-carousel__nav charts-carousel__nav--prev" aria-label="Previous chart" type="button" title="Previous">
+      <span aria-hidden="true">‹</span>
+    </button>
+    <button class="charts-carousel__nav charts-carousel__nav--next" aria-label="Next chart" type="button" title="Next">
+      <span aria-hidden="true">›</span>
+    </button>
+    <div class="charts-carousel__dots" role="tablist" aria-label="Select chart"></div>
+  </div>
+
+  <!-- Recent Activity -->
+  <section>
+    <h2>Recent Activity (Last 7 Days)</h2>
+    <ul>
+      <li>New Users: {{ new_users|default:0 }}</li>
+      <li>New Jobs: {{ new_jobs|default:0 }}</li>
+      <li>New Applications: {{ new_applications|default:0 }}</li>
+    </ul>
+  </section>
+
+  <!-- Analytics Events Summary -->
+  <section>
+    <h2>Analytics Events</h2>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-box__label">Page Views (Total)</div>
+        <div class="stat-box__value">{{ analytics_summary.page_views_total|default:0 }}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box__label">Profile Completed (Total)</div>
+        <div class="stat-box__value">{{ analytics_summary.profile_completed_total|default:0 }}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box__label">Page Views (Last 7 Days)</div>
+        <div class="stat-box__value">{{ analytics_summary.last_7_days.page_views|default:0 }}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box__label">Profile Completed (Last 7 Days)</div>
+        <div class="stat-box__value">{{ analytics_summary.last_7_days.profile_completed|default:0 }}</div>
+      </div>
+    </div>
+
+    {% if analytics_summary.top_pages %}
+    <h3>Top Pages</h3>
+    <div class="table-responsive">
+      <table>
+        <tr>
+          <th>Path</th>
+          <th>Views</th>
+        </tr>
+        {% for row in analytics_summary.top_pages %}
+        <tr>
+          <td>{{ row.path|default:"/" }}</td>
+          <td>{{ row.count }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    {% else %}
+      <p>No page views recorded yet.</p>
+    {% endif %}
+  </section>
+
+  <!-- Review Queue -->
+   <section>
+    <h2>Flagged Jobs (Trust & Safety)</h2>
+  {% if flagged_jobs %}
+    <div class="table-responsive">
+    <table>
+      <tr>
+        <th>Title</th>
+        <th>Employer</th>
+        <th>Reason</th>
+        <th>Actions</th>
+      </tr>
+      {% for job in flagged_jobs %}
+        <tr>
+          <td>{{ job.title }}</td>
+          <td>{{ job.employer.username|default:job.employer }}</td>
+          <td>{{ job.flagged_reason|default:"(no reason provided)" }}</td>
+          <td>
+            <a href="{% url 'admin:job_list_job_change' job.id %}">Review</a> |
+            <form action="{% url 'dashboard:approve_flagged_job' job.id %}" method="post" style="display:inline;" class="js-confirm" data-message="Approve this job? It will be unflagged and activated.">
+              {% csrf_token %}
+              <button type="submit" class="link-button">Approve</button>
+            </form> |
+            <form action="{% url 'dashboard:remove_flagged_job' job.id %}" method="post" style="display:inline;" class="js-confirm" data-message="Remove (deactivate) this job? It will no longer be visible to seekers.">
+              {% csrf_token %}
+              <button type="submit" class="link-button danger">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+    </div>
+  {% else %}
+    <p>No flagged jobs right now 🎉</p>
+  {% endif %}
+  </section>
+
+  <!-- Management Links -->
+  <section class="management-links">
+    <h2>Management</h2>
+    <a href="{% url 'dashboard:admin_analytics_events' %}">Admin Analytics (Events)</a>
+    <a href="{% url 'dashboard:admin_jobs_manage' %}">Manage Jobs (Site)</a>
+    <a href="{% url 'dashboard:admin_applications_manage' %}">Manage Applications (Site)</a>
+    <a href="{% url 'admin:auth_user_changelist' %}">Manage Users (Admin)</a>
+    <a href="{% url 'admin:job_list_job_changelist' %}">Manage Jobs (Admin)</a>
+    <a href="{% url 'admin:job_list_application_changelist' %}">Manage Applications (Admin)</a>
+    <a href="{% url 'admin:profiles_employerprofile_changelist' %}">Manage Employer Profiles</a>
+  </section>
+</div>
+
+<!-- Modal: Action Confirmation -->
+<div id="confirmModal" class="rr-modal" aria-hidden="true">
+  <div class="rr-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+    <h3 id="confirmModalTitle">Please Confirm</h3>
+    <p id="confirmModalMessage">Are you sure?</p>
+    <div class="rr-modal__actions">
+      <button type="button" id="confirmCancel" class="btn btn-secondary">Cancel</button>
+      <button type="button" id="confirmOk" class="btn btn-primary">Confirm</button>
+    </div>
+  </div>
+  <button type="button" class="rr-modal__backdrop" aria-label="Close"></button>
+</div>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<script>
+  window.dashboardData = {
+    dates: {{ dates|safe }},
+    usersByDay: {{ users_by_day|safe }},
+    jobsByDay: {{ jobs_by_day|safe }},
+    applicationsByDay: {{ applications_by_day|default:'[]'|safe }},
+    employersByDay: {{ employers_by_day|default:'[]'|safe }}
+  };
+  // Hide empty slides early if no data
+  document.addEventListener('DOMContentLoaded', function () {
+    const data = window.dashboardData || {};
+    const slides = document.querySelectorAll('.charts-carousel__slide');
+    slides.forEach(slide => {
+      const id = (slide.querySelector('.plotly-chart') || {}).id;
+      if (id === 'applicationsChart' && (!data.applicationsByDay || !data.applicationsByDay.length)) slide.remove();
+      if (id === 'employersChart' && (!data.employersByDay || !data.employersByDay.length)) slide.remove();
+    });
+  });
+  </script>
+<script src="{% static 'dashboard/js/admin_dashboard.js' %}"></script>
+{% endblock %}

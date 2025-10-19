@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    {# NOTE: no custom template tags needed; context processor provides IS_EMPLOYER + DASHBOARD_URL #}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ReRoute | Home{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- =================== NAVBAR (fixed) =================== -->
+        <nav class="navbar">
+            <div class="navbar-logo">
+                <a href="{% url 'home' %}">
+                    <img src="{% static 'images/reroute-trans-logo.png' %}" alt="ReRoute Logo" style="height: 67px;">
+                </a>
+            </div>
+
+            <div class="navbar-links-container">
+                <!-- ---------- Left-side navigation links ---------- -->
+                <div class="nav-links">
+                    <a href="{% url 'about_us' %}">About Us</a>
+                    <a href="{% url 'home' %}">Home</a>
+                    <div class="nav-item has-dropdown">
+                        <a href="{% url 'opportunities' %}">Opportunities</a>
+                        <div class="nav-dropdown" role="menu" aria-label="Opportunities submenu">
+                            <a href="{% url 'opportunities' %}">Job Listings</a>
+                            <a href="{% url 'organization_catalog' %}">Reentry Organizations</a>
+                        </div>
+                    </div>
+                    <a href="{% url 'pricing' %}">Pricing</a>
+                    <a href="{% url 'resource_list' %}">Resources</a>
+                    <a href="{% url 'organization_catalog' %}">Organizations</a>
+
+                    {% if user.is_authenticated %}
+                        {# ✅ Role-aware: always points to the correct dashboard #}
+                        <a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a>
+
+                        {# Left (optional) menu block, kept for parity with original layout #}
+                        <div class="user-menu-container">
+                            <div class="user-dropdown" id="userDropdownLeft">
+                                <a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a>
+                                <a href="{% url 'dashboard:notifications' %}">Notifications{% if UNREAD_NOTIFICATIONS %}<span class="nav-badge">{{ UNREAD_NOTIFICATIONS }}</span>{% endif %}</a>
+                                {# Route to the correct profile page by role #}
+                                <a href="{{ PROFILE_URL }}">Profile</a>
+                                <a href="{% url 'contact' %}">Report Issues</a>
+                                <a href="{% url 'settings' %}">Settings</a>
+                                <form method="POST" action="{% url 'logout' %}" style="margin: 0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="logout-btn">Sign out</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% else %}
+                        {% if request.path != '/login/' %}
+                            <a href="{% url 'login' %}">Login</a>
+                        {% endif %}
+                        {% if request.path != '/signup/' and request.path != '/' %}
+                            <a href="{% url 'signup' %}">Get Started</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <!-- ---------- Right-side profile menu ---------- -->
+                {% if user.is_authenticated %}
+                <div class="user-profile-right">
+                    <!--
+                      Button shows user's initials; clicking toggles dropdown menu.
+                      JS in base.js should control .show on #userDropdown and body.no-scroll for mobile.
+                    -->
+                    <button class="user-initials-btn" id="userMenuButton" aria-expanded="false" aria-controls="userDropdown">
+                        {{ user.first_name|default:user.username|slice:":1" }}{{ user.last_name|default:""|slice:":1" }}
+                        <span id="arrow-icon">▼</span>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown" role="menu" aria-labelledby="userMenuButton">
+                        <a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a>
+                        <a href="{% url 'dashboard:notifications' %}">Notifications{% if UNREAD_NOTIFICATIONS %}<span class="nav-badge">{{ UNREAD_NOTIFICATIONS }}</span>{% endif %}</a>
+                        <a href="{{ PROFILE_URL }}">Profile</a>
+                        <a href="{% url 'contact' %}">Report Issues</a>
+                        <a href="{% url 'settings' %}">Settings</a>
+                        <form method="POST" action="{% url 'logout' %}" style="margin: 0;">
+                            {% csrf_token %}
+                            <button type="submit" class="logout-btn">Sign out</button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- ---------- Mobile hamburger ---------- -->
+                <button class="hamburger" aria-controls="mobileMenu" aria-expanded="false" aria-label="Open menu">☰</button>
+            </div>
+        </nav>
+
+        <!-- Flash messages (visible below fixed nav) -->
+        {% if messages %}
+            <div class="flash-messages max-w-4xl mx-auto mt-4 px-4">
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }}">
+                        <span class="alert-text">{{ message }}</span>
+                        <button class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- =================== MAIN CONTENT =================== -->
+        <main class="content">
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- =================== FOOTER =================== -->
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-column">
+                    <a href="{% url 'home' %}">
+                        <img src="{% static 'images/reroute-trans-logo.png' %}" alt="ReRoute Logo" style="height: 60px;">
+                    </a>
+                    <p>Rebuild. Reclaim. ReRoute.</p>
+                </div>
+
+                <div class="footer-column">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="{% url 'about_us' %}">About Us</a></li>
+                        <li><a href="{% url 'blog_list' %}">Blog</a></li>
+                        <li><a href="{% url 'contact' %}">Contact Us</a></li>
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'opportunities' %}">Opportunities</a></li>
+                        <li><a href="{% url 'resource_list' %}">Resources</a></li>
+                        <li><a href="{% url 'organization_catalog' %}">Organizations</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h4>Contact</h4>
+                    <p>Email: support@reroutejobs.com</p>
+                    <p>Philadelphia, PA</p>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 {{ COMPANY_LEGAL_NAME }}. All rights reserved.</p>
+                <p>
+                  <a href="{% url 'pricing' %}">Pricing</a>
+                  |
+                  <a href="{% url 'privacy' %}">Privacy Policy</a>
+                  |
+                  <a href="{% url 'terms' %}">Terms of Use</a>
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- =================== MOBILE MENU (slide-in) =================== -->
+    {# Optional backdrop; JS will also auto-create one if you omit this #}
+    <div id="mobileBackdrop" class="mobile-backdrop" hidden></div>
+
+    <div id="mobileMenu"
+        class="mobile-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        aria-labelledby="mobileMenuTitle"
+        tabindex="-1">
+    <div class="mobile-menu-header">
+        <span class="mobile-logo">
+        <img src="{% static 'images/reroute-logo.png' %}" alt="ReRoute Logo" height="36">
+        </span>
+        <button class="close-btn" data-close-mobile aria-label="Close menu">✕</button>
+    </div>
+
+    <h2 id="mobileMenuTitle" class="sr-only">Main menu</h2>
+
+    <ul class="mobile-nav-links">
+        <li><a href="{% url 'about_us' %}">About Us</a></li>
+        <li><a href="{% url 'blog_list' %}">Blog</a></li>
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li><a href="{% url 'opportunities' %}">Opportunities</a></li>
+        <li><a href="{% url 'pricing' %}">Pricing</a></li>
+        <li><a href="{% url 'resource_list' %}">Resources</a></li>
+        <li><a href="{% url 'organization_catalog' %}">Organizations</a></li>
+        {% if user.is_authenticated %}
+        <li><a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'dashboard:notifications' %}">Notifications{% if UNREAD_NOTIFICATIONS %}<span class="nav-badge">{{ UNREAD_NOTIFICATIONS }}</span>{% endif %}</a></li>
+        {% else %}
+        <li><a href="{% url 'login' %}">Login</a></li>
+        <li><a href="{% url 'signup' %}">Get Started</a></li>
+        {% endif %}
+    </ul>
+
+    {# =================== MOBILE USER FOOTER =================== #}
+    {% if user.is_authenticated %}
+    <div class="mobile-user-footer">
+        {# ✅ Make the profile circle clickable to the profile page #}
+        <a href="{{ PROFILE_URL }}" class="user-initials-circle" aria-label="Go to your profile">
+        {{ user.first_name|default:user.username|slice:":1" }}{{ user.last_name|default:""|slice:":1" }}
+        </a>
+
+        {# (Optional) Make the name clickable too #}
+        <a href="{{ PROFILE_URL }}" class="mobile-user-name">
+        {{ user.first_name|default:user.username }}
+        </a>
+
+        {# ✅ Logout must be POST — works on mobile, includes CSRF #}
+        <form method="POST" action="{% url 'logout' %}" class="logout-form">
+        {% csrf_token %}
+        <button type="submit" class="logout-btn">Sign out</button>
+        </form>
+    </div>
+    {% else %}
+    {# =================== GUEST (NOT LOGGED IN) =================== #}
+    <div class="mobile-user-footer guest">
+        <div class="user-initials-circle disabled" aria-hidden="true">?</div>
+        <span class="mobile-user-name">Guest</span>
+
+        {# ✅ Clear call-to-action for mobile users #}
+        <a href="{% url 'login' %}" class="login-btn" data-close-mobile-menu>Sign in</a>
+        {# Optional: show signup too #}
+        <a href="{% url 'signup' %}" class="signup-btn" data-close-mobile-menu>Create account</a>
+    </div>
+    {% endif %}
+
+
+    <!-- Base scripts -->
+    <script src="{% static 'js/base.js' %}" defer></script>
+    <script src="{% static 'js/mobile_menu.js' %}" defer></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

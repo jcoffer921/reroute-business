@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'dashboard/css/admin_dashboard.css' %}">
+
+<div class="admin-dashboard">
+  <h1>Manage Applications</h1>
+
+  <section>
+    <form method="get" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+      <input type="text" name="q" value="{{ q }}" placeholder="Search job title or applicant" style="flex:1; min-width:220px; padding:8px 10px; border:1px solid #ddd; border-radius:8px;" />
+      <label for="status-filter" class="visually-hidden">Filter by status</label>
+      <select id="status-filter" name="status" style="padding:8px 10px; border:1px solid #ddd; border-radius:8px;">
+        <option value="">All Statuses</option>
+        {% for val,label in status_choices %}
+          <option value="{{ val }}" {% if status == val %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-primary">Filter</button>
+      <a href="{% url 'dashboard:admin' %}" class="btn btn-secondary">Back to Dashboard</a>
+    </form>
+  </section>
+
+  <div class="table-responsive">
+    <table>
+      <tr>
+        <th>Job</th>
+        <th>Applicant</th>
+        <th>Status</th>
+        <th>Submitted</th>
+        <th>Actions</th>
+      </tr>
+      {% for app in applications %}
+      <tr>
+        <td>{{ app.job.title }}</td>
+        <td>{{ app.applicant.username }}</td>
+        <td>{{ app.get_status_display }}</td>
+        <td>{% if app.submitted_at %}{{ app.submitted_at|date:"M d, Y" }}{% else %}—{% endif %}</td>
+        <td>
+          <form method="post" action="{% url 'dashboard:admin_application_update_status' app.id %}" style="display:inline-flex; gap:6px; align-items:center;">
+            {% csrf_token %}
+            <label for="status-{{ app.id }}" class="visually-hidden">Update status</label>
+            <select id="status-{{ app.id }}" name="status" style="padding:4px 6px; border:1px solid #ddd; border-radius:6px;">
+              {% for val,label in status_choices %}
+                <option value="{{ val }}" {% if app.status == val %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary">Update</button>
+          </form>
+          |
+          <a href="{% url 'admin:job_list_application_change' app.id %}">Open in Admin</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">No applications found.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+<!-- Modal reused from admin dashboard for confirmations (future actions) -->
+<div id="confirmModal" class="rr-modal" aria-hidden="true">
+  <div class="rr-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+    <h3 id="confirmModalTitle">Please Confirm</h3>
+    <p id="confirmModalMessage">Are you sure?</p>
+    <div class="rr-modal__actions">
+      <button type="button" id="confirmCancel" class="btn btn-secondary">Cancel</button>
+      <button type="button" id="confirmOk" class="btn btn-primary">Confirm</button>
+    </div>
+  </div>
+  <button type="button" class="rr-modal__backdrop" aria-label="Close"></button>
+  </div>
+<script src="{% static 'dashboard/js/admin_dashboard.js' %}"></script>
+{% endblock %}

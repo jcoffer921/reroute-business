@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us | ReRoute{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/contact_us.css' %}">
+
+<section class="contact-hero">
+  <div class="contact-hero-content">
+    <h1>Get in Touch With Us</h1>
+    <p>Together, we can make a difference!</p>
+  </div>
+</section>
+
+<section class="contact-section">
+  <div class="contact-container">
+    
+    <!-- Left Column: Contact Form -->
+    <div class="contact-form">
+      <p class="required-note">Fields marked with an * are required</p>
+      <form method="POST" action="{% url 'contact' %}">
+        {% csrf_token %}
+        
+        <label for="first_name">First Name *</label>
+        <input type="text" name="first_name" id="first_name" required>
+
+        <label for="last_name">Last Name *</label>
+        <input type="text" name="last_name" id="last_name" required>
+
+        <label for="email">Email *</label>
+        <input type="email" name="email" id="email" required>
+
+        <label for="phone">Phone</label>
+        <input type="text" name="phone" id="phone">
+
+        <label for="organization">Organization or Business</label>
+        <input type="text" name="organization" id="organization">
+
+        <label for="interest">I'm interested in *</label>
+        <select name="interest" id="interest" required>
+          <option value="">Please select</option>
+          <option value="mentorship">Mentorship</option>
+          <option value="partnership">Partnership</option>
+          <option value="platform access">Accessing the platform</option>
+          <option value="general">General inquiry</option>
+        </select>
+
+        <label for="message">Message *</label>
+        <textarea name="message" id="message" rows="5" required></textarea>
+
+        <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+
+
+        <button type="submit" class="btn-submit">Submit</button>
+        {% if messages %}
+          <div class="message-container">
+            {% for message in messages %}
+              <div class="alert {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+      </form>
+    </div>
+
+    <!-- Right Column: Contact Info -->
+    <div class="contact-info">
+      <h3>ReRoute</h3>
+      <p><strong>Phone:</strong> 267-000-0000</p>
+      <p><strong>Email:</strong> support@reroutejobs.com</p>
+      <p><strong>Address:</strong> 123 Freedom Way, Philadelphia, PA 19104</p>
+
+      <div class="social-icons">
+        <a href="#"><img src="{% static 'images/icons/fb-logo.svg' %}" alt="Facebook"></a>
+        <a href="https://www.instagram.com/officialreroute/"><img src="{% static 'images/icons/insta-logo.svg' %}" alt="Instagram"></a>
+        <a href="https://www.linkedin.com/company/reroute-jobs/about/?viewAsMember=true"><img src="{% static 'images/icons/linkedin-logo.svg' %}" alt="LinkedIn"></a>
+      </div>
+    </div>
+
+  </div>
+</section>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+{% endblock %}
