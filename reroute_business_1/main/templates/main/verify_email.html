@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Verify Your Email | ReRoute{% endblock %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/account/verification.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 640px; margin: 40px auto; text-align: center;">
+  <h2>Please verify your email</h2>
+  <p>To continue, please verify your email address:</p>
+  <p style="font-weight:600;">{{ email }}</p>
+
+  <form method="post" class="verify-actions">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Resend verification email</button>
+  </form>
+
+  <div class="helper-links">
+    <a href="{% url 'settings' %}">Use a different email</a>
+    <span class="sep">·</span>
+    <a href="{% url 'logout' %}">Sign out</a>
+  </div>
+</div>
+{% endblock %}

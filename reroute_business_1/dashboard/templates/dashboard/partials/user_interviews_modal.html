@@ -1,0 +1,42 @@
+<div class="modal-header">
+  <h3 class="modal-title">Your Interviews</h3>
+  <button type="button" class="modal-close" data-close-user-interviews aria-label="Close">✕</button>
+  </div>
+<div class="modal-body">
+  {% if interviews %}
+    <ul class="interviews-list">
+      {% for iv in interviews %}
+        <li class="interview-item" data-id="{{ iv.id }}">
+          <div class="interview-main">
+            <div class="interview-job">
+              <strong>{{ iv.job.title }}</strong>
+              <span class="meta">with {{ iv.employer.get_full_name|default:iv.employer.username }}</span>
+            </div>
+            <div class="interview-when">{{ iv.scheduled_at|date:"M d, Y g:ia" }}</div>
+          </div>
+          <div class="interview-actions">
+            <form class="accept-form" method="post" action="{% url 'dashboard:user_accept_interview' %}">
+              {% csrf_token %}
+              <input type="hidden" name="interview_id" value="{{ iv.id }}">
+              <button type="submit" class="btn btn-primary btn-sm">Accept</button>
+            </form>
+            <details class="resched">
+              <summary class="btn btn-outline btn-sm">Request reschedule</summary>
+              <form class="resched-form" method="post" action="{% url 'dashboard:user_request_reschedule' %}">
+                {% csrf_token %}
+                <input type="hidden" name="interview_id" value="{{ iv.id }}">
+                <label class="sr-only" for="dt-{{ iv.id }}">Suggest date/time</label>
+                <input id="dt-{{ iv.id }}" type="datetime-local" name="datetime">
+                <label class="sr-only" for="msg-{{ iv.id }}">Message</label>
+                <input id="msg-{{ iv.id }}" type="text" name="message" placeholder="Optional note">
+                <button type="submit" class="btn btn-secondary btn-sm">Send</button>
+              </form>
+            </details>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="empty-state">No interviews found.</div>
+  {% endif %}
+</div>

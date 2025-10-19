@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Resend Verification | ReRoute{% endblock %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/account/verification.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container narrow">
+  <h2>Resend verification email</h2>
+  {% if sent %}
+    <div class="notice success">If that email address exists, we just sent a new verification link.</div>
+    <p>Check your inbox and spam folder. You can now return to <a href="{% url 'login' %}">Login</a>.</p>
+  {% else %}
+    <form method="post" class="resend-form">
+      {% csrf_token %}
+      <label for="email">Email address</label>
+      <input id="email" type="email" name="email" class="form-control" placeholder="you@example.com" required>
+      <button type="submit" class="btn btn-primary">Send link</button>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

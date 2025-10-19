@@ -1,0 +1,211 @@
+/* about_us.css — mobile-first, responsive rewrite (drop-in)
+   All sections scale down gracefully; larger screens get enhancements. */
+
+/* ============= HERO ============= */
+.about-hero{
+  background-color:#0F172A;
+  color:#F3F4F6;
+  padding: clamp(3rem, 7vw, 6rem) 1.25rem clamp(2rem, 4vw, 3rem);
+  position:relative;
+  overflow:hidden;
+}
+.about-hero-content{max-width:1200px;margin:0 auto;}
+.about-hero h1{
+  font-size: clamp(2rem, 5.2vw, 3.25rem);
+  font-weight:900;
+  margin:0 0 .75rem;
+}
+.about-hero p{
+  font-size:.95rem;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  font-weight:600;
+}
+/* Pattern on the right — hidden on small screens */
+.about-hero::after{
+  content:"";
+  background-size:100px;
+  background-repeat:repeat;
+  opacity:.18;
+  position:absolute; right:0; top:0; bottom:0; width:50%; z-index:0;
+}
+@media (max-width: 640px){
+  .about-hero::after{display:none;}
+}
+
+/* ============= TEAM BUBBLES ============= */
+.bubble-team-section{
+  background: linear-gradient(135deg, var(--primary-blue), var(--accent-cyan));
+  color:#fff;
+  text-align:center;
+  padding: clamp(2.5rem, 6vw, 5rem) 1.25rem;
+  position:relative;
+  overflow:visible;
+}
+.team-heading{
+  font-size: clamp(1.75rem, 4.5vw, 2.5rem);
+  font-weight:800;
+  margin:0 0 1.5rem;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Inter, Arial, sans-serif; /* swap Comic Sans */
+}
+
+/* Wrapper and bubble defaults (mobile-first) */
+.bubble-wrapper{
+  max-width:1200px; margin:0 auto;
+  display:flex; flex-direction:column; gap:2rem;
+}
+.bubble-with-caption{ width:min(72vw, 360px); margin:0 auto; }
+.bubble{
+  --bubble-size: min(72vw, 320px);
+  width: var(--bubble-size);
+  height: var(--bubble-size);
+  border-radius: 40%;
+  overflow:hidden;
+  border:6px solid #fff;
+  box-shadow:0 12px 24px rgba(0,0,0,.15);
+  transition: transform .25s ease;
+}
+.bubble:hover{ transform: scale(1.04); }
+.bubble img{
+  width:100%;
+  height:100%;
+  /* Fill the bubble while keeping faces visible */
+  object-fit: cover;
+  /* Bias crop towards the top so heads stay in-frame */
+  object-position: 50% 20%;
+}
+
+.bubble-caption{ margin-top:.75rem; max-width: 34ch; margin-inline:auto; color:#f5f5f5; margin-bottom:3px; }
+.bubble-caption h4{ font-size:1.05rem; margin:.25rem 0 .35rem; font-weight:700; }
+.bubble-caption p{ font-size:.95rem; line-height:1.45; padding-bottom:1.5rem; }
+
+/* Larger screens: position the three bubbles in a “triangle” */
+@media (min-width: 900px){
+  /* Increase canvas height so bios aren't clipped behind next section */
+  .bubble-wrapper{ position:relative; min-height: clamp(620px, 68vw, 780px); }
+  .bubble-with-caption{ position:absolute; width:auto; }
+  #bubble1{ left:6%; top:66px; }
+  #bubble2{ right:6%; top:66px; }
+  #bubble3{ left:37%; top:70px; }
+  .bubble{ --bubble-size: clamp(260px, 26vw, 320px); border-width:8px; }
+}
+
+/* ============= OUR STORY ============= */
+.about-story{
+  background-color: var(--neutral-gray);
+  color: var(--contrast-navy);
+  padding: clamp(2.5rem, 6vw, 5rem) 1.25rem;
+  text-align:center;
+}
+.story-container{ max-width: 900px; margin: 0 auto; }
+.about-story h2{ font-size: clamp(1.75rem, 4.2vw, 2.5rem); margin-bottom:1.25rem; }
+.about-story p{ font-size:1.05rem; line-height:1.75; margin-bottom:1.1rem; }
+
+/* ============= MISSION ============= */
+.about-mission{
+  position:relative;
+  background-image:url('/static/images/dream_team.jpg');
+  background-position:center center;
+  background-size:cover;
+  /* Avoid janky mobile 100vh; use min-height and padding instead */
+  min-height: 60vh;
+  padding: clamp(2rem, 5vw, 3rem) 1.25rem;
+  display:flex; align-items:center; justify-content:center;
+  color:#111;
+  object-position: 50% 20%;
+}
+.mission-overlay{
+  position:absolute; inset:0;
+  background: rgba(255,255,255,.35);
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  z-index:1;
+}
+.mission-content{
+  position:relative; z-index:2;
+  max-width: 800px;
+  text-align:center;
+  padding: 1rem;
+}
+.about-mission h2{
+  font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+  font-weight:800; margin-bottom:.75rem; color:#111;
+}
+.mission-text{
+  font-size: 1.05rem; line-height:1.75;
+  max-width: 800px; margin: 1rem auto 0; color:#222;
+}
+.mission-quote{
+  opacity:0; transform: translateY(10px);
+  transition: opacity .6s ease, transform .6s ease;
+  font-size:1.1rem; font-style:italic; color: rebeccapurple; margin-top:1.25rem;
+  text-align:center;
+}
+.mission-quote.visible{ opacity:1; transform:none; }
+.quote-line{ color: rebeccapurple; font-weight:700; font-size:1.5rem; margin-right:.35rem; }
+
+/* ============= VALUES GRID ============= */
+.about-values{
+  background:#fff;
+  color: var(--contrast-navy);
+  padding: clamp(2.5rem, 6vw, 5rem) 1.25rem;
+  text-align:center;
+}
+.values-heading{ font-size: clamp(1.75rem, 4.2vw, 2.5rem); margin-bottom: 1.75rem; }
+
+.value-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  max-width:1100px; margin: 0 auto;
+}
+.value-box{
+  background: var(--neutral-gray);
+  border-radius:12px;
+  padding: 1.25rem;
+  text-align:left;
+  box-shadow:0 6px 18px rgba(0,0,0,.05);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.value-box:hover{
+  transform: translateY(-4px);
+  box-shadow:0 8px 24px rgba(0,0,0,.08);
+}
+.value-box h3{ font-size:1.2rem; margin-bottom:.5rem; }
+.value-box p{ font-size:1rem; line-height:1.6; }
+
+/* ============= CTA ============= */
+.about-cta{
+  background: var(--primary-blue);
+  color:#fff;
+  text-align:center;
+  padding: clamp(2.75rem, 6vw, 6rem) 1.25rem;
+}
+.about-cta h2{ font-size: clamp(1.75rem, 4.2vw, 2.5rem); margin-bottom:.75rem; }
+.about-cta p{
+  font-size:1.05rem; margin: 0 auto 1.5rem;
+  max-width: 640px;
+}
+.cta-buttons{ display:flex; justify-content:center; gap:.75rem; flex-wrap:wrap; }
+.btn-primary, .btn-secondary{
+  display:inline-block;
+  padding:.75rem 1.5rem;
+  border-radius:999px;
+  font-weight:600;
+  text-decoration:none;
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+.btn-primary{
+  background:#fff; color: var(--primary-blue);
+}
+.btn-primary:hover{ background: var(--neutral-gray); }
+.btn-secondary{
+  background: transparent; border:2px solid #fff; color:#fff;
+}
+.btn-secondary:hover{ background: rgba(255,255,255,.12); }
+
+/* ============= Small tweaks for very narrow phones ============= */
+@media (max-width:360px){
+  .about-cta .btn-primary, .about-cta .btn-secondary{ width:100%; text-align:center; }
+}
+

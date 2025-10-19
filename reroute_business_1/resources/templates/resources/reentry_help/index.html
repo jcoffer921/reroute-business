@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Reentry Help | ReRoute Resources{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'resources/css/reentry_help/index.css' %}">
+
+<!-- Hero with gradient + subtle pattern -->
+<section class="rehelp-hero">
+  <div class="rehelp-hero-inner">
+    <h1>Reentry Help</h1>
+    <p class="rehelp-subtext">Legal, housing, and counseling resources to support your journey.</p>
+  </div>
+  <div class="rehelp-hero-bg" aria-hidden="true"></div>
+</section>
+
+<!-- Cards -->
+<section class="rehelp-section">
+  <div class="rehelp-inner">
+    <h2>Support Services</h2>
+    <p class="rehelp-section-subtext">Explore curated guides, links, and programs designed for returning citizens.</p>
+
+    <div class="rehelp-cards">
+      <!-- Legal Aid -->
+      <article class="rehelp-card">
+        <div class="rehelp-card-icon" aria-hidden="true">
+          <!-- Scales icon -->
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 4v12M7 9l-3 4h6l-3-4zm10 0l-3 4h6l-3-4z" stroke="#0F172A" stroke-width="1.6"/></svg>
+        </div>
+        <h3>Legal Aid</h3>
+        <p>Know your rights, expungement options, and where to get free legal help.</p>
+        <div class="rehelp-actions">
+          <a href="{% url 'legal_aid' %}" class="btn-pill">Get Help</a>
+        </div>
+      </article>
+
+      <!-- Housing Options -->
+      <article class="rehelp-card">
+        <div class="rehelp-card-icon" aria-hidden="true">
+          <!-- House icon -->
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 11l9-7 9 7v8a2 2 0 0 1-2 2h-4v-6H9v6H5a2 2 0 0 1-2-2v-8z" stroke="#0F172A" stroke-width="1.6"/></svg>
+        </div>
+        <h3>Housing Options</h3>
+        <p>Find transitional housing, rent assistance, and fair housing information.</p>
+        <div class="rehelp-actions">
+          <a href="{% url 'housing' %}" class="btn-pill">Explore Options</a>
+        </div>
+      </article>
+
+      <!-- Counseling -->
+      <article class="rehelp-card">
+        <div class="rehelp-card-icon" aria-hidden="true">
+          <!-- Chat bubble icon -->
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 7a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v5a4 4 0 0 1-4 4h-5l-4 4v-4H8a4 4 0 0 1-4-4V7z" stroke="#0F172A" stroke-width="1.6"/></svg>
+        </div>
+        <h3>Counseling</h3>
+        <p>Access city services, crisis hotlines, and affordable counseling options.</p>
+        <div class="rehelp-actions">
+          <a href="{% url 'counseling' %}" class="btn-pill">Find Support</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="rehelp-cta">
+  <div class="rehelp-cta-inner">
+    <h3>Need More Help?</h3>
+    <a href="{% url 'resource_list' %}" class="btn-pill">Explore All Reentry Resources</a>
+  </div>
+</section>
+{% endblock %}

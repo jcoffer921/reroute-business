@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}User Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'dashboard/css/base.css' %}">
+<link rel="stylesheet" href="{% static 'dashboard/css/user_dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+{% load profile_extras %}
+<section class="dash-hero">
+  <div class="dash-hero-content">
+    <h1>Welcome, {{ request.user.first_name|default:request.user.username }}!</h1>
+    <p style="margin-top:6px; font-size:.9rem;">
+      <a href="{% url 'contact' %}" class="link">Give Feedback</a>
+    </p>
+  </div>
+</section>
+
+<!-- Dashboard Cards -->
+<div class="dashboard-container">
+
+  
+
+  {% if steps_completed < 3 %}
+  <!-- Progress Carousel (Onboarding) -->
+  <div class="carousel-box">
+    <div class="progress-header">
+      <div class="progress-text">
+        <h2>Create your path with ReRoute</h2>
+        <p>Finish setting up to get matched faster.</p>
+      </div>
+      <div class="progress-bar-wrapper">
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" style="width: {{ completion_percentage }}%;"></div>
+        </div>
+        <div class="progress-count"><span id="progressCount">{{ steps_completed }}</span>/3</div>
+      </div>
+    </div>
+
+    <div class="carousel-wrapper">
+      <button class="carousel-btn left" onclick="scrollCarousel(-1)" aria-label="Previous">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+
+      <div class="carousel-track" id="cardCarousel">
+        <!-- Complete Profile -->
+        {# Route to correct profile page based on role #}
+        <a href="{{ PROFILE_URL }}" class="carousel-card-link">
+          <div class="carousel-card {% if onboarding_steps.profile %}completed{% elif current_step == 'profile' %}current{% endif %}">
+            <div class="card-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21a8 8 0 0 0-16 0"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div class="card-content">
+              <h4 class="card-title">Complete your profile</h4>
+              <p>Add more details to qualify for more jobs.</p>
+            </div>
+            <div class="card-arrow">→</div>
+          </div>
+        </a>
+
+        <!-- Upload Resume -->
+        <a href="{% url 'resumes:resume_welcome' %}" class="carousel-card-link">
+          <div class="carousel-card {% if onboarding_steps.resume %}completed{% elif current_step == 'resume' %}current{% endif %}">
+            <div class="card-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16l4-4h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>
+              </svg>
+            </div>
+            <div class="card-content">
+              <h4 class="card-title">Create a Resume</h4>
+              <p>Showcase your skills to stand out.</p>
+            </div>
+            <div class="card-arrow">→</div>
+          </div>
+        </a>
+
+        <!-- Saved Jobs -->
+        <a href="{% url 'dashboard:saved_jobs' %}" class="carousel-card-link">
+          <div class="carousel-card {% if onboarding_steps.saved_jobs %}completed{% elif current_step == 'saved_jobs' %}current{% endif %}">
+            <div class="card-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 21s-6.716-4.271-9.192-6.747C.96 12.406.96 8.994 2.808 7.147a5 5 0 0 1 7.071 0L12 9.268l2.121-2.121a5 5 0 0 1 7.071 7.071C18.716 16.729 12 21 12 21z"/>
+              </svg>
+            </div>
+            <div class="card-content">
+              <h4 class="card-title">Saved Jobs</h4>
+              <p>View jobs you've bookmarked.</p>
+            </div>
+            <div class="card-arrow">→</div>
+          </div>
+        </a>
+      </div>
+
+      <button class="carousel-btn right" onclick="scrollCarousel(1)" aria-label="Next">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+  {% else %}
+  <!-- Success State when onboarding is done -->
+  <section class="onboarding-success">
+    <div class="success-inner">
+      <div class="success-icon" aria-hidden="true">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12l5 5 11-11" stroke="#16a34a" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <h2>You’re ready to get matched!</h2>
+      <p>Explore jobs tailored to your profile.</p>
+      <a href="{% url 'opportunities' %}" class="btn btn-primary">Find Jobs Now</a>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ===== Resumes + Notifications Grid ===== -->
+  <section class="resume-notifications-grid">
+    <!-- Left: Single Resume card with tabs -->
+    <div class="resume-column">
+      <article class="resume-card">
+        <div class="resume-tabs" role="tablist" aria-label="Resume Tabs">
+          <button class="resume-tab active" data-target="#tab-created" role="tab" aria-selected="true">Created Resume</button>
+          <button class="resume-tab" data-target="#tab-imported" role="tab" aria-selected="false">Imported Resume</button>
+        </div>
+        <div class="resume-tabpanels">
+          <div id="tab-created" class="resume-panel active" role="tabpanel">
+            <div class="resume-thumb" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="96" height="96" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="3" width="16" height="18" rx="2"/>
+                <line x1="8" y1="8" x2="16" y2="8"/>
+                <line x1="8" y1="12" x2="16" y2="12"/>
+                <line x1="8" y1="16" x2="13" y2="16"/>
+              </svg>
+            </div>
+            <header class="resume-card-header">
+              <h3 class="resume-card-title">Your Created Resume</h3>
+            </header>
+            <footer class="resume-card-actions">
+              {% if resume %}
+                <a href="{% url 'resumes:created_resume_view' resume.id %}" class="btn btn-primary">View Resume</a>
+              {% else %}
+                <a href="{% url 'resumes:resume_welcome' %}" class="btn btn-primary">Create Resume</a>
+              {% endif %}
+            </footer>
+          </div>
+          <div id="tab-imported" class="resume-panel" role="tabpanel" hidden>
+            <div class="resume-thumb" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="96" height="96" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+            </div>
+            <header class="resume-card-header">
+              <h3 class="resume-card-title">Imported Resume</h3>
+            </header>
+            <footer class="resume-card-actions">
+              {% if imported_resume %}
+                <a href="{% url 'resumes:imported_resume' imported_resume.id %}" class="btn btn-primary">View Resume</a>
+              {% else %}
+                <a href="{% url 'resumes:resume_welcome' %}" class="btn btn-primary">Import Resume</a>
+              {% endif %}
+            </footer>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- Center: Stats card -->
+    <div class="stats-column">
+      <article class="stats-card">
+        <h3 class="stats-title">Stats</h3>
+        <div class="stats-grid">
+          <div class="stat">
+            <div class="stat-number">{{ stats.applications_sent|default:0 }}</div>
+            <div class="stat-label">Applications Sent</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">{{ stats.profile_views|default:0 }}</div>
+            <div class="stat-label">Profile Views</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">{{ stats.matches_found|default:0 }}</div>
+            <div class="stat-label">Matches Found</div>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <aside class="notifications-column">
+      <section class="notifications-panel" aria-label="Notifications">
+        <div class="notifications-header">
+          <h3 class="section-title">
+            <span aria-hidden="true" class="icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </span>
+            Notifications
+          </h3>
+          <a href="{% url 'dashboard:notifications' %}" class="view-all-link">View All</a>
+        </div>
+        <div class="notifications-scroll">
+          {% if notifications %}
+            <div class="notifications-list">
+              {% for n in notifications|slice:":8" %}
+                {% if n.url %}
+                  <a class="notification-item-link" href="{{ n.url }}">
+                    <article class="notification-card {% if not n.is_read %}unread{% endif %}">
+                      <div class="avatar {% if not n.actor %}admin{% endif %}">
+                        {% if n.actor and n.actor|profile_picture_url %}
+                          <img src="{{ n.actor|profile_picture_url }}" alt="Avatar">
+                        {% elif n.actor %}
+                          {{ n.actor|initials }}
+                        {% else %}
+                          R
+                        {% endif %}
+                      </div>
+                      <div class="content">
+                        <div class="text-row">
+                          <div class="title">{{ n.title|default:n.verb|default:"Update" }}</div>
+                          <time class="timestamp" datetime="{{ n.created_at|date:'c' }}">{{ n.created_at|timesince }} ago</time>
+                        </div>
+                        {% if n.message %}
+                        <div class="message">{{ n.message|striptags|truncatechars:100 }}</div>
+                        {% endif %}
+                      </div>
+                    </article>
+                  </a>
+                {% else %}
+                  <article class="notification-card {% if not n.is_read %}unread{% endif %}">
+                    <div class="avatar {% if not n.actor %}admin{% endif %}">
+                      {% if n.actor and n.actor|profile_picture_url %}
+                        <img src="{{ n.actor|profile_picture_url }}" alt="Avatar">
+                      {% elif n.actor %}
+                        {{ n.actor|initials }}
+                      {% else %}
+                        R
+                      {% endif %}
+                    </div>
+                    <div class="content">
+                      <div class="text-row">
+                        <div class="title">{{ n.title|default:n.verb|default:"Update" }}</div>
+                        <time class="timestamp" datetime="{{ n.created_at|date:'c' }}">{{ n.created_at|timesince }} ago</time>
+                      </div>
+                      {% if n.message %}
+                      <div class="message">{{ n.message|striptags|truncatechars:100 }}</div>
+                      {% endif %}
+                    </div>
+                  </article>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-notifications">You're all caught up. No new notifications.</div>
+          {% endif %}
+        </div>
+      </section>
+    </aside>
+  </section>
+
+  <!-- Suggested Jobs -->
+  <div class="suggested-box">
+    <div class="suggested-header">
+      <a href="{% url 'dashboard:matched_jobs' %}" class="suggested-jobs-link">
+        <h2>Suggested Jobs</h2>
+        <p>Based on your skills and interests</p>
+      </a>
+    </div>
+    {% if suggested_cards %}
+      <div class="suggested-grid">
+        {% for item in suggested_cards|slice:":6" %}
+          {% with job=item.job %}
+          <article class="sq-card">
+            <a class="sq-logo" href="{{ job.employer|employer_public_url }}" aria-label="Employer profile">
+              {% with logo=job.employer|employer_logo_url %}
+              {% if logo %}
+                <img src="{{ logo }}" alt="{{ job.employer.username }} logo">
+              {% else %}
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="11" rx="2" fill="#f9fafb" stroke="#e5e7eb"/><path d="M9 8V7a3 3 0 0 1 6 0v1" stroke="#cbd5e1" fill="none"/><path d="M7 12h10" stroke="#cbd5e1"/></svg>
+              {% endif %}
+              {% endwith %}
+            </a>
+            <div class="sq-title" title="{{ job.title }}">{{ job.title }}</div>
+            <div class="sq-meta">{{ job.employer.username }} · {{ job.location }}</div>
+            {% if item.match %}
+              <div class="sq-badge">{{ item.match }}%</div>
+            {% endif %}
+            <div class="sq-actions">
+              <a class="btn btn-primary btn-sm" href="{% url 'job_detail' job.id %}">Apply</a>
+              <form method="post" action="{% url 'toggle_saved_job' %}">
+                {% csrf_token %}
+                <input type="hidden" name="job_id" value="{{ job.id }}">
+                <button type="submit" class="btn btn-outline btn-sm">Save</button>
+              </form>
+            </div>
+          </article>
+          {% endwith %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <h4>No job suggestions yet</h4>
+        <p>Complete your profile and add skills to see matches tailored to you.</p>
+        <div class="empty-actions">
+          <a href="{{ PROFILE_URL }}" class="btn btn-outline">Complete Profile</a>
+          <a href="{% url 'resumes:resume_welcome' %}" class="btn btn-primary">Create Resume</a>
+          <a href="{% url 'opportunities' %}" class="btn btn-outline">Browse Jobs</a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Scheduled Interviews (same width as tips) -->
+  <div class="tips-box rotating" style="margin-top: 1rem;">
+    <div class="tips-header" style="justify-content: space-between; align-items: center;">
+      <div>
+        <h2>Scheduled Interviews</h2>
+        <p>Upcoming interviews you have lined up</p>
+      </div>
+      <button type="button" id="openUserInterviews" class="btn btn-primary btn-sm">View Interviews</button>
+    </div>
+    {% if upcoming_interviews %}
+      <div class="notifications-list">
+        {% for iv in upcoming_interviews %}
+          <article class="notification-card">
+            <div class="avatar" aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;background:#e5e7eb;color:#374151;font-weight:700;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+            <div class="content">
+              <div class="text-row">
+                <div class="title">
+                  <a href="{% url 'job_detail' iv.job.id %}">{{ iv.job.title }}</a>
+                  <span class="timestamp"> · with {{ iv.employer.get_full_name|default:iv.employer.username }}</span>
+                </div>
+                <time class="timestamp" datetime="{{ iv.scheduled_at|date:'c' }}">{{ iv.scheduled_at|date:"M d, Y g:ia" }}</time>
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-notifications">No interviews scheduled.</div>
+    {% endif %}
+  </div>
+
+  <!-- User Interviews Modal -->
+  <div id="userInterviewsBackdrop" class="modal-backdrop hidden"></div>
+  <div id="userInterviewsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="userInterviewsTitle">
+    <div class="modal-content" id="userInterviewsContent">
+      <!-- Fetched dynamically -->
+    </div>
+  </div>
+
+  <!-- Tips -->
+  <div class="tips-box rotating">
+    <div class="tips-header">
+      <h2>Helpful Tips</h2>
+      <p>Advice to help you get the most out of ReRoute</p>
+    </div>
+    <div id="tipText" class="tip-item">Loading tips...</div>
+    <button id="nextTipBtn" class="next-tip-btn">
+      Next Tip
+      <span aria-hidden="true" style="display:inline-flex;vertical-align:middle;margin-left:.35rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </span>
+    </button>
+  </div>
+</div>
+
+<script src="{% static 'dashboard/js/user_dashboard.js' %}"></script>
+ 
+{% endblock %}

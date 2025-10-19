@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Step 1: Contact Info{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'resumes/css/steps.css' %}">
+
+<div class="resume-builder">
+  <div class="resume-form-panel">
+    <h2>Step 1: Contact Info & Summary</h2>
+
+    {# Surface any non-field errors at the top #}
+    {% if contact_form.non_field_errors %}
+      <div class="alert alert-danger" role="alert">
+        {{ contact_form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      {# === Full Name === #}
+      <div class="form-group">
+        <label for="{{ contact_form.full_name.id_for_label }}">Full Name</label>
+        {# Add stable classes + autofill hints; autofocus helps flow #}
+        {{ contact_form.full_name|add_class:"form-control"|attr:"autocomplete=name"|attr:"autofocus" }}
+        {% if contact_form.full_name.errors %}
+          <div class="invalid-feedback d-block">{{ contact_form.full_name.errors|striptags }}</div>
+        {% else %}
+          <small class="form-text text-muted">As you want it to appear on your resume.</small>
+        {% endif %}
+      </div>
+
+      {# === Email === #}
+      <div class="form-group">
+        <label for="{{ contact_form.email.id_for_label }}">Email</label>
+        {{ contact_form.email|add_class:"form-control"|attr:"autocomplete=email" }}
+        {% if contact_form.email.errors %}
+          <div class="invalid-feedback d-block">{{ contact_form.email.errors|striptags }}</div>
+        {% else %}
+          <small class="form-text text-muted">We'll use this for contact and applications.</small>
+        {% endif %}
+      </div>
+
+      {# === Phone === #}
+      <div class="form-group">
+        <label for="{{ contact_form.phone.id_for_label }}">Phone</label>
+        {# inputmode=tel gives mobile users the right keypad; pattern is optional UI hint #}
+        {{ contact_form.phone|add_class:"form-control"|attr:"autocomplete=tel"|attr:"inputmode=tel"|attr:"placeholder=(123) 456-7890" }}
+        {% if contact_form.phone.errors %}
+          <div class="invalid-feedback d-block">{{ contact_form.phone.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      {# === City + State side-by-side (mobile friendly) === #}
+      <div class="form-row d-flex justify-between gap-2">
+        <div class="form-group" style="flex: 1;">
+          <label for="{{ contact_form.city.id_for_label }}">City</label>
+          {{ contact_form.city|add_class:"form-control"|attr:"autocomplete=address-level2" }}
+          {% if contact_form.city.errors %}
+            <div class="invalid-feedback d-block">{{ contact_form.city.errors|striptags }}</div>
+          {% endif %}
+        </div>
+        <div class="form-group" style="flex: 1;">
+          <label for="{{ contact_form.state.id_for_label }}">State</label>
+          {{ contact_form.state|add_class:"form-control"|attr:"autocomplete=address-level1" }}
+          {% if contact_form.state.errors %}
+            <div class="invalid-feedback d-block">{{ contact_form.state.errors|striptags }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      {# === Summary (optional, stored on Resume) === #}
+      <div class="form-group">
+        <label for="id_summary">Professional Summary (optional)</label>
+        <textarea id="id_summary" name="summary" class="form-control" rows="4" placeholder="Brief intro highlighting your strengths and goals.">{{ resume_summary }}</textarea>
+        <small class="form-text text-muted">1–3 sentences works best. You can edit this later.</small>
+      </div>
+
+      {# === Nav === #}
+      <div class="form-navigation d-flex justify-between">
+        <a href="{% url 'resumes:resume_welcome' %}" class="btn btn-secondary">Back</a>
+        <button type="submit" class="btn btn-primary">Next</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{# Keep your step helpers #}
+<script src="{% static 'resumes/js/steps.js' %}"></script>
+<script src="{% static 'resumes/js/contact_info.js' %}"></script>
+{% endblock %}

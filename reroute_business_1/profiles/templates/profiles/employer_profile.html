@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% comment %}
+  Employer Profile page
+  - Clean card layout with a header showing logo/initials and company name
+  - Edit Profile button opens a slide-out panel with a form
+  - Badge indicates verification status
+  - Some fields may not exist on EmployerProfile; we fall back to UserProfile
+{% endcomment %}
+
+{% block title %}Employer Profile{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/employer_public_profile.css' %}">
+  <link rel="stylesheet" href="{% static 'css/employer_profile.css' %}"> {# for edit panel styles #}
+{% endblock %}
+
+{% block content %}
+<div class="employer-public" data-company="{{ employer_profile.company_name|default:'Your Company' }}">
+  <!-- Hero -->
+  <section class="hero">
+    {% if employer_profile.background_image %}
+      <div class="hero-bg" style="background-image: url('{{ employer_profile.background_image.url }}?v={{ employer_profile.background_image|file_version }}');"></div>
+    {% elif employer_profile.logo %}
+      <div class="hero-bg" style="background-image: url('{{ employer_profile.logo.url }}?v={{ employer_profile.logo|file_version }}');"></div>
+    {% else %}
+      <div class="hero-bg hero-bg--color"></div>
+      <div class="hero-watermark" style="background-image: url('{% static 'images/reroute-trans-logo.png' %}');"></div>
+    {% endif %}
+    <div class="hero-gradient"></div>
+    <div class="hero-content">
+      {% if employer_profile.logo %}
+        <img class="hero-logo" src="{{ employer_profile.logo.url }}?v={{ employer_profile.logo|file_version }}" alt="{{ employer_profile.company_name|default:'Company' }} logo">
+      {% else %}
+        <div class="hero-logo hero-logo--initials" aria-hidden="true">
+          {% with first=employer_profile.company_name|default:'Y'|slice:":1" %}{{ first|upper }}{% endwith %}
+        </div>
+      {% endif %}
+      <div class="hero-text">
+        <h1 class="hero-name">{{ employer_profile.company_name|default:"Your Company" }}</h1>
+        {% if employer_profile.verified or employer_profile.user.profile.verified %}
+          <span class="hero-verified hero-verified--sm">Verified</span>
+        {% else %}
+          <span class="hero-verified hero-verified--sm" style="color:#fcd34d;background:rgba(252,211,77,.14);border-color:rgba(252,211,77,.5)">Pending Verification</span>
+        {% endif %}
+      </div>
+      <button id="openEditPanel" class="btn btn-primary" type="button" style="margin-left:12px;">Edit Profile</button>
+    </div>
+  </section>
+
+  <!-- About Us -->
+  <div class="section-divider"></div>
+  <section class="section section-about">
+    <div class="info-header">
+      <h2 class="section-title">About Us</h2>
+      <button class="edit-btn" type="button" onclick="document.getElementById('openEditPanel')?.click()">Edit</button>
+    </div>
+    <div class="about-text">
+      {{ employer_profile.description|default:"Tell candidates about your mission, culture, and values."|linebreaksbr }}
+    </div>
+  </section>
+
+  <!-- Jobs -->
+  <section class="section section-jobs">
+    <div class="section-head">
+      <h2 class="section-title">Current Job Openings</h2>
+      <a class="btn-view-all" href="{% url 'create_job' %}">Create Job</a>
+    </div>
+    {% if jobs and jobs|length > 0 %}
+      <div class="jobs-grid">
+        {% for job in jobs %}
+          <a class="job-card" href="{% url 'job_detail' job.id %}">
+            <div class="job-card-inner">
+              <div class="job-title">{{ job.title }}</div>
+              <div class="job-meta">
+                <span class="chip">{{ job.get_job_type_display }}</span>
+                <span class="dot">•</span>
+                <span class="location">{{ job.location }}</span>
+              </div>
+              <div class="job-cta-row"><span class="job-apply-btn">Manage</span></div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+      {% if total_jobs and total_jobs > 3 and view_all_url %}
+        <div class="view-all-wrap">
+          <a class="btn-view-all" href="{{ view_all_url }}">View All Jobs by {{ employer_profile.company_name|default:'You' }}</a>
+        </div>
+      {% endif %}
+    {% else %}
+      <p class="muted">You don’t have any active job openings yet.</p>
+    {% endif %}
+  </section>
+
+  <!-- Additional Info -->
+  <section class="section section-info">
+    <div class="info-header">
+      <h2 class="section-title">Additional Info</h2>
+      <button class="edit-btn" type="button" onclick="document.getElementById('openEditPanel')?.click()">Edit</button>
+    </div>
+    <div class="info-grid" style="background: transparent; border: 0; box-shadow: none; padding: 0;">
+      <div class="info-item">
+        <div class="label">Address</div>
+        <div class="value">
+          {% if employer_profile.user.profile.street_address or employer_profile.user.profile.city or employer_profile.user.profile.state %}
+            {{ employer_profile.user.profile.street_address }}{% if employer_profile.user.profile.city %}, {{ employer_profile.user.profile.city }}{% endif %}{% if employer_profile.user.profile.state %}, {{ employer_profile.user.profile.state }}{% endif %}
+          {% else %}
+            <span class="muted">—</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="label">Location</div>
+        <div class="value">
+          {% if employer_profile.user.profile.city or employer_profile.user.profile.state %}
+            {{ employer_profile.user.profile.city }}{% if employer_profile.user.profile.city and employer_profile.user.profile.state %}, {% endif %}{{ employer_profile.user.profile.state }}
+          {% else %}
+            <span class="muted">—</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="label">Contact number</div>
+        <div class="value">
+          {% if employer_profile.user.profile.phone_number %}
+            {{ employer_profile.user.profile.phone_number }}
+          {% else %}
+            <span class="muted">—</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="label">Website</div>
+        <div class="value">
+          {% if employer_profile.website %}
+            <a href="{{ employer_profile.website }}" target="_blank" rel="noopener">{{ employer_profile.website }}</a>
+          {% else %}
+            <span class="muted">—</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Edit panel -->
+  <aside id="editPanel" class="edit-panel hidden" aria-hidden="true">
+    <div class="edit-panel-header">
+      <h2>Edit Employer Profile</h2>
+      <button id="closeEditPanel" class="btn btn-secondary" type="button" aria-label="Close">Cancel</button>
+    </div>
+    <form method="post" enctype="multipart/form-data" class="edit-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button id="cancelInside" type="button" class="btn btn-secondary">Cancel</button>
+      </div>
+    </form>
+  </aside>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/employer_public_profile.js' %}"></script>
+  <script>
+    (function(){
+      const openBtn = document.getElementById('openEditPanel');
+      const panel = document.getElementById('editPanel');
+      const closeBtn = document.getElementById('closeEditPanel');
+      const cancelInside = document.getElementById('cancelInside');
+      function open(){ if(!panel) return; panel.classList.remove('hidden'); panel.classList.add('active'); panel.setAttribute('aria-hidden','false'); }
+      function close(){ if(!panel) return; panel.classList.remove('active'); panel.classList.add('hidden'); panel.setAttribute('aria-hidden','true'); }
+      if (openBtn) openBtn.addEventListener('click', open);
+      if (closeBtn) closeBtn.addEventListener('click', close);
+      if (cancelInside) cancelInside.addEventListener('click', close);
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
+    })();
+  </script>
+{% endblock %}

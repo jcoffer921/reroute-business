@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}All Blog Articles{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/blog_list.css' %}">
+
+<section class="blog-hero">
+  <div class="blog-hero-content">
+    <h1>Our Blog</h1>
+    <p>Read our latest posts on tech, jobs, reentry, mindset and more.</p>
+  </div>
+</section>
+
+<div class="blog-filter-bar">
+  <form method="get">
+    <input type="text" name="q" value="{{ query }}" placeholder="Search posts...">
+    <select name="category">
+      <option value="">All</option>
+      {% for cat in categories %}
+        <option value="{{ cat }}" {% if category_filter == cat %}selected{% endif %}>{{ cat|title }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Go</button>
+  </form>
+</div>
+
+<div class="blog-list-grid">
+  {% for post in posts %}
+    <div class="blog-card">
+      {% if post.image %}
+        <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy" decoding="async">
+      {% endif %}
+      <div class="blog-card-text">
+        <h2>{{ post.title }}</h2>
+        <p>{{ post.content|truncatewords:25 }}</p>
+        <a href="{% url 'blog_detail' slug=post.slug %}" class="btn-read">Read blog →</a>
+        <p class="post-date">{{ post.created_at|date:"F j, Y" }}</p>
+      </div>
+    </div>
+  {% empty %}
+    <p>No articles found.</p>
+  {% endfor %}
+</div>
+{% endblock %}

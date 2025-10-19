@@ -1,0 +1,43 @@
+# --- Python / Django ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+
+# Local env & secrets
+.env
+.env.*
+/env/
+/.venv/
+
+# Databases (local only)
+*.sqlite3
+
+# Django collected/static root (keep app/static tracked)
+staticfiles/
+media/
+
+# If you keep a top-level "static/" as source assets, DO NOT ignore it.
+# If it's generated output, uncomment the next line:
+# /static/
+
+# IDEs & OS junk
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Frontend (until we’re ready to ship it) ---
+/frontend/*
+!/frontend/.gitignore
+
+# Common frontend build artifacts anywhere
+**/node_modules/
+**/dist/
+**/build/
+**/.cache/
+**/.parcel-cache/
+**/.next/
+**/.nuxt/
+**/coverage/

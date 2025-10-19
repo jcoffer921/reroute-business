@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ReRoute | Resources{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'resources/css/resources.css' %}">
+
+<!-- Hero: Full-Width Background Video (merged hero) -->
+<section class="resource-hero-2">
+  <video id="hero2BgVideo" class="hero2-video" autoplay muted loop playsinline preload="metadata"
+         poster="{% static 'images/dont_say_interview.png' %}">
+    <source src="/static/resources/videos/dontSayInInterview.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <div class="hero2-overlay"></div>
+  <div class="hero2-content">
+    <span class="hero2-label">ReRoute Resources</span>
+    <h2 class="hero2-title">Resources to Get You Work-Ready in 60 Seconds</h2>
+    <p class="hero2-subtext">Explore curated tools, quick tips, and guidance from ReRoute to help you stand out in interviews, resumes, and at work.</p>
+    <div class="hero2-actions">
+      <a href="#resource-categories" class="hero2-cta">View All Categories</a>
+      <a href="#resource-library" class="hero2-cta alt">Explore All Resources</a>
+      <button id="hero2Play" class="hero2-play-button" aria-label="Play video">
+        <span class="hero2-play-icon">▶</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Fullscreen Modal for Video Playback with Sound -->
+  <div id="hero2Modal" class="hero2-modal" hidden>
+    <div class="hero2-modal-backdrop" data-hero2-close></div>
+    <div class="hero2-modal-dialog" role="dialog" aria-modal="true" aria-label="Hero video">
+      <button id="hero2Close" class="hero2-modal-close" aria-label="Close video">✕</button>
+      <video id="hero2ModalVideo" class="hero2-modal-video" controls preload="metadata">
+        <source src="/static/resources/videos/dontSayInInterview.mp4" type="video/mp4">
+        </video>
+    </div>
+  </div>
+</section>
+
+<!-- Categories Section (cards) -->
+<section id="resource-categories" class="resource-categories-section">
+  <div class="resource-section">
+    <h2>Resources to Help You Succeed</h2>
+    <p class="section-subtext">Explore our curated collection of tools, courses, and support services designed to empower your journey.</p>
+
+    <div class="resource-cards">
+      <!-- Job Tools Card -->
+      <div class="resource-card">
+        <div class="card-icon" aria-hidden="true">
+          <!-- Clipboard/Resume SVG icon -->
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2" stroke="#0F172A" stroke-width="1.5"/>
+            <rect x="9" y="2" width="6" height="4" rx="1" stroke="#0F172A" stroke-width="1.5"/>
+            <path d="M8 9h8M8 12h8M8 15h5" stroke="#6495ED" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <h3>Job Tools</h3>
+        <p>Templates, interview prep, and email guidance to help you present your best self.</p>
+        <div class="card-actions">
+          <a href="{% url 'job_tools_index' %}" class="learn-more-btn">Learn More →</a>
+        </div>
+      </div>
+
+      <!-- Tech Courses Card -->
+      <div class="resource-card">
+        <div class="card-icon" aria-hidden="true">
+          <!-- Laptop/Code SVG icon -->
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="5" width="18" height="12" rx="2" stroke="#0F172A" stroke-width="1.5"/>
+            <path d="M2 19h20" stroke="#6495ED" stroke-width="1.5"/>
+            <path d="M10 9l-2 3 2 3M14 15l2-3-2-3" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3>Tech Courses</h3>
+        <p>Learn in-demand skills with beginner-friendly programs and free training resources.</p>
+        <div class="card-actions">
+          <a href="{% url 'tech_courses' %}" class="learn-more-btn">Learn More →</a>
+        </div>
+      </div>
+
+      <!-- Reentry Help Card -->
+      <div class="resource-card">
+        <div class="card-icon" aria-hidden="true">
+          <!-- Shield/Help SVG icon -->
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3l7 3v5c0 5.25-3.5 8.75-7 10-3.5-1.25-7-4.75-7-10V6l7-3z" stroke="#0F172A" stroke-width="1.5"/>
+            <path d="M12 9a3 3 0 0 1 3 3c0 1.5-1 2-2 2" stroke="#6495ED" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="12" cy="16.5" r=".75" fill="#6495ED"/>
+          </svg>
+        </div>
+        <h3>Reentry Help</h3>
+        <p>Access legal aid, housing options, and support services to help you move forward.</p>
+        <div class="card-actions">
+          <a href="{% url 'reentry_help_index' %}" class="learn-more-btn">Learn More →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="categories-footer-cta">
+      <a href="#resource-categories" class="btn-secondary outline">View All Categories</a>
+    </div>
+  </div>
+</section>
+
+  {# Former Featured Video section removed and replaced by merged Hero above #}
+
+  <!-- Quick Job-Ready Videos -->
+  <section id="resource-library" class="quick-videos-section">
+    <div class="quick-videos-container">
+      <h2 class="quick-videos-title">Quick Job-Ready Videos</h2>
+      <p class="quick-videos-subtitle">Watch short, practical tips to build confidence and skills.</p>
+
+      <div class="quick-videos-grid">
+        <!-- Single featured video card (expandable to grid later) -->
+        <article class="video-preview-card">
+          <div class="video-preview">
+            <video class="video-thumb" autoplay muted loop playsinline preload="metadata"
+                   poster="{% static 'images/dont_say_interview.png' %}">
+              <source src="/static/resources/videos/dontSayInInterview.mp4" type="video/mp4">
+            </video>
+            <button class="video-play-overlay" aria-label="Play video"
+                    data-video-open data-video-src="/static/resources/videos/dontSayInInterview.mp4">
+              <span>▶</span>
+            </button>
+          </div>
+          <div class="video-info">
+            <h3>5 Things to Never Say in an Interview – 1 minute tip</h3>
+            <p class="video-desc">A fast breakdown of common interview mistakes and what to say instead.</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="videos-footer-cta">
+        <button class="btn-secondary outline" disabled>More Videos Coming Soon</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="resource-quote">
+    <blockquote>“Don't worry about what other people think of you. Just be sure you think correctly about yourself. - Jason Coffer”</blockquote>
+  </div>
+
+  <div class="resource-footer-cta">
+    <p>Can't find what you need?</p>
+    <a href="{% url 'contact' %}" class="btn-secondary">Get in Touch</a>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'resources/js/resource.js' %}" defer></script>
+{% endblock %}

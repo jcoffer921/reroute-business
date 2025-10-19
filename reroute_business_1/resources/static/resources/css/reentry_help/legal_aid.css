@@ -1,0 +1,59 @@
+/* ===== Legal Aid — Redesigned ===== */
+
+/* Hero */
+.la-hero { position: relative; background: linear-gradient(135deg, #0F172A, #345dbd); color: #fff; padding: 4rem 1.25rem 2.5rem; overflow: hidden; }
+.la-hero-inner { max-width: 1100px; margin: 0 auto; text-align: center; position: relative; z-index: 1; }
+.la-hero-icon { display: inline-block; margin-bottom: .6rem; opacity: .95; }
+.la-hero h1 { margin: 0 0 .25rem; font-size: clamp(2.2rem, 4.8vw, 3.2rem); font-weight: 900; }
+.la-subtext { margin: .1rem auto 0; color: #e6e9f2; max-width: 760px; }
+.la-hero-bg { position: absolute; inset: 0; pointer-events: none; opacity: .25; background-image:
+  radial-gradient(circle at 20% 10%, rgba(255,255,255,.25) 0 2px, transparent 2px),
+  radial-gradient(circle at 80% 40%, rgba(255,255,255,.25) 0 2px, transparent 2px),
+  radial-gradient(circle at 40% 80%, rgba(255,255,255,.25) 0 2px, transparent 2px);
+  background-size: 140px 140px;
+}
+
+@media (max-width: 640px){
+  .la-hero { padding: 3.25rem 1rem 2rem; }
+}
+
+/* Sections */
+.la-section { padding: 2.6rem 1.5rem; background: linear-gradient(180deg, #f6f9ff 0%, #ffffff 60%); }
+.la-inner { max-width: 1200px; margin: 0 auto; }
+.la-h2 { text-align: center; margin: 0 0 1.1rem; font-size: clamp(1.8rem, 3.2vw, 2.2rem); font-weight: 900; color: #0F172A; }
+
+/* Cards */
+.la-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.1rem; align-items: stretch; }
+@media (max-width: 1100px){ .la-cards { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px){ .la-cards { grid-template-columns: 1fr; } }
+.la-card { display: flex; flex-direction: column; background: #fff; border: 1px solid #e6ecfb; border-radius: 16px; padding: 1.25rem; box-shadow: 0 6px 18px rgba(10,34,80,.06); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+.la-card:hover { transform: translateY(-6px); border-color: rgba(100,149,237,.5); box-shadow: 0 16px 36px rgba(10,34,80,.12); }
+.la-card-icon { margin-bottom: .5rem; width: 48px; height: 48px; border-radius: 12px; background: rgba(100,149,237,.12); display: inline-flex; align-items: center; justify-content: center; }
+.la-card h2 { margin: .15rem 0 .25rem; font-size: 1.25rem; font-weight: 900; color: #0F172A; }
+.la-card p { margin: 0 0 .9rem; color: #334155; }
+.la-actions { margin-top: auto; display: flex; flex-wrap: wrap; gap: .5rem; }
+.btn-pill { display: inline-block; padding: .55rem 1rem; background: #6495ED; color: #fff; border-radius: 999px; text-decoration: none; font-weight: 800; box-shadow: 0 8px 22px rgba(100,149,237,.35); }
+.btn-pill:hover { background: #5a86d6; }
+
+/* Accordion */
+.la-accordion { display: grid; gap: .6rem; max-width: 900px; margin: 0 auto; }
+.la-acc-item { border: 1px solid #e6ecfb; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 4px 14px rgba(10,34,80,.05); }
+.la-acc-toggle { width: 100%; text-align: left; background: #fff; border: 0; padding: .9rem 1rem; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .6rem; cursor: pointer; }
+.la-acc-toggle:hover { background: #f7faff; }
+.la-acc-title { font-weight: 800; color: #0F172A; }
+.la-acc-icon { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; }
+.la-acc-chevron { width: 16px; height: 16px; border-right: 2px solid #475569; border-bottom: 2px solid #475569; transform: rotate(-45deg); transition: transform .2s ease; }
+.la-acc-toggle[aria-expanded="true"] .la-acc-chevron { transform: rotate(45deg); }
+.la-acc-panel { padding: 0 1rem 1rem; color: #334155; }
+
+/* Related Articles */
+.related-articles { margin-top: 2rem; padding: 2rem; background: #f8f9fa; border-radius: 10px; }
+.related-articles h2 { font-size: 1.8rem; margin-bottom: 1rem; }
+.related-article-list { list-style: none; padding: 0; }
+.related-article-list li { margin-bottom: 1.25rem; }
+
+/* CTA banner */
+.la-cta { background: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%); padding: 2.2rem 1.5rem; }
+.la-cta-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 1rem; }
+.la-cta h3 { margin: 0 0 .25rem; font-size: clamp(1.4rem, 2.8vw, 1.8rem); font-weight: 900; color: #0F172A; }
+.la-support-btn { display: inline-flex; align-items: center; gap: .45rem; }

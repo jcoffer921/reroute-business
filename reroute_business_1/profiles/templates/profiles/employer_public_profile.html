@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Employer — {{ employer_profile.company_name|default:viewed_user.username }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/employer_public_profile.css' %}">
+
+<div class="employer-public" data-company="{{ employer_profile.company_name|default:viewed_user.username }}">
+  <!-- Hero / Header -->
+  <section class="hero">
+    {# Background image if available (prefer background image field if present) #}
+    {% if employer_profile.background_image %}
+      <div class="hero-bg" style="background-image: url('{{ employer_profile.background_image.url }}?v={{ employer_profile.background_image|file_version }}');"></div>
+    {% elif employer_profile.logo %}
+      <div class="hero-bg" style="background-image: url('{{ employer_profile.logo.url }}?v={{ employer_profile.logo|file_version }}');"></div>
+    {% else %}
+      <div class="hero-bg hero-bg--color"></div>
+      <div class="hero-watermark" style="background-image: url('{% static 'images/reroute-trans-logo.png' %}');"></div>
+    {% endif %}
+    <div class="hero-gradient"></div>
+
+    <!-- Bottom-left brand block -->
+    <div class="hero-content">
+      {% if employer_profile.logo %}
+        <img class="hero-logo" src="{{ employer_profile.logo.url }}?v={{ employer_profile.logo|file_version }}" alt="{{ employer_profile.company_name|default:'Company' }} logo">
+      {% else %}
+        <div class="hero-logo hero-logo--initials" aria-hidden="true">
+          {% with first=employer_profile.company_name|default:viewed_user.username|slice:":1" %}{{ first|upper }}{% endwith %}
+        </div>
+      {% endif %}
+      <div class="hero-text">
+        <h1 class="hero-name">{{ employer_profile.company_name|default:viewed_user.username }}</h1>
+        {% if employer_profile.verified or employer_profile.user.profile.verified %}
+          <span class="hero-verified" title="Verified">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Verified
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- About Us -->
+  <div class="section-divider"></div>
+  <section class="section section-about section--alt">
+    <h2 class="section-title">About Us</h2>
+    <div class="about-text">
+      {% if employer_profile.description %}
+        {{ employer_profile.description|linebreaksbr }}
+      {% else %}
+        <em>No company description provided yet.</em>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- Current Listings -->
+  <section class="section section-jobs">
+    <div class="section-head">
+      <h2 class="section-title">Current Job Openings</h2>
+    </div>
+    {% if jobs and jobs|length > 0 %}
+      <div class="jobs-grid">
+        {% for job in jobs %}
+          <a class="job-card" href="{% url 'job_detail' job.id %}" aria-label="View {{ job.title }} details">
+            <div class="job-card-inner">
+              <div class="job-title">{{ job.title }}</div>
+              <div class="job-meta">
+                <span class="chip">{{ job.get_job_type_display }}</span>
+                <span class="dot">•</span>
+                <span class="location">{{ job.location }}</span>
+              </div>
+              <div class="job-cta-row">
+                <span class="job-apply-btn">Apply</span>
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+      {% if total_jobs and total_jobs > 3 and view_all_url %}
+        <div class="view-all-wrap">
+          <a class="btn-view-all" href="{{ view_all_url }}">View All Jobs by {{ employer_profile.company_name|default:viewed_user.username }}</a>
+        </div>
+      {% endif %}
+    {% else %}
+      <p class="muted">This employer does not have any current job openings.</p>
+    {% endif %}
+  </section>
+
+  <!-- Additional Info -->
+  <section class="section section-info section--alt">
+    <h2 class="section-title">Additional Info</h2>
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="label">Address</div>
+        <div class="value">
+          {% if employer_profile.user.profile.street_address or employer_profile.user.profile.city or employer_profile.user.profile.state %}
+            {{ employer_profile.user.profile.street_address }}{% if employer_profile.user.profile.city %}, {{ employer_profile.user.profile.city }}{% endif %}{% if employer_profile.user.profile.state %}, {{ employer_profile.user.profile.state }}{% endif %}
+          {% else %}
+            <span class="muted">—</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="label">Location</div>
+        <div class="value">
+          {% if employer_profile.user.profile.city or employer_profile.user.profile.state %}
+            {{ employer_profile.user.profile.city }}{% if employer_profile.user.profile.city and employer_profile.user.profile.state %}, {% endif %}{{ employer_profile.user.profile.state }}
+          {% else %}
+            <span class="muted">—</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="label">Contact Number</div>
+        <div class="value">
+          {% if employer_profile.user.profile.phone_number %}
+            {{ employer_profile.user.profile.phone_number }}
+          {% else %}
+            <span class="muted">—</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="label">Website</div>
+        <div class="value">
+          {% if employer_profile.website %}
+            <a href="{{ employer_profile.website }}" target="_blank" rel="noopener">{{ employer_profile.website }}</a>
+          {% else %}
+            <span class="muted">—</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="{% static 'js/employer_public_profile.js' %}"></script>
+{% endblock %}

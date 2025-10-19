@@ -1,0 +1,348 @@
+<!-- templates/main/home.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %}ReRoute | Home{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+
+
+<!-- Login Status Message -->
+<div style="text-align: center; margin-top: 1rem;">
+    {% if user.is_authenticated %}
+        <p>You are logged in as <strong>{{ user.username }}</strong>.</p>
+    {% else %}
+        <p>You are not logged in.</p>
+    {% endif %}
+</div>
+
+
+<section class="hero home-hero">
+    <div class="hero-content">
+        <h1>Rebuild. Reclaim. ReRoute.</h1>
+        <div class="sub-hero">
+            <p><span class="highlight">Rebuild</span> people's views of formerly incarcerated individuals as we help them,</p>
+            <p><span class="highlight">Reclaim</span> their place in society in order to</p>
+            <p><span class="highlight">ReRoute</span> their future.</p>
+        </div>
+        <p class="hero-subheadline">Connecting justice-impacted job seekers with supportive employers, resume tools, training, and job matching to make second chances work.</p>
+        <div class="hero-ctas">
+            <a href="{% url 'signup' %}" class="cta-button cta-seekers">Get Started (Job Seekers)</a>
+            <a href="{% url 'employer_signup' %}" class="cta-button cta-employers">Post a Job (Employers)</a>
+        </div>
+    </div>
+</section>
+
+<section id="mission" class="mission">
+    <div class="mission-content">
+        <h2>Our Mission</h2>
+        <p class="mission-lead">We help justice-impacted people rebuild confidence, grow skills, and connect with employers who believe in second chances.</p>
+        <div class="mission-grid">
+          <article class="mission-pill">
+            <div class="pill-icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l8 4v5c0 5-3.5 9-8 9s-8-4-8-9V7l8-4z" stroke="#006da0" stroke-width="1.5"/><path d="M9 12l2 2 4-4" stroke="#00beb8" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <h3>Trust</h3>
+            <p>Respect, dignity, and privacy at every step.</p>
+          </article>
+          <article class="mission-pill">
+            <div class="pill-icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 18h16M6 16V6h6v10" stroke="#006da0" stroke-width="1.5"/><path d="M14 9h4v7" stroke="#00beb8" stroke-width="1.5"/></svg>
+            </div>
+            <h3>Skills</h3>
+            <p>Resume tools and training to grow faster.</p>
+          </article>
+          <article class="mission-pill">
+            <div class="pill-icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 7l9 5 9-5" stroke="#006da0" stroke-width="1.5"/><path d="M3 12l9 5 9-5" stroke="#00beb8" stroke-width="1.5"/></svg>
+            </div>
+            <h3>Opportunities</h3>
+            <p>Match with employers open to second-chance hiring.</p>
+          </article>
+          <article class="mission-pill">
+            <div class="pill-icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 21a9 9 0 1 1 0-18" stroke="#006da0" stroke-width="1.5"/><path d="M7 12h10M12 7v10" stroke="#00beb8" stroke-width="1.5"/></svg>
+            </div>
+            <h3>Community</h3>
+            <p>Support that strengthens people and workplaces.</p>
+          </article>
+        </div>
+    </div>
+</section>
+
+<section id="vision" class="vision-split">
+  <div class="vision-inner" style="--vision-overlay: rgba(0,109,160,0.92); --vision-bg: var(--neutral-gray); --vision-min-h: 80vh;">
+    <div class="vision-left">
+      <h2>Our Vision</h2>
+      <p>At ReRoute, our vision is to break down the stigma surrounding men and women navigating the reentry process. We are building a community that embraces second chances, a space where individuals once shut out by society are supported, not judged.</p>
+      <p>ReRoute exists to rebuild trust, restore dignity, and reshape how we view justice-involved individuals. We believe it takes a village not only to raise a child, but to uplift our mothers, fathers, siblings, and neighbors who deserve another shot at life.</p>
+      <p>As we grow, we aspire to expand our support through access to technology, education, trade certifications, therapy and personal development, paving new pathways to purpose and opportunity.</p>
+      <div class="vision-actions">
+        <a href="{% url 'about_us' %}" class="vision-btn" aria-label="Learn more about ReRoute">Learn More</a>
+      </div>
+    </div>
+    <div class="vision-right" style="--vision-image: url('{% static 'images/jaycoffer.jpg' %}'); --vision-image-pos-y: 78%; --vision-image-pos-x: 52%;"></div>
+  </div>
+  
+ </section>
+
+<!-- What Employers Are Saying -->
+<section id="trust" class="testimonial-section">
+  <div class="testimonial-inner">
+    <blockquote class="pullquote">
+      <div class="pullquote-top reveal-up">“...people with records tend to do better and last longer.”</div>
+      <p class="pullquote-full reveal-up">I work in staffing for light industrial work and people with records tend to do better and last longer. In my experience, they call off less and are usually looking to stay with the company longer term because they know how hard the job market can be. Some of our best performing hires come from this group.</p>
+      <footer class="pullquote-attrib reveal-up">— Staffing Professional, TikTok</footer>
+    </blockquote>
+  </div>
+</section>
+
+<!-- How It Works + Benefits (Unified) -->
+<section id="how-it-works" class="hiw-section">
+  <div class="hiw-inner">
+    <h2>How It Works</h2>
+    <p class="hiw-sub">Simple steps for seekers and employers to connect and succeed.</p>
+    <div class="hiw-steps">
+      <article class="hiw-step">
+        <div class="hiw-icon" aria-hidden="true">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="#006da0" stroke-width="1.5"/>
+            <path d="M8 12h8M12 8v8" stroke="#00beb8" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Sign Up</h3>
+        <p>Create a free account as a job seeker or employer.</p>
+      </article>
+      <article class="hiw-step">
+        <div class="hiw-icon" aria-hidden="true">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 7l9 5 9-5-9-4-9 4z" fill="#6495ED" opacity=".2"/>
+            <path d="M3 7l9 5 9-5M5 10l7 4 7-4" stroke="#0F172A" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <h3>Connect</h3>
+        <p>Use resume tools, training, and matching to find the right fit.</p>
+      </article>
+      <article class="hiw-step">
+        <div class="hiw-icon" aria-hidden="true">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 13l4 4L19 7" stroke="#00beb8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3>Succeed</h3>
+        <p>Get hired, grow skills, and build long-term success.</p>
+      </article>
+    </div>
+
+    <div class="audiences-inner" style="margin-top:1.25rem;">
+      <article class="audience-card">
+        <h3>For Job Seekers</h3>
+        <ul>
+          <li>AI-assisted resume builder</li>
+          <li>Interview prep & email guidance</li>
+          <li>Job matching with supportive employers</li>
+          <li>Training and upskilling pathways</li>
+        </ul>
+        <div class="audience-actions">
+          <a href="{% url 'resumes:resume_welcome' %}" class="btn-pill">Build Your Resume</a>
+          <a href="{% url 'opportunities' %}" class="btn-link">Browse Jobs</a>
+        </div>
+      </article>
+      <article class="audience-card">
+        <h3>For Employers</h3>
+        <ul>
+          <li>Streamlined job posting</li>
+          <li>Access to motivated talent</li>
+          <li>Metrics and insights</li>
+          <li>Second-chance hiring support</li>
+        </ul>
+        <div class="audience-actions">
+          <a href="{% url 'employer_signup' %}" class="btn-pill">Create Employer Account</a>
+          <a href="{% url 'create_job' %}" class="btn-link">Post a Job</a>
+        </div>
+      </article>
+    </div>
+
+  </div>
+</section>
+<!-- =========================
+     Blog Section — Featured + Recent or Teaser Empty State
+     ========================= -->
+<section class="blog-section">
+  {% if featured_posts or recent_posts %}
+    <!-- Hero Carousel (intro slide + featured; fallback to first recent) -->
+    <div class="slider-container blog-hero">
+      <div class="slides-wrapper" id="slidesWrapper">
+        <!-- Intro slide doubles as section header -->
+        <article class="slide hero-slide intro-slide">
+          <div class="hero-media" style="background-image:url('{% static 'images/your_voice.jpg' %}');"></div>
+          <div class="hero-overlay"></div>
+          <div class="hero-content">
+            <div class="hero-tagline">Your Voice Matters</div>
+            <h2 class="hero-kicker">Our Blog</h2>
+            <p class="hero-excerpt">Insights, stories, and resources from the ReRoute team.</p>
+            
+          </div>
+        </article>
+        {% if featured_posts %}
+          {% for post in featured_posts %}
+            <article class="slide hero-slide">
+              <div class="hero-media" style="background-image:url('{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/your_voice.jpg' %}{% endif %}');"></div>
+              <div class="hero-overlay"></div>
+              <div class="hero-content">
+                <h3 class="hero-title">{{ post.title }} <span class="badge-soon">Coming Soon</span></h3>
+                <p class="hero-excerpt">{{ post.content|truncatechars:140 }}</p>
+                
+              </div>
+            </article>
+          {% endfor %}
+        {% else %}
+          {% for post in recent_posts|slice:':1' %}
+            <article class="slide hero-slide">
+              <div class="hero-media" style="background-image:url('{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/your_voice.jpg' %}{% endif %}');"></div>
+              <div class="hero-overlay"></div>
+              <div class="hero-content">
+                <h3 class="hero-title">{{ post.title }} <span class="badge-soon">Coming Soon</span></h3>
+                <p class="hero-excerpt">{{ post.content|truncatechars:140 }}</p>
+                
+              </div>
+            </article>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <button type="button" class="slider-btn prev" aria-label="Previous slide">
+        <span class="arrow-triangle left"></span>
+      </button>
+      <button type="button" class="slider-btn next" aria-label="Next slide">
+        <span class="arrow-triangle right"></span>
+      </button>
+    </div>
+    <div class="slider-dots" id="sliderDots"></div>
+
+    <!-- Recent posts row -->
+    {% if recent_posts %}
+      <div class="recent-row">
+        {% for post in recent_posts %}
+          <article class="post-card">
+            {% if post.image %}
+              <a href="{% url 'blog_detail' slug=post.slug %}" class="post-media" style="background-image:url('{{ post.image.url }}');" aria-label="{{ post.title }}"></a>
+            {% else %}
+              <a href="{% url 'blog_detail' slug=post.slug %}" class="post-media post-media--logo" style="background-image:url('{% static 'images/reroute-trans-logo.png' %}');" aria-label="{{ post.title }}"></a>
+            {% endif %}
+            <div class="post-body">
+              <h4 class="post-title"><a href="{% url 'blog_detail' slug=post.slug %}">{{ post.title }}</a> <span class="badge-soon">Coming Soon</span></h4>
+              <p class="post-excerpt">{{ post.content|truncatechars:110 }}</p>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="blog-header" style="margin-top:1rem;">
+      <a href="{% url 'blog_list' %}" class="view-all-link">View all blog posts</a>
+    </div>
+
+  {% else %}
+    <!-- Teaser Carousel with immersive images -->
+    <div class="slider-container blog-hero">
+      <div class="slides-wrapper" id="slidesWrapper">
+        <!-- Intro slide doubles as section header in empty state -->
+        <article class="slide hero-slide intro-slide">
+          <div class="hero-media" style="background-image:url('{% static 'images/your_voice.jpg' %}');"></div>
+          <div class="hero-overlay"></div>
+          <div class="hero-content">
+            <div class="hero-tagline">Your Voice Matters</div>
+            <h2 class="hero-kicker">Our Blog</h2>
+            <p class="hero-excerpt">We're working on insightful stories and resources. Coming Soon.</p>
+            
+          </div>
+        </article>
+        <article class="slide hero-slide">
+          <div class="hero-media hero-media--logo" style="background-image:url('{% static 'images/reroute-trans-logo.png' %}');"></div>
+          <div class="hero-overlay"></div>
+          <div class="hero-content">
+            <h3 class="hero-title">Resources that make a difference</h3>
+            <p class="hero-excerpt">We're crafting practical guides you can use right away. Coming Soon.</p>
+            
+          </div>
+        </article>
+      </div>
+      <button type="button" class="slider-btn prev" aria-label="Previous slide">
+        <span class="arrow-triangle left"></span>
+      </button>
+      <button type="button" class="slider-btn next" aria-label="Next slide">
+        <span class="arrow-triangle right"></span>
+      </button>
+    </div>
+    <div class="slider-dots" id="sliderDots"></div>
+
+    <!-- Removed duplicate Notify Me CTA under the carousel per request -->
+  {% endif %}
+</section>
+
+
+<section id="features" class="services-section">
+  <div class="services-inner">
+    <div class="services-header">
+      <h2>How ReRoute Helps</h2>
+      <p class="services-subtext">Training, resume tools, and job matching to accelerate your journey.</p>
+    </div>
+    <div class="services-grid">
+      <!-- Tech Training Card -->
+      <article class="service-card">
+        <div class="service-icon" aria-hidden="true">
+          <!-- Graduation cap icon -->
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3L2 8l10 5 10-5-10-5z" fill="#6495ED" opacity=".25"/>
+            <path d="M12 3L2 8l10 5 10-5-10-5z" stroke="#6495ED" stroke-width="1.5"/>
+            <path d="M6 11v3.5c0 1 .6 1.9 1.6 2.3 2.8 1.2 6 1.2 8.8 0 1-.4 1.6-1.3 1.6-2.3V11" stroke="#0F172A" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <h3>Tech Training</h3>
+        <p>Gain in-demand skills through certified bootcamps and workshops.</p>
+        <div class="card-actions">
+          <button class="btn-pill" disabled>Coming Soon</button>
+        </div>
+      </article>
+
+      <!-- Resume Help Card -->
+      <article class="service-card">
+        <div class="service-icon" aria-hidden="true">
+          <!-- Document/Pencil icon -->
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="3" width="12" height="16" rx="2" stroke="#0F172A" stroke-width="1.5"/>
+            <path d="M8 7h6M8 10h6M8 13h4" stroke="#6495ED" stroke-width="1.5"/>
+            <path d="M16 14l4 4-3 1 1-3-2-2z" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3>Resume Help</h3>
+        <p>Build standout resumes with expert guidance and AI tools.</p>
+        <div class="card-actions">
+          <a href="{% url 'resumes:resume_welcome' %}" class="btn-pill">Start Resume</a>
+        </div>
+      </article>
+
+      <!-- Job Matching Card -->
+      <article class="service-card">
+        <div class="service-icon" aria-hidden="true">
+          <!-- Handshake icon -->
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 12l3 3a2 2 0 0 0 3 0l3-3" stroke="#6495ED" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M2 12l6-6 4 4 4-4 6 6" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3>Job Matching</h3>
+        <p>Connect with employers open to second-chance hiring.</p>
+        <div class="card-actions">
+          <a href="{% url 'opportunities' %}" class="btn-pill">Explore Jobs</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<script src="{% static 'js/home.js' %}"></script>
+{% endblock %}

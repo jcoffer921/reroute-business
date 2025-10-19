@@ -1,0 +1,107 @@
+{# employers/employer_signup.html #}
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Employer Signup{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/employer_login.css' %}"> {# reuse styles #}
+<link rel="stylesheet" href="{% static 'css/employer_signup.css' %}"> {# overrides below #}
+
+<section class="auth-card auth-card--wide">
+  <h1 class="auth-title">Create your employer account</h1>
+  <p class="subtitle">Post jobs, review applicants, and manage your company profile.</p>
+  <p class="micro-hint" style="margin-top:6px">
+    Not sure? <a href="{% url 'pricing' %}?tab=employer" class="link">Check our plans first →</a>
+  </p>
+
+  <form method="post" action="{% url 'employer_signup' %}" novalidate>
+    {% csrf_token %}
+
+    <!-- ===== Account section ===== -->
+    <div class="form-row two-col">
+      <div class="form-group">
+        <label for="first_name">First name</label>
+        <input id="first_name" name="first_name" type="text" required
+               value="{{ prefill.first_name|default:'' }}">
+        {% if errors.first_name %}<div class="field-error">{{ errors.first_name }}</div>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="last_name">Last name</label>
+        <input id="last_name" name="last_name" type="text" required
+               value="{{ prefill.last_name|default:'' }}">
+        {% if errors.last_name %}<div class="field-error">{{ errors.last_name }}</div>{% endif %}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Work email</label>
+      <input id="email" name="email" type="email" inputmode="email" autocomplete="email" required
+             placeholder="name@company.com" value="{{ prefill.email|default:'' }}">
+      {% if errors.email %}<div class="field-error">{{ errors.email }}</div>{% endif %}
+    </div>
+
+    <div class="form-row two-col">
+      <div class="form-group">
+        <div class="label-row">
+          <label for="password1">Password</label>
+          <span class="micro-hint" id="pw-hint">Use at least 8 characters.</span>
+        </div>
+        <div class="pwd-wrap">
+          <input id="password1" name="password1" type="password" autocomplete="new-password" required>
+          <span class="pwd-toggle-text" tabindex="0" role="button" aria-controls="password1">Show Password</span>
+        </div>
+        {% if errors.password1 %}<div class="field-error">{{ errors.password1 }}</div>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="password2">Confirm password</label>
+        <div class="pwd-wrap">
+          <input id="password2" name="password2" type="password" autocomplete="new-password" required>
+          <span class="pwd-toggle-text" tabindex="0" role="button" aria-controls="password2">Show Password</span>
+        </div>
+        {% if errors.password2 %}<div class="field-error">{{ errors.password2 }}</div>{% endif %}
+      </div>
+    </div>
+
+    <!-- ===== Company section ===== -->
+    <div class="form-group">
+      <label for="company_name">Company name</label>
+      <input id="company_name" name="company_name" type="text" required
+             value="{{ prefill.company_name|default:'' }}">
+      {% if errors.company_name %}<div class="field-error">{{ errors.company_name }}</div>{% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="website">Website (optional)</label>
+      <input id="website" name="website" type="url" placeholder="https://example.com"
+             value="{{ prefill.website|default:'' }}">
+    </div>
+
+    <div class="form-group">
+      <label for="description">Company description (optional)</label>
+      <textarea id="description" name="description" rows="4"
+                placeholder="Tell candidates about your mission, team size, and benefits.">{{ prefill.description|default:'' }}</textarea>
+    </div>
+
+    <!-- ===== Terms / create button ===== -->
+    <div class="agree-row">
+      <label class="checkbox">
+        <input type="checkbox" name="agree_terms" value="1" {% if prefill %}{% if not errors.agree_terms %}checked{% endif %}{% endif %}>
+        <span>I agree to the <a href="{% url 'terms' %}" target="_blank" rel="noopener">Terms</a> and <a href="{% url 'privacy' %}" target="_blank" rel="noopener">Privacy Policy</a>.</span>
+      </label>
+      {% if errors.agree_terms %}<div class="field-error">{{ errors.agree_terms }}</div>{% endif %}
+    </div>
+
+    <button type="submit" class="btn-pill">Create employer account</button>
+
+    <div class="secondary-actions">
+      <span>Already have an account? <a class="link" href="{% url 'employer_login' %}">Employer login</a>.</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a class="link" href="{% url 'signup' %}">User signup</a>
+    </div>
+  </form>
+</section>
+
+<script src="{% static 'js/employer_signup.js' %}"></script>
+{% endblock %}

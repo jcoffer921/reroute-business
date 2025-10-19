@@ -1,0 +1,92 @@
+.privacy-container {
+  max-width: 900px;
+  margin: 3rem auto;
+  padding: 7rem 2rem;
+  background-color: #fafafa;
+  border-radius: 12px;
+  color: #333;
+  line-height: 1.8;
+}
+
+.privacy-container h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.privacy-text p, .privacy-text li {
+  margin-bottom: 1rem;
+}
+
+#backToTopBtn {
+  display: none;
+  position: fixed;
+  bottom: 40px;
+  right: 30px;
+  z-index: 100;
+  font-size: 20px;
+  border: none;
+  outline: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  padding: 14px 18px;
+  border-radius: 50%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+#backToTopBtn:hover {
+  background-color: #0056b3;
+}
+
+.privacy-toc {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: #f3f3f3;
+  border-left: 4px solid #007bff;
+  border-radius: 8px;
+}
+
+.privacy-toc h2 {
+  margin-top: 0;
+}
+
+.privacy-toc ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.privacy-toc li {
+  margin-bottom: 0.5rem;
+}
+
+.privacy-toc a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.privacy-toc a:hover {
+  text-decoration: underline;
+}
+
+ul {
+  padding-left: 2rem;
+}
+
+h3 {
+  font-size: 17.5px;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+ol {
+  padding-left: 2rem;
+}
+
+hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, #ccc, #eee, #ccc);
+  margin: 2rem 0;
+}

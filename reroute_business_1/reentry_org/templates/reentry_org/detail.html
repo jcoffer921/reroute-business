@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ org.name }} | Reentry Organization{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'reentry_org/catalog.css' %}">
+<style>
+.org-detail { max-width: 960px; margin: 24px auto 56px; padding: 0 16px; }
+.org-header { display: flex; gap: 20px; align-items: center; padding: 16px; background: #fff; border: 1px solid #eee; border-radius: 14px; }
+.org-header .logo { width: 96px; height: 96px; border-radius: 12px; background: #f7f9fc; display: flex; align-items: center; justify-content: center; }
+.org-header .logo img { max-width: 90%; max-height: 90%; object-fit: contain; }
+.org-header .meta { flex: 1; }
+.org-header .name { margin: 0 0 8px; }
+.pill { display: inline-block; font-size: 0.85rem; background: rgba(100,149,237,0.12); color: #2b5dbb; padding: 6px 10px; border-radius: 999px; }
+.meta-row { color: #666; margin-top: 6px; }
+.actions { display: flex; gap: 10px; }
+.btn-link { background: var(--accent, #6495ED); color: #fff; text-decoration: none; padding: 10px 14px; border-radius: 10px; }
+.card { margin-top: 16px; background: #fff; border: 1px solid #eee; border-radius: 14px; padding: 16px; }
+.card h2 { margin: 0 0 10px; font-size: 1.1rem; }
+.empty { color: #666; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="org-detail">
+  <div class="org-header">
+    <div class="logo">
+      {% if org.logo %}
+        <img src="{{ org.logo.url }}" alt="{{ org.name }} logo">
+      {% else %}
+        <img src="{% static 'images/reroute-logo.png' %}" alt="{{ org.name }} logo">
+      {% endif %}
+    </div>
+    <div class="meta">
+      <h1 class="name">{{ org.name }}</h1>
+      <div>
+        <span class="pill">{% for key,label in categories %}{% if org.category == key %}{{ label }}{% endif %}{% endfor %}</span>
+      </div>
+      <div class="meta-row">
+        {% if org.city or org.state %}
+          <span>{{ org.city }}{% if org.city and org.state %}, {% endif %}{{ org.state }}</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="actions">
+      {% if org.website %}<a class="btn-link" href="{{ org.website }}" target="_blank" rel="noopener">Visit Website</a>{% endif %}
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>About</h2>
+    {% if org.website %}
+      <p><strong>Website:</strong> <a href="{{ org.website }}" target="_blank" rel="noopener">{{ org.website }}</a></p>
+    {% endif %}
+    {% if org.description %}
+      <p>{{ org.description }}</p>
+    {% else %}
+      <p class="empty">No description available.</p>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

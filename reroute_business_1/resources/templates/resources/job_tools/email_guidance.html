@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Email Guidance | ReRoute{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'resources/css/job_tools/email_guidance.css' %}">
+
+<!-- Hero -->
+<section class="eg-hero">
+  <div class="eg-hero-inner">
+    <div class="eg-hero-icon" aria-hidden="true">
+      <!-- Envelope icon -->
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="6" width="18" height="12" rx="2" stroke="#0F172A" stroke-width="1.8"/>
+        <path d="M4 8l8 5 8-5" stroke="#6495ED" stroke-width="1.8"/>
+      </svg>
+    </div>
+    <h1>How to Write a Professional Email</h1>
+    <p class="eg-subtext">Clear structure, respectful tone, and concise writing turn your emails into opportunities.</p>
+  </div>
+  <div class="eg-hero-bg" aria-hidden="true"></div>
+</section>
+
+<!-- Basic Structure -->
+<section class="eg-section">
+  <div class="eg-inner">
+    <h2>Basic Email Structure</h2>
+    <div class="eg-info-cards">
+      <article class="eg-info-card">
+        <div class="eg-info-icon" aria-hidden="true">
+          <!-- Subject icon -->
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 7h16M4 12h16M4 17h10" stroke="#0F172A" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="eg-label">Subject</div>
+          <p>Short and clear (e.g., “Application Follow‑Up”).</p>
+        </div>
+      </article>
+
+      <article class="eg-info-card">
+        <div class="eg-info-icon" aria-hidden="true">
+          <!-- Greeting icon -->
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="#6495ED" stroke-width="1.8"/><path d="M8 13h8" stroke="#0F172A" stroke-width="1.8"/></svg>
+        </div>
+        <div>
+          <div class="eg-label">Greeting</div>
+          <p>“Hello [Name],” or “Good morning [Name],”</p>
+        </div>
+      </article>
+
+      <article class="eg-info-card">
+        <div class="eg-info-icon" aria-hidden="true">
+          <!-- Pen icon -->
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 16l6 4 10-10-4-4L6 12 4 16z" stroke="#0F172A" stroke-width="1.6"/></svg>
+        </div>
+        <div>
+          <div class="eg-label">Body</div>
+          <p>State your purpose in 1–3 short sentences.</p>
+        </div>
+      </article>
+
+      <article class="eg-info-card">
+        <div class="eg-info-icon" aria-hidden="true">
+          <!-- Signature icon -->
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 18c3-2 5 2 8 0s5-6 8-8" stroke="#6495ED" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <div class="eg-label">Closing & Signature</div>
+          <p>“Thank you,” then your full name and contact info.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Templates -->
+<section class="eg-section">
+  <div class="eg-inner">
+    <h2>Templates You Can Use</h2>
+
+    <article class="eg-template">
+      <header class="eg-template-head">
+        <div class="eg-template-title">
+          <span class="eg-chip">Follow‑Up</span>
+          <span class="eg-subject">Subject: Thank You — Interview for [Job Title]</span>
+        </div>
+        <button class="eg-copy" data-copy-target="#tpl1">Copy Template</button>
+      </header>
+      <pre id="tpl1" class="eg-code"><code>Hello [Hiring Manager Name],
+
+Thank you for taking the time to speak with me about the [Job Title] role. I appreciated the opportunity and enjoyed learning more about your team.
+
+Please let me know if you need anything else from me. I look forward to next steps.
+
+Best regards,
+[Your Name]
+[Your Phone Number]</code></pre>
+    </article>
+
+    <article class="eg-template">
+      <header class="eg-template-head">
+        <div class="eg-template-title">
+          <span class="eg-chip">Cold Inquiry</span>
+          <span class="eg-subject">Subject: Interest in Opportunities at [Company Name]</span>
+        </div>
+        <button class="eg-copy" data-copy-target="#tpl2">Copy Template</button>
+      </header>
+      <pre id="tpl2" class="eg-code"><code>Hello [Name],
+
+I hope this message finds you well. I'm reaching out to ask if you're currently hiring for any positions. I'm hardworking, dependable, and excited to contribute to a great team.
+
+Thank you for your time and consideration.
+
+Sincerely,
+[Your Name]
+[Your Contact Info]</code></pre>
+    </article>
+  </div>
+</section>
+
+<!-- Do's and Don'ts -->
+<section class="eg-section">
+  <div class="eg-inner">
+    <h2>Do's and Don'ts</h2>
+    <div class="eg-dosdonts">
+      <article class="eg-dd-card do">
+        <div class="eg-dd-head">
+          <span class="eg-dd-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12l5 5 11-11" stroke="#16a34a" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <h3>Do</h3>
+        </div>
+        <ul>
+          <li>Use respectful, clear language</li>
+          <li>Proofread for typos</li>
+          <li>Keep it short and to the point</li>
+          <li>Be polite and professional</li>
+        </ul>
+      </article>
+
+      <article class="eg-dd-card dont">
+        <div class="eg-dd-head">
+          <span class="eg-dd-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l12 12M18 6l-12 12" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <h3>Don't</h3>
+        </div>
+        <ul>
+          <li>Use slang or emojis</li>
+          <li>Write long paragraphs</li>
+          <li>Send without a subject line</li>
+          <li>Forget to include your name</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="eg-cta">
+  <div class="eg-cta-inner">
+    <h3>Need help writing your next email? Explore more Job Tools.</h3>
+    <a href="{% url 'job_tools_index' %}" class="btn-pill">See All Job Tools</a>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'resources/js/job_tools/email_guidance.js' %}" defer></script>
+{% endblock %}

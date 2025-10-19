@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Employer Dashboard{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'dashboard/css/employer_dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'employers/css/dashboard.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+<section class="employer-hero">
+  <div class="employer-hero-content">
+    <h1>Dashboard</h1>
+    <p>Take the leap of faith</p>
+    <p style="margin-top:6px; font-size:.9rem;"><a href="{% url 'contact' %}" class="link">Give Feedback</a></p>
+  </div>
+</section>
+
+<div class="employer-dashboard container">
+  {% if not employer_verified %}
+  <div class="alert warning" role="status" style="margin:12px 0;">
+    <strong>Pending verification:</strong> Your employer account must be verified by ReRoute before you can post jobs. Complete your profile and we’ll review shortly.
+  </div>
+  {% endif %}
+
+  <!-- 📋 Job Listings -->
+  <section class="job-listings">
+    <div class="section-header">
+      <h2>Job Listings</h2>
+      <div class="sort-control">
+        {% if employer_verified %}
+          <a href="{% url 'create_job' %}" class="btn btn-secondary">
+            <i class="fas fa-plus"></i> Create Job
+          </a>
+        {% else %}
+          <a class="btn btn-secondary" aria-disabled="true" title="Pending verification">
+            <i class="fas fa-plus"></i> Create Job
+          </a>
+        {% endif %}
+        <a href="{{ PROFILE_URL }}" class="btn btn-secondary" title="Edit Employer Profile">
+          <i class="fas fa-building"></i> Profile
+        </a>
+        <form method="get" class="sort-form" style="display:inline-flex; align-items:center; gap:.5rem;">
+          <label for="sort_by">Sort by:</label>
+          <select id="sort_by" name="sort_by" onchange="this.form.submit()">
+            <option value="newest" {% if sort_by == 'newest' or not sort_by %}selected{% endif %}>Newest</option>
+            <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Oldest</option>
+          </select>
+        </form>
+      </div>
+    </div>
+
+    <table class="job-table">
+      <thead>
+        <tr>
+          <th>Job Title</th>
+          <th>Candidates</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for job in jobs %}
+        <tr>
+          <td>{{ job.title }}</td>
+          <td>{{ job.applications.count }} active</td>
+          <td>
+            <span class="badge {% if job.is_active %}badge-success{% else %}badge-secondary{% endif %}">
+              {{ job.is_active|yesno:"Open,Closed" }}
+            </span>
+          </td>
+          <td>
+            <form method="post" action="{% url 'dashboard:employer_job_toggle' job.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm {% if job.is_active %}btn-outline{% else %}btn-primary{% endif %}" title="Toggle active/inactive">
+                {% if job.is_active %}Close{% else %}Open{% endif %}
+              </button>
+            </form>
+            <button type="button" class="btn btn-sm btn-outline view-applicants"
+                    data-url="{% url 'dashboard:job_applicants' job.id %}" title="View Applicants">
+              Applicants
+            </button>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No job listings yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 📈 Analytics Summary -->
+  <section class="analytics-section">
+    <div class="section-header" style="justify-content: space-between; align-items: center; margin-bottom:.5rem;">
+      <h2 class="section-title" style="margin:0;">Analytics</h2>
+      <a href="{% url 'dashboard:employer_analytics' %}" class="btn btn-secondary btn-sm" title="Open full Analytics">Open Analytics</a>
+    </div>
+    <div class="analytics-cards">
+      <a class="analytics-card" href="{% url 'dashboard:employer' %}" title="View applicants">
+        <div class="icon-circle icon-green"><i class="fas fa-user"></i></div>
+        <div class="analytics-value">{{ total_applications }}</div>
+        <div class="analytics-label">Total Applicants</div>
+      </a>
+
+      <a class="analytics-card" href="{% url 'dashboard:employer' %}" title="View jobs">
+        <div class="icon-circle icon-blue"><i class="fas fa-file-alt"></i></div>
+        <div class="analytics-value">{{ total_jobs }}</div>
+        <div class="analytics-label">Jobs Posted</div>
+      </a>
+
+      <a class="analytics-card" href="{% url 'dashboard:employer' %}" title="Active listings">
+        <div class="icon-circle icon-amber"><i class="fas fa-briefcase"></i></div>
+        <div class="analytics-value">{{ active_jobs }}</div>
+        <div class="analytics-label">Active Listings</div>
+      </a>
+
+      <a class="analytics-card" href="{% url 'dashboard:employer' %}" title="Filled jobs">
+        <div class="icon-circle icon-purple"><i class="fas fa-check-circle"></i></div>
+        <div class="analytics-value">{{ jobs_filled }}</div>
+        <div class="analytics-label">Jobs Filled via ReRoute</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 🧑‍🤝‍🧑 Matcher (Full-width card) -->
+  <section class="card" style="margin-bottom: 1.5rem;">
+    <div class="section-header" style="margin-bottom:.5rem; justify-content: space-between; align-items:center;">
+      <h2>Matcher</h2>
+      <a href="{% url 'dashboard:employer_matcher' %}" class="btn btn-secondary btn-sm" title="Open full Matcher">Open Matcher</a>
+    </div>
+    {% if matched_seekers %}
+      <ul class="list-group">
+        {% for item in matched_seekers %}
+          <li>
+            <div style="display:flex; justify-content: space-between; align-items:center; gap:.5rem;">
+              <div>
+                <strong>
+                  <a href="{% url 'profiles:public_profile' item.user.username %}">
+                    {{ item.user.first_name|default:item.user.username }}
+                  </a>
+                </strong>
+                <span class="time"> · Best fit for {{ item.job.title }} · {{ item.score }}%</span>
+              </div>
+              <a href="{% url 'dashboard:employer_job_matches' item.job.id %}" class="btn btn-sm btn-outline" title="View all matches for this job">View all</a>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty-state"><i class="fas fa-user-friends"></i> No matches yet.</div>
+    {% endif %}
+  </section>
+
+  <!-- 🔔 Notifications + Interviews (2-column grid) -->
+  <section class="grid-2col">
+    <!-- Notifications -->
+    <div class="card">
+      <div class="section-header" style="justify-content: space-between; align-items: center;">
+        <h3 style="margin:0;">Notifications</h3>
+        <form method="post" action="{% url 'dashboard:notifications' %}" style="margin:0;">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="mark_all_read">
+          <button type="submit" class="btn btn-secondary btn-sm">Mark all read</button>
+        </form>
+      </div>
+      {% if notifications %}
+        <ul class="list-group">
+          {% for note in notifications %}
+            <li>
+              <div>{{ note.message }}</div>
+              <div class="time">{{ note.created_at|timesince }} ago</div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="empty-state">No notifications.</div>
+      {% endif %}
+    </div>
+
+    <!-- Interviews Scheduled -->
+    <div class="card">
+      <div class="section-header" style="justify-content: space-between; align-items:center;">
+        <h3 style="margin:0;">Interviews Scheduled</h3>
+        <button type="button" class="btn btn-primary btn-sm" id="openScheduleInterview">Add Interview</button>
+      </div>
+      {% if interviews %}
+        <ul class="list-group">
+          {% for interview in interviews %}
+            <li>
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:.5rem; flex-wrap:wrap;">
+                <div>
+                  <div><strong>{{ interview.job.title }}</strong></div>
+                  <div class="time">{{ interview.scheduled_at|date:"M d, Y g:ia" }} · {{ interview.candidate.get_full_name|default:interview.candidate.username }}</div>
+                </div>
+                <div class="actions-dropdown">
+                  <button type="button"
+                          class="btn btn-outline btn-sm dropdown-toggle"
+                          data-menu-id="dd-{{ interview.id }}">
+                    Actions ▾
+                  </button>
+                  <div class="dropdown-menu" id="dd-{{ interview.id }}">
+                    <button type="button" class="dropdown-item openReschedule"
+                            data-interview="{{ interview.id }}"
+                            data-datetime="{{ interview.scheduled_at|date:'Y-m-d\\TH:i' }}">
+                      Reschedule
+                    </button>
+                    <form method="post" action="{% url 'dashboard:cancel_interview' %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="interview_id" value="{{ interview.id }}">
+                      <button type="submit" class="dropdown-item" onclick="return confirm('Cancel this interview?');">Cancel</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="empty-state"><i class="far fa-calendar"></i> No interviews scheduled.</div>
+      {% endif %}
+    </div>
+  </section>
+
+</div>
+
+<!-- ====== Schedule Interview Modal ====== -->
+<div id="scheduleInterviewBackdrop" class="modal-backdrop hidden"></div>
+<div id="scheduleInterviewModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="scheduleInterviewTitle">
+  <div class="modal-content">
+    <button class="modal-close" id="scheduleInterviewClose" aria-label="Close">✕</button>
+    <h3 id="scheduleInterviewTitle" style="margin-top:0;">Schedule Interview</h3>
+    <form method="post" action="{% url 'dashboard:schedule_interview' %}" class="edit-form" style="padding:0;">
+      {% csrf_token %}
+      <p>
+        <label for="jobSelect">Job</label>
+        <select required id="jobSelect" name="job_id">
+          {% for j in jobs %}
+            <option value="{{ j.id }}">{{ j.title }}</option>
+          {% endfor %}
+        </select>
+      </p>
+      <p>
+        <label for="cand">Candidate Username</label>
+        <input type="text" id="cand" name="candidate_username" required placeholder="e.g. janedoe" />
+      </p>
+      <p>
+        <label for="dt">Date &amp; Time</label>
+        <input type="datetime-local" id="dt" name="datetime" required />
+      </p>
+      <p>
+        <label for="notes">Notes (optional)</label>
+        <textarea id="notes" name="notes" rows="3" placeholder="Notes for the interview..."></textarea>
+      </p>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Schedule</button>
+        <button type="button" class="btn btn-secondary" id="scheduleInterviewClose2">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ====== Reschedule Interview Modal ====== -->
+<div id="rescheduleInterviewBackdrop" class="modal-backdrop hidden"></div>
+<div id="rescheduleInterviewModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="rescheduleInterviewTitle">
+  <div class="modal-content">
+    <button class="modal-close" id="rescheduleInterviewClose" aria-label="Close">✕</button>
+    <h3 id="rescheduleInterviewTitle" style="margin-top:0;">Reschedule Interview</h3>
+    <form method="post" action="{% url 'dashboard:reschedule_interview' %}" class="edit-form" style="padding:0;">
+      {% csrf_token %}
+      <input type="hidden" id="rescheduleInterviewId" name="interview_id" value="">
+      <p>
+        <label for="rescheduleDt">New Date &amp; Time</label>
+        <input type="datetime-local" id="rescheduleDt" name="datetime" required />
+      </p>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" id="rescheduleInterviewClose2">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- ====== Modal for applicants ====== -->
+<div id="modalBackdrop" class="modal-backdrop hidden"></div>
+<div id="modalRoot" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-content">
+    <button class="modal-close" aria-label="Close">✕</button>
+    <div id="modalBody">Loading…</div>
+  </div>
+  
+  
+</div>
+
+<script src="{% static 'dashboard/js/employer_dashboard.js' %}" defer></script>
+<script>
+  (function(){
+    const openBtn = document.getElementById('openScheduleInterview');
+    const modal = document.getElementById('scheduleInterviewModal');
+    const backdrop = document.getElementById('scheduleInterviewBackdrop');
+    const closeBtn = document.getElementById('scheduleInterviewClose');
+    function open(){ modal.classList.remove('hidden'); backdrop.classList.remove('hidden'); }
+    function close(){ modal.classList.add('hidden'); backdrop.classList.add('hidden'); }
+    if (openBtn) openBtn.addEventListener('click', open);
+    if (backdrop) backdrop.addEventListener('click', close);
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    const closeBtn2 = document.getElementById('scheduleInterviewClose2');
+    if (closeBtn2) closeBtn2.addEventListener('click', close);
+  })();
+
+  // Reschedule modal wiring
+  (function(){
+    // Dropdown toggles
+    document.addEventListener('click', (e) => {
+      const toggle = e.target.closest('.dropdown-toggle');
+      // Close all menus if clicking outside
+      if (!toggle && !e.target.closest('.actions-dropdown')) {
+        document.querySelectorAll('.actions-dropdown .dropdown-menu').forEach(m => m.classList.remove('show'));
+        return;
+      }
+      if (toggle) {
+        const id = toggle.getAttribute('data-menu-id');
+        const menu = document.getElementById(id);
+        if (menu) {
+          const isOpen = menu.classList.contains('show');
+          document.querySelectorAll('.actions-dropdown .dropdown-menu').forEach(m => m.classList.remove('show'));
+          if (!isOpen) menu.classList.add('show');
+        }
+      }
+    });
+
+    const openBtns = document.querySelectorAll('.openReschedule');
+    const modal = document.getElementById('rescheduleInterviewModal');
+    const backdrop = document.getElementById('rescheduleInterviewBackdrop');
+    const closeBtn = document.getElementById('rescheduleInterviewClose');
+    const closeBtn2 = document.getElementById('rescheduleInterviewClose2');
+    const idInput = document.getElementById('rescheduleInterviewId');
+    const dtInput = document.getElementById('rescheduleDt');
+
+    function open(interviewId, dt) {
+      if (!modal) return;
+      idInput.value = interviewId || '';
+      if (dt) dtInput.value = dt;
+      modal.classList.remove('hidden');
+      backdrop.classList.remove('hidden');
+      // Close any open dropdowns
+      document.querySelectorAll('.actions-dropdown .dropdown-menu').forEach(m => m.classList.remove('show'));
+    }
+    function close(){
+      if (!modal) return;
+      modal.classList.add('hidden');
+      backdrop.classList.add('hidden');
+    }
+    openBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-interview');
+        const dt = btn.getAttribute('data-datetime');
+        open(id, dt);
+      });
+    });
+    if (backdrop) backdrop.addEventListener('click', close);
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    if (closeBtn2) closeBtn2.addEventListener('click', close);
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
+  })();
+</script>
+{% endblock %}

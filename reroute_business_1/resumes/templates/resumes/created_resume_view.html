@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% load static %}
+{% load resume_filters %}
+{% block title %}Your Resume{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'resumes/css/created_resume_view.css' %}">
+<link href="https://fonts.googleapis.com/css?family=Rokkitt:400,700|Lato:400,300" rel="stylesheet">
+
+<style>
+  /* Two‑pane layout: created view (left) + live style (right) */
+  .resume-toolbar { max-width: 1100px; margin: 0 auto 12px; display:flex; align-items:center; justify-content: space-between; gap:.75rem; padding: 0 1rem; }
+  .resume-toolbar .btns { display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
+  .resume-toolbar .btn { padding: 8px 12px; border-radius: 6px; text-decoration:none; border: 1px solid #c8d1db; background:#fff; color:#003660; font-weight:600; }
+  .resume-toolbar .btn.primary { background:#003660; color:#fff; border-color:#003660; }
+
+  .resume-dual { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 0 1rem; }
+  .resume-pane { background: transparent; }
+  .resume-pane iframe { width:100%; height: calc(100vh - 240px); min-height:520px; border: 1px solid #e5e7eb; border-radius:8px; background:#fff; }
+  @media (max-width: 980px) { .resume-dual { grid-template-columns: 1fr; } .resume-pane iframe { height:520px; } }
+</style>
+
+<!-- Toolbar: actions + style selector -->
+<div class="resume-toolbar">
+  <div class="btns">
+    <button id="saveResumeBtn" data-save-url="{% url 'resumes:save_created_resume' resume.id %}" data-resume-id="{{ resume.id }}">
+      <span class="label">Save to Dashboard</span>
+      <span class="spinner" style="display: none;"></span>
+    </button>
+    <a class="btn" href="{% url 'resumes:download_resume' resume.id %}">Download PDF</a>
+    <span id="saveStatus"></span>
+  </div>
+
+  <div id="stylePreview" data-preview-url="{% url 'resumes:preview_style' resume.id %}" data-set-url="{% url 'resumes:set_resume_template' resume.id %}">
+    <label for="tpl" style="font-weight:600; margin-right:.35rem;">Style:</label>
+    <select id="tpl" name="template" class="form-control">
+      {% for key,label in resume.TEMPLATE_CHOICES %}
+        <option value="{{ key }}" {% if resume.template == key %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
+
+<!-- Side‑by‑side previews -->
+<div class="resume-dual">
+  <div class="resume-pane">
+    <div id="cv" class="instaFade">
+  <!-- ===== Header ===== -->
+  <div class="mainDetails">
+    <div id="name">
+      {# Prefer resume.full_name, else user names #}
+      <h1 class="quickFade delayTwo">
+        {{ resume.full_name|default:resume.user.first_name }} {{ resume.user.last_name }}
+      </h1>
+      <h2 class="quickFade delayThree">Job Seeker | Ready to Work</h2>
+    </div>
+
+    <div id="contactDetails" class="quickFade delayFour">
+      <ul>
+        <li>Email: {{ resume.user.email }}</li>
+        {% if contact_info and contact_info.phone %}
+          <li>Phone: {{ contact_info.phone }}</li>
+        {% elif profile and profile.phone_number %}
+          <li>Phone: {{ profile.phone_number }}</li>
+        {% endif %}
+        {% if contact_info %}
+          {% if contact_info.city or contact_info.state %}
+            <li>
+              {{ contact_info.city }}{% if contact_info.city and contact_info.state %}, {% endif %}{{ contact_info.state }}
+            </li>
+          {% endif %}
+        {% endif %}
+      </ul>
+    </div>
+    <div class="clear"></div>
+  </div>
+
+  <!-- ===== Body ===== -->
+  <div id="mainArea" class="quickFade delayFive">
+
+    <!-- Summary (no title; full width) -->
+    {% if resume.summary or profile.bio %}
+    <section>
+      <article>
+        <div class="sectionContent" style="float:none;width:100%;">
+          <p>{{ resume.summary|default:profile.bio|default:"Hardworking and motivated individual seeking new opportunities to grow and contribute meaningfully." }}</p>
+        </div>
+      </article>
+      <div class="clear"></div>
+    </section>
+    {% endif %}
+
+    <!-- Experience (dual-compatible: builder or imported) -->
+    {% if experience_entries %}
+    <section>
+      <div class="sectionTitle"><h1>Work Experience</h1></div>
+      <div class="sectionContent">
+        {% for entry in experience_entries %}
+          <article>
+            {# Imported path: entry.dates is a free-text string like "aug 2025 - present" #}
+            {% if entry.dates %}
+              <p>
+                <strong>{{ entry.job_title }}</strong> — {{ entry.company }}
+                ({{ entry.dates|normalize_dates }})
+              </p>
+            {% else %}
+              {# Builder path: format using real dates #}
+              {% if entry.currently_work_here %}
+                <p><strong>{{ entry.job_title }}</strong> — {{ entry.company }}
+                  ({{ entry.start_date|date:"b Y" }} - Present)
+                </p>
+              {% else %}
+                <p><strong>{{ entry.job_title }}</strong> — {{ entry.company }}
+                  ({{ entry.start_date|date:"b Y" }} - {{ entry.end_date|date:"b Y" }})
+                </p>
+              {% endif %}
+            {% endif %}
+
+            {# Description → true bullets (each line = bullet) #}
+            {% if entry.description %}
+              <ul class="bullets">
+                {% for line in entry.description.splitlines %}
+                  {% if line|not_blank %}<li>{{ line|strip_bullet }}</li>{% endif %}
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </article>
+        {% endfor %}
+      </div>
+      <div class="clear"></div>
+    </section>
+    {% endif %}
+
+    <!-- Skills (don't use .all in an if; either iterate or check .exists) -->
+    {% with skills=resume.skills.all %}
+      {% if skills|length %}
+        <section>
+      <div class="sectionTitle"><h1>Key Skills</h1></div>
+      <div class="sectionContent">
+        <ul class="keySkills">
+          {% for skill in skills %}
+            <li class="skill-pill">{{ skill.name|title }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="clear"></div>
+    </section>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Education (dual-compatible) -->
+    {% if education_entries %}
+    <section>
+      <div class="sectionTitle"><h1>Education</h1></div>
+      <div class="sectionContent">
+        {% for edu in education_entries %}
+          <article>
+            {% if edu.school_name %}
+              {# Imported shape: school_name/degree/graduation_year #}
+              <p>
+                <strong>{{ edu.degree|default:"Education/Training" }}</strong> — {{ edu.school_name }}
+                {% if edu.graduation_year %} ({{ edu.graduation_year }}){% endif %}
+              </p>
+            {% else %}
+              {# Builder shape: school/degree/start_date/end_date/description #}
+              {% with yr_range="" %}
+                {% if edu.start_date %}
+                  {% if edu.end_date %}
+                    {% with yr_range=edu.start_date|date:"Y"|add:" - "|add:edu.end_date|date:"Y" %}{% endwith %}
+                  {% else %}
+                    {% with yr_range=edu.start_date|date:"Y"|add:" - Present" %}{% endwith %}
+                  {% endif %}
+                {% endif %}
+                <p>
+                  <strong>{{ edu.degree|default:"Education/Training" }}</strong> — {{ edu.school }}
+                  {% if yr_range %} ({{ yr_range }}){% endif %}
+                </p>
+              {% endwith %}
+              {% if edu.description %}
+                <div class="edu-notes">{{ edu.description }}</div>
+              {% endif %}
+            {% endif %}
+          </article>
+        {% endfor %}
+      </div>
+      <div class="clear"></div>
+    </section>
+    {% endif %}
+
+    <!-- Certifications (TextField: one per line) -->
+    {% if resume.certifications %}
+    <section>
+      <div class="sectionTitle"><h1>Certifications</h1></div>
+      <div class="sectionContent">
+        <ul class="bullets">
+          {% for cert in resume.certifications.splitlines %}
+            {% if cert|not_blank %}<li>{{ cert }}</li>{% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="clear"></div>
+    </section>
+    {% endif %}
+  </div>
+    </div>
+  </div>
+  <div class="resume-pane">
+    <iframe id="stylePreviewFrame" title="Resume Style Preview" src="{% url 'resumes:preview_style' resume.id %}?template={{ resume.template }}"></iframe>
+  </div>
+</div>
+
+<script src="{% static 'resumes/js/created_resume_view.js' %}"></script>
+<script>
+  // Live style preview + persist choice
+  document.addEventListener('DOMContentLoaded', () => {
+    const wrap = document.getElementById('stylePreview');
+    const select = document.getElementById('tpl');
+    const frame = document.getElementById('stylePreviewFrame');
+    if (!wrap || !select || !frame) return;
+    const previewUrl = wrap.dataset.previewUrl;
+    const setUrl = wrap.dataset.setUrl;
+    const csrftoken = (document.cookie.match(/(?:^|; )csrftoken=([^;]+)/)||[])[1];
+    select.addEventListener('change', () => {
+      const choice = select.value;
+      // Update iframe preview
+      frame.src = `${previewUrl}?template=${encodeURIComponent(choice)}`;
+      // Persist on server (non-blocking)
+      fetch(setUrl, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': decodeURIComponent(csrftoken || ''), 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `template=${encodeURIComponent(choice)}`
+      }).catch(() => {});
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Post a Job{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'employers/css/create_job.css' %}">
+
+<div class="job-post">
+  {% if employer_verified is not defined or not employer_verified %}
+  <div class="alert warning" role="status" style="margin:12px 0;">
+    <strong>Pending verification:</strong> Your employer account must be verified by ReRoute before you can post jobs. Please complete your company profile; we’ll notify you when approved.
+  </div>
+  {% endif %}
+  <!-- Header: icon + title -->
+  <div class="jp-header">
+    <div class="jp-icon" aria-hidden="true">🧾</div>
+    <div>
+      <h1 class="jp-title">Post a New Job</h1>
+      <p class="jp-subtitle">Share a short, clear description. You can edit later.</p>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <form method="post" class="jp-form" novalidate {% if not employer_verified %}aria-disabled="true" onsubmit="return false;"{% endif %}>
+    {% csrf_token %}
+
+    <div class="jp-grid">
+      <!-- LEFT COLUMN -->
+      <div class="jp-col">
+        <!-- Job Title -->
+        <div class="jp-field">
+          <label for="title">Job Title</label>
+          <input id="title" name="title" type="text" required
+                 placeholder="e.g., Warehouse Associate">
+          <small class="jp-help">Keep it specific. Avoid ALL CAPS.</small>
+        </div>
+
+        <!-- Description -->
+        <div class="jp-field">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" rows="6" required
+                    data-max="1200"
+                    placeholder="Role overview, day-to-day, mission…"></textarea>
+          <div class="jp-meta"><small><span id="descCount">0</span>/1200</small></div>
+        </div>
+
+        <!-- Tags (chips) -->
+        <div class="jp-field">
+          <label for="tags">Tags</label>
+          <!-- Hidden input stores the comma-separated value we submit -->
+          <input id="tags" name="tags" type="hidden">
+          <div class="jp-chips" id="chips" data-input="tags" aria-label="Job tags input">
+            <input class="chip-input" type="text" placeholder="Type a tag and press Enter">
+          </div>
+          <small class="jp-help">Examples: forklift, night shift, entry-level</small>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="form-column">
+        <div class="form-group">
+          <label for="location">Location</label>
+          <input id="location" name="location" type="text" required placeholder="City, ST or Remote">
+        </div>
+
+        <div class="form-group">
+          <label for="experience_level">Experience</label>
+          <select id="experience_level" name="experience_level">
+            <option value="">Select level</option>
+            <option value="entry">Entry-level</option>
+            <option value="junior">Junior</option>
+            <option value="mid">Mid</option>
+            <option value="senior">Senior</option>
+            <option value="lead">Lead</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="job_type">Job Type</label>
+          <select id="job_type" name="job_type">
+            <option value="full_time">Full-Time</option>
+            <option value="part_time">Part-Time</option>
+            <option value="contract">Contract</option>
+            <option value="internship">Internship</option>
+            <option value="temporary">Temporary</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="salary_type">Pay Type</label>
+          <select id="salary_type" name="salary_type" onchange="togglePayFields(this.value)">
+            <option value="hour">Per Hour</option>
+            <option value="year">Per Year</option>
+          </select>
+        </div>
+
+        <div id="hourly_fields" class="form-group-row">
+          <div class="form-group">
+            <label for="hourly_min">Hourly Min ($)</label>
+            <input id="hourly_min" name="hourly_min" type="number" step="0.01" placeholder="18.50">
+          </div>
+          <div class="form-group">
+            <label for="hourly_max">Hourly Max ($)</label>
+            <input id="hourly_max" name="hourly_max" type="number" step="0.01" placeholder="24.00">
+          </div>
+        </div>
+
+        <div id="yearly_fields" class="form-group-row" style="display:none">
+          <div class="form-group">
+            <label for="salary_min">Yearly Min (in thousands)</label>
+            <input id="salary_min" name="salary_min" type="number" placeholder="57 = $57k">
+          </div>
+          <div class="form-group">
+            <label for="salary_max">Yearly Max (in thousands)</label>
+            <input id="salary_max" name="salary_max" type="number" placeholder="62 = $62k">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="requirements">Requirements</label>
+          <textarea id="requirements" name="requirements" rows="6" required></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sticky Actions -->
+    <div class="jp-actions">
+      <a href="{% url 'employer_dashboard' %}" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary">Post Job</button>
+    </div>
+  </form>
+</div>
+<script src="{% static 'employers/js/create_job.js' %}"></script>
+{% endblock %}

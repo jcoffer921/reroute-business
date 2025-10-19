@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ReRoute | Pricing{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}"> {# base card + buttons #}
+<link rel="stylesheet" href="{% static 'css/pricing.css' %}"> {# pricing-specific polish #}
+
+<section class="settings-hero">
+  <div class="settings-hero-content">
+    <h1>Pricing</h1>
+    <p>Choose the plan that fits your needs.</p>
+  </div>
+  <div class="settings-mini-nav">
+    <a class="mini-link" href="{% url 'settings' %}">Back to Settings</a>
+  </div>
+</section>
+
+<div class="settings-container pricing-container">
+  <div class="settings-section pricing-wrap">
+    <div class="settings-card pricing-card">
+      <div class="settings-card__head pricing-head">
+        <div>
+          <h3 class="settings-card__title pricing-title">Pick The Best Plan</h3>
+          <p class="pricing-sub">Select a plan that fits your needs. You can change plans anytime.</p>
+        </div>
+      </div>
+
+      <div class="pricing-tabs">
+        <a href="{% url 'pricing' %}?tab=user"
+           class="tab-btn {% if active_tab == 'user' %}tab-btn--active{% endif %}">Job Seeker</a>
+        <a href="{% url 'pricing' %}?tab=employer"
+           class="tab-btn {% if active_tab == 'employer' %}tab-btn--active{% endif %}">Employer</a>
+      </div>
+
+      {% if active_tab == 'user' %}
+        <div class="pricing-grid">
+          <div class="price-card">
+            <div class="plan-name">Free</div>
+            <div class="plan-underline"></div>
+            {% if request.user.is_authenticated and not IS_EMPLOYER %}
+              <div class="plan-badge pill pill--ok">Current Plan</div>
+            {% endif %}
+            <div class="price">$0</div>
+            <div class="price-sub">Per Month</div>
+            <hr class="plan-divider">
+            <ul class="plan-features">
+              <li>Resume builder + upload</li>
+              <li>Job search & apply</li>
+              <li>Profile visibility to employers</li>
+              <li>Access to resources (guides, reentry help, etc.)</li>
+            </ul>
+            <div class="settings-card__actions settings-card__actions--footer">
+              {% if request.user.is_authenticated %}
+                {% if IS_EMPLOYER %}
+                  <a href="{% url 'pricing' %}?tab=employer" class="btn btn-secondary btn-pill">View Employer Plans</a>
+                {% else %}
+                  {# Job seekers already on their active plan — no CTA #}
+                {% endif %}
+              {% else %}
+                <a href="{% url 'signup' %}" class="btn btn-primary btn-pill">Get Started Free</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% else %}
+        {% if request.user.is_authenticated and not IS_EMPLOYER %}
+          <div class="pill pill--info" style="display:inline-block; margin-bottom:12px;">Switch to an employer account to purchase.</div>
+        {% endif %}
+        <div class="pricing-grid">
+          <div class="price-card">
+            <div class="plan-name">Basic</div>
+            <div class="plan-underline"></div>
+            {% if current_plan == 'basic' %}<div class="plan-badge pill pill--ok">Current Plan</div>{% endif %}
+            <div class="price">$50</div>
+            <div class="price-sub">Per Month</div>
+            <hr class="plan-divider">
+            <ul class="plan-features">
+              <li>For small employers testing ReRoute or hiring occasionally</li>
+              <li>Up to 5 job postings / month</li>
+              <li>Limited candidate database access (basic profiles, no direct contact until candidate applies)</li>
+              <li>Standard analytics (views & applicants per job)</li>
+              <li>Standard listings (no company logo / no featured placement)</li>
+              <li>Email support only</li>
+              <li>Per-hire fee: + $1,000 per hire</li>
+              <li class="with-icon">
+                <span class="feat-icon no" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6l-12 12" />
+                  </svg>
+                </span>
+                <span class="feat-text">No interview scheduling</span>
+              </li>
+              <li class="with-icon">
+                <span class="feat-icon no" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6l-12 12" />
+                  </svg>
+                </span>
+                <span class="feat-text">No integrations</span>
+              </li>
+            </ul>
+            <div class="settings-card__actions settings-card__actions--footer">
+              {% if IS_EMPLOYER %}
+                <a href="{% url 'checkout' %}?plan=basic" class="btn btn-primary btn-pill" {% if current_plan == 'basic' %}aria-disabled="true" data-disabled="true"{% endif %}>Choose Basic</a>
+              {% else %}
+                <div class="plan-badge pill pill--info">Employer Only</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="price-card card-popular">
+            <div class="popular-tag pill pill--info">Most Popular</div>
+            <div class="plan-name">Pro</div>
+            <div class="plan-underline"></div>
+            {% if current_plan == 'pro' %}<div class="plan-badge pill pill--ok">Current Plan</div>{% endif %}
+            <div class="price">$99</div>
+            <div class="price-sub">Per Month</div>
+            <hr class="plan-divider">
+            <ul class="plan-features">
+              <li>For active employers who want to hire faster</li>
+              <li>Unlimited job postings</li>
+              <li>Full candidate database access (advanced search + contact details)</li>
+              <li>Advanced analytics (conversion tracking, hire reports, trends)</li>
+              <li>Company logo + featured listings</li>
+              <li>Priority support (faster response times)</li>
+              <li class="with-icon">
+                <span class="feat-icon ok" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                </span>
+                <span class="feat-text">Interview scheduling built-in</span>
+              </li>
+              <li class="with-icon">
+                <span class="feat-icon ok" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                </span>
+                <span class="feat-text">Basic integrations (CSV export / ATS import)</span>
+              </li>
+              <li>Per-hire fee: + $500 per hire</li>
+            </ul>
+            <div class="settings-card__actions settings-card__actions--footer">
+              {% if IS_EMPLOYER %}
+                <a href="{% url 'checkout' %}?plan=pro" class="btn btn-primary btn-pill" {% if current_plan == 'pro' %}aria-disabled="true" data-disabled="true"{% endif %}>Upgrade to Pro</a>
+              {% else %}
+                <div class="plan-badge pill pill--info">Employer Only</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="price-card">
+            <div class="plan-name">Enterprise</div>
+            <div class="plan-underline"></div>
+            <div class="plan-badge pill pill--warn">Coming Soon</div>
+            <div class="price">$300</div>
+            <div class="price-sub">Per Month</div>
+            <hr class="plan-divider">
+            <ul class="plan-features">
+              <li>For large employers with consistent hiring needs</li>
+              <li>Everything in Pro, plus:</li>
+              <li>Custom analytics dashboard</li>
+              <li>Premium branding & campaigns</li>
+              <li>24/7 priority support</li>
+              <li>Dedicated account manager</li>
+              <li>Deep integrations (ATS, HR systems, APIs)</li>
+              <li>❌ No per-hire fees</li>
+            </ul>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

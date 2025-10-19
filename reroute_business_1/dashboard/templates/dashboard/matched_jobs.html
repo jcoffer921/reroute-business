@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Matched Jobs{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'dashboard/css/matched_jobs.css' %}">
+
+<div class="matched-jobs-wrapper">
+  <h2>Matched Jobs Based on Your Skills</h2>
+
+  <!-- Filters: ZIP + Radius -->
+  <form method="get" action="{% url 'dashboard:matched_jobs' %}" class="match-filter-form">
+    <div class="field">
+      <label for="zip-input">ZIP</label>
+      <input id="zip-input" type="text" name="zip" value="{{ selected_zip }}" placeholder="e.g., 19104" maxlength="5">
+    </div>
+    <div class="field">
+      <label for="radius-select">Radius (mi)</label>
+      <select id="radius-select" name="radius">
+        <option value="10" {% if selected_radius == 10 %}selected{% endif %}>10</option>
+        <option value="25" {% if selected_radius == 25 %}selected{% endif %}>25</option>
+        <option value="50" {% if selected_radius == 50 %}selected{% endif %}>50</option>
+        <option value="100" {% if selected_radius == 100 %}selected{% endif %}>100</option>
+      </select>
+    </div>
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">Apply</button>
+      {% if selected_zip %}
+        <a href="{% url 'dashboard:matched_jobs' %}" class="btn btn-outline">Clear</a>
+      {% endif %}
+    </div>
+  </form>
+
+  {% if items %}
+    <div class="job-listings">
+      {% for item in items %}
+        {% with job=item.job overlap=item.overlap %}
+        <div class="job-card">
+          <div class="job-card-header">
+            <h4 class="job-title">{{ job.title }}</h4>
+          </div>
+
+          <p class="job-desc">{{ job.description|truncatechars:150 }}</p>
+
+          {% if job.skills_required.all %}
+            <p class="job-skills"><strong>Skills Required:</strong>
+              {% for skill in job.skills_required.all %}
+                <span class="badge-skill">{{ skill.name }}</span>
+              {% endfor %}
+            </p>
+          {% endif %}
+
+          {% if overlap %}
+            <p class="job-matches"><strong>Matched Skills:</strong>
+              {% for s in overlap %}
+                <span class="badge-skill badge-match">{{ s }}</span>
+              {% endfor %}
+            </p>
+          {% endif %}
+
+          <div class="job-card-footer">
+            <a href="{% url 'job_detail' job.id %}" class="view-job-btn">View Job</a>
+          </div>
+        </div>
+        {% endwith %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">No jobs matched your current skills. Try adding more skills to your profile.</div>
+  {% endif %}
+</div>
+{% endblock %}
+

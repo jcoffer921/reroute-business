@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Admin Analytics — Events{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'dashboard/css/admin_dashboard.css' %}">
+
+<section class="admin-hero">
+  <div class="admin-hero-content">
+    <h1>Analytics — Events</h1>
+    <p>Insights for the last {{ days }} day(s)</p>
+  </div>
+  <div style="margin-top:8px">
+    <a href="{% url 'dashboard:admin' %}" class="btn btn-secondary btn-sm">Back to Admin Dashboard</a>
+  </div>
+  <form method="get" style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+    <label for="days">Window:</label>
+    <select name="days" id="days" onchange="this.form.submit()">
+      <option value="7" {% if days == 7 %}selected{% endif %}>7 days</option>
+      <option value="14" {% if days == 14 %}selected{% endif %}>14 days</option>
+      <option value="30" {% if days == 30 %}selected{% endif %}>30 days</option>
+      <option value="90" {% if days == 90 %}selected{% endif %}>90 days</option>
+    </select>
+  </form>
+</section>
+
+<div class="admin-dashboard">
+  <!-- Tiles -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-box__label">Page Views</div>
+      <div class="stat-box__value">{{ page_views_total|default:0 }}</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-box__label">Unique Visitors (approx)</div>
+      <div class="stat-box__value">{{ unique_visitors|default:0 }}</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-box__label">Profiles Completed</div>
+      <div class="stat-box__value">{{ profiles_completed|default:0 }}</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-box__label">Resumes Created</div>
+      <div class="stat-box__value">{{ resumes_created|default:0 }}</div>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <!-- Pie Chart: Page Views by Path -->
+    <section>
+      <h2>Page Views by Path (share)</h2>
+      <div id="pageViewsPie" class="chart-sm"></div>
+    </section>
+
+    <!-- Line Chart: Page Views by Day -->
+    <section>
+      <h2>Page Views by Day</h2>
+      <div id="pageViewsLine" class="chart-sm"></div>
+    </section>
+
+    <!-- Stacked Bar: Authenticated vs Anonymous by Day -->
+    <section class="grid-span-2">
+      <h2>Authenticated vs Anonymous Views</h2>
+      <div id="viewsStacked" class="chart-sm"></div>
+    </section>
+  </div>
+
+  <!-- Top Pages Table -->
+  <section>
+    <h2>Top Pages</h2>
+    {% if top_pages %}
+    <div class="table-responsive">
+      <table>
+        <tr>
+          <th>Path</th>
+          <th>Views</th>
+        </tr>
+        {% for row in top_pages %}
+        <tr>
+          <td>{{ row.path|default:"/" }}</td>
+          <td>{{ row.count }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    {% else %}
+      <p>No page views in this window.</p>
+    {% endif %}
+  </section>
+
+  <!-- Top Referrers -->
+  <section>
+    <h2>Top Referrers</h2>
+    {% if top_referrers %}
+    <div class="table-responsive">
+      <table>
+        <tr>
+          <th>Referrer</th>
+          <th>Count</th>
+        </tr>
+        {% for row in top_referrers %}
+        <tr>
+          <td>{{ row.referer }}</td>
+          <td>{{ row.count }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    {% else %}
+      <p>No referrer data available.</p>
+    {% endif %}
+  </section>
+</div>
+
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<script>
+  const pieLabels = {{ pie_labels|default:'[]'|safe }};
+  const pieCounts = {{ pie_counts|default:'[]'|safe }};
+  const colors = ['#2563eb','#22c1dc','#16a34a','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#94a3b8'];
+  const baseLayout = { margin: { l: 30, r: 20, t: 20, b: 30 }, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)' };
+  const baseConfig = { displayModeBar: 'hover', responsive: true, scrollZoom: true };
+
+  // Pie: page views by path
+  Plotly.newPlot('pageViewsPie', [{
+    type: 'pie', labels: pieLabels, values: pieCounts, textinfo: 'label+percent', hoverinfo: 'label+value+percent', marker: { colors: colors }
+  }], { ...baseLayout, showlegend: true, legend: { orientation: 'v', x: 1, y: 0.5 } }, baseConfig);
+
+  // Line: views by day
+  const lineLabels = {{ views_by_day_labels|default:'[]'|safe }};
+  const lineCounts = {{ views_by_day_counts|default:'[]'|safe }};
+  Plotly.newPlot('pageViewsLine', [{
+    type: 'scatter', mode: 'lines', name: 'Page Views', x: lineLabels, y: lineCounts, line: { color: '#2563eb' }, fill: 'tozeroy', fillcolor: 'rgba(37,99,235,0.2)'
+  }], { ...baseLayout, hovermode: 'x unified' }, baseConfig);
+
+  // Stacked: authed vs anon per day
+  const authed = {{ views_by_day_authed|default:'[]'|safe }};
+  const anon = {{ views_by_day_anon|default:'[]'|safe }};
+  Plotly.newPlot('viewsStacked', [
+    { type: 'bar', name: 'Authenticated', x: lineLabels, y: authed, marker: { color: '#16a34a' } },
+    { type: 'bar', name: 'Anonymous', x: lineLabels, y: anon, marker: { color: '#94a3b8' } }
+  ], { ...baseLayout, barmode: 'stack' }, baseConfig);
+</script>
+{% endblock %}

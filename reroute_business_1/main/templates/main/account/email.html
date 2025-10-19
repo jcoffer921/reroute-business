@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Email Settings | ReRoute{% endblock %}
+
+{% block content %}
+<div class="account-settings-wrapper">
+    <h2>Email Addresses</h2>
+
+    <p>The following email addresses are associated with your account:</p>
+
+    <div class="email-list">
+        {% for emailaddress in emailaddresses %}
+            <div class="email-entry">
+                <label>
+                    <input type="radio" name="email" value="{{ emailaddress.email }}"
+                           {% if emailaddress.primary %}checked{% endif %}>
+                    {{ emailaddress.email }}
+                    {% if not emailaddress.verified %}
+                        <strong>Unverified</strong>
+                    {% endif %}
+                </label>
+
+                <form method="post" action="{% url 'account_email' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="email" value="{{ emailaddress.email }}">
+                    <button name="action_primary" type="submit">Make Primary</button>
+                    <button name="action_send" type="submit">Re-send Verification</button>
+                    <button name="action_remove" type="submit">Remove</button>
+                </form>
+            </div>
+        {% empty %}
+            <p>No email addresses found.</p>
+        {% endfor %}
+    </div>
+
+    <h3>Add New Email</h3>
+    <form method="post" action="{% url 'account_email' %}">
+        {% csrf_token %}
+        {{ form.email.label_tag }} {{ form.email }}
+        <button name="action_add" type="submit">Add Email</button>
+    </form>
+</div>
+{% endblock %}
