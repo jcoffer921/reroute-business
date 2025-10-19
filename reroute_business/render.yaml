@@ -1,22 +1,19 @@
-# render.yaml — declarative infra for ReRoute
 services:
   - type: web
     name: reroute-business
     env: python
     plan: starter
     autoDeploy: true
+    rootDir: reroute_business
 
-    # Install deps + build static assets
     buildCommand: |
       pip install --upgrade pip
       pip install -r requirements.txt
-      python manage.py collectstatic --noinput  # compresses & fingerprints with WhiteNoise
+      python manage.py collectstatic --noinput
 
-    # Run DB migrations before swapping traffic
     preDeployCommand: |
       python manage.py migrate --noinput
 
-    # Start Django with Gunicorn; Render injects $PORT
     startCommand: gunicorn reroute.wsgi:application
 
     envVars:
