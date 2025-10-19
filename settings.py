@@ -25,8 +25,8 @@ DATABASES = {
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Project pointers
-ROOT_URLCONF = 'reroute_business_1.urls'
-WSGI_APPLICATION = 'reroute_business_1.wsgi.application'
+ROOT_URLCONF = 'reroute_business.urls'
+WSGI_APPLICATION = 'reroute_business.wsgi.application'
 
 
 TEMPLATES = [
