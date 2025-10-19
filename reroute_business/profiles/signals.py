@@ -5,7 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
-from reroute_business.profiles.models import UserProfile, Subscription
+from profiles.models import UserProfile, Subscription
 from django.contrib.auth.models import User
 
 
@@ -21,7 +21,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 def track_userprofile_change(sender, instance: UserProfile, created: bool, **kwargs):
     """Log profile create/update as analytics events (non-blocking)."""
     try:
-        from reroute_business.core.utils.analytics import track_event
+        from core.utils.analytics import track_event
         event_type = 'profile_created' if created else 'profile_updated'
         track_event(
             event_type=event_type,

@@ -1,0 +1,73 @@
+/* Wrapper for matched jobs section */
+.matched-jobs-wrapper {
+  padding: 7rem 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Page heading */
+.matched-jobs-wrapper h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+/* Job card styles */
+.job-card {
+  border: 1px solid #ddd;
+  padding: 1.25rem;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s ease;
+  margin-bottom: 1.5rem;
+}
+
+.job-card:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Job title */
+.job-card h4 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* Skill badges shown in match */
+.badge-skill {
+  background-color: #e0f2ff;
+  color: #0077b6;
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-right: 0.4rem;
+  margin-top: 0.3rem;
+  display: inline-block;
+}
+
+/* Button to view job details */
+.view-job-btn {
+  display: inline-block;
+  background-color: #0077b6;
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+  margin-top: 1rem;
+}
+
+.view-job-btn:hover {
+  background-color: #005f8e;
+}
+
+/* Optional: empty state */
+.empty-state {
+  text-align: center;
+  margin-top: 3rem;
+  font-size: 1.1rem;
+  color: #888;
+}

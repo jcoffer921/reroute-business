@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string, get_template
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.clickjacking import xframe_options_sameorigin
-from reroute_business.core.utils.analytics import track_event
+from core.utils.analytics import track_event
 
 """
 Avoid importing heavy optional deps at module import time.
@@ -20,9 +20,9 @@ WeasyPrint requires system libraries (cairo/pango); import it lazily
 inside the view that needs it to prevent 500s when opening other pages.
 """
 
-from reroute_business.profiles.models import UserProfile
-from reroute_business.core.constants import RELATABLE_SKILLS
-from reroute_business.core.models import Skill
+from profiles.models import UserProfile
+from core.constants import RELATABLE_SKILLS
+from core.models import Skill
 
 from .models import (
     Resume, ContactInfo, Education, Experience,

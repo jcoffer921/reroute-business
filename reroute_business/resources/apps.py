@@ -3,4 +3,4 @@ from django.apps import AppConfig
 
 class ResourcesConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'reroute_business.resources'
+    name = 'resources'

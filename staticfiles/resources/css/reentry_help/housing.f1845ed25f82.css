@@ -1,0 +1,79 @@
+/* ========== General Page Styling ========== */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  line-height: 1.6;
+  padding: 6rem 2rem;
+}
+
+/* ========== Section Wrapper ========== */
+.resource-section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* ========== Headings ========== */
+.resource-section h1 {
+  font-size: 2rem;
+  color: #0a4b78;
+  margin-bottom: 1.2rem;
+}
+
+.resource-section h2 {
+  font-size: 1.4rem;
+  color: #0a4b78;
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+}
+
+/* ========== Resource Boxes ========== */
+.resource-box {
+  padding: 1.2rem;
+  border-left: 4px solid #0a4b78;
+  background-color: #f0f8ff;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+}
+
+/* ========== Lists ========== */
+.resource-box ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.resource-box li {
+  margin-bottom: 0.7rem;
+  padding-left: 1.4rem;
+  position: relative;
+}
+
+.resource-box li::before {
+  content: "•";
+  color: #0a4b78;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+}
+
+/* ========== Links ========== */
+.resource-box a {
+  color: #0074cc;
+  text-decoration: none;
+}
+
+.resource-box a:hover {
+  text-decoration: underline;
+}
+
+/* ========== Last Updated Note ========== */
+.update-note {
+  margin-top: 2rem;
+  font-size: 0.85rem;
+  color: #666;
+  text-align: center;
+}

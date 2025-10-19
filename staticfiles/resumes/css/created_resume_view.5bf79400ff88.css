@@ -1,0 +1,147 @@
+/* === Layout and Base Styling === */
+html, body {
+  background: #d2d2d2;
+  font-family: 'Lato', helvetica, arial, sans-serif;
+  font-size: 16px;
+  padding-top: 4rem;
+  color: #222;
+}
+
+#cv {
+  width: 90%;
+  max-width: 800px;
+  background: #f3f3f3;
+  margin: 30px auto;
+  position: relative;
+  padding-bottom: 60px; /* space for action row */
+}
+
+.clear { clear: both; }
+p { font-size: 1em; line-height: 1.4em; margin-bottom: 20px; color: #444; }
+
+/* Header */
+.mainDetails {
+  padding: 25px 35px;
+  border-bottom: 2px solid #003660;
+  background: #ededed;
+}
+
+#name h1 {
+  font-size: 2.2em;               /* slightly smaller to avoid wrapping */
+  font-weight: 700;
+  font-family: 'Rokkitt', Helvetica, Arial, sans-serif;
+  margin-bottom: -6px;
+}
+
+#name h2 {
+  font-size: 1.25em;               /* tighter subtitle */
+  margin-left: 2px;
+  font-family: 'Rokkitt', Helvetica, Arial, sans-serif;
+  color: #335e7e;
+}
+
+#contactDetails { float: right; }
+#contactDetails ul { list-style: none; font-size: 0.9em; margin-top: 2px; }
+#contactDetails ul li { margin-bottom: 3px; color: #444; }
+
+/* Sections */
+#mainArea { padding: 0 40px; }
+.sectionTitle { float: left; width: 25%; }
+.sectionContent { float: right; width: 72.5%; }
+
+.sectionTitle h1 {
+  font-family: 'Rokkitt', Helvetica, Arial, sans-serif;
+  font-style: italic;
+  font-size: 1.2em;                /* tightened */
+  color: #003660;
+}
+
+.sectionContent h2 {
+  font-family: 'Rokkitt', Helvetica, Arial, sans-serif;
+  font-size: 1.2em;
+  margin-bottom: -2px;
+}
+.subDetails { font-size: 0.8em; font-style: italic; margin-bottom: 3px; }
+
+/* Skill list -> adaptive columns */
+.keySkills {
+  list-style: none;
+  column-gap: 1.5rem;
+  column-count: 2;                 /* better on narrow screens; will grow in print */
+  margin-bottom: 20px;
+  font-size: 1em;
+  color: #444;
+}
+@media (min-width: 900px) {
+  .keySkills { column-count: 3; }
+}
+
+/* Real bullet lists for descriptions/certifications */
+.bullets { margin: .4rem 0 1rem; padding-left: 1.2rem; list-style: disc; }
+.bullets li { margin-bottom: .25rem; }
+
+@media print {
+  #cv { width: 100%; }
+}
+
+/* Fade-in */
+.instaFade { animation: fade-in 0.4s ease-in; }
+@keyframes fade-in { from {opacity:0} to {opacity:1} }
+
+/* Actions row under the resume */
+.save-section-below {
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  justify-content: flex-start;
+  padding: 0 1rem;
+}
+
+/* Save button */
+#saveResumeBtn {
+  background-color: #003660;
+  color: #fff;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+#saveResumeBtn:hover { background-color: #005a94; transform: translateY(-1px); }
+
+/* Download button styled lightly */
+.btn-download {
+  display: inline-block;
+  padding: 10px 14px;
+  border: 1px solid #c8d1db;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #003660;
+  background: #ffffff;
+}
+.btn-download:hover { background: #f7fbff; }
+
+/* Spinner */
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid #fff; border-top: 2px solid transparent;
+  border-radius: 50%; animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+#saveStatus { font-size: 0.9rem; font-weight: 500; color: #333; }
+
+/* Print polish */
+@media print {
+  html, body { background: #fff; padding: 0; }
+  #cv { width: 100%; margin: 0; background: #fff; }
+  .save-section-below, .btn-download { display: none !important; }
+  .keySkills { column-count: 3; }    /* use more columns on paper */
+}

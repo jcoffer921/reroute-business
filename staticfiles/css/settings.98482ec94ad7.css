@@ -1,0 +1,214 @@
+.settings-hero {
+    background-color: #0F172A; /* rich navy blue */
+    color: #F3F4F6; /* rich navy blue for contrast */
+    padding: 10rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.settings-hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.settings-hero h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    color: #F3F4F6;
+}
+
+.settings-hero p {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    color: #F3F4F6;
+}
+
+.settings-hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.about-hero h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    color: #F3F4F6;
+}
+
+.about-hero p {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    color: #F3F4F6;
+}
+
+.settings-container {
+  text-align: left;
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 7rem 2rem;
+  background-color: #66666617;
+}
+
+.settings-container form {
+  margin-bottom: 2rem;
+  padding: 7rem 1rem;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+
+.settings-container h3 {
+  margin-top: 0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;       /* stack label above input */
+  align-items: flex-start;      /* align items to the left */
+  margin-bottom: 1.5rem;
+}
+
+
+label {
+  display: block;
+  text-align: left;
+  margin-bottom: -1.5rem;  /* Tight spacing under the label */
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #1f2937;       /* Dark neutral (Tailwind's gray-800 for reference) */
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  display: block;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.95rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease-in-out;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border-color: #6495ed; /* ReRoute blue */
+  outline: none;
+}
+
+/* Optional: better focus style */
+input:focus {
+  border-color: #4687f2;
+  outline: none;
+}
+
+button.danger {
+  background: #d9534f;
+  color: white;
+}
+
+.settings-box.danger-zone {
+  max-height: 200px;
+  background: var(--neutral-gray);
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 2rem 1rem;
+  margin: 2rem auto;
+  max-width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  gap: 1rem;
+}
+
+.settings-box.danger-zone form {
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+.settings-box.danger-zone form {
+  margin: 0;
+}
+
+.settings-box.danger-zone h3 {
+  margin-bottom: 0.25rem;
+}
+
+.settings-box.danger-zone p {
+  margin-bottom: 0.5rem;
+}
+
+.settings-box h3 {
+  margin-bottom: 0.25rem;
+  font-size: 1.25rem;
+}
+
+.settings-box p {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.settings-section {
+  text-align: left ;
+  background: var(--neutral-gray);
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 2rem 1rem;
+  margin: 2rem auto;
+  max-width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+.button-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: -2rem;
+}
+
+.btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-primary {
+  margin-top: 1rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #2d2c72;
+}
+
+.btn-secondary {
+  background-color: #17a2b8;
+  color: white;
+
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #330005;
+}

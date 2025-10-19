@@ -1,0 +1,200 @@
+/* ============================================================
+   Employer Signup — full stylesheet (drop-in)
+   - Wider card for 2-column fields
+   - Clean labels/inputs, strong focus states
+   - Inline "Show Password" support
+   - Accessible error/hint styles
+   - Mobile-friendly grid
+   ============================================================ */
+
+/* Global safety: predictable sizing */
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ---------- Card container ---------- */
+.auth-card{
+  max-width: 480px;                 /* base width (shared look) */
+  margin: 56px auto;
+  padding: 28px 24px;
+  background:#fff;
+  border-radius:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.06);
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Wider variant just for employer signup */
+.auth-card--wide { max-width: 760px; }           /* comfy for two columns */
+@media (min-width: 1200px){ .auth-card--wide { max-width: 840px; } }
+
+/* ---------- Headings ---------- */
+.auth-title{
+  text-align:center;
+  font-weight:800;
+  font-size:28px;
+  color:#111827;
+  margin:0 0 6px;
+}
+.subtitle{
+  text-align:center;
+  color:#6b7280;
+  margin:0 0 18px;
+  font-size:14.5px;
+}
+
+/* ---------- Form layout ---------- */
+.form-group { margin-bottom: 16px; }
+
+.label-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:12px;
+}
+
+/* Two-column rows for desktop, single-column on mobile */
+.form-row.two-col{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap:16px;
+}
+@media (max-width: 640px){
+  .form-row.two-col{ grid-template-columns: 1fr; }
+}
+
+/* ---------- Labels & micro text ---------- */
+label{
+  display:block;
+  font-weight:600;
+  color:#374151;
+  font-size:14.5px;
+}
+.micro-hint{
+  font-size:12px;
+  color:#6b7280;
+  white-space:nowrap;
+}
+
+/* ---------- Inputs & textareas ---------- */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
+textarea,
+.input{
+  width:100%;
+  margin-top:6px;
+  padding:12px 14px;
+  font-size:16px;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  background:#f9fafb;
+}
+
+/* Focus ring consistent with brand */
+input:focus,
+textarea:focus,
+.input:focus{
+  outline:none;
+  border-color:#2563eb;                     /* brand primary */
+  box-shadow:0 0 0 3px rgba(37,99,235,.15);
+}
+
+/* Textarea match inputs */
+textarea{ min-height: 110px; resize: vertical; }
+
+/* ---------- Inline "Show Password" support ---------- */
+/* Wrap your password inputs in .pwd-wrap and add a span.pwd-toggle-text */
+.pwd-wrap{ position: relative; }
+
+/* Make space inside inputs for the toggle text on the right */
+.pwd-wrap input{
+  padding-right: 132px;                      /* fits “Show Password” */
+}
+
+/* The toggle itself is just text (not a button) */
+.pwd-toggle-text{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:14px;
+  color:#6b7280;
+  cursor:pointer;                            /* feels clickable */
+  user-select:none;
+}
+.pwd-toggle-text:hover,
+.pwd-toggle-text:focus{
+  color:#2563eb;                              /* brand accent on hover */
+  text-decoration: underline;
+  outline:none;
+}
+
+/* Narrow phones: slightly tighter padding so text doesn’t wrap */
+@media (max-width: 360px){
+  .pwd-wrap input{ padding-right:110px; }
+  .pwd-toggle-text{ font-size:13px; }
+}
+
+/* ---------- Terms / checkbox row ---------- */
+.agree-row{ margin:10px 0 16px; }
+.agree-row .checkbox{
+  display:inline-flex;
+  gap:10px;
+  align-items:center;
+  color:#374151;
+  font-size:14.5px;
+}
+.agree-row .checkbox input[type="checkbox"]{ width:18px; height:18px; }
+
+/* Optional small “?” help badge style if used */
+.help{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:18px; height:18px; border-radius:50%;
+  border:1px solid #9ca3af; color:#6b7280; font-size:12px; line-height:1;
+  cursor:help;
+}
+
+/* ---------- Errors & hints ---------- */
+.auth-error{ min-height:18px; color:#b91c1c; margin-bottom:10px; }
+.field-error{ margin-top:6px; color:#b91c1c; font-size:13px; }
+.field-hint{ margin-top:6px; font-size:12.5px; color:#6b7280; }
+.has-error{ border-color:#b91c1c !important; box-shadow:0 0 0 3px rgba(185,28,28,.08) !important; }
+
+/* ---------- Primary CTA ---------- */
+.btn-pill{
+  width:100%;
+  padding:14px 20px;
+  border:0;
+  border-radius:9999px;                      /* pill shape */
+  background:#2563eb;                        /* brand primary */
+  color:#fff;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+  transition:transform .02s ease, background .15s ease;
+}
+.btn-pill:hover{ background:#1d4ed8; }
+.btn-pill:active{ transform:translateY(1px); }
+.btn-pill:disabled{ opacity:.6; cursor:not-allowed; }
+
+/* ---------- Secondary actions (links under the button) ---------- */
+.secondary-actions{
+  margin-top:16px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  color:#6b7280;
+  text-align:center;
+  flex-wrap:wrap;
+}
+.secondary-actions .link{
+  color:#6d28d9;                              /* subtle indigo used elsewhere */
+  text-decoration:none;
+}
+.secondary-actions .link:hover{ text-decoration:underline; }
+.secondary-actions .sep{ color:#9ca3af; }
+
+/* ---------- Mobile card padding tweak ---------- */
+@media (max-width:480px){
+  .auth-card{ margin:40px 12px; padding:24px 16px; }
+}

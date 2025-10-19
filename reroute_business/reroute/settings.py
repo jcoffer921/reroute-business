@@ -25,8 +25,8 @@ DATABASES = {
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Project pointers
-ROOT_URLCONF = 'reroute_business.reroute.urls'
-WSGI_APPLICATION = 'reroute_business.reroute.wsgi.application'
+ROOT_URLCONF = 'reroute.urls'
+WSGI_APPLICATION = 'reroute.wsgi.application'
 
 
 TEMPLATES = [
@@ -41,8 +41,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 # Project context
-                'reroute_business.main.context_processors.role_flags',
-                'reroute_business.main.context_processors.unread_notifications',
+                'reroute.main.context_processors.role_flags',
+                'reroute.main.context_processors.unread_notifications',
             ],
         },
     },
@@ -96,15 +96,15 @@ USE_X_FORWARDED_HOST = True
 # ---------- APPS ----------
 INSTALLED_APPS = [
     # local apps
-    'reroute_business.main',
-    'reroute_business.resumes',
-    'reroute_business.dashboard',
-    'reroute_business.blog',
-    'reroute_business.core',
-    'reroute_business.profiles',
-    'reroute_business.job_list',
-    'reroute_business.resources',
-    'reroute_business.reentry_org',
+    'main',
+    'resumes',
+    'dashboard',
+    'blog',
+    'core',
+    'profiles',
+    'job_list',
+    'resources',
+    'reentry_org',
 
     # default Django apps
     'django.contrib.admin',
@@ -136,9 +136,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'reroute_business.main.middleware.EnforceVerifiedEmailMiddleware',
-    'reroute_business.reroute.security_headers.SecurityHeadersMiddleware',
-    'reroute_business.core.middleware.pageviews.PageViewMiddleware',
+    'main.middleware.EnforceVerifiedEmailMiddleware',
+    'reroute.security_headers.SecurityHeadersMiddleware',
+    'core.middleware.pageviews.PageViewMiddleware',
 ]
 
 
@@ -146,6 +146,8 @@ MIDDLEWARE = [
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'main' / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

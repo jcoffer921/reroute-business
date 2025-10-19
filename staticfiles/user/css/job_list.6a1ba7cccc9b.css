@@ -1,0 +1,384 @@
+.opportunities-hero {
+    background: linear-gradient(135deg, #2386e2, #345dbd);
+    /* background-color: #0F172A; /* rich navy blue */
+    color: #F3F4F6; /* rich navy blue for contrast */
+    margin: 0 auto;
+    padding: 10rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.opportunities-hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.opportunities-hero h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    color: #F3F4F6;
+}
+
+.opportunities-hero p {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    color: #F3F4F6;
+}
+
+/* ===== Wrapper for Search + Filters + Results ===== */
+.opportunities-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ===== Search Bar Styles ===== */
+.search-bar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.search-bar input[type="text"] {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.search-bar button[type="submit"] {
+  background-color: #074772;
+  color: #fff;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+}
+
+.search-filter-form {
+  flex: 0 0 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem; /* Optional: space between columns */
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+/* ===== Layout: Filters and Jobs Side-by-Side ===== */
+.job-layout {
+  flex-basis: 75%;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+/* ===== Filters Sidebar ===== */
+.filters-sidebar {
+  flex: 0 0 250px;
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Job List Section ===== */
+.job-list {
+  flex: 1;
+  max-width: 750px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding: 0.5rem 1rem;
+  margin-top: 0;         /* <-- Remove large top spacing */
+}
+
+/* ===== Responsive: Stack Layout on Mobile ===== */
+@media screen and (max-width: 768px) {
+  .job-layout {
+    flex-direction: column;
+  }
+
+  .filters-sidebar {
+    width: 100%;
+    box-shadow: none;
+    padding: 0;
+  }
+}
+
+
+.job-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-left: 5px solid #0a4b78;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  margin-bottom: 1.5rem;
+}
+
+.job-card:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* Header with logo and job title/info side-by-side */
+.job-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.job-logo {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: #fafafa;
+}
+
+/* Job info to the right of the logo */
+.job-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.job-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0;
+  padding: 0;
+  line-height: 1.1;
+  color: #222;
+}
+
+.job-title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.job-title-link:hover {
+  text-decoration: underline;
+  color: var(--accent-cyan); /* Optional: use your site's accent color */
+}
+
+.job-company {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #666;
+  padding-top: 0.2rem;
+  list-style: 1.2;
+}
+
+/* Meta information row */
+.job-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0f0;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.meta-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 100px;
+}
+
+.meta-label {
+  font-size: 0.75rem;
+  color: #888;
+  margin-bottom: 0.25rem;
+}
+
+.meta-value {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.per-year {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+/* Footer with time + save link */
+.job-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.posted-time {
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.save-job {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  color: #0a4b78;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+
+.save-job:hover {
+  color: #054169;
+}
+
+.bookmark-icon {
+  width: 24px;
+  height: 24px;
+  color: #555;
+  transition: fill 0.2s ease, color 0.2s ease;
+}
+
+.bookmark-icon.filled {
+  fill: #2563eb; /* blue-600 */
+  stroke: #2563eb;
+}
+
+/* Show sidebar and adjust layout on desktop */
+@media (min-width: 1024px) {
+  .job-layout {
+    flex-direction: row;
+    gap: 2rem;
+  }
+
+  .filters-sidebar {
+    display: block;
+    width: 250px;
+    flex-shrink: 0;
+    padding-right: 1rem;
+  }
+
+  .job-list {
+    flex: 1;
+  }
+}
+
+.mobile-filter-toggle {
+  display: block;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  background: #0a4b78;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+}
+
+@media (min-width: 1024px) {
+  .mobile-filter-toggle {
+    display: none;
+  }
+}
+
+/* Responsive adjustments for job cards on smaller screens */
+@media (max-width: 1023px) {
+  .job-card {
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.08);
+  }
+
+  .job-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .job-logo {
+    width: 48px;
+    height: 48px;
+  }
+
+  .job-info {
+    margin-top: 0.25rem;
+    text-align: left;
+  }
+
+  .job-title {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .job-company {
+    font-size: 0.875rem;
+    color: #777;
+  }
+
+  .job-meta {
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #eee;
+  }
+
+  .meta-section {
+    width: 100%;
+  }
+
+  .meta-label {
+    font-size: 0.75rem;
+    color: #999;
+  }
+
+  .meta-value {
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .job-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 1rem;
+    gap: 0.5rem;
+  }
+
+  .posted-time {
+    font-size: 0.8rem;
+    color: #aaa;
+  }
+
+  .save-job {
+    font-size: 0.9rem;
+    color: #0a4b78;
+    text-decoration: none;
+  }
+
+  .save-job i {
+    margin-right: 4px;
+  }
+}
+
+.no-jobs {
+  text-align: center;
+  font-style: italic;
+  color: #888;
+  margin-top: 2rem;
+}

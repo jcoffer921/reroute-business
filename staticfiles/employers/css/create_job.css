@@ -1,0 +1,164 @@
+/* === Container === */
+.job-post {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 5rem 1.25rem 5rem; /* bottom space for sticky actions */
+}
+
+/* === Header === */
+.jp-header {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+.jp-icon {
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+  border-radius: 12px;
+  background: #eef2ff;
+  font-size: 1.25rem;
+}
+.jp-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+.jp-subtitle {
+  margin: .25rem 0 0;
+  color: #6b7280;
+}
+
+/* === Form === */
+.jp-form {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,.04);
+}
+
+.jp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem 2rem;
+}
+
+.jp-col { display: flex; flex-direction: column; gap: 1rem; }
+
+.jp-field { display: flex; flex-direction: column; gap: .5rem; }
+.jp-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+.jp-field label {
+  font-weight: 600;
+  color: #111827;
+}
+
+.jp-help { color: #6b7280; }
+
+.jp-meta { display: flex; justify-content: flex-end; color: #6b7280; }
+
+.jp-field input,
+.jp-field textarea,
+.jp-field select {
+  width: 100%;
+  padding: .8rem .9rem;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #f9fafb;
+  font-size: 1rem;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.jp-field input:focus,
+.jp-field textarea:focus,
+.jp-field select:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+}
+
+/* === Chips (Tags) === */
+.jp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  min-height: 44px;
+  padding: .4rem;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #f9fafb;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .35rem .55rem;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #075985;
+  font-size: .9rem;
+}
+.chip-x {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #0c4a6e;
+  font-size: 1rem;
+  line-height: 1;
+}
+.chip-input {
+  flex: 1;
+  min-width: 160px;
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: .4rem;
+  font-size: 1rem;
+}
+
+/* === Sticky Actions (bottom) === */
+.jp-actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: .75rem;
+  margin-top: 1.25rem;
+  padding: .75rem;
+  background: linear-gradient(to top, rgba(255,255,255,1), rgba(255,255,255,.85));
+  border-top: 1px solid #e5e7eb;
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .65rem 1.1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+}
+.btn-primary:hover { background: #1e40af; }
+.btn-secondary {
+  background: #f3f4f6;
+  color: #111827;
+  border-color: #e5e7eb;
+}
+.btn-secondary:hover { background: #e5e7eb; }
+
+/* === Responsive === */
+@media (max-width: 960px) {
+  .jp-grid { grid-template-columns: 1fr; }
+  .jp-actions { justify-content: stretch; gap: .5rem; }
+  .btn { flex: 1; justify-content: center; }
+}

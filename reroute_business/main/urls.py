@@ -2,7 +2,7 @@
 from django.urls import path, include
 from django.shortcuts import redirect
 from . import views
-from reroute_business.job_list.user import views as user_views
+from job_list.user import views as user_views
 from .forms import Step1Form, Step2Form, Step3Form, Step4Form
 from .views import (
     CustomPasswordResetView,
@@ -35,10 +35,10 @@ urlpatterns = [
     path('employer/dashboard/', lambda request: redirect('dashboard:employer'), name='employer_dashboard'),
 
     # ================ Apps ================
-    path('blog/', include('reroute_business.blog.urls')),
-    path('resumes/', include('reroute_business.resumes.urls')),
-    path('profile/', include('reroute_business.profiles.urls')),     # includes user_profile route
-    path('dashboard/', include(('reroute_business.dashboard.urls', 'dashboard'), namespace='dashboard')),
+    path('blog/', include('blog.urls')),
+    path('resumes/', include('resumes.urls')),
+    path('profile/', include('profiles.urls')),     # includes user_profile route
+    path('dashboard/', include(('dashboard.urls', 'dashboard'), namespace='dashboard')),
 
     # ================ User-side Job Board (prefixed) ================
     path('opportunities/', user_views.opportunities_view, name='opportunities'),

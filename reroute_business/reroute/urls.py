@@ -4,8 +4,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 # project urls.py (add these imports)
-from reroute_business.main import views as main_views                   # for dashboard view
-from reroute_business.profiles.views import (
+from main import views as main_views                   # for dashboard view
+from profiles.views import (
     update_demographics,
     update_emergency_contact,
     update_employment_info,
@@ -22,7 +22,7 @@ from reroute_business.profiles.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('reroute_business.main.urls')),
+    path('', include('main.urls')),
 
     # Aliases (exact paths for convenience) --> NEEDED
     path('profile/', user_profile_view, name='my_profile'),  # exact-path alias
@@ -44,17 +44,17 @@ urlpatterns = [
 
     # --- APP INCLUDES (handle deeper paths under same prefixes) ---
     # Include profiles with namespace so templates can use `profiles:...`
-    path('profile/',   include(('reroute_business.profiles.urls', 'profiles'), namespace='profiles')),  # /profile/update/... /profile/view/<username>/
-    path('dashboard/', include(('reroute_business.dashboard.urls', 'dashboard'), namespace='dashboard')),
+    path('profile/',   include(('profiles.urls', 'profiles'), namespace='profiles')),  # /profile/update/... /profile/view/<username>/
+    path('dashboard/', include(('dashboard.urls', 'dashboard'), namespace='dashboard')),
 
     # (the rest you already have)
-    path('jobs/',      include('reroute_business.job_list.urls')),
-    path('resume/',    include(('reroute_business.resumes.urls', 'resumes'), namespace='resumes')),
+    path('jobs/',      include('job_list.urls')),
+    path('resume/',    include(('resumes.urls', 'resumes'), namespace='resumes')),
     path('accounts/',  include('allauth.urls')),
-    path('resources/', include('reroute_business.resources.urls')),
-    path('organizations/', include('reroute_business.reentry_org.urls')),
-    path('blog/',      include('reroute_business.blog.urls')),
-    path('api/',       include('reroute_business.core.urls')),
+    path('resources/', include('resources.urls')),
+    path('organizations/', include('reentry_org.urls')),
+    path('blog/',      include('blog.urls')),
+    path('api/',       include('core.urls')),
 ]
 
 

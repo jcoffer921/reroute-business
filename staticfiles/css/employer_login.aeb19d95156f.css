@@ -1,0 +1,123 @@
+/* -----------------------------------------------------------
+   Employer Login — same layout as sample (no sample colors)
+   Uses neutral grays + your brand primary for the button.
+   ----------------------------------------------------------- */
+
+/* Card */
+.auth-card{
+  max-width: 480px;
+  margin: 56px auto;
+  padding: 28px 24px;                /* was 5rem 2rem (too tall) */
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.06);
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Heading + subtitle */
+.auth-title{
+  text-align:center;
+  font-weight:800;
+  font-size:28px;
+  color:#111827;
+  margin:0 0 6px;
+}
+.subtitle{
+  text-align:center;
+  color:#6b7280;
+  margin:0 0 18px;
+  font-size:14.5px;
+}
+
+/* Error region */
+.auth-error{
+  min-height:18px;
+  color:#b91c1c;
+  margin-bottom:10px;
+}
+
+/* Fields */
+.form-group{ margin-bottom:16px; }
+.label-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+label{ font-weight:600; color:#374151; font-size:14.5px; }
+.micro-link{
+  font-size:14px;
+  text-decoration:none;
+  color:#4b5563;                     /* neutral; not sample teal */
+}
+.micro-link:hover{ text-decoration:underline; }
+
+input[type="text"], input[type="password"]{
+  width:100%;
+  margin-top:6px;
+  padding:12px 14px;
+  font-size:16px;
+  border:1px solid #e5e7eb;
+  border-radius:12px;                 /* rounded corners like sample */
+  background:#f9fafb;
+}
+input:focus{
+  outline:none;
+  border-color:#2563eb;               /* your brand primary */
+  box-shadow:0 0 0 3px rgba(37,99,235,.15);
+}
+
+/* Remember device */
+.remember-row{ margin:8px 0 16px; }
+.checkbox{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  color:#374151;
+  font-size:14.5px;
+}
+.checkbox input[type="checkbox"]{ width:20px; height:20px; border-radius:4px; }
+.help{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:18px; height:18px; border-radius:50%;
+  border:1px solid #9ca3af; color:#6b7280; font-size:12px; line-height:1;
+  cursor:help;
+}
+
+/* Pill button */
+.btn-pill{
+  width:100%;
+  padding:14px 20px;
+  border:0;
+  border-radius:9999px;               /* pill shape */
+  background:#2563eb;                 /* brand primary */
+  color:#fff;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+  transition:transform .02s ease, background .15s ease;
+}
+.btn-pill:hover{ background:#1d4ed8; }
+.btn-pill:active{ transform:translateY(1px); }
+.btn-pill:disabled{ opacity:.6; cursor:not-allowed; }
+
+/* Secondary actions */
+.secondary-actions{
+  margin-top:16px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  color:#6b7280;
+  text-align:center;
+  flex-wrap:wrap;
+}
+.secondary-actions .link{
+  color:#6d28d9;                      /* subtle indigo from your site */
+  text-decoration:none;
+}
+.secondary-actions .link:hover{ text-decoration:underline; }
+
+/* Mobile */
+@media (max-width:480px){
+  .auth-card{ margin:40px 12px; padding:24px 16px; }
+}

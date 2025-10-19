@@ -1,4 +1,4 @@
-from reroute_business.job_list.models import Job
+from job_list.models import Job
 
 
 def _normalize_skills(qs):
@@ -12,9 +12,9 @@ def match_jobs_for_user(user, origin_zip: str | None = None, radius: int = 25):
       - distance bonus within 25mi (+20) or 50mi (+10) if origin_zip provided
       - recency bonus if posted within 14 days (+10)
     """
-    from reroute_business.resumes.models import Resume
+    from resumes.models import Resume
     from django.utils import timezone
-    from reroute_business.job_list.utils.geo import is_within_radius
+    from job_list.utils.geo import is_within_radius
 
     resume = (
         Resume.objects.filter(user=user)
@@ -76,8 +76,8 @@ def match_seekers_for_employer(employer_user, limit_per_job: int = 3):
       { 'job': Job, 'profile': UserProfile, 'user': User, 'score': float }
     Sorted by score desc, limited per job to avoid flooding the dashboard.
     """
-    from reroute_business.profiles.models import UserProfile
-    from reroute_business.resumes.models import Resume
+    from profiles.models import UserProfile
+    from resumes.models import Resume
 
     jobs = Job.objects.filter(employer=employer_user, is_active=True).prefetch_related("skills_required")
     if not jobs.exists():

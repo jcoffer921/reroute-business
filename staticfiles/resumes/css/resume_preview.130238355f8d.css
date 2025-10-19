@@ -1,0 +1,216 @@
+/* Wrapper for left (editable) and right (preview) panels */
+.resume-preview-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 7rem 2rem;
+}
+
+.raw-resume-text pre,
+.raw-preview-text pre {
+  white-space: pre-wrap;
+  font-size: 0.85rem;
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Left: Editable resume block */
+.resume-final-preview {
+  flex: 1 1 48%;
+  background: white;
+  padding: 2rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.08);
+  font-family: 'Inter', sans-serif;
+  border-radius: 8px;
+}
+
+/* Right: Formatted preview block */
+.resume-builder-final {
+  flex: 1 1 48%;
+  background: #fff;
+  padding: 2rem;
+  border-left: 1px solid #ddd;
+  box-shadow: 0 0 10px rgba(0,0,0,0.08);
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  border-radius: 8px;
+}
+
+/* Print-friendly layout inside right preview */
+.resume-print-layout {
+  font-size: 14px;
+  color: #111;
+}
+
+.resume-name {
+  font-size: 22px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.resume-contact {
+  font-size: 13px;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.resume-print-layout h2 {
+  font-size: 16px;
+  color: #003366;
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.25rem;
+}
+
+.resume-print-layout ul {
+  padding-left: 1.25rem;
+  margin: 0.5rem 0;
+}
+
+.resume-print-layout li {
+  margin-bottom: 0.25rem;
+}
+
+/* Editable Panel: Section Styling */
+.resume-header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.25rem;
+}
+
+.resume-header p {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.resume-section {
+  margin-top: 2rem;
+}
+
+.resume-section h2 {
+  font-size: 1.25rem;
+  color: #003366;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.25rem;
+}
+
+.resume-section [contenteditable="true"]:hover {
+  background: #f8f9fa;
+  cursor: text;
+}
+
+/* Skills list styling */
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  list-style: none;
+  padding-left: 0;
+  margin-top: 1rem;
+}
+
+.skills-list li {
+  padding: 5px 10px;
+  background: #e9ecef;
+  border-radius: 5px;
+}
+
+/* Action buttons */
+.actions {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.actions .btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-primary {
+  background-color: #0047AB;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #00307d;
+}
+
+.btn-secondary {
+  background-color: #ddd;
+  color: #000;
+}
+
+.btn-secondary:hover {
+  background-color: #ccc;
+}
+
+/* Responsive tweaks */
+@media (max-width: 960px) {
+  .resume-preview-wrapper {
+    flex-direction: column;
+  }
+
+  .resume-final-preview,
+  .resume-builder-final {
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+}
+
+@media print {
+  /* Hide everything else */
+  body * {
+    visibility: hidden;
+  }
+
+  .resume-builder-final,
+  .resume-builder-final * {
+    visibility: visible;
+  }
+
+  .resume-builder-final {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 1in;
+    background: white;
+    color: black;
+    box-shadow: none !important;
+  }
+
+  /* Hide navigation, buttons, and footer */
+  nav, footer, .actions, .resume-preview-wrapper, .resume-final-preview {
+    display: none !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 1in;
+  }
+
+  h1, h2 {
+    page-break-after: avoid;
+  }
+
+  ul {
+    padding-left: 1.25rem;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+

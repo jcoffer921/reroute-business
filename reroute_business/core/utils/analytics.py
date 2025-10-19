@@ -2,7 +2,7 @@
 Reusable analytics tracker for lightweight, safe logging.
 
 Usage:
-    from reroute_business.core.utils.analytics import track_event
+    from core.utils.analytics import track_event
     track_event(request=request, event_type='page_view')
 
 This helper MUST NOT raise; failures are swallowed (logged at debug level).
@@ -17,7 +17,7 @@ from django.http import HttpRequest
 from django.utils.timezone import now
 
 try:
-    from reroute_business.core.models import AnalyticsEvent
+    from core.models import AnalyticsEvent
 except Exception:  # during migrations or first deploy
     AnalyticsEvent = None  # type: ignore
 

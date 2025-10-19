@@ -15,14 +15,14 @@ from django.db.models import Q
 
 # ===== Domain imports (align to your actual apps) =====
 # Jobs live in job_list; bring Job, SavedJob, Application from there for consistency.
-from reroute_business.job_list.models import Job, SavedJob, Application
-from reroute_business.job_list.models import ArchivedJob
+from job_list.models import Job, SavedJob, Application
+from job_list.models import ArchivedJob
 from django.db.utils import ProgrammingError
-from reroute_business.job_list.matching import match_jobs_for_user
+from job_list.matching import match_jobs_for_user
 
 # Profiles & resumes
-from reroute_business.profiles.models import UserProfile
-from reroute_business.resumes.models import Education, Experience, Resume  # your resumes app owns these
+from profiles.models import UserProfile
+from resumes.models import Education, Experience, Resume  # your resumes app owns these
 
 
 # =========================
@@ -173,7 +173,7 @@ def user_dashboard(request):
     matches_found = len(suggested_jobs) if suggested_jobs else 0
     profile_views = 0
     try:
-        from reroute_business.core.models import AnalyticsEvent
+        from core.models import AnalyticsEvent
         # Prefer explicit profile_view events
         q = AnalyticsEvent.objects.filter(event_type="profile_view")
         try:
@@ -360,7 +360,7 @@ def employer_dashboard(request):
 
     # Ensure EmployerProfile exists (optional: not strictly required for counts)
     try:
-        from reroute_business.profiles.models import EmployerProfile
+        from profiles.models import EmployerProfile
         EmployerProfile.objects.get_or_create(user=employer_user)
     except Exception:
         pass
@@ -371,7 +371,7 @@ def employer_dashboard(request):
     jobs = Job.objects.filter(employer=employer_user).order_by(order)
 
     # Match candidates to this employer's jobs (top few per job)
-    from reroute_business.job_list.matching import match_seekers_for_employer
+    from job_list.matching import match_seekers_for_employer
     matched_seekers = match_seekers_for_employer(employer_user, limit_per_job=3)[:9]
     # Recent in-app notifications for this employer (include broadcasts)
     try:
@@ -426,7 +426,7 @@ def employer_dashboard(request):
     # Employer verification flag (controls alert banner)
     employer_verified = False
     try:
-        from reroute_business.profiles.models import EmployerProfile as _EP
+        from profiles.models import EmployerProfile as _EP
         ep = _EP.objects.filter(user=employer_user).first()
         employer_verified = bool(getattr(ep, 'verified', False)) if ep else False
     except Exception:
@@ -459,7 +459,7 @@ def employer_job_matches(request, job_id: int):
         return redirect('dashboard:employer')
 
     # Use existing matcher and filter to this job, with a large per-job limit
-    from reroute_business.job_list.matching import match_seekers_for_employer
+    from job_list.matching import match_seekers_for_employer
     items = [
         it for it in match_seekers_for_employer(request.user, limit_per_job=200)
         if it.get('job') and it['job'].id == job.id
@@ -473,7 +473,7 @@ def employer_job_matches(request, job_id: int):
 @login_required
 def employer_matcher(request):
     """Overall matcher view: grouped matches for all of this employer's jobs."""
-    from reroute_business.job_list.matching import match_seekers_for_employer
+    from job_list.matching import match_seekers_for_employer
     # We only need previews here, so fetch top 3 per job for efficiency
     items = match_seekers_for_employer(request.user, limit_per_job=3)
 
@@ -493,7 +493,7 @@ def employer_matcher(request):
         seen_job_ids.add(job.id)
 
     # Ensure we show jobs with no matches as well
-    from reroute_business.job_list.models import Job as _Job
+    from job_list.models import Job as _Job
     employer_jobs = list(_Job.objects.filter(employer=request.user).order_by('-created_at'))
     matched_job_ids = {b['job'].id for b in job_blocks}
     for j in employer_jobs:
@@ -554,7 +554,7 @@ def notifications_view(request):
     is_emp = False
     try:
         # Try to infer employment role (if profiles app present)
-        from reroute_business.profiles.models import UserProfile
+        from profiles.models import UserProfile
         up = UserProfile.objects.filter(user=request.user).first()
         is_emp = bool(getattr(up, 'is_employer', False))
     except Exception:
@@ -1079,9 +1079,9 @@ def admin_dashboard(request):
     """
     # Import models
     from django.contrib.auth.models import User
-    from reroute_business.job_list.models import Job, Application
-    from reroute_business.resumes.models import Resume
-    from reroute_business.profiles.models import UserProfile, EmployerProfile
+    from job_list.models import Job, Application
+    from resumes.models import Resume
+    from profiles.models import UserProfile, EmployerProfile
 
     # Stats
     user_count = User.objects.count()
@@ -1113,7 +1113,7 @@ def admin_dashboard(request):
     ]
     # Approximate employers by day using User.date_joined for users who have an EmployerProfile
     try:
-        from reroute_business.profiles.models import EmployerProfile
+        from profiles.models import EmployerProfile
         employers_by_day = [
             EmployerProfile.objects.filter(user__date_joined__date=day).count() for day in last_30
         ]
@@ -1141,7 +1141,7 @@ def admin_dashboard(request):
         "last_7_days": {"page_views": 0, "profile_completed": 0},
     }
     try:
-        from reroute_business.core.models import AnalyticsEvent
+        from core.models import AnalyticsEvent
         from django.db.models import Count
 
         seven_days_ago = now() - timedelta(days=7)
@@ -1189,7 +1189,7 @@ def admin_analytics_events(request):
     - Tiles for totals (page views, unique visitors, profiles completed, resumes created)
     - Top referrers
     """
-    from reroute_business.core.models import AnalyticsEvent
+    from core.models import AnalyticsEvent
     from django.db.models import Count
 
     try:
@@ -1239,7 +1239,7 @@ def admin_analytics_events(request):
     try:
         resumes_created = events.filter(event_type='resume_created').count()
         if resumes_created == 0:
-            from reroute_business.resumes.models import Resume
+            from resumes.models import Resume
             resumes_created = Resume.objects.filter(created_at__gte=start_ts).count()
     except Exception:
         resumes_created = 0
@@ -1406,7 +1406,7 @@ def admin_application_update_status(request, app_id: int):
 @staff_member_required
 @require_POST
 def approve_flagged_job(request, job_id: int):
-    from reroute_business.job_list.models import Job
+    from job_list.models import Job
     job = Job.objects.filter(id=job_id).first()
     if not job:
         messages.error(request, "Job not found.")
@@ -1425,7 +1425,7 @@ def approve_flagged_job(request, job_id: int):
 @staff_member_required
 @require_POST
 def remove_flagged_job(request, job_id: int):
-    from reroute_business.job_list.models import Job
+    from job_list.models import Job
     job = Job.objects.filter(id=job_id).first()
     if not job:
         messages.error(request, "Job not found.")

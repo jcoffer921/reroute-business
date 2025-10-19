@@ -1,0 +1,209 @@
+/* Wrapper for matched jobs section */
+.matched-jobs-wrapper {
+  padding: 7rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Page heading */
+.matched-jobs-wrapper h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+/* Filter form */
+.matched-jobs-wrapper .match-filter-form {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 12px;
+  align-items: end;
+  background: #fff;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  margin: 16px 0 24px;
+}
+
+.matched-jobs-wrapper .match-filter-form .field {
+  grid-column: span 6;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.matched-jobs-wrapper .match-filter-form .actions {
+  grid-column: span 12;
+  display: flex;
+  gap: 10px;
+}
+
+.matched-jobs-wrapper .match-filter-form label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.matched-jobs-wrapper .match-filter-form input,
+.matched-jobs-wrapper .match-filter-form select {
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  color: #111827;
+}
+
+.matched-jobs-wrapper .match-filter-form input:focus,
+.matched-jobs-wrapper .match-filter-form select:focus {
+  outline: none;
+  border-color: #0077b6;
+  box-shadow: 0 0 0 3px rgba(0,119,182,0.15);
+}
+
+.matched-jobs-wrapper .match-filter-form input#zip-input {
+  max-width: 120px;
+}
+
+.matched-jobs-wrapper .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.matched-jobs-wrapper .btn-primary {
+  background: #0077b6;
+  color: #fff;
+}
+
+.matched-jobs-wrapper .btn-primary:hover {
+  background: #005f8e;
+}
+
+.matched-jobs-wrapper .btn-outline {
+  background: #fff;
+  color: #0077b6;
+  border-color: #bfe6f8;
+}
+
+.matched-jobs-wrapper .btn-outline:hover {
+  background: #f0f9ff;
+}
+
+@media (min-width: 720px) {
+  .matched-jobs-wrapper .match-filter-form .field {
+    grid-column: span 3;
+  }
+  .matched-jobs-wrapper .match-filter-form .actions {
+    grid-column: span 6;
+    justify-content: flex-start;
+  }
+}
+
+/* Job card styles */
+.job-listings {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 900px) {
+  .job-listings { grid-template-columns: 1fr 1fr; }
+}
+
+.job-card {
+  border: 1px solid #e5e7eb;
+  padding: 1.1rem 1.1rem 0.95rem;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+  position: relative;
+}
+
+.job-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.10);
+  transform: translateY(-2px);
+}
+
+/* Job title */
+.job-card h4 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+}
+
+.job-card-header { display: flex; align-items: center; justify-content: space-between; }
+.job-title { color: #0f172a; }
+
+.job-desc { color: #334155; line-height: 1.5; margin-bottom: 0.75rem; }
+
+/* Skill badges shown in match */
+.badge-skill {
+  background-color: #e0f2ff;
+  color: #0b5d8a;
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-right: 0.35rem;
+  margin-top: 0.35rem;
+  display: inline-block;
+}
+
+.badge-match {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #bbf7d0;
+}
+
+/* Button to view job details */
+.view-job-btn {
+  display: inline-block;
+  background-color: #0077b6;
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+  margin-top: 1rem;
+}
+
+.view-job-btn:hover {
+  background-color: #005f8e;
+}
+
+.job-card-footer { display: flex; justify-content: flex-end; }
+
+/* Optional: empty state */
+.empty-state {
+  text-align: center;
+  margin-top: 3rem;
+  font-size: 1.1rem;
+  color: #888;
+}
+
+/* Lighten any hr that might still render here */
+.matched-jobs-wrapper hr { border: none; border-top: 1px solid #eef2f7; margin: 12px 0; }
+
+@media (prefers-color-scheme: dark) {
+  .matched-jobs-wrapper .match-filter-form { background: #0b1220; border-color: #1f2937; }
+  .matched-jobs-wrapper .match-filter-form label { color: #cbd5e1; }
+  .matched-jobs-wrapper .match-filter-form input,
+  .matched-jobs-wrapper .match-filter-form select { background: #0b1220; color: #e5e7eb; border-color: #334155; }
+
+  .job-card { background: #0b1220; border-color: #1f2937; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
+  .job-title { color: #e5e7eb; }
+  .job-desc { color: #cbd5e1; }
+  .badge-skill { background: #0b2a3a; color: #9bd3ef; }
+  .badge-match { background: #083b2b; color: #b8f3d0; border-color: #14532d; }
+}

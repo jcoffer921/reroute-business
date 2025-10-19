@@ -1,0 +1,96 @@
+/* ===== Interview Prep Styles ===== */
+
+.interview-hero {
+  background-color: #e3f2fd;
+  text-align: center;
+  padding: 10rem 2rem;
+  border-radius: 0 0 1.5rem 1.5rem;
+}
+
+.interview-hero h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #0d47a1;
+  margin-bottom: 1rem;
+}
+
+.interview-hero p {
+  font-size: 1.1rem;
+  color: #444;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.interview-section {
+  padding: 2.5rem 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.interview-section h2 {
+  font-size: 1.5rem;
+  color: #1e88e5;
+  margin-bottom: 1rem;
+}
+
+.interview-section ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  line-height: 1.7;
+  color: #333;
+}
+
+.dos-donts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.dos-donts .do,
+.dos-donts .dont {
+  flex: 1 1 300px;
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.dos-donts .do {
+  background-color: #e8f5e9;
+  border-left: 4px solid #43a047;
+}
+
+.dos-donts .dont {
+  background-color: #ffebee;
+  border-left: 4px solid #e53935;
+}
+
+.dos-donts h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.interview-cta {
+  text-align: center;
+  padding: 2rem;
+  background-color: #f1f8ff;
+  border-top: 1px solid #ccc;
+}
+
+.interview-cta p {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.btn-primary {
+  background-color: #1e88e5;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.btn-primary:hover {
+  background-color: #1565c0;
+}

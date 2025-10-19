@@ -3,8 +3,8 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django import forms
 
-from reroute_business.resumes.models import Application
-from reroute_business.profiles.models import UserProfile, EmployerProfile
+from resumes.models import Application
+from profiles.models import UserProfile, EmployerProfile
 
 
 @admin.register(Application)

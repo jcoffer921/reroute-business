@@ -1,0 +1,116 @@
+/* ===== Slider Layout ===== */
+.blog-slider {
+  max-width: 1100px;      /* keeps it readable */
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.slider-container {
+  position: relative;
+  overflow: hidden;        /* hides off-screen slides */
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+/* Wrapper holds all slides in a single row */
+.slides-wrapper {
+  display: flex;
+  width: 100%;            /* JS will expand this to N*100% */
+  will-change: transform; /* smoother GPU-accelerated transform */
+}
+
+/* Each slide gets an equal fraction of the wrapper width via JS */
+.slide {
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+/* Headings & text cleanup */
+.blog-slider h2 {
+  margin-bottom: 1rem;
+}
+
+.slide h3 {
+  margin: 0 0 .5rem;
+  line-height: 1.25;
+}
+
+.slide p {
+  margin: .25rem 0 .75rem;
+}
+
+/* Buttons */
+.blog-actions {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+}
+
+.btn-primary,
+.btn-secondary {
+  display: inline-block;
+  padding: .6rem 1rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+
+.btn-primary { border-color: #1f6fff; }
+.btn-primary:hover { background: #1f6fff; color: #fff; }
+
+.btn-secondary { border-color: #ddd; color: #333; }
+.btn-secondary:hover { background: #f7f7f7; }
+
+/* Arrows */
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: rgba(255,255,255,0.9);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.slider-btn.prev { left: .75rem; }
+.slider-btn.next { right: .75rem; }
+
+/* Simple triangles using borders */
+.arrow-triangle {
+  display: inline-block;
+  width: 0; height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+}
+.arrow-triangle.left  { border-right: 10px solid #333; margin-right: 2px; }
+.arrow-triangle.right { border-left: 10px solid #333; margin-left: 2px; }
+
+/* Dots */
+.slider-dots {
+  display: flex;
+  gap: .5rem;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+.slider-dots .dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  border: 0;
+  background: #d0d5dd;
+  cursor: pointer;
+}
+.slider-dots .dot.active {
+  background: #1f6fff;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .slide { padding: 1rem; }
+  .slider-btn { width: 38px; height: 38px; }
+}
