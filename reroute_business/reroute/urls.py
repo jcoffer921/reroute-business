@@ -22,7 +22,7 @@ from reroute_business.profiles.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('main.urls')),
+    path('', include('reroute_businessmain.urls')),
 
     # Aliases (exact paths for convenience) --> NEEDED
     path('profile/', user_profile_view, name='my_profile'),  # exact-path alias
