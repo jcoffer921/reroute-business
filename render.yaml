@@ -6,18 +6,18 @@ services:
     autoDeploy: true
 
     buildCommand: |
-      export DJANGO_SETTINGS_MODULE=reroute_business.reroute.settings
-      export DEBUG=False
       pip install --upgrade pip
       pip install -r requirements.txt
-      rm -rf staticfiles
-      python manage.py collectstatic --noinput
-
+      cd Projects                            # correct folder name with capital P
+      rm -rf ../staticfiles                  # clean old staticfiles folder
+      export DJANGO_SETTINGS_MODULE=reroute_business.reroute.settings
+      export DEBUG=False
+      python manage.py collectstatic --noinput --verbosity 2
 
     preDeployCommand: |
-      python manage.py migrate --noinput
+      cd Projects && python manage.py migrate --noinput
 
-    startCommand: gunicorn reroute_business.reroute.wsgi:application
+    startCommand: cd Projects && gunicorn reroute_business.reroute.wsgi:application
 
     envVars:
       - key: PYTHON_VERSION
@@ -36,6 +36,8 @@ services:
         fromDatabase:
           name: reroute-postgres
           property: connectionString
+      - key: RENDER
+        value: "true"
 
 databases:
   - name: reroute-postgres
