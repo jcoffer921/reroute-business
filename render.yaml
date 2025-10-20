@@ -13,13 +13,13 @@ services:
     preDeployCommand: |
       python manage.py migrate --noinput
 
-    startCommand: gunicorn reroute_business.wsgi:application
+    startCommand: gunicorn reroute_business.reroute.wsgi:application
 
     envVars:
       - key: PYTHON_VERSION
         value: 3.12
       - key: DJANGO_SETTINGS_MODULE
-        value: reroute_business.settings
+        value: reroute_business.reroute.settings
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG

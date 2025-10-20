@@ -25,8 +25,8 @@ DATABASES = {
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Project pointers
-ROOT_URLCONF = 'reroute_business.urls'
-WSGI_APPLICATION = 'reroute_business.wsgi.application'
+ROOT_URLCONF = 'reroute_business.reroute.urls'
+WSGI_APPLICATION = 'reroute_business.reroute.wsgi.application'
 
 
 TEMPLATES = [
@@ -137,7 +137,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'main.middleware.EnforceVerifiedEmailMiddleware',
-    'reroute.security_headers.SecurityHeadersMiddleware',
+    'reroute_business.reroute.security_headers.SecurityHeadersMiddleware',
     'core.middleware.pageviews.PageViewMiddleware',
 ]
 
