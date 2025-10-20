@@ -6,10 +6,13 @@ services:
     autoDeploy: true
 
     buildCommand: |
+      export DJANGO_SETTINGS_MODULE=reroute_business.reroute.settings
+      export DEBUG=False
       pip install --upgrade pip
       pip install -r requirements.txt
       rm -rf staticfiles
       python manage.py collectstatic --noinput
+
 
     preDeployCommand: |
       python manage.py migrate --noinput
