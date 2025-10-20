@@ -147,7 +147,7 @@ MIDDLEWARE = [
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'main' / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 MEDIA_URL = '/media/'
