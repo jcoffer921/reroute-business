@@ -6,14 +6,18 @@ services:
     autoDeploy: true
 
     buildCommand: |
+      echo "Running build..."
+      export PYTHONPATH=/opt/render/project/src
       export DJANGO_SETTINGS_MODULE=reroute_business.reroute.settings
       export DEBUG=False
       pip install --upgrade pip
       pip install -r requirements.txt
       rm -rf staticfiles
-      python manage.py collectstatic --noinput --verbosity 2
+      python manage.py collectstatic --noinput --verbosity 2 || (echo "Collectstatic failed!" && exit 1)
 
     preDeployCommand: |
+      export PYTHONPATH=/opt/render/project/src
+      export DJANGO_SETTINGS_MODULE=reroute_business.reroute.settings
       python manage.py migrate --noinput
 
     startCommand: gunicorn reroute_business.reroute.wsgi:application
