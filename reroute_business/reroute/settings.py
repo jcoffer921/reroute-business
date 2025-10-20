@@ -41,8 +41,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 # Project context
-                'reroute_business.reroute.main.context_processors.role_flags',
-                'reroute_business.reroute.main.context_processors.unread_notifications',
+                'reroute_business.main.context_processors.role_flags',
+                'reroute_business.main.context_processors.unread_notifications',
             ],
         },
     },
