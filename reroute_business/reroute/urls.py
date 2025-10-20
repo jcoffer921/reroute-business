@@ -4,8 +4,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 # project urls.py (add these imports)
-from main import views as main_views                   # for dashboard view
-from profiles.views import (
+from reroute_business.main import views as main_views                   # for dashboard view
+from reroute_business.profiles.views import (
     update_demographics,
     update_emergency_contact,
     update_employment_info,

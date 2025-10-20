@@ -7,15 +7,15 @@ from django.urls import reverse, NoReverseMatch
 from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.core.mail import send_mail
-from core.utils.analytics import track_event
+from reroute_business.core.utils.analytics import track_event
 from django.http import JsonResponse, HttpResponse
 
-from job_list.models import Job, Application, SavedJob
-from job_list.utils.geo import is_within_radius  # expects (origin_zip, target_zip, radius_mi)
-from resumes.models import Resume
+from reroute_business.job_list.models import Job, Application, SavedJob
+from reroute_business.job_list.utils.geo import is_within_radius  # expects (origin_zip, target_zip, radius_mi)
+from reroute_business.resumes.models import Resume
 from django.contrib.auth.models import User
 
-from core.models import Skill
+from reroute_business.core.models import Skill
 
 
 import logging
@@ -171,7 +171,7 @@ def apply_to_job(request, job_id):
 
     # 🔔 In-app notification for employer
     try:
-        from dashboard.models import Notification
+        from reroute_business.dashboard.models import Notification
         Notification.objects.create(
             user=job.employer,
             actor=request.user,
@@ -204,7 +204,7 @@ def apply_to_job(request, job_id):
 # ---------- Scored matching ----------
 def match_jobs(request, seeker_id):
     """Delegate to the shared matching module and render the matches page."""
-    from job_list.matching import match_jobs_for_user
+    from reroute_business.job_list.matching import match_jobs_for_user
 
     user = get_object_or_404(User, id=seeker_id)
 

@@ -17,7 +17,7 @@ from django.http import HttpRequest
 from django.utils.timezone import now
 
 try:
-    from core.models import AnalyticsEvent
+    from reroute_business.core.models import AnalyticsEvent
 except Exception:  # during migrations or first deploy
     AnalyticsEvent = None  # type: ignore
 

@@ -1,8 +1,8 @@
 # models.py
 from django.db import models
 from django.contrib.auth.models import User
-from job_list.models import Job
-from core.models import Skill
+from reroute_business.job_list.models import Job
+from reroute_business.core.models import Skill
 
 US_STATE_CHOICES = [
     ('AL', 'Alabama'),

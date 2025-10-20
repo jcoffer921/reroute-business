@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
-from core.models import Skill
-from core.constants import RELATABLE_SKILLS
+from reroute_business.core.models import Skill
+from reroute_business.core.constants import RELATABLE_SKILLS
 
 class Command(BaseCommand):
     help = 'Seeds the Skill table with relatable skills from constants.py'

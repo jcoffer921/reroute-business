@@ -42,10 +42,10 @@ from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.views.decorators.http import require_GET, require_POST
 
-from job_list.models import Application
-from main.forms import UserSignupForm
-from resumes.models import Resume
-from profiles.views import is_employer
+from reroute_business.job_list.models import Application
+from reroute_business.main.forms import UserSignupForm
+from reroute_business.resumes.models import Resume
+from reroute_business.profiles.views import is_employer
 
 
 # Optional dependency for contact form reCAPTCHA
@@ -58,7 +58,7 @@ except Exception:
 # -----------------------------
 # Local Imports
 # -----------------------------
-from profiles.models import EmployerProfile, UserProfile, Subscription
+from reroute_business.profiles.models import EmployerProfile, UserProfile, Subscription
 
 # Try to import a custom password form; if unavailable, we use Django's default.
 try:
@@ -68,7 +68,7 @@ except Exception:
 
 # If you rely on a shared Skill list:
 try:
-    from core.models import Skill
+    from reroute_business.core.models import Skill
 except Exception:
     Skill = None  # We’ll guard usage via conditionals
 
@@ -101,7 +101,7 @@ def home(request):
     recent_posts   = []
 
     try:
-        from blog.models import BlogPost
+        from reroute_business.blog.models import BlogPost
         # --- Try to get the BlogPost model dynamically to avoid import-time crashes
         BlogPost = apps.get_model('blog', 'BlogPost') if apps.is_installed('blog') else None
 
@@ -139,7 +139,7 @@ def about_us(request):
     """Public About page with lightweight page view logging."""
     # Best-effort analytics; never blocks rendering
     try:
-        from core.utils.analytics import track_event
+        from reroute_business.core.utils.analytics import track_event
         track_event(event_type='page_view', request=request)
     except Exception:
         pass
@@ -165,7 +165,7 @@ def pricing(request):
     current_plan = None
     if request.user.is_authenticated and is_employer(request.user):
         try:
-            from profiles.models import Subscription
+            from reroute_business.profiles.models import Subscription
             sub, _ = Subscription.objects.get_or_create(user=request.user)
             current_plan = (sub.plan_name or '').lower()
         except Exception:

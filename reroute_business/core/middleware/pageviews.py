@@ -5,7 +5,7 @@ from typing import Callable
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 
-from core.utils.analytics import track_event
+from reroute_business.core.utils.analytics import track_event
 
 
 class PageViewMiddleware:
