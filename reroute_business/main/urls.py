@@ -35,10 +35,10 @@ urlpatterns = [
     path('employer/dashboard/', lambda request: redirect('dashboard:employer'), name='employer_dashboard'),
 
     # ================ Apps ================
-    path('blog/', include('blog.urls')),
-    path('resumes/', include('resumes.urls')),
-    path('profile/', include('profiles.urls')),     # includes user_profile route
-    path('dashboard/', include(('dashboard.urls', 'dashboard'), namespace='dashboard')),
+    path('blog/', include('reroute_business.blog.urls')),
+    path('resumes/', include('reroute_business.resumes.urls')),
+    path('profile/', include('reroute_business.profiles.urls')),     # includes user_profile route
+    path('dashboard/', include(('reroute_business.dashboard.urls', 'dashboard'), namespace='dashboard')),
 
     # ================ User-side Job Board (prefixed) ================
     path('opportunities/', user_views.opportunities_view, name='opportunities'),
