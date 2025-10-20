@@ -16,7 +16,7 @@ if BASE_DIR not in sys.path:
 
 # Force DEBUG=true to avoid manifest static lookups and HTTPS redirects
 os.environ.setdefault("DEBUG", "true")
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "reroute.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "reroute_business.reroute.settings")
 
 import django  # noqa: E402
 django.setup()
