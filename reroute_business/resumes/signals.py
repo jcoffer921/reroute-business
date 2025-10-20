@@ -11,7 +11,7 @@ from .utils.preview import generate_resume_preview
 def track_resume_change(sender, instance: Resume, created: bool, **kwargs):
     """Log resume create/update as analytics events (non-blocking)."""
     try:
-        from core.utils.analytics import track_event
+        from reroute_business.core.utils.analytics import track_event
         event_type = 'resume_created' if created else 'resume_updated'
         track_event(
             event_type=event_type,

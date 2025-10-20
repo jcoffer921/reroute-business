@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from resumes.models import Resume
-from job_list.models import Job
-from core.models import Skill
-from job_list.matching import match_jobs_for_user
+from reroute_business.resumes.models import Resume
+from reroute_business.job_list.models import Job
+from reroute_business.core.models import Skill
+from reroute_business.job_list.matching import match_jobs_for_user
 
 class JobMatchingTest(TestCase):
     def setUp(self):

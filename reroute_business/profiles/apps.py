@@ -5,4 +5,4 @@ class ProfilesConfig(AppConfig):
     name = 'profiles'
 
     def ready(self):
-        import profiles.signals
+        import reroute_business.profiles.signals

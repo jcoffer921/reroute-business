@@ -1,7 +1,7 @@
 # core/models.py
 
 from django.db import models
-from core.constants import RELATABLE_SKILLS
+from reroute_business.core.constants import RELATABLE_SKILLS
 from django.contrib.auth.models import User  #
 
 

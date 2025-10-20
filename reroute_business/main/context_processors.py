@@ -102,7 +102,7 @@ def unread_notifications(request):
     user = getattr(request, 'user', None)
     try:
         if getattr(user, 'is_authenticated', False):
-            from dashboard.models import Notification
+            from reroute_business.dashboard.models import Notification
             count = Notification.objects.filter(user=user, is_read=False).count()
     except Exception:
         count = 0

@@ -2,7 +2,7 @@
 from django.urls import path, include
 from django.shortcuts import redirect
 from . import views
-from job_list.user import views as user_views
+from reroute_business.job_list.user import views as user_views
 from .forms import Step1Form, Step2Form, Step3Form, Step4Form
 from .views import (
     CustomPasswordResetView,

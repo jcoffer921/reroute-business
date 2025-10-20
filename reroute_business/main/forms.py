@@ -11,9 +11,9 @@ import re
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from profiles.models import UserProfile
+from reroute_business.profiles.models import UserProfile
 from django.contrib.auth.forms import PasswordChangeForm
-from profiles.constants import USER_STATUS_CHOICES
+from reroute_business.profiles.constants import USER_STATUS_CHOICES
 
 
 class UserSignupForm(forms.ModelForm):

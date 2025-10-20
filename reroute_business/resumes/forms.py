@@ -8,7 +8,7 @@ from django.forms import modelformset_factory, BaseModelFormSet
 from django.core.exceptions import ValidationError
 
 from .models import Resume, ContactInfo, Education, Experience, Project
-from core.models import Skill
+from reroute_business.core.models import Skill
 
 # ---------- Step 1: Contact Info ----------
 

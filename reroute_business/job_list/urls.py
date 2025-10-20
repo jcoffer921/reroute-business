@@ -1,6 +1,6 @@
 from django.urls import path
-from job_list.user import views as user_views
-from job_list.employers import views as employer_views
+from reroute_business.job_list.user import views as user_views
+from reroute_business.job_list.employers import views as employer_views
 
 urlpatterns = [
   # ===== USER-SIDE JOB VIEWS =====
