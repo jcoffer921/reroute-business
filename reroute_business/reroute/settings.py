@@ -96,15 +96,15 @@ USE_X_FORWARDED_HOST = True
 # ---------- APPS ----------
 INSTALLED_APPS = [
     # local apps
-    'main',
-    'resumes',
-    'dashboard',
-    'blog',
-    'core',
-    'profiles',
-    'job_list',
-    'resources',
-    'reentry_org',
+    'reroute_business.main',
+    'reroute_business.resumes',
+    'reroute_business.dashboard',
+    'reroute_business.blog',
+    'reroute_business.core',
+    'reroute_business.profiles',
+    'reroute_business.job_list',
+    'reroute_business.resources',
+    'reroute_business.reentry_org',
 
     # default Django apps
     'django.contrib.admin',
@@ -123,6 +123,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
 ]
+
 
 
 # ---------- MIDDLEWARE ----------
