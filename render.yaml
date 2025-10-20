@@ -12,7 +12,7 @@ services:
       export DEBUG=False
       pip install --upgrade pip
       pip install -r requirements.txt
-      rm -rf staticfiles
+      rm -rf reroute_business/staticfiles  # match STATIC_ROOT path
       python manage.py collectstatic --noinput --verbosity 2 || (echo "Collectstatic failed!" && exit 1)
 
     preDeployCommand: |
