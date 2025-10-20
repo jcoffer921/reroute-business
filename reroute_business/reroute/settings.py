@@ -81,12 +81,12 @@ def _csv_env(name, default):
 
 ALLOWED_HOSTS = _csv_env(
     "ALLOWED_HOSTS",
-    "reroute-backend.onrender.com, reroute-business.onrender.com, reroutejobs.com, www.reroutejobs.com, localhost, 127.0.0.1",
+    "reroute-backend.onrender.com,reroute-business.onrender.com,reroutejobs.com,www.reroutejobs.com,localhost,127.0.0.1",
 )
 
 CSRF_TRUSTED_ORIGINS = _csv_env(
     "CSRF_TRUSTED_ORIGINS",
-    "https://reroute-backend.onrender.com, https://reroute-business.onrender.com, https://reroutejobs.com, https://www.reroutejobs.com, http://localhost, http://127.0.0.1",
+    "https://reroute-backend.onrender.com,https://reroute-business.onrender.com,https://reroutejobs.com,https://www.reroutejobs.com,http://localhost,http://127.0.0.1",
 )
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
