@@ -4,7 +4,6 @@ services:
     env: python
     plan: starter
     autoDeploy: true
-    rootDir: src
 
     buildCommand: |
       pip install --upgrade pip
