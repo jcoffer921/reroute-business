@@ -166,6 +166,11 @@ WHITENOISE_MANIFEST_STRICT = False
 # fallback lookups won't 500 if a manifest entry is missing.
 WHITENOISE_KEEP_ONLY_HASHED_FILES = False
 
+# In case collected files are missing at runtime, allow WhiteNoise
+# to serve directly from finders (app/static + STATICFILES_DIRS).
+# This is safe for our scale and removes 404s if collectstatic fails.
+WHITENOISE_USE_FINDERS = True
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
