@@ -12,10 +12,11 @@ services:
       export DEBUG=False
       pip install --upgrade pip
       pip install -r requirements.txt
-      echo "📦 Installing complete — collecting static files..."
-      python manage.py shell -c "from django.conf import settings; print('BASE_DIR:', settings.BASE_DIR); print('STATIC_ROOT:', settings.STATIC_ROOT); print('STATICFILES_DIRS:', settings.STATICFILES_DIRS)"
-      python manage.py collectstatic --noinput --verbosity 2 || (echo '❌ Collectstatic failed!' && exit 1)
-      echo "✅ Static files collected successfully!"
+      echo " Ensuring staticfiles directory exists..."
+      mkdir -p reroute_business/staticfiles       # create it explicitly
+      python manage.py collectstatic --noinput --verbosity 2 || (echo "❌ Collectstatic failed!" && exit 1)
+      echo " Static files collected successfully!"
+
 
 
 
