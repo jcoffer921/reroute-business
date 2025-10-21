@@ -162,6 +162,10 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # missing from the manifest (serve un-hashed file instead).
 WHITENOISE_MANIFEST_STRICT = False
 
+# Keep original, un-hashed files in STATIC_ROOT so that
+# fallback lookups won't 500 if a manifest entry is missing.
+WHITENOISE_KEEP_ONLY_HASHED_FILES = False
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
