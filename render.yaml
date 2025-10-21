@@ -18,7 +18,8 @@ services:
       python manage.py shell -c "from django.conf import settings; import os; print('BASE_DIR:', settings.BASE_DIR); print('STATIC_ROOT:', settings.STATIC_ROOT); print('STATICFILES_DIRS:', settings.STATICFILES_DIRS); print('STATIC_ROOT exists?', os.path.exists(settings.STATIC_ROOT));"
 
       echo "📁 Creating staticfiles directory manually..."
-      mkdir -pv reroute_business/staticfiles   # force create the destination
+      # STATIC_ROOT is <repo>/staticfiles per settings; create that exact path
+      mkdir -pv staticfiles   # force create the destination
 
       echo "🎨 Running collectstatic..."
       python manage.py collectstatic --noinput --verbosity 2
