@@ -8,7 +8,7 @@ load_dotenv()
 import dj_database_url
 
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-dev-secret")
 
@@ -129,7 +129,7 @@ INSTALLED_APPS = [
 # ---------- MIDDLEWARE ----------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',   # ✅ must be right after SecurityMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -141,6 +141,7 @@ MIDDLEWARE = [
     'reroute_business.reroute.security_headers.SecurityHeadersMiddleware',
     'reroute_business.core.middleware.pageviews.PageViewMiddleware',
 ]
+
 
 
 # ---------- STATIC / MEDIA ----------
