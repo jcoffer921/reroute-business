@@ -21,9 +21,14 @@ services:
       # STATIC_ROOT is <repo>/staticfiles per settings; create that exact path
       mkdir -pv staticfiles   # force create the destination
 
-      echo "🎨 Running collectstatic..."
+      echo "🎨 Running collectstatic (fresh copy)..."
+      # Clear the STATIC_ROOT before collecting to avoid stale files
+      rm -rf staticfiles && mkdir -pv staticfiles
       python manage.py collectstatic --noinput --verbosity 2
-      ls -R reroute_business/staticfiles || echo '⚠️ No staticfiles yet!'
+
+      echo "🔎 Verifying collected assets..."
+      python manage.py findstatic css/style.css || true
+      ls -R staticfiles | sed -n '1,200p'
       echo "✅ BUILD COMPLETE"
 
 
