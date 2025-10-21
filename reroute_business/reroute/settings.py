@@ -146,8 +146,16 @@ MIDDLEWARE = [
 
 # ---------- STATIC / MEDIA ----------
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'main' / 'static']
+
+# Ensure Django can find the project's static assets reliably in production.
+# BASE_DIR points at the repo root, while our app static lives under
+# 'reroute_business/main/static'. Use the correct absolute path here.
+STATICFILES_DIRS = [BASE_DIR / 'reroute_business' / 'main' / 'static']
+
+# Where collected static files are written during build/deploy
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Use WhiteNoise hashed storage for cache-busted assets
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
