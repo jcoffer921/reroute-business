@@ -6,16 +6,25 @@ services:
     autoDeploy: true
 
     buildCommand: |
-      echo "🔧 Running build from $(pwd)..."
+      echo "🔧 BUILD START at $(pwd)"
       export PYTHONPATH=/opt/render/project/src
       export DJANGO_SETTINGS_MODULE=reroute_business.reroute.settings
       export DEBUG=False
+
       pip install --upgrade pip
       pip install -r requirements.txt
-      echo " Ensuring staticfiles directory exists..."
-      mkdir -p reroute_business/staticfiles       # create it explicitly
-      python manage.py collectstatic --noinput --verbosity 2 || (echo "❌ Collectstatic failed!" && exit 1)
-      echo " Static files collected successfully!"
+
+      echo "📂 Checking for staticfiles directories..."
+      python manage.py shell -c "from django.conf import settings; import os; print('BASE_DIR:', settings.BASE_DIR); print('STATIC_ROOT:', settings.STATIC_ROOT); print('STATICFILES_DIRS:', settings.STATICFILES_DIRS); print('STATIC_ROOT exists?', os.path.exists(settings.STATIC_ROOT));"
+
+      echo "📁 Creating staticfiles directory manually..."
+      mkdir -pv reroute_business/staticfiles   # force create the destination
+
+      echo "🎨 Running collectstatic..."
+      python manage.py collectstatic --noinput --verbosity 2
+      ls -R reroute_business/staticfiles || echo '⚠️ No staticfiles yet!'
+      echo "✅ BUILD COMPLETE"
+
 
 
 
