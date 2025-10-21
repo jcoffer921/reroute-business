@@ -158,6 +158,10 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Use WhiteNoise hashed storage for cache-busted assets
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+# Avoid 500s if a template references a static path
+# missing from the manifest (serve un-hashed file instead).
+WHITENOISE_MANIFEST_STRICT = False
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
