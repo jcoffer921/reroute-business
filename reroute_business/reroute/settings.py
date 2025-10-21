@@ -155,8 +155,8 @@ STATICFILES_DIRS = [BASE_DIR / 'reroute_business' / 'main' / 'static']
 # Where collected static files are written during build/deploy
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Use WhiteNoise hashed storage for cache-busted assets
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# Use WhiteNoise compressed storage (non-manifest) to avoid manifest lookups
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # Avoid 500s if a template references a static path
 # missing from the manifest (serve un-hashed file instead).
@@ -172,7 +172,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
 }
 
 
