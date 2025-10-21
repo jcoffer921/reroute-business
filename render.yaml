@@ -40,7 +40,12 @@ services:
       export DJANGO_SETTINGS_MODULE=reroute_business.reroute.settings
       python manage.py migrate --noinput
 
-    startCommand: gunicorn reroute_business.reroute.wsgi:application
+    startCommand: |
+      export PYTHONPATH=/opt/render/project/src
+      export DJANGO_SETTINGS_MODULE=reroute_business.reroute.settings
+      # Run migrations on startup as a safety net (idempotent)
+      python manage.py migrate --noinput || true
+      exec gunicorn reroute_business.reroute.wsgi:application
 
     envVars:
       - key: PYTHON_VERSION
