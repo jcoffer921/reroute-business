@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reentry Organizations | ReRoute{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'reentry_org/catalog.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="org-hero">
+  <h1>Reentry Organizations</h1>
+  <p class="subhead">Explore verified community organizations providing employment, housing, legal aid, and reentry support.</p>
+
+  <form method="get" class="search-form" action="">
+    <div class="search-row">
+      <input class="search-input" type="text" name="q" placeholder="Search by name or keyword" value="{{ q }}" aria-label="Search organizations">
+      <select class="category-select" name="category" aria-label="Filter by category">
+        <option value="">All categories</option>
+        {% for key,label in categories %}
+          <option value="{{ key }}" {% if active_category == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn-primary" type="submit">Search</button>
+    </div>
+  </form>
+</section>
+
+<section class="org-grid">
+  {% if orgs %}
+    <div class="cards">
+      {% for org in orgs %}
+        <div class="org-card">
+          <div class="logo-wrap">
+            {% if org.logo %}
+              <img src="{{ org.logo.url }}" alt="{{ org.name }} logo">
+            {% else %}
+              <img src="{% static 'images/reroute-logo.png' %}" alt="{{ org.name }} logo">
+            {% endif %}
+          </div>
+          <div class="org-info">
+            <h3 class="org-name">{{ org.name }}</h3>
+            <span class="org-category">{% for key,label in categories %}{% if org.category == key %}{{ label }}{% endif %}{% endfor %}</span>
+          </div>
+          <div class="overlay">
+            <span class="overlay-btn" role="button">View More</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if orgs.paginator.num_pages > 1 %}
+    <div class="pagination">
+      {% if orgs.has_previous %}
+        <a class="page-link" href="?page={{ orgs.previous_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if active_category %}&category={{ active_category }}{% endif %}">Previous</a>
+      {% endif %}
+      <span class="page-status">Page {{ orgs.number }} of {{ orgs.paginator.num_pages }}</span>
+      {% if orgs.has_next %}
+        <a class="page-link" href="?page={{ orgs.next_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if active_category %}&category={{ active_category }}{% endif %}">Next</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  {% else %}
+    <div class="empty-state">
+      <p>No organizations found. Try different filters.</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
+
