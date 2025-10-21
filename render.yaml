@@ -6,15 +6,17 @@ services:
     autoDeploy: true
 
     buildCommand: |
-      echo "Running build..."
+      echo "🔧 Running build from $(pwd)..."
       export PYTHONPATH=/opt/render/project/src
       export DJANGO_SETTINGS_MODULE=reroute_business.reroute.settings
       export DEBUG=False
       pip install --upgrade pip
       pip install -r requirements.txt
-      cd reroute_business          # 👈 ensure we're in the correct directory
-      rm -rf staticfiles
-      python ../manage.py collectstatic --noinput --verbosity 2 || (echo "Collectstatic failed!" && exit 1)
+      echo "📦 Installing complete — collecting static files..."
+      python manage.py shell -c "from django.conf import settings; print('BASE_DIR:', settings.BASE_DIR); print('STATIC_ROOT:', settings.STATIC_ROOT); print('STATICFILES_DIRS:', settings.STATICFILES_DIRS)"
+      python manage.py collectstatic --noinput --verbosity 2 || (echo '❌ Collectstatic failed!' && exit 1)
+      echo "✅ Static files collected successfully!"
+
 
 
     preDeployCommand: |
