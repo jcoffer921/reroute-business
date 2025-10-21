@@ -29,12 +29,10 @@
                         <a href="{% url 'opportunities' %}">Opportunities</a>
                         <div class="nav-dropdown" role="menu" aria-label="Opportunities submenu">
                             <a href="{% url 'opportunities' %}">Job Listings</a>
-                            <a href="{% url 'organization_catalog' %}">Reentry Organizations</a>
                         </div>
                     </div>
                     <a href="{% url 'pricing' %}">Pricing</a>
                     <a href="{% url 'resource_list' %}">Resources</a>
-                    <a href="{% url 'organization_catalog' %}">Organizations</a>
 
                     {% if user.is_authenticated %}
                         {# ✅ Role-aware: always points to the correct dashboard #}
@@ -131,7 +129,6 @@
                         <li><a href="{% url 'home' %}">Home</a></li>
                         <li><a href="{% url 'opportunities' %}">Opportunities</a></li>
                         <li><a href="{% url 'resource_list' %}">Resources</a></li>
-                        <li><a href="{% url 'organization_catalog' %}">Organizations</a></li>
                     </ul>
                 </div>
 
@@ -182,7 +179,6 @@
         <li><a href="{% url 'opportunities' %}">Opportunities</a></li>
         <li><a href="{% url 'pricing' %}">Pricing</a></li>
         <li><a href="{% url 'resource_list' %}">Resources</a></li>
-        <li><a href="{% url 'organization_catalog' %}">Organizations</a></li>
         {% if user.is_authenticated %}
         <li><a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a></li>
         <li><a href="{% url 'dashboard:notifications' %}">Notifications{% if UNREAD_NOTIFICATIONS %}<span class="nav-badge">{{ UNREAD_NOTIFICATIONS }}</span>{% endif %}</a></li>
