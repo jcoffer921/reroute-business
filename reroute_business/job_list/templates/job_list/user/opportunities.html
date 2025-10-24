@@ -25,14 +25,16 @@
 </section>
 
 <!-- Filters + Results -->
+<div id="filtersBackdrop" class="filters-backdrop" hidden></div>
 <div class="opportunities-wrapper">
   <div class="container">
     <div class="container">
       <!-- Filters + Job List -->
       <div class="layout-grid">
         <!-- Filters Sidebar -->
-        <aside class="filters-sidebar" id="filtersSidebar">
+        <aside class="filters-sidebar" id="filtersSidebar" aria-label="Job filters" aria-hidden="true">
           <div class="filters-card">
+            <button type="button" class="filters-close" onclick="toggleFilters()" aria-label="Close filters">✕ Close</button>
             <h3 class="filters-title">Job Type</h3>
             <div class="pill-group">
               <label class="pill">
@@ -98,7 +100,7 @@
       </div>
     </div>
   </div>
-</form>
+
 
 <script>
   const toggleSaveUrl = "{% url 'toggle_saved_job' %}";

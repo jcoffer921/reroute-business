@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ReRoute | Pricing{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+<link rel="stylesheet" href="{% static 'css/pricing.css' %}">
+
+<section class="settings-hero">
+  <div class="settings-hero-content">
+    <h1>Pricing</h1>
+    <p>Aligned to support justice-impacted job seekers and their community partners.</p>
+  </div>
+  <div class="settings-mini-nav">
+    <a class="mini-link" href="{% url 'settings' %}">Back to Settings</a>
+  </div>
+</section>
+
+<div class="settings-container pricing-container">
+  <div class="settings-section pricing-wrap">
+    <div class="settings-card pricing-card">
+      <div class="settings-card__head pricing-head">
+        <div>
+          <h3 class="settings-card__title pricing-title">Choose Your Path</h3>
+          <p class="pricing-sub">Clear, transparent pricing based on our October 2025 model.</p>
+        </div>
+      </div>
+
+      <!-- Three primary customer segments -->
+      <div class="pricing-grid">
+        <!-- Job Seekers -->
+        <div class="price-card">
+          <div class="plan-name">Job Seekers</div>
+          <div class="plan-underline"></div>
+          <div class="price">$0</div>
+          <div class="price-sub">Free Access</div>
+          <hr class="plan-divider">
+          <ul class="plan-features">
+            <li>Full access to tools and resources</li>
+            <li>Resume builder and uploads</li>
+            <li>Verified jobs matched to your profile</li>
+            <li>Guides, reentry help, and support</li>
+          </ul>
+          <div class="settings-card__actions settings-card__actions--footer">
+            <a href="{% url 'signup' %}" class="btn btn-primary btn-pill">Get Started</a>
+          </div>
+        </div>
+
+        <!-- Reentry Organizations -->
+        <div class="price-card card-popular">
+          <div class="popular-tag pill pill--info">Best for Partners</div>
+          <div class="plan-name">Reentry Organizations</div>
+          <div class="plan-underline"></div>
+          <div class="price">$400</div>
+          <div class="price-sub">Per Month + $100/participant referral</div>
+          <hr class="plan-divider">
+          <ul class="plan-features">
+            <li>Organization dashboard for participant progress</li>
+            <li>Centralized referrals and outcomes tracking</li>
+            <li>Priority listings for partner-ready candidates</li>
+            <li>Reports for grants, compliance, and impact</li>
+          </ul>
+          <div class="settings-card__actions settings-card__actions--footer">
+            <a href="{% url 'contact' %}" class="btn btn-secondary btn-pill">Partner with Us</a>
+          </div>
+        </div>
+
+        <!-- Employers -->
+        <div class="price-card">
+          <div class="plan-name">Employers</div>
+          <div class="plan-underline"></div>
+          <div class="price">$400</div>
+          <div class="price-sub">Per Month + $200/successful hire</div>
+          <hr class="plan-divider">
+          <ul class="plan-features">
+            <li>Unlimited postings to verified job seekers</li>
+            <li>Candidate outreach and interview coordination</li>
+            <li>Performance and conversion insights</li>
+            <li>Dedicated support for inclusive hiring</li>
+          </ul>
+          <div class="settings-card__actions settings-card__actions--footer">
+            <a href="{% url 'employer_signup' %}" class="btn btn-primary btn-pill">Hire Through ReRoute</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add-On Features -->
+      <div class="info-section" style="margin-top:28px;">
+        <h3 class="section-heading">Add-On Features</h3>
+        <ul class="plan-features">
+          <li>Sponsored listings: $50–$100 per job</li>
+          <li>Featured badges: $250 per month</li>
+          <li>Workforce analytics dashboards: emerging premium feature</li>
+        </ul>
+      </div>
+
+      <!-- Why Choose ReRoute? -->
+      <div class="info-section" style="margin-top:18px;">
+        <h3 class="section-heading">Why Choose ReRoute?</h3>
+        <ul class="plan-features">
+          <li>Transparent pricing aligned with outcomes</li>
+          <li>Verified jobs and trusted partners</li>
+          <li>Data-driven results to improve placement and retention</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+

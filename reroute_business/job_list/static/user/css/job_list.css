@@ -80,6 +80,61 @@
   position: sticky;
   top: 80px;
 }
+/* Mobile drawer behavior for filters */
+@media (max-width: 1023px) {
+  .filters-sidebar {
+    display: block;
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100dvh;
+    width: min(90vw, 360px);
+    background: #ffffff;
+    box-shadow: -10px 0 24px rgba(2, 6, 23, 0.18);
+    transform: translateX(100%);
+    transition: transform .25s ease;
+    z-index: 901;
+    overflow-y: auto;
+    padding: 1rem;
+    border-left: 1px solid #e5e7eb;
+  }
+  .filters-sidebar.open { transform: translateX(0); }
+  .filters-card { box-shadow: none; border: 0; padding: 0; }
+  body.no-scroll { overflow: hidden; }
+}
+
+/* Backdrop overlay */
+.filters-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.45);
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+  z-index: 900;
+}
+.filters-backdrop.show { opacity: 1; pointer-events: auto; }
+
+/* Close button visible only on mobile drawer */
+@media (max-width: 1023px) {
+  .filters-close {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #111827;
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 6px 12px;
+    margin: 0 0 8px;
+    cursor: pointer;
+  }
+}
+@media (min-width: 1024px) {
+  .filters-close { display: none; }
+}
 .filters-card { background: #fff; padding: 1rem; border: 1px solid #e6ecfb; border-radius: 12px; box-shadow: 0 6px 16px rgba(10,34,80,0.06); display: grid; gap: .5rem; 
   /* Softer accent for active pills (overrideable) */
   --pill-active-bg: #0A77B4; /* softer than #006da0 */
@@ -340,6 +395,12 @@
   .mobile-filter-toggle {
     display: none;
   }
+}
+
+/* Tighter padding on small screens */
+@media (max-width: 640px) {
+  .opportunities-wrapper { padding: 1rem; }
+  .search-bar { gap: 0.75rem; }
 }
 
 /* Responsive adjustments for job cards on smaller screens */

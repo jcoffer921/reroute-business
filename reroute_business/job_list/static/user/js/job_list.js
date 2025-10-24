@@ -1,12 +1,33 @@
 function toggleFilters() {
   const sidebar = document.getElementById('filtersSidebar');
-  sidebar.style.display = sidebar.style.display === 'block' ? 'none' : 'block';
+  const backdrop = document.getElementById('filtersBackdrop');
+  const isOpen = sidebar.classList.contains('open');
+
+  if (!isOpen) {
+    sidebar.classList.add('open');
+    sidebar.setAttribute('aria-hidden', 'false');
+    if (backdrop) {
+      backdrop.hidden = false;
+      backdrop.classList.add('show');
+    }
+    document.body.classList.add('no-scroll');
+  } else {
+    sidebar.classList.remove('open');
+    sidebar.setAttribute('aria-hidden', 'true');
+    if (backdrop) {
+      backdrop.classList.remove('show');
+      // delay hiding until transition ends
+      setTimeout(() => { backdrop.hidden = true; }, 200);
+    }
+    document.body.classList.remove('no-scroll');
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('jobFilterForm');
   const results = document.getElementById('jobResults');
   const sidebar = document.getElementById('filtersSidebar');
+  const backdrop = document.getElementById('filtersBackdrop');
 
   function collectFilters() {
     const params = new URLSearchParams();
@@ -72,6 +93,35 @@ document.addEventListener('DOMContentLoaded', () => {
       let t;
       el.addEventListener('input', () => { clearTimeout(t); t = setTimeout(ajaxUpdate, 400); });
     }
+  });
+
+  // Backdrop and ESC to close drawer (mobile)
+  if (backdrop) {
+    backdrop.addEventListener('click', () => { if (sidebar && sidebar.classList.contains('open')) toggleFilters(); });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebar && sidebar.classList.contains('open')) {
+      toggleFilters();
+    }
+  });
+
+  // When resizing to desktop, ensure drawer state is reset
+  let lastIsMobile = window.innerWidth <= 1023;
+  window.addEventListener('resize', () => {
+    const isMobile = window.innerWidth <= 1023;
+    if (!isMobile && lastIsMobile) {
+      // leaving mobile -> desktop
+      if (sidebar) {
+        sidebar.classList.remove('open');
+        sidebar.removeAttribute('aria-hidden');
+      }
+      if (backdrop) {
+        backdrop.classList.remove('show');
+        backdrop.hidden = true;
+      }
+      document.body.classList.remove('no-scroll');
+    }
+    lastIsMobile = isMobile;
   });
 });
 

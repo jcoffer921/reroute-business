@@ -117,3 +117,12 @@
   margin-right: auto;
   display: block;
 }
+
+/* Light section headings for below-the-fold info blocks */
+.section-heading {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 8px;
+}
+.info-section .plan-features li { color: #374151; }
