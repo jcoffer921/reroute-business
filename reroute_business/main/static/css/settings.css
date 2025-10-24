@@ -49,6 +49,7 @@
 
 /* Right: Panels */
 .settings-panels { display: grid; gap: 1rem; grid-column: 2; grid-row: 1; }
+@media (max-width: 900px){ .settings-panels { grid-column: 1; grid-row: auto; } }
 .panel { display: none; }
 .panel.active { display: block; }
 
@@ -394,4 +395,10 @@ button.danger {
   .settings-card__actions .btn, .settings-card__actions form { width: 100%; }
   .settings-card__actions a.btn, .settings-card__actions button.btn { width: 100%; }
   .kv__row { grid-template-columns: 1fr; align-items: start; }
+}
+
+/* Mobile hero spacing */
+@media (max-width: 640px) {
+  .settings-hero { padding: 5rem 1rem 2rem; }
+  .settings-hero h1 { font-size: 2rem; }
 }

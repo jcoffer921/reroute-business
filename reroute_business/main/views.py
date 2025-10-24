@@ -171,7 +171,8 @@ def pricing(request):
         except Exception:
             current_plan = None
 
-    return render(request, 'main/pricing.html', {
+    # Render updated pricing (v2) with three primary segments
+    return render(request, 'main/pricing_v2.html', {
         "active_tab": tab,
         "current_plan": current_plan,
     })
