@@ -6,10 +6,16 @@
 .org-hero {
   text-align: center;
   padding: 56px 16px 24px;
+  min-height: 100vh;                 /* full-screen hero */
+  display: flex;                      /* center content */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 .org-hero h1 {
   font-weight: 700;
-  margin: 0 0 8px;
+  margin: 0 auto 8px;
+  max-width: 700px;
 }
 .org-hero .subhead {
   color: #5f6b7a;
@@ -39,6 +45,15 @@
   cursor: pointer;
 }
 .btn-primary:hover { opacity: .92; }
+
+/* Constrain readable width and improve mobile stacking */
+.org-hero .subhead,
+.search-form { max-width: 700px; margin-left: auto; margin-right: auto; }
+
+@media (max-width: 640px) {
+  .search-form .search-row { flex-direction: column; gap: 10px; }
+  .search-input, .category-select, .btn-primary { width: 100%; max-width: 420px; }
+}
 
 .org-grid { padding: 16px; }
 .cards {
@@ -82,4 +97,3 @@
 .page-status { color:#5f6b7a; }
 
 .empty-state { text-align:center; color:#5f6b7a; padding: 24px 0 56px; }
-
