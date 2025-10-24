@@ -179,6 +179,12 @@ def pricing(request):
 
 
 @require_GET
+def faq_view(request):
+    """Frequently Asked Questions page with accordion layout."""
+    return render(request, 'main/faq.html')
+
+
+@require_GET
 def pricing_checkout(request):
     """
     Placeholder checkout page for employer plans.

@@ -130,6 +130,7 @@
                         <li><a href="{% url 'home' %}">Home</a></li>
                         <li><a href="{% url 'opportunities' %}">Opportunities</a></li>
                         <li><a href="{% url 'resource_list' %}">Resources</a></li>
+                        <li><a href="{% url 'faq' %}">FAQ</a></li>
                     </ul>
                 </div>
 
@@ -148,6 +149,8 @@
                   <a href="{% url 'privacy' %}">Privacy Policy</a>
                   |
                   <a href="{% url 'terms' %}">Terms of Use</a>
+                  |
+                  <a href="{% url 'faq' %}">FAQ</a>
                 </p>
             </div>
         </footer>
@@ -181,6 +184,7 @@
         <li><a href="{% url 'reentry_org:organization_catalog' %}">Reentry Organizations</a></li>
         <li><a href="{% url 'pricing' %}">Pricing</a></li>
         <li><a href="{% url 'resource_list' %}">Resources</a></li>
+        <li><a href="{% url 'faq' %}">FAQ</a></li>
         {% if user.is_authenticated %}
         <li><a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a></li>
         <li><a href="{% url 'dashboard:notifications' %}">Notifications{% if UNREAD_NOTIFICATIONS %}<span class="nav-badge">{{ UNREAD_NOTIFICATIONS }}</span>{% endif %}</a></li>
