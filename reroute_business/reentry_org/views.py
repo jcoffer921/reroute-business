@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
+from django.db.utils import ProgrammingError, OperationalError
 from django.db.models import Q
 
 from .models import ReentryOrganization
@@ -16,8 +17,12 @@ def organization_catalog(request):
         queryset = queryset.filter(category=category)
 
     page = request.GET.get('page', 1)
-    paginator = Paginator(queryset, 12)
-    orgs = paginator.get_page(page)
+    try:
+        paginator = Paginator(queryset, 12)
+        orgs = paginator.get_page(page)
+    except (ProgrammingError, OperationalError):
+        paginator = Paginator(ReentryOrganization.objects.none(), 12)
+        orgs = paginator.get_page(1)
 
     context = {
         'orgs': orgs,
