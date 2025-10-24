@@ -52,7 +52,7 @@ urlpatterns = [
     path('resume/',    include(('reroute_business.resumes.urls', 'resumes'), namespace='resumes')),
     path('accounts/',  include('allauth.urls')),
     path('resources/', include('reroute_business.resources.urls')),
-    path('organizations/', include('reroute_business.reentry_org.urls')),
+    path('organizations/', include(('reroute_business.reentry_org.urls', 'reentry_org'), namespace='reentry_org')),
     path('blog/',      include('reroute_business.blog.urls')),
     path('api/',       include('reroute_business.core.urls')),
 ]
