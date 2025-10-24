@@ -38,7 +38,7 @@
 .pricing-grid {
   display: grid;
   gap: 20px;
-  margin-top: 10px;
+  margin-top: 8px; /* slightly tightened spacing under section heading */
   align-items: stretch;             /* ensure equal height rows */
   justify-items: stretch;
   max-width: 1200px;
