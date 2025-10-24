@@ -29,10 +29,7 @@
                         <a href="#" onclick="return false;" aria-haspopup="true" aria-expanded="false">Opportunities</a>
                         <div class="nav-dropdown" role="menu" aria-label="Opportunities submenu">
                             <a href="{% url 'opportunities' %}">Jobs</a>
-                            {% url 'organization_catalog' as ORG_CATALOG_URL %}
-                            {% if ORG_CATALOG_URL %}
-                                <a href="{{ ORG_CATALOG_URL }}">Reentry Organizations</a>
-                            {% endif %}
+                            <a href="{% url 'organization_catalog' %}">Reentry Organizations</a>
                         </div>
                     </div>
                     <a href="{% url 'pricing' %}">Pricing</a>
@@ -181,10 +178,7 @@
         <li><a href="{% url 'blog_list' %}">Blog</a></li>
         <li><a href="{% url 'home' %}">Home</a></li>
         <li><a href="{% url 'opportunities' %}">Opportunities</a></li>
-        {% url 'organization_catalog' as ORG_CATALOG_URL %}
-        {% if ORG_CATALOG_URL %}
-        <li><a href="{{ ORG_CATALOG_URL }}">Reentry Organizations</a></li>
-        {% endif %}
+        <li><a href="{% url 'organization_catalog' %}">Reentry Organizations</a></li>
         <li><a href="{% url 'pricing' %}">Pricing</a></li>
         <li><a href="{% url 'resource_list' %}">Resources</a></li>
         {% if user.is_authenticated %}

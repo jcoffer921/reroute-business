@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.paginator import Paginator
 from django.db.models import Q
 
 from .models import ReentryOrganization
@@ -17,12 +17,7 @@ def organization_catalog(request):
 
     page = request.GET.get('page', 1)
     paginator = Paginator(queryset, 12)
-    try:
-        orgs = paginator.page(page)
-    except PageNotAnInteger:
-        orgs = paginator.page(1)
-    except EmptyPage:
-        orgs = paginator.page(paginator.num_pages)
+    orgs = paginator.get_page(page)
 
     context = {
         'orgs': orgs,
@@ -31,4 +26,3 @@ def organization_catalog(request):
         'categories': ReentryOrganization.CATEGORIES,
     }
     return render(request, 'reentry_org/catalog.html', context)
-
