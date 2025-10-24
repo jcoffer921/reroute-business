@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ReRoute | Frequently Asked Questions{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/faq.css' %}">
+
+<section class="faq-hero">
+  <div class="faq-hero-inner">
+    <h1>Frequently Asked Questions</h1>
+    <p class="faq-sub">Learn how ReRoute supports Job Seekers, Reentry Organizations, and Employers.</p>
+
+    <div class="faq-search">
+      <input id="faqSearch" type="search" placeholder="Search questions..." aria-label="Search FAQs">
+    </div>
+  </div>
+  <div class="faq-hero-bg" aria-hidden="true"></div>
+  </section>
+
+<section class="faq-section">
+  <div class="faq-container">
+
+    <h2 class="faq-category">For Job Seekers</h2>
+    <div class="faq-list" data-category="job_seekers">
+      <article class="faq-item" data-question>
+        <button class="faq-q" aria-expanded="false">
+          <span>What is ReRoute?</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="faq-a" hidden>
+          <p>ReRoute is a platform connecting justice-impacted job seekers with verified opportunities, reentry organizations, and inclusive employers.</p>
+        </div>
+      </article>
+
+      <article class="faq-item" data-question>
+        <button class="faq-q" aria-expanded="false"><span>Is ReRoute free for job seekers?</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-a" hidden>
+          <p>Yes. Job seekers get free access to resume tools, resources, and job applications.</p>
+        </div>
+      </article>
+
+      <article class="faq-item" data-question>
+        <button class="faq-q" aria-expanded="false"><span>How do I apply for a job?</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-a" hidden>
+          <p>Browse <a href="{% url 'opportunities' %}">Opportunities</a>, open a listing, and click Apply. You can also save jobs to apply later.</p>
+        </div>
+      </article>
+
+      <article class="faq-item" data-question>
+        <button class="faq-q" aria-expanded="false"><span>Can I upload my resume?</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-a" hidden>
+          <p>Yes. Use the resume builder or upload an existing resume on your profile.</p>
+        </div>
+      </article>
+
+      <article class="faq-item" data-question>
+        <button class="faq-q" aria-expanded="false"><span>How do I connect with reentry organizations?</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-a" hidden>
+          <p>Explore <a href="{% url 'reentry_org:organization_catalog' %}">Reentry Organizations</a> to discover verified partners for housing, legal aid, counseling, and more.</p>
+        </div>
+      </article>
+    </div>
+
+    <h2 class="faq-category">For Reentry Organizations</h2>
+    <div class="faq-list" data-category="orgs">
+      <article class="faq-item" data-question>
+        <button class="faq-q" aria-expanded="false"><span>How does the $400 monthly plan work?</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-a" hidden>
+          <p>Organizations subscribe for $400/month to access dashboards, participant management, and partner features.</p>
+        </div>
+      </article>
+      <article class="faq-item" data-question>
+        <button class="faq-q" aria-expanded="false"><span>What is the $100 referral fee?</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-a" hidden>
+          <p>You earn $100 per participant referral who engages through ReRoute, per our partner terms.</p>
+        </div>
+      </article>
+      <article class="faq-item" data-question>
+        <button class="faq-q" aria-expanded="false"><span>Can I track participant outcomes through ReRoute?</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-a" hidden>
+          <p>Yes. The organization dashboard supports progress, referrals, and outcomes tracking, with analytics expanding as a premium feature.</p>
+        </div>
+      </article>
+    </div>
+
+    <h2 class="faq-category">For Employers</h2>
+    <div class="faq-list" data-category="employers">
+      <article class="faq-item" data-question>
+        <button class="faq-q" aria-expanded="false"><span>How do I post jobs?</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-a" hidden>
+          <p>Create an employer account and publish listings to reach verified, justice-impacted candidates.</p>
+        </div>
+      </article>
+      <article class="faq-item" data-question>
+        <button class="faq-q" aria-expanded="false"><span>What does the $200 placement fee include?</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-a" hidden>
+          <p>It covers successful hires sourced via ReRoute, including candidate screening and engagement support.</p>
+        </div>
+      </article>
+      <article class="faq-item" data-question>
+        <button class="faq-q" aria-expanded="false"><span>How does ReRoute verify candidates?</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-a" hidden>
+          <p>We use profile checks, partner referrals, and platform signals to maintain a verified talent pool.</p>
+        </div>
+      </article>
+    </div>
+
+    <h2 class="faq-category">General Questions</h2>
+    <div class="faq-list" data-category="general">
+      <article class="faq-item" data-question>
+        <button class="faq-q" aria-expanded="false"><span>What is ReRoute’s mission?</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-a" hidden>
+          <p>Empower justice-impacted individuals with access to jobs, skills, and supportive community networks.</p>
+        </div>
+      </article>
+      <article class="faq-item" data-question>
+        <button class="faq-q" aria-expanded="false"><span>Where is ReRoute based?</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-a" hidden>
+          <p>Philadelphia, PA.</p>
+        </div>
+      </article>
+      <article class="faq-item" data-question>
+        <button class="faq-q" aria-expanded="false"><span>How can I contact support?</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="faq-a" hidden>
+          <p>Visit our <a href="{% url 'contact' %}">Contact</a> page and we’ll get back to you.</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="faq-cta">
+      <p>Still have questions?</p>
+      <a class="btn btn-primary btn-pill" href="{% url 'contact' %}">Contact Us</a>
+    </div>
+  </div>
+</section>
+
+<script src="{% static 'js/faq.js' %}" defer></script>
+{% endblock %}
+

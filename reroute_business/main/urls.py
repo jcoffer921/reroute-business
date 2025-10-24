@@ -23,6 +23,7 @@ urlpatterns = [
     path('resources/', views.resources_view, name='resources'),
     path('pricing/', views.pricing, name='pricing'),
     path('pricing/checkout/', views.pricing_checkout, name='checkout'),
+    path('faq/', views.faq_view, name='faq'),
 
     # ================ Email Verification Helpers ================
     path('verify-email/', views.verify_email_notice, name='verify_email_notice'),
