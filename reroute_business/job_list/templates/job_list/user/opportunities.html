@@ -7,7 +7,7 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'user/css/job_list.css' %}">
 <style>
-  .opportunities-wrapper { position: relative; }
+  .opportunities-page { position: relative; }
   .jobs-overlay {
     position: absolute;
     inset: 0;
@@ -35,7 +35,7 @@
     .jobs-overlay-card h2 { font-size: 1.75rem; }
   }
   /* Prevent interaction with underlying content when overlay is shown */
-  .opportunities-wrapper.overlay-active > *:not(.jobs-overlay) {
+  .opportunities-page.overlay-active > *:not(.jobs-overlay) {
     filter: blur(2px);
     pointer-events: none;
     user-select: none;
@@ -43,26 +43,8 @@
   .jobs-overlay-card .subtle { font-size: .95rem; color: #6b7280; }
 </style>
 
-<!-- Full-width hero (outside the form) with primary search inside -->
-<section class="opportunities-hero">
-  <div class="opportunities-hero-content">
-    <h1>Explore Job Opportunities</h1>
-    <p class="hero-sub">Discover full-time, part-time, and second-chance hiring opportunities near you.</p>
-    <form method="get" action="{% url 'opportunities' %}" id="jobFilterForm" class="search-filter-form">
-      <div class="search-bar search-bar--inline">
-        <input type="text" name="q" placeholder="Job title, keywords" value="{{ q }}" aria-label="Job title or keywords">
-        <input type="text" name="zip" placeholder="Location (ZIP)" value="{{ user_zip }}" aria-label="Location by ZIP">
-        <button type="submit" class="btn btn-primary">Search</button>
-        <button type="button" class="mobile-filter-toggle" onclick="toggleFilters()">Filters</button>
-      </div>
-    </form>
-  </div>
-</section>
-
-<!-- Filters + Results -->
-<div id="filtersBackdrop" class="filters-backdrop" hidden></div>
-<div class="opportunities-wrapper overlay-active">
-  <!-- Jobs Coming Soon overlay -->
+<div class="opportunities-page overlay-active">
+  <!-- Cover the entire page content area (not navbar/footer) -->
   <div class="jobs-overlay" role="status" aria-live="polite">
     <div class="jobs-overlay-card">
       <h2>Jobs Coming Soon</h2>
@@ -71,6 +53,26 @@
       <div class="subtle" style="margin-top:8px;">We’ll notify users as postings go live.</div>
     </div>
   </div>
+
+  <!-- Full-width hero (outside the form) with primary search inside -->
+  <section class="opportunities-hero">
+    <div class="opportunities-hero-content">
+      <h1>Explore Job Opportunities</h1>
+      <p class="hero-sub">Discover full-time, part-time, and second-chance hiring opportunities near you.</p>
+      <form method="get" action="{% url 'opportunities' %}" id="jobFilterForm" class="search-filter-form">
+        <div class="search-bar search-bar--inline">
+          <input type="text" name="q" placeholder="Job title, keywords" value="{{ q }}" aria-label="Job title or keywords">
+          <input type="text" name="zip" placeholder="Location (ZIP)" value="{{ user_zip }}" aria-label="Location by ZIP">
+          <button type="submit" class="btn btn-primary">Search</button>
+          <button type="button" class="mobile-filter-toggle" onclick="toggleFilters()">Filters</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Filters + Results -->
+  <div id="filtersBackdrop" class="filters-backdrop" hidden></div>
+  <div class="opportunities-wrapper">
   <div class="container">
     <div class="container">
       <!-- Filters + Job List -->
@@ -144,6 +146,8 @@
       </div>
     </div>
   </div>
+  <!-- end .opportunities-wrapper -->
+</div>
 
 
 <script>
