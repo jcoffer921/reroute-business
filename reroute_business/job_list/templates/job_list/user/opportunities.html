@@ -6,13 +6,48 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'user/css/job_list.css' %}">
+<style>
+  .opportunities-wrapper { position: relative; }
+  .jobs-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    padding: 1rem;
+  }
+  .jobs-overlay-card {
+    max-width: 720px;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    padding: 24px;
+    text-align: center;
+  }
+  .jobs-overlay-card h2 { margin: 0 0 8px; font-size: 1.5rem; }
+  .jobs-overlay-card p { margin: 0 0 16px; color: #374151; }
+  .jobs-overlay-card .btn { display: inline-block; }
+  @media (min-width: 640px) {
+    .jobs-overlay-card { padding: 32px; }
+    .jobs-overlay-card h2 { font-size: 1.75rem; }
+  }
+  /* Prevent interaction with underlying content when overlay is shown */
+  .opportunities-wrapper.overlay-active > *:not(.jobs-overlay) {
+    filter: blur(2px);
+    pointer-events: none;
+    user-select: none;
+  }
+  .jobs-overlay-card .subtle { font-size: .95rem; color: #6b7280; }
+</style>
 
 <!-- Full-width hero (outside the form) with primary search inside -->
 <section class="opportunities-hero">
   <div class="opportunities-hero-content">
     <h1>Explore Job Opportunities</h1>
     <p class="hero-sub">Discover full-time, part-time, and second-chance hiring opportunities near you.</p>
-    <p class="hero-coming-soon">Jobs Coming Soon.</p>
     <form method="get" action="{% url 'opportunities' %}" id="jobFilterForm" class="search-filter-form">
       <div class="search-bar search-bar--inline">
         <input type="text" name="q" placeholder="Job title, keywords" value="{{ q }}" aria-label="Job title or keywords">
@@ -26,7 +61,16 @@
 
 <!-- Filters + Results -->
 <div id="filtersBackdrop" class="filters-backdrop" hidden></div>
-<div class="opportunities-wrapper">
+<div class="opportunities-wrapper overlay-active">
+  <!-- Jobs Coming Soon overlay -->
+  <div class="jobs-overlay" role="status" aria-live="polite">
+    <div class="jobs-overlay-card">
+      <h2>Jobs Coming Soon</h2>
+      <p>In the meantime check out our resources to be best prepared when they arrive.</p>
+      <a href="{% url 'resource_list' %}" class="btn btn-primary">Explore Resources</a>
+      <div class="subtle" style="margin-top:8px;">We’ll notify users as postings go live.</div>
+    </div>
+  </div>
   <div class="container">
     <div class="container">
       <!-- Filters + Job List -->
