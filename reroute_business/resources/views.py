@@ -127,6 +127,7 @@ def lesson_schema(request, slug):
             'slug': lesson.slug,
             'description': lesson.description,
             'video_url': lesson.video_static_path,
+            'youtube_video_id': getattr(lesson, 'youtube_video_id', None),
             'duration_seconds': lesson.duration_seconds,
         },
         'questions': questions,

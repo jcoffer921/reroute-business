@@ -13,10 +13,16 @@
   </header>
 
   <div class="lesson-player-wrap">
-    <video id="lessonVideo" class="lesson-video" playsinline controls preload="metadata">
-      <source src="{{ lesson.video_static_path }}" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
+    {% if lesson.youtube_video_id %}
+      <div id="ytPlayerWrapper" class="lesson-video" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;background:#000;">
+        <div id="ytPlayer" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+      </div>
+    {% else %}
+      <video id="lessonVideo" class="lesson-video" playsinline controls preload="metadata">
+        <source src="{{ lesson.video_static_path }}" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+    {% endif %}
 
     <!-- Overlay dialog for questions -->
     <div id="lessonOverlay" class="lesson-overlay" hidden aria-hidden="true"></div>
@@ -50,6 +56,7 @@
 <script>
   window.__LESSON_SLUG__ = "{{ lesson.slug }}";
   window.__CSRF_TOKEN__ = "{{ csrf_token }}";
+  window.__LESSON_YT_ID__ = "{{ lesson.youtube_video_id|default_if_none:'' }}" || null;
   // Ensure a session key exists for guests
   (function(){ if(!sessionStorage.getItem('resources:session:init')) { sessionStorage.setItem('resources:session:init', '1'); } })();
   // Base endpoints
@@ -61,4 +68,3 @@
 </script>
 <script src="{% static 'resources/js/lesson_controller.js' %}" defer></script>
 {% endblock %}
-

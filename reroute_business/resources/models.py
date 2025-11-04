@@ -77,6 +77,12 @@ class Lesson(models.Model):
         max_length=500,
         help_text="Static path under /static, e.g., /static/resources/videos/ResumeBasics101-improved.mp4",
     )
+    youtube_video_id = models.CharField(
+        max_length=32,
+        blank=True,
+        null=True,
+        help_text="Optional YouTube video ID (e.g., bBkWA7sBOEg) to stream via YouTube player.",
+    )
     duration_seconds = models.FloatField(default=0)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

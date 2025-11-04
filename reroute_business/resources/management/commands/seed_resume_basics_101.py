@@ -19,6 +19,8 @@ class Command(BaseCommand):
                 "title": "Resume Basics 101",
                 "description": "Build a strong resume by mastering structure, strong statements, and soft skills.",
                 "video_static_path": video_path,
+                # YouTube source for on-site playback
+                "youtube_video_id": "bBkWA7sBOEg",
                 "duration_seconds": 200.0,  # approx; not critical
                 "is_active": True,
             },
@@ -83,4 +85,3 @@ class Command(BaseCommand):
         )
 
         self.stdout.write(self.style.SUCCESS("Seeded 'Resume Basics 101' lesson."))
-

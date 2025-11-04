@@ -1,10 +1,6 @@
 // Interactive lesson controller for Resume Basics 101 and similar lessons
 (function(){
   const $ = (sel) => document.querySelector(sel);
-  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
-
-  const video = $('#lessonVideo');
-  if (!video) return;
 
   const overlay = $('#lessonOverlay');
   const dialog = $('#lessonDialog');
@@ -24,11 +20,16 @@
   const csrfToken = getCookie('csrftoken');
 
   let schema = null;
+  let player = null;
+  let useYouTube = false;
+  let ytReady = false;
+  let ytPoll = null;
+  let lastTime = 0;
+
   let state = {
     answered: {}, // questionId -> {completed: bool, correct: bool, attempts: n}
     orderDone: 0,
     currentIndex: 0,
-    blockingSeek: true,
   };
 
   const storageKey = `resources:lesson:${slug}:state`;
@@ -38,40 +39,116 @@
     .then(r => r.json())
     .then(data => {
       schema = data;
+      useYouTube = !!(data && data.lesson && data.lesson.youtube_video_id);
+      if (useYouTube) {
+        bootYouTube(data.lesson.youtube_video_id);
+      } else {
+        bootHTML5();
+      }
       // hydrate from server progress
       if (data.progress) {
         state.orderDone = data.progress.last_answered_question_order || 0;
-        if (data.progress.last_video_time) video.currentTime = data.progress.last_video_time;
+        const t = data.progress.last_video_time || 0;
+        if (!useYouTube) {
+          try { const v = $('#lessonVideo'); if (v && t) v.currentTime = t; } catch(e) {}
+        } // for YouTube, we seek after the player is ready
       }
-      bindVideo();
     })
     .catch(err => console.error('Failed to load lesson schema', err));
 
-  function bindVideo(){
-    video.addEventListener('timeupdate', onTimeUpdate);
-    video.addEventListener('seeking', onSeeking);
-    if (openSubmit) openSubmit.addEventListener('click', submitOpenEnded);
-    if (completeClose) completeClose.addEventListener('click', closeCompletion);
+  function bootHTML5(){
+    const video = $('#lessonVideo');
+    if (!video) return;
+    player = {
+      get time(){ return video.currentTime; },
+      set time(t){ video.currentTime = t; },
+      play(){ try { return video.play(); } catch(e) { return Promise.resolve(); } },
+      pause(){ try { video.pause(); } catch(e) {} },
+      onTime(cb){ video.addEventListener('timeupdate', () => cb(video.currentTime)); },
+      onSeekAttempt(cb){ video.addEventListener('seeking', () => cb(video.currentTime)); },
+    };
+    bindCommon();
   }
 
-  function onTimeUpdate(){
+  function bootYouTube(videoId){
+    const YT_ID = videoId || window.__LESSON_YT_ID__;
+    if (!YT_ID) return;
+    loadYouTubeAPI(() => {
+      ytReady = true;
+      // eslint-disable-next-line no-undef
+      player = new YT.Player('ytPlayer', {
+        videoId: YT_ID,
+        playerVars: {
+          playsinline: 1,
+          rel: 0,
+          modestbranding: 1,
+          origin: window.location.origin,
+        },
+        events: {
+          onReady: () => {
+            const t = (schema && schema.progress && schema.progress.last_video_time) || 0;
+            if (t) try { player.seekTo(t, true); } catch(e) {}
+            bindYT();
+          },
+          onStateChange: (ev) => {
+            // 1 = PLAYING, 2 = PAUSED
+            if (ev.data === 1) startYTPoll();
+            else stopYTPoll();
+          },
+        }
+      });
+    });
+  }
+
+  function bindYT(){
+    bindCommon();
+  }
+
+  function bindCommon(){
+    if (openSubmit) openSubmit.addEventListener('click', submitOpenEnded);
+    if (completeClose) completeClose.addEventListener('click', closeCompletion);
+    if (!useYouTube) {
+      const video = $('#lessonVideo');
+      player.onTime(onAnyTimeUpdate);
+      player.onSeekAttempt(onAnySeekAttempt);
+    } else {
+      startYTPoll();
+    }
+  }
+
+  function startYTPoll(){
+    stopYTPoll();
+    ytPoll = setInterval(() => {
+      if (!player || typeof player.getCurrentTime !== 'function') return;
+      const t = player.getCurrentTime();
+      onAnyTimeUpdate(t);
+      // detect forward seeking beyond next checkpoint
+      const nextQ = nextUnansweredQuestion();
+      if (nextQ && t > nextQ.timestamp_seconds - 0.2 && t > lastTime + 0.7) {
+        try { player.seekTo(Math.max(0, nextQ.timestamp_seconds - 0.5), true); } catch(e) {}
+      }
+      lastTime = t;
+    }, 250);
+  }
+  function stopYTPoll(){ if (ytPoll) { clearInterval(ytPoll); ytPoll = null; } }
+
+  function onAnyTimeUpdate(current){
     persistProgress(false);
     const nextQ = nextUnansweredQuestion();
     if (!nextQ) return; // all done
-    const t = video.currentTime;
+    const t = typeof current === 'number' ? current : (player ? player.time : 0);
     if (t >= nextQ.timestamp_seconds - 0.1) {
-      video.pause();
+      pausePlayer();
       showQuestion(nextQ);
     }
   }
 
-  function onSeeking(e){
+  function onAnySeekAttempt(target){
     const nextQ = nextUnansweredQuestion();
-    if (!nextQ) return; // allow free seek after completion
-    const target = video.currentTime;
-    if (target > nextQ.timestamp_seconds - 0.2) {
-      // snap back to just before checkpoint
-      video.currentTime = Math.max(0, nextQ.timestamp_seconds - 0.5);
+    if (!nextQ) return;
+    const t = typeof target === 'number' ? target : (player ? player.time : 0);
+    if (t > nextQ.timestamp_seconds - 0.2) {
+      seekTo(Math.max(0, nextQ.timestamp_seconds - 0.5));
     }
   }
 
@@ -115,7 +192,7 @@
     const body = {
       question_id: q.id,
       selected_choice_id: ch.id,
-      current_time: video.currentTime,
+      current_time: currentTime(),
     };
     postJSON(endpoints.attempt, body).then(res => {
       const ok = !!res && typeof res.is_correct === 'boolean' ? res.is_correct : false;
@@ -127,13 +204,12 @@
       if (ok) {
         showFeedback('Correct!', true);
         state.orderDone = Math.max(state.orderDone, q.order);
-        setTimeout(()=>{ hideDialog(); resumeVideoSlightly(); persistProgress(true); }, 550);
+        setTimeout(()=>{ hideDialog(); resumeSlightly(); persistProgress(true); }, 550);
       } else {
         showFeedback('Try Again', false);
         persistProgress(false);
       }
     }).catch(()=>{
-      // offline fallback: optimistic update but don't advance
       showFeedback('Network error — try again', false);
     });
   }
@@ -146,9 +222,9 @@
     const body = {
       question_id: q.id,
       open_text: text,
-      current_time: video.currentTime,
+      current_time: currentTime(),
     };
-    postJSON(endpoints.attempt, body).then(res => {
+    postJSON(endpoints.attempt, body).then(() => {
       const qst = state.answered[q.id] || { attempts: 0 };
       qst.attempts = (qst.attempts||0) + 1;
       qst.correct = false; // not scored
@@ -156,7 +232,7 @@
       state.answered[q.id] = qst;
       showFeedback('Saved', true);
       state.orderDone = Math.max(state.orderDone, q.order);
-      setTimeout(()=>{ hideDialog(); resumeVideoSlightly(); persistProgress(true); }, 550);
+      setTimeout(()=>{ hideDialog(); resumeSlightly(); persistProgress(true); }, 550);
     }).catch(()=>{
       showFeedback('Network error — try again', false);
     });
@@ -173,29 +249,27 @@
     feedbackEl.textContent = '';
   }
 
-  function resumeVideoSlightly(){
-    video.currentTime = Math.min(video.duration, video.currentTime + 0.2);
-    // If all answered, show completion
+  function resumeSlightly(){
+    seekTo(currentTime() + 0.2);
     const nextQ = nextUnansweredQuestion();
     if (!nextQ) {
       showCompletion();
     } else {
-      video.play().catch(()=>{});
+      playPlayer();
     }
   }
 
   function showCompletion(){
-    const correct = (schema && schema.lesson) ? (schema.progress && schema.progress.correct_count) : 0;
-    // recompute locally from state if needed
+    const correct = (schema && schema.lesson && schema.progress) ? (schema.progress.correct_count) : 0;
     let localCorrect = 0; const scoredCount = (schema.questions||[]).filter(q => q.is_scored).length;
     (schema.questions||[]).forEach(q => { if (q.is_scored && state.answered[q.id] && state.answered[q.id].completed && state.answered[q.id].correct) localCorrect++; });
     const correctCount = Number.isFinite(correct) && correct >= localCorrect ? correct : localCorrect;
-    completeSummary.textContent = `You answered ${correctCount} of ${scoredCount} correctly. Keep building your skills with ReRoute Learn.`;
+    completeSummary.textContent = `Lesson Complete – Great work! You answered ${correctCount} of ${scoredCount} correctly.`;
 
     completeOverlay.hidden = false; completeOverlay.setAttribute('aria-hidden','false');
     completeDialog.hidden = false; completeDialog.setAttribute('aria-hidden','false');
     postJSON(endpoints.progress, {
-      last_video_time: video.currentTime,
+      last_video_time: currentTime(),
       last_answered_question_order: state.orderDone,
       completed: true,
       raw_state: state,
@@ -211,12 +285,23 @@
     try { sessionStorage.setItem(storageKey, JSON.stringify(state)); } catch(e) {}
     if (flush) {
       postJSON(endpoints.progress, {
-        last_video_time: video.currentTime,
+        last_video_time: currentTime(),
         last_answered_question_order: state.orderDone,
         raw_state: state,
       }).catch(()=>{});
     }
   }
+
+  function currentTime(){
+    try {
+      if (useYouTube && player && typeof player.getCurrentTime === 'function') return player.getCurrentTime();
+      const v = $('#lessonVideo');
+      return v ? v.currentTime : 0;
+    } catch(e) { return 0; }
+  }
+  function pausePlayer(){ try { useYouTube ? player.pauseVideo() : $('#lessonVideo').pause(); } catch(e) {} }
+  function playPlayer(){ try { useYouTube ? player.playVideo() : $('#lessonVideo').play(); } catch(e) {} }
+  function seekTo(t){ try { useYouTube ? player.seekTo(Math.max(0, t), true) : ($('#lessonVideo').currentTime = Math.max(0, t)); } catch(e) {} }
 
   function postJSON(url, body){
     return fetch(url, {
@@ -247,5 +332,17 @@
     }
     return cookieValue;
   }
-})();
 
+  function loadYouTubeAPI(cb){
+    if (window.YT && window.YT.Player) { cb(); return; }
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    const prev = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = function(){
+      if (typeof prev === 'function') try { prev(); } catch(e) {}
+      cb();
+    };
+  }
+})();
