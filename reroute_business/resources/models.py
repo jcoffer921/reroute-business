@@ -21,13 +21,13 @@ class Resource(models.Model):
         return self.title
 
 
-class LearningModule(models.Model):
+class ResourceModule(models.Model):
     """
-    LearningModule represents a structured learning resource that can be
-    displayed on the public Resources page. It includes a title, short
-    description, a category (with predefined choices), an optional external
-    link to content (e.g., video/course/article), optional internal content,
-    and an auto-populated creation timestamp for ordering by recency.
+    ResourceModule represents a structured learning resource that displays
+    directly on the site (no redirects). It includes a title, short
+    description, a category (with predefined choices), optional internal
+    content, and an optional embed HTML (e.g., an iframe) for inline video.
+    A creation timestamp supports ordering by most recent in the UI.
     """
 
     # Category choices for grouping modules on the page
@@ -47,8 +47,14 @@ class LearningModule(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
-    external_link = models.URLField(blank=True, null=True)
+
+    # Optional embedded video HTML (iframe); used to render inline player
+    embed_html = models.TextField(blank=True, null=True)
+
+    # Optional internal rich content (future: lessons, text, steps)
     internal_content = models.TextField(blank=True, null=True)
+
+    # Timestamp for ordering by recency in the Resources page
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

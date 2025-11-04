@@ -154,11 +154,16 @@
                 <span class="module-badge">{{ module.get_category_display }}</span>
               </header>
               <p class="module-desc">{{ module.description }}</p>
-              <div class="module-actions">
-                {% if module.external_link %}
-                  <a href="{{ module.external_link }}" class="learn-more-btn" target="_blank" rel="noopener noreferrer">Open Module →</a>
-                {% endif %}
-              </div>
+
+              {# Inline embedded video if present (no external redirects) #}
+              {% if module.embed_html %}
+                <div class="module-video">
+                  {# The embed HTML is trusted content from admin; render safe #}
+                  {{ module.embed_html|safe }}
+                </div>
+              {% else %}
+                <div class="module-coming-soon">Coming Soon</div>
+              {% endif %}
             </article>
           {% endfor %}
         {% else %}

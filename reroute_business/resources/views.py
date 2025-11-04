@@ -1,16 +1,16 @@
 # resources/views.py
 from django.shortcuts import render
 from reroute_business.blog.models import BlogPost
-from .models import LearningModule
+from .models import ResourceModule
 
 
 def resource_list(request):
     """
-    Render the Resources landing page.
-    Includes the Learning Modules section: we query all modules and order by
-    most recent (created_at descending) so fresh content appears first.
+    Resources landing page with inline Learning Modules.
+    - Queries all ResourceModule records ordered by most recent, passing them
+      to the template so videos can render inline (no external redirects).
     """
-    modules = LearningModule.objects.all().order_by('-created_at')
+    modules = ResourceModule.objects.all().order_by('-created_at')
     return render(request, 'resources/resource_list.html', {
         'modules': modules,
     })

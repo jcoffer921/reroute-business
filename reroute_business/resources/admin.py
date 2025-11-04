@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import LearningModule
+from .models import ResourceModule
 
 
-@admin.register(LearningModule)
-class LearningModuleAdmin(admin.ModelAdmin):
+@admin.register(ResourceModule)
+class ResourceModuleAdmin(admin.ModelAdmin):
     """
     Admin configuration to manage Learning Modules.
     - Search by title and description for quick discovery.
