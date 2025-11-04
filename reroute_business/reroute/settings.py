@@ -234,3 +234,27 @@ LOGOUT_REDIRECT_URL = '/'
 
 # Allauth relaxed flags for dev/demo
 DISABLE_ALLAUTH_EMAIL_VERIFICATION = True
+
+# --- Allow YouTube video embedding (fix for CSP blocking) ---
+from django.middleware.security import SecurityMiddleware
+
+# Add or update this setting
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+
+# Add custom response headers for embedding videos
+CSP_HEADER = "frame-src https://www.youtube.com https://www.youtube-nocookie.com"
+
+def add_csp_header(get_response):
+    def middleware(request):
+        response = get_response(request)
+        response["Content-Security-Policy"] = CSP_HEADER
+        return response
+    return middleware
+
+# Append to MIDDLEWARE if not already there
+MIDDLEWARE += [
+    "django.middleware.common.CommonMiddleware",
+]
+
+# Manually add this middleware in your settings
+MIDDLEWARE.append("reroute_business.settings.add_csp_header")
