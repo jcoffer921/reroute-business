@@ -138,6 +138,36 @@
     </div>
   </section>
 
+  {# Learning Modules Section (new) - placed directly under Quick Job-Ready Videos #}
+  <section id="learning-modules" class="modules-section">
+    <div class="modules-container">
+      <h2 class="modules-title">Learning Modules</h2>
+      <p class="modules-subtitle">Curated lessons to build skills step-by-step.</p>
+
+      {# Responsive grid of module cards; uses styles consistent with resource cards #}
+      <div class="modules-grid">
+        {% if modules %}
+          {% for module in modules %}
+            <article class="resource-card module-card">
+              <header class="module-header">
+                <h3 class="module-title">{{ module.title }}</h3>
+                <span class="module-badge">{{ module.get_category_display }}</span>
+              </header>
+              <p class="module-desc">{{ module.description }}</p>
+              <div class="module-actions">
+                {% if module.external_link %}
+                  <a href="{{ module.external_link }}" class="learn-more-btn" target="_blank" rel="noopener noreferrer">Open Module →</a>
+                {% endif %}
+              </div>
+            </article>
+          {% endfor %}
+        {% else %}
+          <p class="modules-empty">No learning modules available yet. Check back soon.</p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
   <div class="resource-quote">
     <blockquote>“Don't worry about what other people think of you. Just be sure you think correctly about yourself. - Jason Coffer”</blockquote>
   </div>

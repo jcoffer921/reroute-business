@@ -415,3 +415,43 @@ html { scroll-behavior: smooth; }
 .btn-secondary:hover {
   background-color: #0277bd;
 }
+
+/* ===== Learning Modules (new) ===== */
+.modules-section {
+  background: #f9fbff;
+  padding: 3rem 1.5rem 4rem;
+}
+.modules-container { max-width: 1100px; margin: 0 auto; }
+.modules-title {
+  text-align: center;
+  font-size: clamp(1.8rem, 3.6vw, 2.5rem);
+  font-weight: 900;
+  color: #0F172A;
+  margin: 0 0 .5rem;
+}
+.modules-subtitle { text-align: center; color: #6b7280; margin: 0 0 2rem; }
+
+/* Grid similar to category cards but adaptive */
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+/* Reuse card look with subtle hover animation */
+.module-card { display: flex; flex-direction: column; gap: .5rem; }
+.module-header { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.module-title { margin: 0; font-size: 1.1rem; color: #0F172A; }
+.module-badge {
+  display: inline-block;
+  font-size: .75rem;
+  font-weight: 700;
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  padding: .25rem .55rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.module-desc { color: #334155; margin: .25rem 0 .5rem; }
+.module-actions { margin-top: auto; }

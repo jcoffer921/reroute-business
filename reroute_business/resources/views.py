@@ -1,10 +1,19 @@
 # resources/views.py
 from django.shortcuts import render
 from reroute_business.blog.models import BlogPost
+from .models import LearningModule
 
 
 def resource_list(request):
-    return render(request, 'resources/resource_list.html')
+    """
+    Render the Resources landing page.
+    Includes the Learning Modules section: we query all modules and order by
+    most recent (created_at descending) so fresh content appears first.
+    """
+    modules = LearningModule.objects.all().order_by('-created_at')
+    return render(request, 'resources/resource_list.html', {
+        'modules': modules,
+    })
 
 
 def interview_prep(request):
