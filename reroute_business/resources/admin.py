@@ -18,10 +18,11 @@ class ResourceModuleAdmin(admin.ModelAdmin):
     - Default ordering shows most recent first.
     """
 
-    list_display = ("title", "category", "created_at")
+    list_display = ("title", "category", "video_url", "created_at")
     list_filter = ("category",)
-    search_fields = ("title", "description")
+    search_fields = ("title", "description", "video_url")
     ordering = ("-created_at",)
+    fields = ("title", "description", "category", "video_url", "embed_html", "internal_content")
 
 
 class LessonChoiceInline(admin.TabularInline):
