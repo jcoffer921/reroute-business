@@ -13,7 +13,9 @@
       if (bgVideo) {
         bgVideo.muted = true;
         const p = bgVideo.play();
-        if (p && typeof p.then === 'function') p.catch(()=>{});
+        if (p && typeof p.then === 'function') p.catch(()=>{
+          // Retry after metadata/canplay or visibility change
+        });
       }
     } catch(_){}
   };
@@ -67,5 +69,24 @@
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !modal.hasAttribute('hidden')) closeModal();
+  });
+
+  // Try to start background playback once handlers are wired up
+  // (autoplay is allowed for muted video in most browsers)
+  playBg();
+
+  // Improve reliability: attempt again when media can play, and when tab becomes visible
+  if (bgVideo) {
+    bgVideo.addEventListener('loadeddata', () => {
+      if (bgVideo.paused) playBg();
+    });
+    bgVideo.addEventListener('canplay', () => {
+      if (bgVideo.paused) playBg();
+    });
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      if (bgVideo && bgVideo.paused) playBg();
+    }
   });
 })();

@@ -166,6 +166,7 @@
                       width="560" height="315"
                       src="{{ module.video_url|youtube_embed_url }}"
                       title="{{ module.title }}"
+                      frameborder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       referrerpolicy="strict-origin-when-cross-origin"
                       allowfullscreen>
@@ -211,6 +212,7 @@
                     height="315"
                     src="{{ 'https://www.youtube.com/watch?v='|add:lesson.youtube_video_id|youtube_embed_url }}"
                     title="{{ lesson.title }}"
+                    frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     referrerpolicy="strict-origin-when-cross-origin"
                     allowfullscreen>

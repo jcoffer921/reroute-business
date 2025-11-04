@@ -1,1 +1,3 @@
+# Allow this specific hero/quick video to be committed and deployed
 reroute_business/resources/static/resources/videos/*.mp4
+!reroute_business/resources/static/resources/videos/dontSayInInterview.mp4
