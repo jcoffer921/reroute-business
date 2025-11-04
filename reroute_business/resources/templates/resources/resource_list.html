@@ -162,6 +162,7 @@
                     <iframe
                       id="ytmod-{{ module.title|slugify }}"
                       class="yt-embed"
+                      data-completion-target="complete-{{ module.title|slugify }}"
                       width="560" height="315"
                       src="{{ module.video_url|youtube_embed_url }}"
                       title="{{ module.title }}"
@@ -176,15 +177,9 @@
                     </video>
                   {% endif %}
                 </div>
-                {% if 'youtube.com' in module.video_url or 'youtu.be' in module.video_url %}
-                  <div id="complete-ytmod-{{ module.title|slugify }}" class="module-complete" style="display:none; margin-top:.5rem; color:#1b3b82; font-weight:700;">
-                    ✅ Lesson Complete – Well done!
-                  </div>
-                {% else %}
-                  <div id="complete-{{ module.title|slugify }}" class="module-complete" style="display:none; margin-top:.5rem; color:#1b3b82; font-weight:700;">
-                    ✅ Lesson Complete – Well done!
-                  </div>
-                {% endif %}
+                <div id="complete-{{ module.title|slugify }}" class="module-complete" style="display:none; margin-top:.5rem; color:#1b3b82; font-weight:700;">
+                  ✅ Lesson Complete – Well done!
+                </div>
               {% elif module.embed_html %}
                 <div class="module-video">{{ module.embed_html|safe }}</div>
               {% else %}
@@ -211,9 +206,10 @@
                   <iframe
                     id="yt-{{ lesson.slug }}"
                     class="yt-embed"
+                    data-completion-target="complete-{{ lesson.slug }}"
                     width="560"
                     height="315"
-                    src="{{ ('https://www.youtube.com/watch?v='|add:lesson.youtube_video_id)|youtube_embed_url }}"
+                    src="{{ 'https://www.youtube.com/watch?v='|add:lesson.youtube_video_id|youtube_embed_url }}"
                     title="{{ lesson.title }}"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     referrerpolicy="strict-origin-when-cross-origin"
@@ -289,8 +285,7 @@
         document.head.appendChild(tag);
         window.onYouTubeIframeAPIReady = function(){
           ytIframes.forEach(function(ifr){
-            var slug = (ifr.id || '').replace('yt-','');
-            var completeId = 'complete-' + slug;
+            var completeId = ifr.getAttribute('data-completion-target') || '';
             new YT.Player(ifr.id, {
               events: {
                 onStateChange: function(e){
