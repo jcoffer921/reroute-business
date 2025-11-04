@@ -210,7 +210,7 @@
                     data-completion-target="complete-{{ lesson.slug }}"
                     width="560"
                     height="315"
-                    src="{{ 'https://www.youtube.com/watch?v='|add:lesson.youtube_video_id|youtube_embed_url }}"
+                    src="https://www.youtube.com/embed/{{ lesson.youtube_video_id }}"
                     title="{{ lesson.title }}"
                     frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
