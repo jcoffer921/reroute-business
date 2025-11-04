@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static resources_extras %}
 
 {% block title %}ReRoute | Resources{% endblock %}
 
@@ -155,12 +155,38 @@
               </header>
               <p class="module-desc">{{ module.description }}</p>
 
-              {# Inline embedded video if present (no external redirects) #}
-              {% if module.embed_html %}
+              {# Inline video auto-detect (YouTube vs local MP4) #}
+              {% if module.video_url %}
                 <div class="module-video">
-                  {# The embed HTML is trusted content from admin; render safe #}
-                  {{ module.embed_html|safe }}
+                  {% if 'youtube.com' in module.video_url or 'youtu.be' in module.video_url %}
+                    <iframe
+                      id="ytmod-{{ module.title|slugify }}"
+                      class="yt-embed"
+                      width="560" height="315"
+                      src="{{ module.video_url|youtube_embed_url }}"
+                      title="{{ module.title }}"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerpolicy="strict-origin-when-cross-origin"
+                      allowfullscreen>
+                    </iframe>
+                  {% else %}
+                    <video class="module-html5" data-completion-target="complete-{{ module.title|slugify }}" width="100%" controls playsinline preload="metadata">
+                      <source src="{{ module.video_url }}" type="video/mp4">
+                      Video not supported.
+                    </video>
+                  {% endif %}
                 </div>
+                {% if 'youtube.com' in module.video_url or 'youtu.be' in module.video_url %}
+                  <div id="complete-ytmod-{{ module.title|slugify }}" class="module-complete" style="display:none; margin-top:.5rem; color:#1b3b82; font-weight:700;">
+                    ✅ Lesson Complete – Well done!
+                  </div>
+                {% else %}
+                  <div id="complete-{{ module.title|slugify }}" class="module-complete" style="display:none; margin-top:.5rem; color:#1b3b82; font-weight:700;">
+                    ✅ Lesson Complete – Well done!
+                  </div>
+                {% endif %}
+              {% elif module.embed_html %}
+                <div class="module-video">{{ module.embed_html|safe }}</div>
               {% else %}
                 <div class="module-coming-soon">Coming Soon</div>
               {% endif %}
@@ -170,7 +196,7 @@
           <p class="modules-empty">No learning modules available yet. Check back soon.</p>
         {% endif %}
 
-        {# Interactive Lessons (editable in admin) #}
+        {# Interactive Lessons (render video inline) #}
         {% if lessons %}
           {% for lesson in lessons %}
             <article class="resource-card module-card">
@@ -179,12 +205,52 @@
                 <span class="module-badge">Interactive Lesson</span>
               </header>
               <p class="module-desc">{{ lesson.description }}</p>
-              <div class="card-actions">
-                <a class="learn-more-btn" href="{% url 'lesson_detail' lesson.slug %}">Start Lesson →</a>
+
+              <div class="module-video">
+                {% if lesson.youtube_video_id %}
+                  <iframe
+                    id="yt-{{ lesson.slug }}"
+                    class="yt-embed"
+                    width="560"
+                    height="315"
+                    src="{{ ('https://www.youtube.com/watch?v='|add:lesson.youtube_video_id)|youtube_embed_url }}"
+                    title="{{ lesson.title }}"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen>
+                  </iframe>
+                {% else %}
+                  <video class="module-html5" data-completion-target="complete-{{ lesson.slug }}" width="100%" controls playsinline preload="metadata">
+                    <source src="{{ lesson.video_static_path }}" type="video/mp4">
+                    Video not supported.
+                  </video>
+                {% endif %}
+              </div>
+
+              <div id="complete-{{ lesson.slug }}" class="module-complete" style="display:none; margin-top:.5rem; color:#1b3b82; font-weight:700;">
+                ✅ Lesson Complete – Well done!
               </div>
             </article>
           {% endfor %}
         {% endif %}
+
+        {# Local MP4 lesson card: What Not to Say in an Interview #}
+        <article class="resource-card module-card">
+          <header class="module-header">
+            <h3 class="module-title">What Not to Say in an Interview</h3>
+            <span class="module-badge">Workforce Readiness</span>
+          </header>
+          <p class="module-desc">A quick 1-minute tip on common interview mistakes and better alternatives.</p>
+          <div class="module-video">
+            <video class="module-html5" data-completion-target="complete-dont-say" width="100%" controls playsinline preload="metadata">
+              <source src="/static/resources/videos/dontSayInInterview.mp4" type="video/mp4">
+              Video not supported.
+            </video>
+          </div>
+          <div id="complete-dont-say" class="module-complete" style="display:none; margin-top:.5rem; color:#1b3b82; font-weight:700;">
+            ✅ Lesson Complete – Well done!
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -202,4 +268,42 @@
 
 {% block extra_js %}
   <script src="{% static 'resources/js/resource.js' %}" defer></script>
+  <script>
+    (function(){
+      // HTML5 video completion messages
+      document.querySelectorAll('.module-html5').forEach(function(v){
+        v.addEventListener('ended', function(){
+          var t = v.getAttribute('data-completion-target');
+          if (t) {
+            var el = document.getElementById(t);
+            if (el) el.style.display = 'block';
+          }
+        });
+      });
+
+      // YouTube iframe completion via Iframe API
+      var ytIframes = document.querySelectorAll('iframe.yt-embed');
+      if (ytIframes.length) {
+        var tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(tag);
+        window.onYouTubeIframeAPIReady = function(){
+          ytIframes.forEach(function(ifr){
+            var slug = (ifr.id || '').replace('yt-','');
+            var completeId = 'complete-' + slug;
+            new YT.Player(ifr.id, {
+              events: {
+                onStateChange: function(e){
+                  if (e.data === YT.PlayerState.ENDED) {
+                    var el = document.getElementById(completeId);
+                    if (el) el.style.display = 'block';
+                  }
+                }
+              }
+            });
+          });
+        };
+      }
+    })();
+  </script>
 {% endblock %}

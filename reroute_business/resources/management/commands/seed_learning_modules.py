@@ -33,6 +33,8 @@ class Command(BaseCommand):
                     "Learn how to prepare for your next interview with confidence. "
                     "Covers research, common questions, and how to leave a strong impression."
                 ),
+                # No video yet; placeholder only
+                "video_url": "",
                 "embed_html": "",
                 "internal_content": internal_notes,
             },
@@ -56,6 +58,8 @@ class Command(BaseCommand):
                     "Build a strong resume that highlights your skills and experience. "
                     "This quick lesson covers structure, strong statements, and soft skills."
                 ),
+                # Use watch URL; template converts to embed automatically
+                "video_url": "https://www.youtube.com/watch?v=bBkWA7sBOEg",
                 "embed_html": "",
                 "internal_content": (
                     "Focus on accomplishments, tailor for each job, and keep it concise.\n"
@@ -73,6 +77,29 @@ class Command(BaseCommand):
                 "Updated ResourceModule: 'Resume Basics 101'"
             ))
 
+        # Local MP4 module: What Not to Say in an Interview
+        obj3, created3 = ResourceModule.objects.update_or_create(
+            title="What Not to Say in an Interview",
+            defaults={
+                "category": ResourceModule.CATEGORY_WORKFORCE,
+                "description": (
+                    "A quick 1-minute tip on common interview mistakes and better alternatives."
+                ),
+                # Static path is served by WhiteNoise/app staticfiles
+                "video_url": "/static/resources/videos/dontSayInInterview.mp4",
+                "embed_html": "",
+            },
+        )
+
+        if created3:
+            self.stdout.write(self.style.SUCCESS(
+                "Created ResourceModule: 'What Not to Say in an Interview'"
+            ))
+        else:
+            self.stdout.write(self.style.WARNING(
+                "Updated ResourceModule: 'What Not to Say in an Interview'"
+            ))
+
         self.stdout.write(self.style.SUCCESS(
-            "Seed complete. Visit /resources/ to view the modules and start the interactive lesson."
+            "Seed complete. Visit /resources/ to view the modules and videos."
         ))

@@ -49,6 +49,11 @@ class ResourceModule(models.Model):
     description = models.TextField(blank=True)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
 
+    # Optional video URL (YouTube or local static path). If present, UI
+    # auto-detects the correct player (iframe vs <video>). Prefer this over
+    # embed_html for new content.
+    video_url = models.CharField(max_length=500, blank=True, null=True)
+
     # Optional embedded video HTML (iframe); used to render inline player
     embed_html = models.TextField(blank=True, null=True)
 
