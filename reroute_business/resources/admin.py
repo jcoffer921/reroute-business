@@ -1,5 +1,12 @@
 from django.contrib import admin
-from .models import ResourceModule
+from .models import (
+    ResourceModule,
+    Lesson,
+    LessonQuestion,
+    LessonChoice,
+    LessonAttempt,
+    LessonProgress,
+)
 
 
 @admin.register(ResourceModule)
@@ -15,3 +22,54 @@ class ResourceModuleAdmin(admin.ModelAdmin):
     list_filter = ("category",)
     search_fields = ("title", "description")
     ordering = ("-created_at",)
+
+
+class LessonChoiceInline(admin.TabularInline):
+    model = LessonChoice
+    extra = 0
+
+
+class LessonQuestionInline(admin.TabularInline):
+    model = LessonQuestion
+    extra = 0
+
+
+@admin.register(Lesson)
+class LessonAdmin(admin.ModelAdmin):
+    list_display = ("title", "slug", "is_active", "created_at")
+    search_fields = ("title", "description", "slug")
+    list_filter = ("is_active",)
+    inlines = [LessonQuestionInline]
+
+
+@admin.register(LessonQuestion)
+class LessonQuestionAdmin(admin.ModelAdmin):
+    list_display = ("lesson", "order", "timestamp_seconds", "qtype", "is_required", "is_scored", "active")
+    list_filter = ("qtype", "is_required", "is_scored", "active")
+    search_fields = ("prompt",)
+    inlines = [LessonChoiceInline]
+
+
+@admin.register(LessonAttempt)
+class LessonAttemptAdmin(admin.ModelAdmin):
+    list_display = ("question", "user", "session_key", "is_correct", "attempt_number", "video_time", "created_at")
+    list_filter = ("is_correct", "question__lesson")
+    search_fields = ("session_key", "open_text")
+
+
+@admin.register(LessonProgress)
+class LessonProgressAdmin(admin.ModelAdmin):
+    list_display = (
+        "lesson",
+        "user",
+        "session_key",
+        "correct_count",
+        "scored_count",
+        "accuracy_percent",
+        "last_video_time",
+        "last_answered_question_order",
+        "completed_at",
+        "updated_at",
+    )
+    list_filter = ("lesson",)
+    search_fields = ("session_key",)

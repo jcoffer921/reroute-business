@@ -6,24 +6,16 @@ from reroute_business.resources.models import ResourceModule
 
 class Command(BaseCommand):
     """
-    Seed a demo Learning Module for inline playback on the Resources page.
+    Seed example ResourceModule cards without external embeds.
 
-    This command creates or updates the "Interview Preparation Basics" module
-    with an Edpuzzle iframe stored in `embed_html`. It is safe to run multiple
-    times; subsequent runs will update the existing record.
+    Removes legacy Edpuzzle usage by leaving `embed_html` empty so the
+    Resources page shows native lessons only (or a Coming Soon placeholder).
+    Safe to run multiple times.
     """
 
-    help = "Seed a demo ResourceModule with inline Edpuzzle video (no redirects)."
+    help = "Seed demo ResourceModule cards without external embeds."
 
     def handle(self, *args, **options):
-        # Admin-provided embed code to render inline (iframe is stored as HTML)
-        # Provided embed code for the module video
-        embed_iframe = (
-            '<iframe width="590" height="475" '
-            'src="https://edpuzzle.com/embed/media/68e722221dd3288ee3765820" '
-            'frameborder="0" allowfullscreen></iframe>'
-        )
-
         # Optional internal notes/content for future expansion
         internal_notes = (
             "Understand what employers look for in interviews\n"
@@ -32,45 +24,39 @@ class Command(BaseCommand):
             "Learn effective follow-up etiquette\n"
         )
 
-        # Create or update the ResourceModule by title to keep this idempotent
+        # Interview Prep 101 card without external embed
         obj, created = ResourceModule.objects.update_or_create(
             title="Interview Prep 101",
             defaults={
-                "category": ResourceModule.CATEGORY_WORKFORCE,  # Workforce Readiness
+                "category": ResourceModule.CATEGORY_WORKFORCE,
                 "description": (
                     "Learn how to prepare for your next interview with confidence. "
-                    "This short lesson covers how to research the company, practice common questions, "
-                    "and leave a lasting impression. Includes real-world examples and quick tips to help "
-                    "you stand out in any hiring conversation."
+                    "Covers research, common questions, and how to leave a strong impression."
                 ),
-                "embed_html": embed_iframe,   # Inline player (no external redirects)
+                "embed_html": "",
                 "internal_content": internal_notes,
             },
         )
 
         if created:
             self.stdout.write(self.style.SUCCESS(
-                "Created demo ResourceModule: 'Interview Prep 101'"
+                "Created ResourceModule: 'Interview Prep 101'"
             ))
         else:
             self.stdout.write(self.style.WARNING(
-                "Updated existing ResourceModule: 'Interview Prep 101'"
+                "Updated ResourceModule: 'Interview Prep 101'"
             ))
 
-        self.stdout.write(self.style.SUCCESS(
-            "Seed complete. Visit /resources/ to view the Learning Modules section."
-        ))
-
-        # Also create a second sample module: Resume Basics 101
+        # Resume Basics 101 card without external embed; interactive lesson is separate
         obj2, created2 = ResourceModule.objects.update_or_create(
             title="Resume Basics 101",
             defaults={
                 "category": ResourceModule.CATEGORY_WORKFORCE,
                 "description": (
                     "Build a strong resume that highlights your skills and experience. "
-                    "This quick lesson covers structure, keywords, and tailoring to the job."
+                    "This quick lesson covers structure, strong statements, and soft skills."
                 ),
-                "embed_html": embed_iframe,
+                "embed_html": "",
                 "internal_content": (
                     "Focus on accomplishments, tailor for each job, and keep it concise.\n"
                     "Use action verbs and quantify results where possible.\n"
@@ -80,9 +66,13 @@ class Command(BaseCommand):
 
         if created2:
             self.stdout.write(self.style.SUCCESS(
-                "Created demo ResourceModule: 'Resume Basics 101'"
+                "Created ResourceModule: 'Resume Basics 101'"
             ))
         else:
             self.stdout.write(self.style.WARNING(
-                "Updated existing ResourceModule: 'Resume Basics 101'"
+                "Updated ResourceModule: 'Resume Basics 101'"
             ))
+
+        self.stdout.write(self.style.SUCCESS(
+            "Seed complete. Visit /resources/ to view the modules and start the interactive lesson."
+        ))

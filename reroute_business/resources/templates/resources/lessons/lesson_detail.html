@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ReRoute | {{ lesson.title }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'resources/css/lesson.css' %}">
+
+<section class="lesson-container">
+  <header class="lesson-header">
+    <h1 class="lesson-title">{{ lesson.title }}</h1>
+    <p class="lesson-desc">{{ lesson.description }}</p>
+  </header>
+
+  <div class="lesson-player-wrap">
+    <video id="lessonVideo" class="lesson-video" playsinline controls preload="metadata">
+      <source src="{{ lesson.video_static_path }}" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+
+    <!-- Overlay dialog for questions -->
+    <div id="lessonOverlay" class="lesson-overlay" hidden aria-hidden="true"></div>
+    <div id="lessonDialog" class="lesson-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="lessonPrompt">
+      <div class="lesson-dialog-inner">
+        <h2 id="lessonPrompt" class="lesson-prompt"></h2>
+        <div id="lessonChoices" class="lesson-choices"></div>
+        <div id="lessonOpenEnded" class="lesson-open-ended" hidden>
+          <textarea id="lessonTextarea" rows="3" placeholder="Type your answer..." aria-label="Your answer"></textarea>
+          <button id="lessonSubmitOpen" class="lesson-btn primary">Submit</button>
+        </div>
+        <div id="lessonFeedback" class="lesson-feedback" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- Completion Modal -->
+    <div id="lessonCompleteOverlay" class="lesson-overlay" hidden aria-hidden="true"></div>
+    <div id="lessonComplete" class="lesson-complete" hidden role="dialog" aria-modal="true" aria-labelledby="lessonCompleteTitle">
+      <div class="lesson-complete-inner">
+        <h3 id="lessonCompleteTitle">✅ Lesson Complete</h3>
+        <p id="lessonCompleteSummary"></p>
+        <div class="lesson-complete-actions">
+          <a href="{% url 'resource_list' %}" class="lesson-btn">Explore more resources</a>
+          <button id="lessonCompleteClose" class="lesson-btn primary">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  window.__LESSON_SLUG__ = "{{ lesson.slug }}";
+  window.__CSRF_TOKEN__ = "{{ csrf_token }}";
+  // Ensure a session key exists for guests
+  (function(){ if(!sessionStorage.getItem('resources:session:init')) { sessionStorage.setItem('resources:session:init', '1'); } })();
+  // Base endpoints
+  window.__LESSON_ENDPOINTS__ = {
+    schema: "{% url 'lesson_schema' lesson.slug %}",
+    attempt: "{% url 'lesson_attempt' lesson.slug %}",
+    progress: "{% url 'lesson_progress' lesson.slug %}",
+  };
+</script>
+<script src="{% static 'resources/js/lesson_controller.js' %}" defer></script>
+{% endblock %}
+

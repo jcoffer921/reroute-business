@@ -169,6 +169,22 @@
         {% else %}
           <p class="modules-empty">No learning modules available yet. Check back soon.</p>
         {% endif %}
+
+        {# Interactive Lessons (editable in admin) #}
+        {% if lessons %}
+          {% for lesson in lessons %}
+            <article class="resource-card module-card">
+              <header class="module-header">
+                <h3 class="module-title">{{ lesson.title }}</h3>
+                <span class="module-badge">Interactive Lesson</span>
+              </header>
+              <p class="module-desc">{{ lesson.description }}</p>
+              <div class="card-actions">
+                <a class="learn-more-btn" href="{% url 'lesson_detail' lesson.slug %}">Start Lesson →</a>
+              </div>
+            </article>
+          {% endfor %}
+        {% endif %}
       </div>
     </div>
   </section>

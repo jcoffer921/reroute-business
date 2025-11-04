@@ -17,4 +17,9 @@ urlpatterns = [
     path('reentry-help/housing/', views.housing, name='housing'),
     path('reentry-help/counseling/', views.counseling, name='counseling'),
 
+    # Interactive lessons
+    path('lessons/<slug:slug>/', views.lesson_detail, name='lesson_detail'),
+    path('api/lessons/<slug:slug>/schema/', views.lesson_schema, name='lesson_schema'),
+    path('api/lessons/<slug:slug>/attempt/', views.lesson_attempt, name='lesson_attempt'),
+    path('api/lessons/<slug:slug>/progress/', views.lesson_progress, name='lesson_progress'),
 ]
