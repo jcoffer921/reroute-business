@@ -17,6 +17,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Admin-provided embed code to render inline (iframe is stored as HTML)
+        # Provided embed code for the module video
         embed_iframe = (
             '<iframe width="590" height="475" '
             'src="https://edpuzzle.com/embed/media/68e722221dd3288ee3765820" '
@@ -33,7 +34,7 @@ class Command(BaseCommand):
 
         # Create or update the ResourceModule by title to keep this idempotent
         obj, created = ResourceModule.objects.update_or_create(
-            title="Interview Preparation Basics",
+            title="Interview Prep 101",
             defaults={
                 "category": ResourceModule.CATEGORY_WORKFORCE,  # Workforce Readiness
                 "description": (
@@ -49,14 +50,39 @@ class Command(BaseCommand):
 
         if created:
             self.stdout.write(self.style.SUCCESS(
-                "Created demo ResourceModule: 'Interview Preparation Basics'"
+                "Created demo ResourceModule: 'Interview Prep 101'"
             ))
         else:
             self.stdout.write(self.style.WARNING(
-                "Updated existing ResourceModule: 'Interview Preparation Basics'"
+                "Updated existing ResourceModule: 'Interview Prep 101'"
             ))
 
         self.stdout.write(self.style.SUCCESS(
             "Seed complete. Visit /resources/ to view the Learning Modules section."
         ))
 
+        # Also create a second sample module: Resume Basics 101
+        obj2, created2 = ResourceModule.objects.update_or_create(
+            title="Resume Basics 101",
+            defaults={
+                "category": ResourceModule.CATEGORY_WORKFORCE,
+                "description": (
+                    "Build a strong resume that highlights your skills and experience. "
+                    "This quick lesson covers structure, keywords, and tailoring to the job."
+                ),
+                "embed_html": embed_iframe,
+                "internal_content": (
+                    "Focus on accomplishments, tailor for each job, and keep it concise.\n"
+                    "Use action verbs and quantify results where possible.\n"
+                ),
+            },
+        )
+
+        if created2:
+            self.stdout.write(self.style.SUCCESS(
+                "Created demo ResourceModule: 'Resume Basics 101'"
+            ))
+        else:
+            self.stdout.write(self.style.WARNING(
+                "Updated existing ResourceModule: 'Resume Basics 101'"
+            ))
