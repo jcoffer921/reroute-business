@@ -257,4 +257,4 @@ MIDDLEWARE += [
 ]
 
 # Manually add this middleware in your settings
-MIDDLEWARE.append("reroute_business.settings.add_csp_header")
+MIDDLEWARE.append("reroute_business.reroute.settings.add_csp_header")
