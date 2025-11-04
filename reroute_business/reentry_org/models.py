@@ -32,9 +32,9 @@ class ReentryOrganization(models.Model):
     class Meta:
         ordering = ["name"]
         indexes = [
-            models.Index(fields=["is_verified", "category"], name="reentry_org_is_verified_category_idx"),
+            # Short index name to satisfy backends with 30-char identifier limits (e.g., Oracle)
+            models.Index(fields=["is_verified", "category"], name="reorg_vrf_cat_idx"),
         ]
 
     def __str__(self) -> str:
         return self.name
-
