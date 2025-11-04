@@ -77,28 +77,10 @@ class Command(BaseCommand):
                 "Updated ResourceModule: 'Resume Basics 101'"
             ))
 
-        # Local MP4 module: What Not to Say in an Interview
-        obj3, created3 = ResourceModule.objects.update_or_create(
-            title="What Not to Say in an Interview",
-            defaults={
-                "category": ResourceModule.CATEGORY_WORKFORCE,
-                "description": (
-                    "A quick 1-minute tip on common interview mistakes and better alternatives."
-                ),
-                # Static path is served by WhiteNoise/app staticfiles
-                "video_url": "/static/resources/videos/dontSayInInterview.mp4",
-                "embed_html": "",
-            },
-        )
-
-        if created3:
-            self.stdout.write(self.style.SUCCESS(
-                "Created ResourceModule: 'What Not to Say in an Interview'"
-            ))
-        else:
-            self.stdout.write(self.style.WARNING(
-                "Updated ResourceModule: 'What Not to Say in an Interview'"
-            ))
+        # Ensure we do NOT keep a local MP4 module in the Learning Modules grid
+        removed = ResourceModule.objects.filter(title="What Not to Say in an Interview").delete()
+        if removed[0]:
+            self.stdout.write(self.style.WARNING("Removed local MP4 module from Learning Modules."))
 
         self.stdout.write(self.style.SUCCESS(
             "Seed complete. Visit /resources/ to view the modules and videos."
