@@ -11,6 +11,7 @@
   let schema = null;
   let useYouTube = false;
   let player = null;
+  let ytEndPoll = null;
 
   fetch(endpoints.schema, { credentials: 'same-origin' })
     .then(r => r.json())
@@ -26,6 +27,15 @@
     const video = $('#lessonVideo');
     if (!video) return;
     try { video.addEventListener('ended', onVideoEnded); } catch(_){ }
+    // Fallback: detect near-end via timeupdate if 'ended' doesn't fire reliably
+    try {
+      let endedOnce = false;
+      video.addEventListener('timeupdate', () => {
+        if (endedOnce) return;
+        const dur = Number(video.duration || 0);
+        if (dur && (dur - video.currentTime) <= 0.3) { endedOnce = true; onVideoEnded(); }
+      });
+    } catch(_){ }
   }
 
   function bootYouTube(videoId){
@@ -39,6 +49,23 @@
         events: {
           onStateChange: (ev) => {
             try { if (typeof YT !== 'undefined' && ev.data === YT.PlayerState.ENDED) onVideoEnded(); } catch(_){ }
+            // Fallback: start/stop near-end poll
+            try {
+              if (typeof YT !== 'undefined' && ev.data === YT.PlayerState.PLAYING) {
+                if (ytEndPoll) clearInterval(ytEndPoll);
+                ytEndPoll = setInterval(() => {
+                  try {
+                    const dur = typeof player.getDuration === 'function' ? player.getDuration() : 0;
+                    const cur = typeof player.getCurrentTime === 'function' ? player.getCurrentTime() : 0;
+                    if (dur && (dur - cur) <= 0.35) { clearInterval(ytEndPoll); ytEndPoll = null; onVideoEnded(); }
+                  } catch(_){ }
+                }, 500);
+              } else if (typeof YT !== 'undefined' && ev.data === YT.PlayerState.PAUSED) {
+                // keep polling during pause as user might be at the end
+              } else {
+                if (ytEndPoll) { clearInterval(ytEndPoll); ytEndPoll = null; }
+              }
+            } catch(_){ }
           }
         }
       });

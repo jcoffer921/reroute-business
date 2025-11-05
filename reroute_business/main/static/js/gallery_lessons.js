@@ -43,12 +43,38 @@
       // Wire YT ended
       loadYouTubeAPI(()=>{
         // eslint-disable-next-line no-undef
-        const player = new YT.Player(iframe.id, { events: { onStateChange: (ev)=>{ try{ if(typeof YT!=='undefined' && ev.data===YT.PlayerState.ENDED){ showQuizButton(); } }catch(_){ } } } });
+        const player = new YT.Player(iframe.id, { events: { onStateChange: (ev)=>{
+          try{ if(typeof YT!=='undefined' && ev.data===YT.PlayerState.ENDED){ showQuizButton(); } }catch(_){ }
+          // Fallback: near-end polling
+          try {
+            if (typeof YT!=='undefined' && ev.data===YT.PlayerState.PLAYING) {
+              if (modal.__ytEndPoll) clearInterval(modal.__ytEndPoll);
+              modal.__ytEndPoll = setInterval(()=>{
+                try{
+                  const dur = typeof player.getDuration==='function' ? player.getDuration() : 0;
+                  const cur = typeof player.getCurrentTime==='function' ? player.getCurrentTime() : 0;
+                  if (dur && (dur - cur) <= 0.35) { clearInterval(modal.__ytEndPoll); modal.__ytEndPoll=null; showQuizButton(); }
+                }catch(_){ }
+              }, 500);
+            } else if (typeof YT!=='undefined' && ev.data===YT.PlayerState.ENDED) {
+              if (modal.__ytEndPoll) { clearInterval(modal.__ytEndPoll); modal.__ytEndPoll=null; }
+            }
+          } catch(_){ }
+        } } });
         modal.__ytPlayer = player;
       });
     }
     if (videoEl){
       try { videoEl.addEventListener('ended', showQuizButton); } catch(_){ }
+      // Fallback: near-end via timeupdate
+      try {
+        let done=false;
+        videoEl.addEventListener('timeupdate', ()=>{
+          if (done) return;
+          const dur = Number(videoEl.duration||0);
+          if (dur && (dur - videoEl.currentTime) <= 0.3) { done=true; showQuizButton(); }
+        });
+      } catch(_){ }
     }
   }
 

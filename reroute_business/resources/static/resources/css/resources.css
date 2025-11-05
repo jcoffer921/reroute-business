@@ -275,10 +275,31 @@ html { scroll-behavior: smooth; }
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  position: relative; /* allow overlayed quiz UI */
 }
 #galleryModalContainer { position: relative; width: 100%; height: 100%; }
 #galleryModalContainer iframe,
 #galleryModalContainer video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+/* Quiz UI inside gallery modal overlays video to ensure visibility */
+#galleryVideoModal .lesson-quiz-actions {
+  position: absolute;
+  left: 0; right: 0; bottom: 12px;
+  display: flex; justify-content: center;
+  z-index: 5;
+  pointer-events: auto;
+}
+#galleryVideoModal .lesson-quiz-container {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  padding: 16px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(2px);
+  z-index: 4;
+}
+/* Keep close/fullscreen buttons above overlays */
+#galleryVideoModal .hero2-modal-close { z-index: 6; }
 
 /* ===== Resource Categories (Cards) ===== */
 .resource-categories-section {
