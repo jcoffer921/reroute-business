@@ -158,7 +158,7 @@
               {# Inline video auto-detect (YouTube vs local MP4) #}
               {% if module.video_url %}
                 <div class="module-video">
-                  {% if 'youtube.com' in module.video_url or 'youtu.be' in module.video_url %}
+                  {% if 'youtube.com' in module.video_url or 'youtu.be' in module.video_url or 'youtube-nocookie.com' in module.video_url or '<iframe' in module.video_url %}
                     <iframe
                       id="ytmod-{{ module.title|slugify }}"
                       class="yt-embed"

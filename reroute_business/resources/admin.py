@@ -7,6 +7,7 @@ from .models import (
     LessonAttempt,
     LessonProgress,
 )
+from .templatetags.resources_extras import youtube_embed_url
 
 
 @admin.register(ResourceModule)
@@ -23,6 +24,16 @@ class ResourceModuleAdmin(admin.ModelAdmin):
     search_fields = ("title", "description", "video_url")
     ordering = ("-created_at",)
     fields = ("title", "description", "category", "video_url", "embed_html", "internal_content")
+
+    def save_model(self, request, obj, form, change):
+        # Normalize any YouTube or pasted iframe into a clean embed URL
+        if obj.video_url:
+            try:
+                obj.video_url = youtube_embed_url(obj.video_url).strip()
+            except Exception:
+                # If normalization fails, keep original to avoid data loss
+                pass
+        super().save_model(request, obj, form, change)
 
 
 class LessonChoiceInline(admin.TabularInline):
