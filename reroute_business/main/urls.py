@@ -64,4 +64,5 @@ urlpatterns = [
     # ================ Legal ================
     path('terms/', views.terms_view, name='terms'),
     path('privacy/', views.privacy_view, name='privacy'),
+    path('videos/', views.video_gallery, name='video_gallery'),
 ]

@@ -59,6 +59,7 @@ except Exception:
 # Local Imports
 # -----------------------------
 from reroute_business.profiles.models import EmployerProfile, UserProfile, Subscription
+from reroute_business.main.models import YouTubeVideo
 
 # Try to import a custom password form; if unavailable, we use Django's default.
 try:
@@ -398,6 +399,7 @@ def login_view(request):
         # Normalize
         identifier = (identifier or "").strip()
         password = password or ""
+    
         if not identifier or not password:
             return None, "Username/email and password are required."
 
@@ -543,6 +545,15 @@ def logout_view(request):
     """Log out anyone (user or employer) and bounce to login."""
     logout(request)
     return redirect('login')
+
+# ===============================
+# Video Library
+# ===============================
+def video_gallery(request):
+    videos = YouTubeVideo.objects.all().order_by('-created_at')
+    return render(request, 'main/video_gallery.html', {
+        'videos': videos,
+    })
 
 # =========================================================================
 # Email Verification Helpers

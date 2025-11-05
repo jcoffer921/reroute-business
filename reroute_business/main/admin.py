@@ -5,6 +5,7 @@ from django import forms
 
 from reroute_business.resumes.models import Application
 from reroute_business.profiles.models import UserProfile, EmployerProfile
+from .models import YouTubeVideo
 
 
 @admin.register(Application)
@@ -115,3 +116,16 @@ try:
 except admin.sites.NotRegistered:
     pass
 admin.site.register(User, UserAdmin)
+
+
+@admin.register(YouTubeVideo)
+class YouTubeVideoAdmin(admin.ModelAdmin):
+    list_display = ("title", "created_at")
+    search_fields = ("title", "description", "video_url")
+    readonly_fields = ("created_at",)
+    fields = ("title", "video_url", "description", "created_at")
+
+    def save_model(self, request, obj, form, change):
+        # Normalize URL into embed form before saving
+        obj.video_url = obj.embed_url()
+        super().save_model(request, obj, form, change)
