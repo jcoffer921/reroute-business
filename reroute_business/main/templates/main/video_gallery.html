@@ -12,6 +12,14 @@
 <section class="video-gallery-section">
   <div class="video-library-container">
     <h1 class="page-title">Learning Videos</h1>
+    <div class="video-filters">
+      <a class="filter-btn {% if not active_cat %}active{% endif %}" href="{% url 'video_gallery' %}">All</a>
+      <a class="filter-btn {% if active_cat=='module' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=module">Modules</a>
+      <a class="filter-btn {% if active_cat=='quick' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=quick">Quick Tips</a>
+      <a class="filter-btn {% if active_cat=='lecture' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=lecture">Lectures</a>
+      <a class="filter-btn {% if active_cat=='webinar' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=webinar">Webinars</a>
+      <a class="filter-btn {% if active_cat=='other' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=other">Other</a>
+    </div>
     {% if videos %}
       <div class="video-gallery-grid">
         {% for video in videos %}
@@ -24,6 +32,8 @@
               data-attempt-url="{% url 'lesson_attempt' video.lesson_slug %}"
               data-progress-url="{% url 'lesson_progress' video.lesson_slug %}"
             {% endif %}
+            data-category="{{ video.effective_category }}"
+            data-tags="{{ video.effective_tags }}"
           >
             <div class="video-thumb-container" data-video-id="{{ vid }}">
               <img src="https://i.ytimg.com/vi/{{ vid }}/hqdefault.jpg" alt="{{ video.title }} thumbnail">
@@ -32,6 +42,7 @@
               </button>
             </div>
             <div class="video-card-body">
+              {% if video.lesson_slug %}<span class="video-badge">Interactive Quiz</span>{% endif %}
               <div class="video-category">Learning videos</div>
               <div class="video-card-title">{{ video.title }}</div>
               <div class="video-meta">
@@ -81,11 +92,48 @@
       <p class="empty-state">No videos yet. Add some in the admin.</p>
     {% endif %}
   </div>
+
+<!-- Global modal for gallery videos -->
+<section>
+  <div id="galleryVideoModal" class="hero2-modal" hidden>
+    <div class="hero2-modal-backdrop" data-gallery-close></div>
+    <div class="hero2-modal-dialog" role="dialog" aria-modal="true" aria-label="Video player">
+      <button id="galleryModalClose" class="hero2-modal-close" aria-label="Close video">✕</button>
+      <button id="galleryModalFullscreen" class="hero2-modal-close" style="right:48px" aria-label="Toggle fullscreen">⤢</button>
+      <div id="galleryModalContainer" style="width:100%; height:100%; background:#000;"></div>
+
+      <!-- Inline lesson overlays (used when card has data-lesson) -->
+      <div class="lesson-overlay" hidden aria-hidden="true"></div>
+      <div class="lesson-dialog" hidden role="dialog" aria-modal="true">
+        <div class="lesson-dialog-inner">
+          <h2 class="lesson-prompt"></h2>
+          <div class="lesson-choices"></div>
+          <div class="lesson-open-ended" hidden>
+            <textarea class="lesson-textarea" rows="3" placeholder="Type your answer..." aria-label="Your answer"></textarea>
+            <button class="lesson-submit-open lesson-btn primary">Submit</button>
+          </div>
+          <div class="lesson-feedback" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="lesson-overlay lesson-complete-overlay" hidden aria-hidden="true"></div>
+      <div class="lesson-complete" hidden role="dialog" aria-modal="true">
+        <div class="lesson-complete-inner">
+          <h3>✅ Lesson Complete</h3>
+          <p class="lesson-complete-summary"></p>
+          <div class="lesson-complete-actions">
+            <a href="{% url 'resource_list' %}" class="lesson-btn">Explore more resources</a>
+            <button class="lesson-complete-close lesson-btn primary">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 {% endblock %}
 
 {% block extra_js %}
   <script src="{% static 'js/learning_gallery.js' %}" defer></script>
+  <script src="{% static 'js/learning_filters.js' %}" defer></script>
   <script src="{% static 'js/gallery_lessons.js' %}" defer></script>
 {% endblock %}

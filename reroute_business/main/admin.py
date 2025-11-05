@@ -120,10 +120,11 @@ admin.site.register(User, UserAdmin)
 
 @admin.register(YouTubeVideo)
 class YouTubeVideoAdmin(admin.ModelAdmin):
-    list_display = ("title", "created_at")
-    search_fields = ("title", "description", "video_url")
+    list_display = ("title", "category", "created_at")
+    list_filter = ("category",)
+    search_fields = ("title", "description", "video_url", "tags")
     readonly_fields = ("created_at",)
-    fields = ("title", "video_url", "description", "created_at")
+    fields = ("title", "video_url", "category", "tags", "description", "created_at")
 
     def save_model(self, request, obj, form, change):
         # Normalize URL into embed form before saving

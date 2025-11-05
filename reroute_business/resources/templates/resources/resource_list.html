@@ -21,7 +21,7 @@
     <div class="hero2-actions">
       <a href="#resource-categories" class="hero2-cta">View All Categories</a>
       <a href="#resource-library" class="hero2-cta alt">Explore All Resources</a>
-      <a href="{% url 'video_gallery' %}" class="hero2-cta alt">Video Library</a>
+      <a href="{% url 'video_gallery' %}" class="hero2-cta alt">Modules</a>
       <button id="hero2Play" class="hero2-play-button" aria-label="Play video">
         <span class="hero2-play-icon">▶</span>
       </button>
@@ -140,103 +140,7 @@
   </section>
 
   {# Learning Modules Section (new) - placed directly under Quick Job-Ready Videos #}
-  <section id="learning-modules" class="modules-section">
-    <div class="modules-container">
-      <h2 class="modules-title">Learning Modules</h2>
-      <p class="modules-subtitle">Curated lessons to build skills step-by-step.</p>
-
-      {# Responsive grid of module cards; uses styles consistent with resource cards #}
-      <div class="modules-grid">
-        {% if modules %}
-          {% for module in modules %}
-            <article class="resource-card module-card">
-              <header class="module-header">
-                <h3 class="module-title">{{ module.title }}</h3>
-                <span class="module-badge">{{ module.get_category_display }}</span>
-              </header>
-              <p class="module-desc">{{ module.description }}</p>
-
-{# Inline video auto-detect (YouTube vs local MP4) #}
-              {% if module.video_url %}
-                <div class="module-video">
-                  {# DEBUG: {{ module.video_url|youtube_embed_url }} #}
-                  {% if 'youtube.com' in module.video_url or 'youtu.be' in module.video_url or 'youtube-nocookie.com' in module.video_url or '<iframe' in module.video_url %}
-                    <iframe
-                      id="ytmod-{{ module.title|slugify }}"
-                      class="yt-embed"
-                      data-completion-target="complete-{{ module.title|slugify }}"
-                      width="560" height="315"
-                      src="{{ module.video_url|youtube_embed_url }}"
-                      title="{{ module.title }}"
-                      frameborder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      referrerpolicy="strict-origin-when-cross-origin"
-                      allowfullscreen>
-                    </iframe>
-                  {% else %}
-                    <video class="module-html5" data-completion-target="complete-{{ module.title|slugify }}" width="100%" controls playsinline preload="metadata">
-                      <source src="{{ module.video_url }}" type="video/mp4">
-                      Video not supported.
-                    </video>
-                  {% endif %}
-                </div>
-                <div id="complete-{{ module.title|slugify }}" class="module-complete" style="display:none; margin-top:.5rem; color:#1b3b82; font-weight:700;">
-                  ✅ Lesson Complete - Well done!
-                </div>
-              {% elif module.embed_html %}
-                <div class="module-video">{{ module.embed_html|safe }}</div>
-              {% else %}
-                <div class="module-coming-soon">Coming Soon</div>
-              {% endif %}
-            </article>
-          {% endfor %}
-        {% else %}
-          <p class="modules-empty">No learning modules available yet. Check back soon.</p>
-        {% endif %}
-
-        {# Interactive Lessons (render video inline) #}
-        {% if lessons %}
-          {% for lesson in lessons %}
-            <article class="resource-card module-card">
-              <header class="module-header">
-                <h3 class="module-title">{{ lesson.title }}</h3>
-                <span class="module-badge">Interactive Lesson</span>
-              </header>
-              <p class="module-desc">{{ lesson.description }}</p>
-
-              <div class="module-video">
-                {% if lesson.youtube_video_id %}
-                  <iframe
-                    id="yt-{{ lesson.slug }}"
-                    class="yt-embed"
-                    data-completion-target="complete-{{ lesson.slug }}"
-                    width="560"
-                    height="315"
-                    src="https://www.youtube.com/embed/{{ lesson.youtube_video_id }}"
-                    title="{{ lesson.title }}"
-                    frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerpolicy="strict-origin-when-cross-origin"
-                    allowfullscreen>
-                  </iframe>
-                {% else %}
-                  <video class="module-html5" data-completion-target="complete-{{ lesson.slug }}" width="100%" controls playsinline preload="metadata">
-                    <source src="{{ lesson.video_static_path }}" type="video/mp4">
-                    Video not supported.
-                  </video>
-                {% endif %}
-              </div>
-
-              <div id="complete-{{ lesson.slug }}" class="module-complete" style="display:none; margin-top:.5rem; color:#1b3b82; font-weight:700;">
-                ✅ Lesson Complete – Well done!
-              </div>
-            </article>
-          {% endfor %}
-        {% endif %}
-
-      </div>
-    </div>
-  </section>
+  {# Learning Modules section removed by request #}
 
   <div class="resource-quote">
     <blockquote>“Don't worry about what other people think of you. Just be sure you think correctly about yourself. - Jason Coffer”</blockquote>

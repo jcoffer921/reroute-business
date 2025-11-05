@@ -185,9 +185,83 @@
     }).catch(()=>{});
   }
 
+  function initModal(modal){
+    if (!modal || !modal.hasAttribute('data-lesson')) return;
+    const iframeId = modal.getAttribute('data-iframe-id');
+    const iframe = iframeId ? document.getElementById(iframeId) : null;
+    if (!iframe) return;
+
+    const schemaUrl = modal.getAttribute('data-schema-url');
+    const attemptUrl = modal.getAttribute('data-attempt-url');
+    const progressUrl = modal.getAttribute('data-progress-url');
+
+    const overlay = modal.querySelector('.lesson-overlay:not(.lesson-complete-overlay)');
+    const dialog = modal.querySelector('.lesson-dialog');
+    const promptEl = modal.querySelector('.lesson-prompt');
+    const choicesEl = modal.querySelector('.lesson-choices');
+    const openWrap = modal.querySelector('.lesson-open-ended');
+    const openArea = modal.querySelector('.lesson-textarea');
+    const openSubmit = modal.querySelector('.lesson-submit-open');
+    const feedbackEl = modal.querySelector('.lesson-feedback');
+    const completeOverlay = modal.querySelector('.lesson-complete-overlay');
+    const completeDialog = modal.querySelector('.lesson-complete');
+    const completeSummary = modal.querySelector('.lesson-complete-summary');
+    const completeClose = modal.querySelector('.lesson-complete-close');
+
+    let schema = null; let player = null; let poll = null;
+    function currentTime(){ try { return (player && typeof player.getCurrentTime==='function') ? player.getCurrentTime() : 0; } catch(e){ return 0; } }
+    function pause(){ try { player.pauseVideo(); } catch(e){} }
+    function play(){ try { player.playVideo(); } catch(e){} }
+    function seekTo(t){ try { player.seekTo(Math.max(0,t), true); } catch(e){} }
+
+    function showDialog(){ if (!dialog||!overlay) return; dialog.hidden=false; dialog.setAttribute('aria-hidden','false'); overlay.hidden=false; overlay.setAttribute('aria-hidden','false'); }
+    function hideDialog(){ if (!dialog||!overlay) return; dialog.hidden=true; dialog.setAttribute('aria-hidden','true'); overlay.hidden=true; overlay.setAttribute('aria-hidden','true'); if(feedbackEl) feedbackEl.textContent=''; }
+    function showCompletion(correct, scored){ if(!completeOverlay||!completeDialog) return; if(completeSummary) completeSummary.textContent = 'Lesson Complete – Great work! You answered ' + correct + ' of ' + scored + ' correctly.'; completeOverlay.hidden=false; completeOverlay.setAttribute('aria-hidden','false'); completeDialog.hidden=false; completeDialog.setAttribute('aria-hidden','false'); }
+    function hideCompletion(){ if(!completeOverlay||!completeDialog) return; completeDialog.hidden=true; completeDialog.setAttribute('aria-hidden','true'); completeOverlay.hidden=true; completeOverlay.setAttribute('aria-hidden','true'); }
+    function postJSON(url, body){ return fetch(url,{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},credentials:'same-origin',body:JSON.stringify(body||{})}).then(r=>{ if(!r.ok) throw new Error('Bad'); return r.json(); }); }
+
+    const QUIZ_DEBUG = /(?:\?|&)quizdebug=(1|true)/i.test(location.search);
+    function nextUnanswered(){ const qs=(schema&&schema.questions)||[]; for(let i=0;i<qs.length;i++){ const q=qs[i]; if(!q || !q.id) continue; const done = modal.__answered && modal.__answered[q.id]; if(!done || !done.completed) return q; } return null; }
+    function onTick(){
+      const q=nextUnanswered();
+      if(!q) return; 
+      const t=currentTime();
+      // Use a slightly wider threshold than the poll interval to avoid skipping
+      if(t >= (q.timestamp_seconds-0.3)){
+        if (QUIZ_DEBUG) console.log('[QUIZ] trigger @', t.toFixed(2), '>=', (q.timestamp_seconds-0.3).toFixed(2), 'for q', q.id);
+        pause(); renderQuestion(q);
+      }
+    }
+    function start(){ if(poll) clearInterval(poll); poll=setInterval(onTick, 400); }
+    function resumeSlightly(){ seekTo(currentTime()+0.2); play(); }
+    function persist(flush){ if(flush){ const qs=(schema&&schema.questions)||[]; const scored=qs.filter(x=>x.is_scored).length; let correct=0; qs.forEach(x=>{ const st=modal.__answered && modal.__answered[x.id]; if(x.is_scored && st && st.correct) correct++; }); postJSON(progressUrl,{ last_video_time: currentTime(), last_answered_question_order: 0, raw_state: modal.__answered||{}, completed: (!nextUnanswered()) }).catch(()=>{}); if(!nextUnanswered()) showCompletion(correct, scored); } }
+
+    function renderQuestion(q){ if(!promptEl) return; promptEl.textContent = q.prompt; if(feedbackEl) feedbackEl.textContent=''; if(choicesEl) choicesEl.innerHTML=''; if(openWrap) openWrap.hidden=true; if(q.qtype==='MULTIPLE_CHOICE'){ (q.choices||[]).forEach(c=>{ const btn=document.createElement('button'); btn.className='lesson-btn'; btn.textContent=(c.label||'')+' '+(c.text||''); btn.addEventListener('click',()=>{ postJSON(attemptUrl,{ question_id:q.id, selected_choice_id:c.id, current_time: currentTime() }).then(resp=>{ modal.__answered = modal.__answered || {}; const st=modal.__answered[q.id] || { attempts:0 }; st.attempts++; st.completed=true; st.correct=!!resp.is_correct; modal.__answered[q.id]=st; if(feedbackEl) feedbackEl.textContent = st.correct ? 'Correct!' : 'Saved'; setTimeout(()=>{ hideDialog(); resumeSlightly(); persist(true); }, 480); }).catch(()=>{ if(feedbackEl) feedbackEl.textContent='Network error.'; }); }); choicesEl.appendChild(btn); }); } else { if(openWrap) openWrap.hidden=false; if(openArea) openArea.value=''; }
+      showDialog(); }
+
+    if(openSubmit){ openSubmit.addEventListener('click',()=>{ const q=nextUnanswered(); const text=(openArea&&openArea.value||'').trim(); if(!q||!text) return; postJSON(attemptUrl,{ question_id:q.id, open_text:text, current_time: currentTime() }).then(()=>{ modal.__answered = modal.__answered || {}; const st=modal.__answered[q.id] || { attempts:0 }; st.attempts++; st.completed=true; st.correct=false; modal.__answered[q.id]=st; hideDialog(); resumeSlightly(); persist(true); }).catch(()=>{ if(feedbackEl) feedbackEl.textContent='Network error.'; }); }); }
+    if(completeClose){ completeClose.addEventListener('click', hideCompletion); }
+
+    fetch(schemaUrl, { credentials:'same-origin' }).then(r=>r.json()).then(data=>{
+      modal.__answered = modal.__answered || {};
+      schema = data || {};
+      if (QUIZ_DEBUG && schema && Array.isArray(schema.questions)){
+        try{
+          console.log('[QUIZ] loaded schema with timestamps:', schema.questions.map(q=>({id:q.id, t:q.timestamp_seconds})));
+        }catch(_){ }
+      }
+      loadYouTubeAPI(()=>{
+        // eslint-disable-next-line no-undef
+        player = new YT.Player(iframe.id, { events: { onReady: ()=>{ start(); }, onStateChange: (ev)=>{ if(ev.data===1) start(); else if(ev.data===2){} } } });
+      });
+    }).catch(()=>{});
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.video-card[data-lesson]')
       .forEach(initCard);
+    const modal = document.getElementById('galleryVideoModal');
+    const obs = new MutationObserver(()=>{ initModal(document.getElementById('galleryVideoModal')); });
+    if (modal){ obs.observe(modal, { attributes:true, attributeFilter:['data-lesson','data-iframe-id'] }); }
   });
 })();
-

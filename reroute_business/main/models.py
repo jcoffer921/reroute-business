@@ -12,6 +12,15 @@ class YouTubeVideo(models.Model):
     )
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    CATEGORY_CHOICES = [
+        ("module", "Module (Interactive)"),
+        ("quick", "Quick Tip"),
+        ("lecture", "Lecture"),
+        ("webinar", "Webinar"),
+        ("other", "Other"),
+    ]
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, blank=True, default="")
+    tags = models.CharField(max_length=200, blank=True, help_text="Comma-separated tags, e.g., resume,interview,soft-skills")
 
     class Meta:
         ordering = ("-created_at",)

@@ -557,6 +557,7 @@ def logout_view(request):
 # ===============================
 @ensure_csrf_cookie
 def video_gallery(request):
+    req_cat = (request.GET.get('cat') or '').strip().lower()
     videos = list(YouTubeVideo.objects.all().order_by('-created_at'))
 
     # Attach a related interactive lesson slug when available by matching YouTube IDs
@@ -591,8 +592,19 @@ def video_gallery(request):
                 vid = ids.get(v.id)
                 if vid and vid in by_id:
                     setattr(v, 'lesson_slug', by_id[vid])
+    # Compute an effective category for filtering and rendering
+    for v in videos:
+        eff = (v.category or '').strip().lower()
+        if not eff:
+            eff = 'module' if getattr(v, 'lesson_slug', None) else 'other'
+        setattr(v, 'effective_category', eff)
+        setattr(v, 'effective_tags', (v.tags or '').lower())
 
-    return render(request, 'main/video_gallery.html', {'videos': videos})
+    # Optional server-side filter
+    if req_cat in {'module','quick','lecture','webinar','other'}:
+        videos = [v for v in videos if getattr(v, 'effective_category', '') == req_cat]
+
+    return render(request, 'main/video_gallery.html', {'videos': videos, 'active_cat': req_cat})
 
 # =========================================================================
 # Email Verification Helpers
