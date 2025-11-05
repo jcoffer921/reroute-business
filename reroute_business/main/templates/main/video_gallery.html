@@ -13,6 +13,8 @@
             <div class="video-frame">
               <div class="video-aspect">
                 <iframe
+                  id="ytvid-{{ video.id }}"
+                  class="yt-embed yt-gallery-embed"
                   src="{{ video.embed_url }}"
                   title="{{ video.title }}"
                   frameborder="0"
@@ -54,3 +56,35 @@
 </style>
 {% endblock %}
 
+{% block extra_js %}
+  <script>
+    (function(){
+      var ytIframes = document.querySelectorAll('iframe.yt-embed');
+      if (!ytIframes.length) return;
+
+      var tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(tag);
+
+      window.onYouTubeIframeAPIReady = function(){
+        ytIframes.forEach(function(ifr){
+          try {
+            new YT.Player(ifr.id, {
+              events: {
+                onReady: function(){ /* hook for autoplay, etc. */ },
+                onStateChange: function(e){
+                  // Example: log end event or trigger UI updates
+                  if (e.data === YT.PlayerState.ENDED) {
+                    ifr.closest('.video-card')?.classList.add('video-ended');
+                  }
+                }
+              }
+            });
+          } catch (err) {
+            // Ignore instantiation errors for non-YouTube iframes
+          }
+        });
+      };
+    })();
+  </script>
+{% endblock %}
