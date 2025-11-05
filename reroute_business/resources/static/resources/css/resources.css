@@ -562,3 +562,34 @@ html { scroll-behavior: smooth; }
 .video-title { margin: 0.75rem 0 0.25rem; font-size: 1.1rem; color: #0F172A; }
 .video-desc { margin: 0; color: #475569; font-size: 0.95rem; }
 .empty-state { color: #64748b; }
+
+/* ===== Microsoft-style Learning Videos grid ===== */
+.video-gallery-section { padding: 2rem 1rem; background: #fff; }
+.video-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+.learning-video-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e6ecfb;
+  box-shadow: 0 2px 10px rgba(10,34,80,0.06);
+  overflow: hidden;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.learning-video-card:hover{ transform: translateY(-2px); box-shadow: 0 10px 24px rgba(10,34,80,0.12); }
+.video-thumb-container{ position: relative; aspect-ratio: 16 / 9; background:#f3f4f6; }
+.video-thumb-container img{ width:100%; height:100%; object-fit: cover; display:block; }
+.video-play-btn{
+  position:absolute; inset:0; display:grid; place-items:center; background: radial-gradient(circle at center, rgba(0,0,0,0.12), rgba(0,0,0,0.35));
+  border:0; cursor:pointer; color:#fff; transition: background .15s ease;
+}
+.video-play-btn:hover{ background: radial-gradient(circle at center, rgba(0,0,0,0.18), rgba(0,0,0,0.5)); }
+.video-play-btn span{ width:58px; height:58px; display:inline-flex; align-items:center; justify-content:center; border-radius:999px; border:2px solid rgba(255,255,255,0.9); background: rgba(100,149,237,0.85); box-shadow: 0 6px 20px rgba(100,149,237,0.35); }
+.video-card-body{ padding: .9rem .9rem 1rem; }
+.video-category{ color:#4361ee; font-weight:700; font-size:.8rem; letter-spacing:.02em; }
+.video-card-title{ margin:.4rem 0 .6rem; font-size:1.05rem; font-weight:800; color:#0F172A; }
+.video-meta{ display:flex; align-items:center; gap:.6rem; color:#475569; font-size:.9rem; }
+.video-author-img{ width:28px; height:28px; border-radius:999px; object-fit:cover; border:1px solid #e6ecfb; }
+@media (max-width: 420px){ .video-gallery-grid{ grid-template-columns: 1fr; } }

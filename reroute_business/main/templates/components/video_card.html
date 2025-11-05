@@ -1,6 +1,14 @@
 {# Reusable YouTube video card component #}
 {# Params: title, embed_src, iframe_id, description (optional), data_completion_target (optional), extra_class (optional) #}
-<article class="video-card {{ extra_class|default:'' }}">
+<article class="video-card {{ extra_class|default:'' }}"
+  {% if lesson_slug %}
+    data-lesson="1"
+    data-lesson-slug="{{ lesson_slug }}"
+    data-schema-url="{% url 'lesson_schema' lesson_slug %}"
+    data-attempt-url="{% url 'lesson_attempt' lesson_slug %}"
+    data-progress-url="{% url 'lesson_progress' lesson_slug %}"
+  {% endif %}
+>
   <div class="video-frame">
     <div class="video-aspect">
       <iframe
@@ -23,5 +31,29 @@
     <p style="margin-top:.5rem">
       <a href="{% url 'lesson_detail' lesson_slug %}" class="learn-more-btn">Take Interactive Lesson</a>
     </p>
+    <!-- Inline lesson overlay elements (scoped within this card) -->
+    <div class="lesson-overlay" hidden aria-hidden="true"></div>
+    <div class="lesson-dialog" hidden role="dialog" aria-modal="true">
+      <div class="lesson-dialog-inner">
+        <h2 class="lesson-prompt"></h2>
+        <div class="lesson-choices"></div>
+        <div class="lesson-open-ended" hidden>
+          <textarea class="lesson-textarea" rows="3" placeholder="Type your answer..." aria-label="Your answer"></textarea>
+          <button class="lesson-submit-open lesson-btn primary">Submit</button>
+        </div>
+        <div class="lesson-feedback" aria-live="polite"></div>
+      </div>
+    </div>
+    <div class="lesson-overlay lesson-complete-overlay" hidden aria-hidden="true"></div>
+    <div class="lesson-complete" hidden role="dialog" aria-modal="true">
+      <div class="lesson-complete-inner">
+        <h3>✅ Lesson Complete</h3>
+        <p class="lesson-complete-summary"></p>
+        <div class="lesson-complete-actions">
+          <a href="{% url 'resource_list' %}" class="lesson-btn">Explore more resources</a>
+          <button class="lesson-complete-close lesson-btn primary">Close</button>
+        </div>
+      </div>
+    </div>
   {% endif %}
 </article>

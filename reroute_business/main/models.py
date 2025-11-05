@@ -50,23 +50,33 @@ class YouTubeVideo(models.Model):
             except Exception:
                 return url
 
+        # Helper to prefer nocookie embeds
+        def _nocookie(url: str) -> str:
+            try:
+                from urllib.parse import urlparse, urlunparse
+                u = urlparse(url)
+                host = u.netloc.replace('www.youtube.com', 'www.youtube-nocookie.com').replace('youtube.com', 'youtube-nocookie.com')
+                return urlunparse((u.scheme, host, u.path, u.params, u.query, u.fragment))
+            except Exception:
+                return url
+
         # youtu.be short links
         if host.endswith("youtu.be"):
             vid = path.lstrip("/").split("/")[0]
-            return _append_enablejsapi(f"https://www.youtube.com/embed/{vid}") if vid else val
+            return _append_enablejsapi(f"https://www.youtube-nocookie.com/embed/{vid}") if vid else val
 
         # youtube watch links
         if host.endswith("youtube.com") or host.endswith("m.youtube.com") or host.endswith("www.youtube.com"):
             if path.startswith("/watch"):
                 vid = (qs.get("v") or [""])[0]
-                return _append_enablejsapi(f"https://www.youtube.com/embed/{vid}") if vid else val
+                return _append_enablejsapi(f"https://www.youtube-nocookie.com/embed/{vid}") if vid else val
             # shorts
             if "/shorts/" in path:
                 parts = [p for p in path.split("/") if p]
                 try:
                     i = parts.index("shorts")
                     vid = parts[i + 1]
-                    return _append_enablejsapi(f"https://www.youtube.com/embed/{vid}") if vid else val
+                    return _append_enablejsapi(f"https://www.youtube-nocookie.com/embed/{vid}") if vid else val
                 except Exception:
                     pass
 

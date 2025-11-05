@@ -1,20 +1,77 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}ReRoute | Video Library{% endblock %}
+{% block title %}ReRoute | Learning Videos{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'resources/css/resources.css' %}">
+<link rel="stylesheet" href="{% static 'resources/css/lesson.css' %}">
 {% endblock %}
 
 {% block content %}
-<section class="video-library-section">
+<section class="video-gallery-section">
   <div class="video-library-container">
-    <h1 class="page-title">Video Library</h1>
+    <h1 class="page-title">Learning Videos</h1>
     {% if videos %}
-      <div class="video-grid">
+      <div class="video-gallery-grid">
         {% for video in videos %}
-          {% include 'components/video_card.html' with iframe_id='ytvid-'|add:video.id|stringformat:'s' title=video.title embed_src=video.embed_url description=video.description lesson_slug=video.lesson_slug %}
+          {% with vid=(video.youtube_id|default:video.youtube_id2) %}
+          <article class="learning-video-card"
+            {% if video.lesson_slug %}
+              data-lesson="1"
+              data-lesson-slug="{{ video.lesson_slug }}"
+              data-schema-url="{% url 'lesson_schema' video.lesson_slug %}"
+              data-attempt-url="{% url 'lesson_attempt' video.lesson_slug %}"
+              data-progress-url="{% url 'lesson_progress' video.lesson_slug %}"
+            {% endif %}
+          >
+            <div class="video-thumb-container" data-video-id="{{ vid }}">
+              <img src="https://i.ytimg.com/vi/{{ vid }}/hqdefault.jpg" alt="{{ video.title }} thumbnail">
+              <button class="video-play-btn" aria-label="Play {{ video.title }}">
+                <span>▶</span>
+              </button>
+            </div>
+            <div class="video-card-body">
+              <div class="video-category">Learning videos</div>
+              <div class="video-card-title">{{ video.title }}</div>
+              <div class="video-meta">
+                {% with avatar=video.author_avatar|default:'/static/images/reroute-trans-logo.png' %}
+                  <img class="video-author-img" src="{{ avatar }}" alt="{{ video.author|default:'ReRoute Team' }}">
+                {% endwith %}
+                <span class="video-author">{{ video.author|default:'ReRoute Team' }}</span>
+                <span>•</span>
+                <span class="video-time">{{ video.edited_time|default:video.created_at|timesince }} ago</span>
+              </div>
+
+              {% if video.lesson_slug %}
+                <!-- Inline overlays for questions -->
+                <div class="lesson-overlay" hidden aria-hidden="true"></div>
+                <div class="lesson-dialog" hidden role="dialog" aria-modal="true">
+                  <div class="lesson-dialog-inner">
+                    <h2 class="lesson-prompt"></h2>
+                    <div class="lesson-choices"></div>
+                    <div class="lesson-open-ended" hidden>
+                      <textarea class="lesson-textarea" rows="3" placeholder="Type your answer..." aria-label="Your answer"></textarea>
+                      <button class="lesson-submit-open lesson-btn primary">Submit</button>
+                    </div>
+                    <div class="lesson-feedback" aria-live="polite"></div>
+                  </div>
+                </div>
+                <div class="lesson-overlay lesson-complete-overlay" hidden aria-hidden="true"></div>
+                <div class="lesson-complete" hidden role="dialog" aria-modal="true">
+                  <div class="lesson-complete-inner">
+                    <h3>✅ Lesson Complete</h3>
+                    <p class="lesson-complete-summary"></p>
+                    <div class="lesson-complete-actions">
+                      <a href="{% url 'resource_list' %}" class="lesson-btn">Explore more resources</a>
+                      <button class="lesson-complete-close lesson-btn primary">Close</button>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </article>
+          {% endwith %}
         {% endfor %}
       </div>
     {% else %}
@@ -26,34 +83,6 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script>
-    (function(){
-      var ytIframes = document.querySelectorAll('iframe.yt-embed');
-      if (!ytIframes.length) return;
-
-      var tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      document.head.appendChild(tag);
-
-      window.onYouTubeIframeAPIReady = function(){
-        ytIframes.forEach(function(ifr){
-          try {
-            new YT.Player(ifr.id, {
-              events: {
-                onReady: function(){ /* hook for autoplay, etc. */ },
-                onStateChange: function(e){
-                  // Example: log end event or trigger UI updates
-                  if (e.data === YT.PlayerState.ENDED) {
-                    ifr.closest('.video-card')?.classList.add('video-ended');
-                  }
-                }
-              }
-            });
-          } catch (err) {
-            // Ignore instantiation errors for non-YouTube iframes
-          }
-        });
-      };
-    })();
-  </script>
+  <script src="{% static 'js/learning_gallery.js' %}" defer></script>
+  <script src="{% static 'js/gallery_lessons.js' %}" defer></script>
 {% endblock %}

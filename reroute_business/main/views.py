@@ -41,6 +41,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from reroute_business.job_list.models import Application
 from reroute_business.main.forms import UserSignupForm
@@ -554,6 +555,7 @@ def logout_view(request):
 # ===============================
 # Video Library
 # ===============================
+@ensure_csrf_cookie
 def video_gallery(request):
     videos = list(YouTubeVideo.objects.all().order_by('-created_at'))
 
@@ -581,6 +583,7 @@ def video_gallery(request):
             vid = extract_vid(v.embed_url())
             if vid:
                 ids[v.id] = vid
+                setattr(v, 'youtube_id2', vid)
         if ids:
             lessons = Lesson.objects.filter(youtube_video_id__in=list(ids.values())).only('slug', 'youtube_video_id')
             by_id = {ls.youtube_video_id: ls.slug for ls in lessons}

@@ -41,6 +41,10 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
   padding: 2rem;
 }
 
+/* Constrain footer logo size across breakpoints */
+.site-footer .footer-logo-img { height: 36px; max-height: 36px; width: auto; object-fit: contain; }
+@media (min-width: 768px){ .site-footer .footer-logo-img { height: 44px; max-height: 44px; } }
+
 
 /* ========== NAVBAR ========== */
 .navbar {
@@ -55,7 +59,7 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
 }
 
 .navbar-logo { display: flex; align-items: center; flex-shrink: 0; }
-.navbar-logo img { height: 48px; object-fit: contain; }
+.navbar-logo img, .brand-logo { height: 44px; max-height: 44px; width: auto; object-fit: contain; }
 
 .navbar-links-container { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 1rem; }
 

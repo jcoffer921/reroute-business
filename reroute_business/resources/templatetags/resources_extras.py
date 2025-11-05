@@ -57,8 +57,8 @@ def youtube_embed_url(value: str) -> str:
     qs = parse_qs(u.query or "")
 
     def _embed_for_video(video_id: str) -> str:
-        # For now we ignore extra params (si, t, etc.) for embeds
-        return _append_enablejsapi(f"https://www.youtube.com/embed/{video_id}")
+        # Prefer youtube-nocookie to avoid blockers/cookies; keep API enabled
+        return _append_enablejsapi(f"https://www.youtube-nocookie.com/embed/{video_id}")
 
     # youtu.be short links
     if host.endswith("youtu.be"):
@@ -90,7 +90,7 @@ def youtube_embed_url(value: str) -> str:
         # Playlist-only links
         playlist = (qs.get("list") or [""])[0]
         if playlist and not qs.get("v"):
-            return _append_enablejsapi(f"https://www.youtube.com/embed/videoseries?list={playlist}")
+            return _append_enablejsapi(f"https://www.youtube-nocookie.com/embed/videoseries?list={playlist}")
 
     # Fallback to original
     return val
