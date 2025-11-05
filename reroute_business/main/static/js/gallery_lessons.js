@@ -249,13 +249,15 @@
         qs.forEach(x=>{ const st=modal.__answered && modal.__answered[x.id]; if(st && st.completed) answered++; if(x.is_scored && st && st.correct) correct++; });
         const started = answered>0;
         const allAnswered = total>0 && answered>=total;
+        // Only mark/show complete when all questions answered AND video has ended
+        const doneNow = started && allAnswered && (modal.__videoEnded === true);
         postJSON(progressUrl,{
           last_video_time: currentTime(),
           last_answered_question_order: 0,
           raw_state: modal.__answered||{},
-          completed: (started && allAnswered)
+          completed: doneNow
         }).catch(()=>{});
-        if (started && allAnswered) showCompletion(correct, scored);
+        if (doneNow) showCompletion(correct, scored);
       }
     }
 
@@ -267,6 +269,7 @@
 
     fetch(schemaUrl, { credentials:'same-origin' }).then(r=>r.json()).then(data=>{
       modal.__answered = modal.__answered || {};
+      modal.__videoEnded = false;
       schema = data || {};
       if (QUIZ_DEBUG && schema && Array.isArray(schema.questions)){
         try{
@@ -275,7 +278,7 @@
       }
       loadYouTubeAPI(()=>{
         // eslint-disable-next-line no-undef
-        player = new YT.Player(iframe.id, { events: { onReady: ()=>{ start(); }, onStateChange: (ev)=>{ if(ev.data===1) start(); else if(ev.data===2){} } } });
+        player = new YT.Player(iframe.id, { events: { onReady: ()=>{ modal.__videoEnded=false; start(); }, onStateChange: (ev)=>{ if(ev.data===1){ start(); } else if(ev.data===2){ /* paused */ } else if (typeof YT!=='undefined' && ev.data===YT.PlayerState.ENDED){ modal.__videoEnded=true; persist(true); } } } });
         modal.__ytPlayer = player;
       });
     }).catch(()=>{});
