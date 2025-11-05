@@ -15,7 +15,7 @@
     {% if videos %}
       <div class="video-gallery-grid">
         {% for video in videos %}
-          {% with vid=(video.youtube_id|default:video.youtube_id2) %}
+          {% firstof video.youtube_id video.youtube_id2 as vid %}
           <article class="learning-video-card"
             {% if video.lesson_slug %}
               data-lesson="1"
@@ -35,12 +35,16 @@
               <div class="video-category">Learning videos</div>
               <div class="video-card-title">{{ video.title }}</div>
               <div class="video-meta">
-                {% with avatar=video.author_avatar|default:'/static/images/reroute-trans-logo.png' %}
-                  <img class="video-author-img" src="{{ avatar }}" alt="{{ video.author|default:'ReRoute Team' }}">
-                {% endwith %}
+                <img class="video-author-img" src="{{ video.author_avatar|default:'/static/images/reroute-trans-logo.png' }}" alt="{{ video.author|default:'ReRoute Team' }}">
                 <span class="video-author">{{ video.author|default:'ReRoute Team' }}</span>
                 <span>•</span>
-                <span class="video-time">{{ video.edited_time|default:video.created_at|timesince }} ago</span>
+                {% if video.edited_time %}
+                  <span class="video-time">{{ video.edited_time }}</span>
+                {% elif video.created_at %}
+                  <span class="video-time">{{ video.created_at|timesince }} ago</span>
+                {% else %}
+                  <span class="video-time">Recently</span>
+                {% endif %}
               </div>
 
               {% if video.lesson_slug %}
@@ -71,7 +75,6 @@
               {% endif %}
             </div>
           </article>
-          {% endwith %}
         {% endfor %}
       </div>
     {% else %}
