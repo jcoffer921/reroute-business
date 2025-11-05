@@ -146,9 +146,11 @@
       if (flush){
         const scored = (schema.questions||[]).filter(q => q.is_scored).length;
         let correct = 0; (schema.questions||[]).forEach(q => { const st = state.answered[q.id]; if (q.is_scored && st && st.correct) correct++; });
-        postJSON(progressUrl, { last_video_time: currentTime(), last_answered_question_order: 0, raw_state: state, completed: (!nextUnanswered()) })
+        // Only mark completed after at least one question was displayed/answered in this session
+        const started = Object.keys(state.answered||{}).length > 0;
+        postJSON(progressUrl, { last_video_time: currentTime(), last_answered_question_order: 0, raw_state: state, completed: (started && !nextUnanswered()) })
           .catch(()=>{});
-        if (!nextUnanswered()) showCompletion(correct, scored);
+        if (started && !nextUnanswered()) showCompletion(correct, scored);
       }
     }
 
@@ -238,7 +240,24 @@
     }
     function start(){ if(poll) clearInterval(poll); poll=setInterval(onTick, 400); modal.__quizPoll = poll; }
     function resumeSlightly(){ seekTo(currentTime()+0.2); play(); }
-    function persist(flush){ if(flush){ const qs=(schema&&schema.questions)||[]; const scored=qs.filter(x=>x.is_scored).length; let correct=0; qs.forEach(x=>{ const st=modal.__answered && modal.__answered[x.id]; if(x.is_scored && st && st.correct) correct++; }); postJSON(progressUrl,{ last_video_time: currentTime(), last_answered_question_order: 0, raw_state: modal.__answered||{}, completed: (!nextUnanswered()) }).catch(()=>{}); if(!nextUnanswered()) showCompletion(correct, scored); } }
+    function persist(flush){
+      if(flush){
+        const qs=(schema&&schema.questions)||[];
+        const total=qs.length;
+        const scored=qs.filter(x=>x.is_scored).length;
+        let correct=0, answered=0;
+        qs.forEach(x=>{ const st=modal.__answered && modal.__answered[x.id]; if(st && st.completed) answered++; if(x.is_scored && st && st.correct) correct++; });
+        const started = answered>0;
+        const allAnswered = total>0 && answered>=total;
+        postJSON(progressUrl,{
+          last_video_time: currentTime(),
+          last_answered_question_order: 0,
+          raw_state: modal.__answered||{},
+          completed: (started && allAnswered)
+        }).catch(()=>{});
+        if (started && allAnswered) showCompletion(correct, scored);
+      }
+    }
 
     function renderQuestion(q){ if(!promptEl) return; promptEl.textContent = q.prompt; if(feedbackEl) feedbackEl.textContent=''; if(choicesEl) choicesEl.innerHTML=''; if(openWrap) openWrap.hidden=true; if(q.qtype==='MULTIPLE_CHOICE'){ (q.choices||[]).forEach(c=>{ const btn=document.createElement('button'); btn.className='lesson-btn'; btn.textContent=(c.label||'')+' '+(c.text||''); btn.addEventListener('click',()=>{ postJSON(attemptUrl,{ question_id:q.id, selected_choice_id:c.id, current_time: currentTime() }).then(resp=>{ modal.__answered = modal.__answered || {}; const st=modal.__answered[q.id] || { attempts:0 }; st.attempts++; st.completed=true; st.correct=!!resp.is_correct; modal.__answered[q.id]=st; if(feedbackEl) feedbackEl.textContent = st.correct ? 'Correct!' : 'Saved'; setTimeout(()=>{ hideDialog(); resumeSlightly(); persist(true); }, 480); }).catch(()=>{ if(feedbackEl) feedbackEl.textContent='Network error.'; }); }); choicesEl.appendChild(btn); }); } else { if(openWrap) openWrap.hidden=false; if(openArea) openArea.value=''; }
       showDialog(); }

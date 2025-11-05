@@ -262,6 +262,16 @@ html { scroll-behavior: smooth; }
   .hero2-modal-dialog { width: 96vw; }
 }
 
+/* ====== Gallery modal overrides: fill entire viewport with the player ====== */
+#galleryVideoModal .hero2-modal-backdrop { background: rgba(0,0,0,0.85); }
+#galleryVideoModal .hero2-modal-dialog {
+  top: 0; left: 0; transform: none; width: 100vw; height: 100vh; aspect-ratio: auto;
+  border-radius: 0; max-width: none; box-shadow: none; background: transparent;
+}
+#galleryModalContainer { position: absolute; inset: 0; width: 100%; height: 100%; }
+#galleryModalContainer iframe,
+#galleryModalContainer video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
 /* ===== Resource Categories (Cards) ===== */
 .resource-categories-section {
   background: linear-gradient(180deg, #f3f8ff 0%, #ffffff 60%);
