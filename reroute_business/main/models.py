@@ -21,6 +21,14 @@ class YouTubeVideo(models.Model):
     ]
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, blank=True, default="")
     tags = models.CharField(max_length=200, blank=True, help_text="Comma-separated tags, e.g., resume,interview,soft-skills")
+    mp4_static_path = models.CharField(
+        max_length=500, blank=True, default="",
+        help_text="Optional: local MP4 under /static, e.g. /static/resources/videos/quick_tip.mp4"
+    )
+    poster = models.CharField(
+        max_length=500, blank=True, default="",
+        help_text="Optional: poster image path under /static for local MP4s"
+    )
 
     class Meta:
         ordering = ("-created_at",)

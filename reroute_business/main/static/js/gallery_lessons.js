@@ -208,6 +208,10 @@
     const completeSummary = modal.querySelector('.lesson-complete-summary');
     const completeClose = modal.querySelector('.lesson-complete-close');
 
+    // Clean up any previous session
+    try { if (modal.__quizPoll) { clearInterval(modal.__quizPoll); modal.__quizPoll = null; } } catch(_){ }
+    try { if (modal.__ytPlayer && typeof modal.__ytPlayer.destroy === 'function') { modal.__ytPlayer.destroy(); modal.__ytPlayer = null; } } catch(_){ }
+
     let schema = null; let player = null; let poll = null;
     function currentTime(){ try { return (player && typeof player.getCurrentTime==='function') ? player.getCurrentTime() : 0; } catch(e){ return 0; } }
     function pause(){ try { player.pauseVideo(); } catch(e){} }
@@ -232,7 +236,7 @@
         pause(); renderQuestion(q);
       }
     }
-    function start(){ if(poll) clearInterval(poll); poll=setInterval(onTick, 400); }
+    function start(){ if(poll) clearInterval(poll); poll=setInterval(onTick, 400); modal.__quizPoll = poll; }
     function resumeSlightly(){ seekTo(currentTime()+0.2); play(); }
     function persist(flush){ if(flush){ const qs=(schema&&schema.questions)||[]; const scored=qs.filter(x=>x.is_scored).length; let correct=0; qs.forEach(x=>{ const st=modal.__answered && modal.__answered[x.id]; if(x.is_scored && st && st.correct) correct++; }); postJSON(progressUrl,{ last_video_time: currentTime(), last_answered_question_order: 0, raw_state: modal.__answered||{}, completed: (!nextUnanswered()) }).catch(()=>{}); if(!nextUnanswered()) showCompletion(correct, scored); } }
 
@@ -253,6 +257,7 @@
       loadYouTubeAPI(()=>{
         // eslint-disable-next-line no-undef
         player = new YT.Player(iframe.id, { events: { onReady: ()=>{ start(); }, onStateChange: (ev)=>{ if(ev.data===1) start(); else if(ev.data===2){} } } });
+        modal.__ytPlayer = player;
       });
     }).catch(()=>{});
   }

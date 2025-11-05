@@ -32,11 +32,15 @@
               data-attempt-url="{% url 'lesson_attempt' video.lesson_slug %}"
               data-progress-url="{% url 'lesson_progress' video.lesson_slug %}"
             {% endif %}
-            data-category="{{ video.effective_category }}"
+            data-category="{{ video.effective_category|default:video.category|default:'other' }}"
             data-tags="{{ video.effective_tags }}"
           >
-            <div class="video-thumb-container" data-video-id="{{ vid }}">
-              <img src="https://i.ytimg.com/vi/{{ vid }}/hqdefault.jpg" alt="{{ video.title }} thumbnail">
+            <div class="video-thumb-container" data-video-id="{{ vid }}" {% if not vid and video.mp4_static_path %}data-mp4-src="{{ video.mp4_static_path }}"{% endif %}>
+              {% if vid %}
+                <img src="https://i.ytimg.com/vi/{{ vid }}/hqdefault.jpg" alt="{{ video.title }} thumbnail">
+              {% else %}
+                <img src="{{ video.poster|default:'/static/images/dont_say_interview.png' }}" alt="{{ video.title }} thumbnail">
+              {% endif %}
               <button class="video-play-btn" aria-label="Play {{ video.title }}">
                 <span>▶</span>
               </button>

@@ -124,9 +124,13 @@ class YouTubeVideoAdmin(admin.ModelAdmin):
     list_filter = ("category",)
     search_fields = ("title", "description", "video_url", "tags")
     readonly_fields = ("created_at",)
-    fields = ("title", "video_url", "category", "tags", "description", "created_at")
+    fields = ("title", "video_url", "mp4_static_path", "poster", "category", "tags", "description", "created_at")
 
     def save_model(self, request, obj, form, change):
         # Normalize URL into embed form before saving
+        # Normalize YouTube URL if present
         obj.video_url = obj.embed_url()
+        # If it's a local MP4 and no category chosen, default to Quick Tip
+        if (not obj.category) and (obj.mp4_static_path or (obj.video_url == "")):
+            obj.category = "quick"
         super().save_model(request, obj, form, change)

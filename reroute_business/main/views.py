@@ -596,7 +596,12 @@ def video_gallery(request):
     for v in videos:
         eff = (v.category or '').strip().lower()
         if not eff:
-            eff = 'module' if getattr(v, 'lesson_slug', None) else 'other'
+            if getattr(v, 'lesson_slug', None):
+                eff = 'module'
+            elif getattr(v, 'mp4_static_path', ''):
+                eff = 'quick'
+            else:
+                eff = 'other'
         setattr(v, 'effective_category', eff)
         setattr(v, 'effective_tags', (v.tags or '').lower())
 
