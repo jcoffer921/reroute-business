@@ -38,23 +38,35 @@ class YouTubeVideo(models.Model):
         path = u.path or ""
         qs = parse_qs(u.query or "")
 
+        def _append_enablejsapi(url: str) -> str:
+            try:
+                from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+                u = urlparse(url)
+                q = parse_qs(u.query)
+                if "enablejsapi" not in q:
+                    q["enablejsapi"] = ["1"]
+                new_q = urlencode({k: v[-1] if isinstance(v, list) else v for k, v in q.items()})
+                return urlunparse((u.scheme, u.netloc, u.path, u.params, new_q, u.fragment))
+            except Exception:
+                return url
+
         # youtu.be short links
         if host.endswith("youtu.be"):
             vid = path.lstrip("/").split("/")[0]
-            return f"https://www.youtube.com/embed/{vid}" if vid else val
+            return _append_enablejsapi(f"https://www.youtube.com/embed/{vid}") if vid else val
 
         # youtube watch links
         if host.endswith("youtube.com") or host.endswith("m.youtube.com") or host.endswith("www.youtube.com"):
             if path.startswith("/watch"):
                 vid = (qs.get("v") or [""])[0]
-                return f"https://www.youtube.com/embed/{vid}" if vid else val
+                return _append_enablejsapi(f"https://www.youtube.com/embed/{vid}") if vid else val
             # shorts
             if "/shorts/" in path:
                 parts = [p for p in path.split("/") if p]
                 try:
                     i = parts.index("shorts")
                     vid = parts[i + 1]
-                    return f"https://www.youtube.com/embed/{vid}" if vid else val
+                    return _append_enablejsapi(f"https://www.youtube.com/embed/{vid}") if vid else val
                 except Exception:
                     pass
 

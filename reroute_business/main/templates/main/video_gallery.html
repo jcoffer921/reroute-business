@@ -1,33 +1,20 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}ReRoute | Video Library{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'resources/css/resources.css' %}">
+{% endblock %}
+
 {% block content %}
-<section class="video-gallery-section">
-  <div class="container">
+<section class="video-library-section">
+  <div class="video-library-container">
     <h1 class="page-title">Video Library</h1>
     {% if videos %}
       <div class="video-grid">
         {% for video in videos %}
-          <article class="video-card">
-            <div class="video-frame">
-              <div class="video-aspect">
-                <iframe
-                  id="ytvid-{{ video.id }}"
-                  class="yt-embed yt-gallery-embed"
-                  src="{{ video.embed_url }}"
-                  title="{{ video.title }}"
-                  frameborder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerpolicy="strict-origin-when-cross-origin"
-                  allowfullscreen></iframe>
-              </div>
-            </div>
-            <h3 class="video-title">{{ video.title }}</h3>
-            {% if video.description %}
-              <p class="video-desc">{{ video.description }}</p>
-            {% endif %}
-          </article>
+          {% include 'components/video_card.html' with iframe_id='ytvid-'|add:video.id|stringformat:'s' title=video.title embed_src=video.embed_url description=video.description lesson_slug=video.lesson_slug %}
         {% endfor %}
       </div>
     {% else %}
@@ -36,24 +23,6 @@
   </div>
 </section>
 
-<style>
-  .video-gallery-section { padding: 2rem 1rem; }
-  .page-title { margin: 0 0 1rem; font-size: 1.75rem; }
-  .video-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1.25rem;
-  }
-  .video-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); padding: 0.75rem; }
-  .video-frame { width: 100%; }
-  .video-aspect { position: relative; width: 100%; padding-top: 56.25%; border-radius: 12px; overflow: hidden; }
-  .video-aspect iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-  .video-title { margin: 0.75rem 0 0.25rem; font-size: 1.1rem; }
-  .video-desc { margin: 0; color: #475569; font-size: 0.95rem; }
-  .empty-state { color: #64748b; }
-  .container { max-width: 1100px; margin: 0 auto; }
-  @media (max-width: 380px) { .video-grid { grid-template-columns: 1fr; } }
-</style>
 {% endblock %}
 
 {% block extra_js %}

@@ -1,0 +1,27 @@
+{# Reusable YouTube video card component #}
+{# Params: title, embed_src, iframe_id, description (optional), data_completion_target (optional), extra_class (optional) #}
+<article class="video-card {{ extra_class|default:'' }}">
+  <div class="video-frame">
+    <div class="video-aspect">
+      <iframe
+        id="{{ iframe_id }}"
+        class="yt-embed"
+        {% if data_completion_target %}data-completion-target="{{ data_completion_target }}"{% endif %}
+        src="{{ embed_src }}"
+        title="{{ title }}"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen></iframe>
+    </div>
+  </div>
+  <h3 class="video-title">{{ title }}</h3>
+  {% if description %}
+    <p class="video-desc">{{ description }}</p>
+  {% endif %}
+  {% if lesson_slug %}
+    <p style="margin-top:.5rem">
+      <a href="{% url 'lesson_detail' lesson_slug %}" class="learn-more-btn">Take Interactive Lesson</a>
+    </p>
+  {% endif %}
+</article>

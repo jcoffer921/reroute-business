@@ -60,6 +60,11 @@ except Exception:
 # -----------------------------
 from reroute_business.profiles.models import EmployerProfile, UserProfile, Subscription
 from reroute_business.main.models import YouTubeVideo
+try:
+    # Optional: map gallery videos to interactive lessons when IDs match
+    from reroute_business.resources.models import Lesson
+except Exception:
+    Lesson = None
 
 # Try to import a custom password form; if unavailable, we use Django's default.
 try:
@@ -550,10 +555,41 @@ def logout_view(request):
 # Video Library
 # ===============================
 def video_gallery(request):
-    videos = YouTubeVideo.objects.all().order_by('-created_at')
-    return render(request, 'main/video_gallery.html', {
-        'videos': videos,
-    })
+    videos = list(YouTubeVideo.objects.all().order_by('-created_at'))
+
+    # Attach a related interactive lesson slug when available by matching YouTube IDs
+    if Lesson:
+        def extract_vid(url: str) -> str:
+            from urllib.parse import urlparse, parse_qs
+            u = urlparse(url or '')
+            host = (u.netloc or '').lower()
+            path = u.path or ''
+            qs = parse_qs(u.query or '')
+            if 'youtube.com/embed/' in url:
+                try:
+                    return path.rstrip('/').split('/')[-1]
+                except Exception:
+                    return ''
+            if host.endswith('youtu.be'):
+                return path.lstrip('/').split('/')[0]
+            if host.endswith('youtube.com') and path.startswith('/watch'):
+                return (qs.get('v') or [''])[0]
+            return ''
+
+        ids = {}
+        for v in videos:
+            vid = extract_vid(v.embed_url())
+            if vid:
+                ids[v.id] = vid
+        if ids:
+            lessons = Lesson.objects.filter(youtube_video_id__in=list(ids.values())).only('slug', 'youtube_video_id')
+            by_id = {ls.youtube_video_id: ls.slug for ls in lessons}
+            for v in videos:
+                vid = ids.get(v.id)
+                if vid and vid in by_id:
+                    setattr(v, 'lesson_slug', by_id[vid])
+
+    return render(request, 'main/video_gallery.html', {'videos': videos})
 
 # =========================================================================
 # Email Verification Helpers

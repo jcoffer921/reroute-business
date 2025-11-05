@@ -1,5 +1,5 @@
 from django import template
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 import re
 
 register = template.Library()
@@ -28,13 +28,24 @@ def youtube_embed_url(value: str) -> str:
         if m:
             val = m.group(1)
 
+    def _append_enablejsapi(url: str) -> str:
+        try:
+            u = urlparse(url)
+            q = parse_qs(u.query)
+            if "enablejsapi" not in q:
+                q["enablejsapi"] = ["1"]
+            new_q = urlencode({k: v[-1] if isinstance(v, list) else v for k, v in q.items()})
+            return urlunparse((u.scheme, u.netloc, u.path, u.params, new_q, u.fragment))
+        except Exception:
+            return url
+
     # Already an embed URL
     if "youtube.com/embed/" in val or "youtube-nocookie.com/embed/" in val:
-        return val
+        return _append_enablejsapi(val)
 
     # Bare video id (letters, numbers, -, _)
     if "://" not in val and all(c.isalnum() or c in "-_" for c in val) and 8 <= len(val) <= 64:
-        return f"https://www.youtube.com/embed/{val}"
+        return _append_enablejsapi(f"https://www.youtube.com/embed/{val}")
 
     try:
         u = urlparse(val)
@@ -47,7 +58,7 @@ def youtube_embed_url(value: str) -> str:
 
     def _embed_for_video(video_id: str) -> str:
         # For now we ignore extra params (si, t, etc.) for embeds
-        return f"https://www.youtube.com/embed/{video_id}"
+        return _append_enablejsapi(f"https://www.youtube.com/embed/{video_id}")
 
     # youtu.be short links
     if host.endswith("youtu.be"):
@@ -79,7 +90,7 @@ def youtube_embed_url(value: str) -> str:
         # Playlist-only links
         playlist = (qs.get("list") or [""])[0]
         if playlist and not qs.get("v"):
-            return f"https://www.youtube.com/embed/videoseries?list={playlist}"
+            return _append_enablejsapi(f"https://www.youtube.com/embed/videoseries?list={playlist}")
 
     # Fallback to original
     return val
