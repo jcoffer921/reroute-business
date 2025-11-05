@@ -241,20 +241,24 @@ from django.middleware.security import SecurityMiddleware
 # Add or update this setting
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
-# Add custom response headers for embedding videos
-CSP_HEADER = "frame-src https://www.youtube.com https://www.youtube-nocookie.com"
+# --- Allow YouTube video embedding (fix for CSP blocking) ---
+from django.utils.deprecation import MiddlewareMixin
 
-def add_csp_header(get_response):
-    def middleware(request):
-        response = get_response(request)
-        response["Content-Security-Policy"] = CSP_HEADER
+# Disable Cross-Origin opener blocking so YouTube embeds work correctly
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+
+# Define a Content Security Policy that allows YouTube videos, scripts, and images
+class AddCSPHeaderMiddleware(MiddlewareMixin):
+    def process_response(self, request, response):
+        response["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "frame-src https://www.youtube.com https://www.youtube-nocookie.com; "
+            "script-src 'self' 'unsafe-inline' https://www.youtube.com https://www.gstatic.com; "
+            "img-src 'self' data: https://i.ytimg.com; "
+            "media-src 'self' https://www.youtube.com;"
+        )
         return response
-    return middleware
 
-# Append to MIDDLEWARE if not already there
-MIDDLEWARE += [
-    "django.middleware.common.CommonMiddleware",
-]
+# ✅ Append our custom CSP middleware at the end of the chain
+MIDDLEWARE.append("reroute_business.reroute.settings.AddCSPHeaderMiddleware")
 
-# Manually add this middleware in your settings
-MIDDLEWARE.append("reroute_business.reroute.settings.add_csp_header")
