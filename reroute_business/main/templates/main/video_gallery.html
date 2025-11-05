@@ -14,11 +14,11 @@
     <h1 class="page-title">Learning Videos</h1>
     <div class="video-filters">
       <a class="filter-btn {% if not active_cat %}active{% endif %}" href="{% url 'video_gallery' %}">All</a>
-      <a class="filter-btn {% if active_cat=='module' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=module">Modules</a>
-      <a class="filter-btn {% if active_cat=='quick' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=quick">Quick Tips</a>
-      <a class="filter-btn {% if active_cat=='lecture' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=lecture">Lectures</a>
-      <a class="filter-btn {% if active_cat=='webinar' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=webinar">Webinars</a>
-      <a class="filter-btn {% if active_cat=='other' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=other">Other</a>
+      <a class="filter-btn {% if active_cat == 'module' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=module">Modules</a>
+      <a class="filter-btn {% if active_cat == 'quick' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=quick">Quick Tips</a>
+      <a class="filter-btn {% if active_cat == 'lecture' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=lecture">Lectures</a>
+      <a class="filter-btn {% if active_cat == 'webinar' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=webinar">Webinars</a>
+      <a class="filter-btn {% if active_cat == 'other' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=other">Other</a>
     </div>
     {% if videos %}
       <div class="video-gallery-grid">
