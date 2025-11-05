@@ -53,6 +53,7 @@
     let schema = null;
     let player = null;
     let poll = null;
+    let videoEnded = false;
     let state = { answered: {}, orderDone: 0 };
     const storageKey = 'gallery:lesson:' + (card.getAttribute('data-lesson-slug') || '') + ':state';
     try { const saved = sessionStorage.getItem(storageKey); if (saved) state = Object.assign(state, JSON.parse(saved)); } catch(e){}
@@ -148,9 +149,10 @@
         let correct = 0; (schema.questions||[]).forEach(q => { const st = state.answered[q.id]; if (q.is_scored && st && st.correct) correct++; });
         // Only mark completed after at least one question was displayed/answered in this session
         const started = Object.keys(state.answered||{}).length > 0;
-        postJSON(progressUrl, { last_video_time: currentTime(), last_answered_question_order: 0, raw_state: state, completed: (started && !nextUnanswered()) })
+        const doneNow = started && !nextUnanswered() && videoEnded;
+        postJSON(progressUrl, { last_video_time: currentTime(), last_answered_question_order: 0, raw_state: state, completed: doneNow })
           .catch(()=>{});
-        if (started && !nextUnanswered()) showCompletion(correct, scored);
+        if (doneNow) showCompletion(correct, scored);
       }
     }
 
@@ -171,6 +173,7 @@
       });
     }
     if (completeClose){ completeClose.addEventListener('click', hideCompletion); }
+    if (completeOverlay){ completeOverlay.addEventListener('click', hideCompletion); }
 
     // Boot: load schema, then player
     fetch(schemaUrl, { credentials: 'same-origin' }).then(r => r.json()).then(data => {
@@ -179,8 +182,12 @@
         // eslint-disable-next-line no-undef
         player = new YT.Player(iframe.id, {
           events: {
-            onReady: () => { startPoll(); },
-            onStateChange: (ev) => { if (ev.data === 1) startPoll(); else if (ev.data === 2) stopPoll(); }
+            onReady: () => { videoEnded = false; startPoll(); },
+            onStateChange: (ev) => {
+              if (ev.data === 1) startPoll();
+              else if (ev.data === 2) stopPoll();
+              try { if (typeof YT !== 'undefined' && ev.data === YT.PlayerState.ENDED) { videoEnded = true; persist(true); } } catch(_){ }
+            }
           }
         });
       });

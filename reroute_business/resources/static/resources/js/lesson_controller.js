@@ -25,6 +25,7 @@
   let ytReady = false;
   let ytPoll = null;
   let lastTime = 0;
+  let videoEnded = false;
 
   let state = {
     answered: {}, // questionId -> {completed: bool, correct: bool, attempts: n}
@@ -67,6 +68,8 @@
       onTime(cb){ video.addEventListener('timeupdate', () => cb(video.currentTime)); },
       onSeekAttempt(cb){ video.addEventListener('seeking', () => cb(video.currentTime)); },
     };
+    // Track when the video ends to gate completion
+    try { video.addEventListener('ended', onVideoEnded); } catch(e){}
     bindCommon();
   }
 
@@ -94,6 +97,11 @@
             // 1 = PLAYING, 2 = PAUSED
             if (ev.data === 1) startYTPoll();
             else stopYTPoll();
+            try {
+              if (typeof YT !== 'undefined' && ev.data === YT.PlayerState.ENDED) {
+                onVideoEnded();
+              }
+            } catch(e){}
           },
         }
       });
@@ -107,6 +115,8 @@
   function bindCommon(){
     if (openSubmit) openSubmit.addEventListener('click', submitOpenEnded);
     if (completeClose) completeClose.addEventListener('click', closeCompletion);
+    if (completeOverlay) completeOverlay.addEventListener('click', closeCompletion);
+    document.addEventListener('keydown', (e)=>{ if (!completeDialog.hidden && (e.key === 'Escape' || e.key === 'Esc')) closeCompletion(); });
     if (!useYouTube) {
       const video = $('#lessonVideo');
       player.onTime(onAnyTimeUpdate);
@@ -253,9 +263,36 @@
     seekTo(currentTime() + 0.2);
     const nextQ = nextUnansweredQuestion();
     if (!nextQ) {
-      showCompletion();
+      // All questions answered; only show completion after video ends
+      if (videoEnded) {
+        showCompletion();
+      } else {
+        playPlayer();
+      }
     } else {
       playPlayer();
+    }
+  }
+
+  function allQuestionsAnswered(){
+    const qs = (schema && schema.questions) ? schema.questions : [];
+    if (!qs.length) return false;
+    for (let i=0;i<qs.length;i++){
+      const q = qs[i];
+      const st = state.answered[q.id];
+      if (!st || !st.completed) return false;
+    }
+    return true;
+  }
+
+  function onVideoEnded(){
+    videoEnded = true;
+    // If all questions are answered, now show completion
+    if (allQuestionsAnswered()) {
+      showCompletion();
+    } else {
+      // Persist final time/state without marking completed
+      persistProgress(true);
     }
   }
 
@@ -284,10 +321,14 @@
   function persistProgress(flush){
     try { sessionStorage.setItem(storageKey, JSON.stringify(state)); } catch(e) {}
     if (flush) {
+      const answeredCount = Object.keys(state.answered||{}).length;
+      const started = answeredCount > 0;
+      const completedNow = started && allQuestionsAnswered() && videoEnded;
       postJSON(endpoints.progress, {
         last_video_time: currentTime(),
         last_answered_question_order: state.orderDone,
         raw_state: state,
+        completed: completedNow,
       }).catch(()=>{});
     }
   }
