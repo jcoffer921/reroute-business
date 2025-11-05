@@ -8,16 +8,12 @@
 
   function makeIframe(videoId){
     var ifr = document.createElement('iframe');
-    ifr.className = 'yt-embed';
+    ifr.className = 'yt-embed rr-vid-fill';
     ifr.setAttribute('allowfullscreen', '');
     ifr.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
     ifr.setAttribute('title', 'YouTube video player');
     ifr.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
     ifr.src = 'https://www.youtube.com/embed/' + encodeURIComponent(videoId) + '?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1';
-    // Ensure it fills the modal container
-    ifr.style.width = '100%';
-    ifr.style.height = '100%';
-    ifr.style.border = '0';
     return ifr;
   }
 
@@ -33,8 +29,8 @@
     delete modal.__answered;
   }
 
-  function openModal(){ if (modal) { resetOverlays(); modal.removeAttribute('hidden'); document.body.style.overflow='hidden'; } }
-  function closeModal(){ if (modal) { modal.setAttribute('hidden',''); document.body.style.overflow=''; if (modalContainer){ modalContainer.innerHTML=''; }
+  function openModal(){ if (modal) { resetOverlays(); modal.removeAttribute('hidden'); document.body.classList.add('modal-open'); } }
+  function closeModal(){ if (modal) { modal.setAttribute('hidden',''); document.body.classList.remove('modal-open'); if (modalContainer){ modalContainer.innerHTML=''; }
       // Signal end of previous session
       modal.removeAttribute('data-iframe-id'); modal.removeAttribute('data-lesson');
     } }
@@ -65,11 +61,20 @@
       var v = document.createElement('video');
       v.playsInline = true; v.setAttribute('playsinline','');
       v.autoplay = true; v.muted = false; v.controls = true; v.preload = 'metadata';
-      v.style.width='100%'; v.style.height='100%'; v.style.objectFit='contain';
+      v.className = 'rr-vid-fill rr-object-contain';
       var src = document.createElement('source'); src.src = mp4; src.type = 'video/mp4'; v.appendChild(src);
+      if (!v.id) { v.id = 'mp4vid-' + Math.random().toString(36).slice(2,10); }
       if (modalContainer){ modalContainer.appendChild(v); }
-      // Ensure no lesson data leaks into modal for plain MP4s
-      if (modal){ modal.removeAttribute('data-lesson'); ['data-lesson-slug','data-schema-url','data-attempt-url','data-progress-url','data-iframe-id'].forEach(function(a){ modal.removeAttribute(a); }); }
+      // If the source card has a lesson, propagate lesson metadata for HTML5 flow
+      if (card && modal){
+        if (card.hasAttribute('data-lesson')) modal.setAttribute('data-lesson','1'); else modal.removeAttribute('data-lesson');
+        ['data-lesson-slug','data-schema-url','data-attempt-url','data-progress-url'].forEach(function(attr){
+          var val = card.getAttribute(attr);
+          if (val) modal.setAttribute(attr, val); else modal.removeAttribute(attr);
+        });
+        modal.setAttribute('data-video-el-id', v.id);
+        modal.removeAttribute('data-iframe-id');
+      }
       openModal();
       return;
     }
@@ -88,6 +93,7 @@
         if (vAttr) modal.setAttribute(attr, vAttr); else modal.removeAttribute(attr);
       });
       modal.setAttribute('data-iframe-id', autoId);
+      modal.removeAttribute('data-video-el-id');
     }
 
     openModal();

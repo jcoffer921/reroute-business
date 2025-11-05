@@ -69,8 +69,7 @@
         const list = document.createElement('div'); list.className='lesson-quiz-choices';
         (q.choices||[]).forEach(ch => {
           const id = `q${q.id}_${ch.id}`;
-          const label = document.createElement('label'); label.setAttribute('for', id);
-          label.style.display='flex'; label.style.alignItems='center'; label.style.gap='8px';
+          const label = document.createElement('label'); label.setAttribute('for', id); label.classList.add('rr-flex-row-8');
           const inp = document.createElement('input'); inp.type='radio'; inp.name=`q_${q.id}`; inp.value = ch.id; inp.id = id;
           label.appendChild(inp);
           const span = document.createElement('span'); span.textContent = `${(ch.label||'').toUpperCase()}) ${ch.text||''}`; label.appendChild(span);
@@ -78,7 +77,7 @@
         });
         box.appendChild(list);
       } else {
-        const ta = document.createElement('textarea'); ta.rows=3; ta.name=`t_${q.id}`; ta.placeholder='Type your answer...'; ta.style.width='100%';
+        const ta = document.createElement('textarea'); ta.rows=3; ta.name=`t_${q.id}`; ta.placeholder='Type your answer...'; ta.classList.add('rr-w-100');
         box.appendChild(ta);
       }
       quizContainer.appendChild(box);
@@ -86,7 +85,7 @@
 
     const actions = document.createElement('div'); actions.className='lesson-quiz-actions-bar';
     const submit = document.createElement('button'); submit.type='button'; submit.className='lesson-btn primary'; submit.textContent='Submit Quiz';
-    const result = document.createElement('div'); result.className='lesson-quiz-result'; result.style.marginTop='8px';
+    const result = document.createElement('div'); result.className='lesson-quiz-result rr-mt-8';
     actions.appendChild(submit);
     quizContainer.appendChild(actions);
     quizContainer.appendChild(result);

@@ -7,8 +7,10 @@
   function initModal(modal){
     if (!modal || !modal.hasAttribute('data-lesson')) return;
     const iframeId = modal.getAttribute('data-iframe-id');
+    const videoElId = modal.getAttribute('data-video-el-id');
     const iframe = iframeId ? document.getElementById(iframeId) : null;
-    if (!iframe) return;
+    const videoEl = videoElId ? document.getElementById(videoElId) : null;
+    if (!iframe && !videoEl) return;
 
     const schemaUrl = modal.getAttribute('data-schema-url');
     const attemptUrl = modal.getAttribute('data-attempt-url');
@@ -32,17 +34,22 @@
 
     function renderQuiz(){ if(!quizContainer || !schema) return; quizContainer.innerHTML='';
       const qs=(schema.questions||[]);
-      qs.forEach(q=>{ const box=document.createElement('div'); box.className='lesson-quiz-question'; const h=document.createElement('h3'); h.textContent=q.prompt||''; box.appendChild(h); if(q.qtype==='MULTIPLE_CHOICE'){ const list=document.createElement('div'); list.className='lesson-quiz-choices'; (q.choices||[]).forEach(ch=>{ const id='mq_'+q.id+'_'+ch.id; const lab=document.createElement('label'); lab.setAttribute('for', id); lab.style.display='flex'; lab.style.alignItems='center'; lab.style.gap='8px'; const inp=document.createElement('input'); inp.type='radio'; inp.name='q_'+q.id; inp.value=ch.id; inp.id=id; lab.appendChild(inp); const span=document.createElement('span'); span.textContent=((ch.label||'').toUpperCase())+') '+(ch.text||''); lab.appendChild(span); list.appendChild(lab); }); box.appendChild(list); } else { const ta=document.createElement('textarea'); ta.rows=3; ta.name='t_'+q.id; ta.placeholder='Type your answer...'; ta.style.width='100%'; box.appendChild(ta); } quizContainer.appendChild(box); });
-      const actions=document.createElement('div'); actions.className='lesson-quiz-actions-bar'; const submit=document.createElement('button'); submit.type='button'; submit.className='lesson-btn primary'; submit.textContent='Submit Quiz'; const result=document.createElement('div'); result.className='lesson-quiz-result'; result.style.marginTop='8px'; actions.appendChild(submit); quizContainer.appendChild(actions); quizContainer.appendChild(result); quizContainer.hidden=false; submit.addEventListener('click', ()=>submitQuiz(qs, result)); }
+      qs.forEach(q=>{ const box=document.createElement('div'); box.className='lesson-quiz-question'; const h=document.createElement('h3'); h.textContent=q.prompt||''; box.appendChild(h); if(q.qtype==='MULTIPLE_CHOICE'){ const list=document.createElement('div'); list.className='lesson-quiz-choices'; (q.choices||[]).forEach(ch=>{ const id='mq_'+q.id+'_'+ch.id; const lab=document.createElement('label'); lab.setAttribute('for', id); lab.classList.add('rr-flex-row-8'); const inp=document.createElement('input'); inp.type='radio'; inp.name='q_'+q.id; inp.value=ch.id; inp.id=id; lab.appendChild(inp); const span=document.createElement('span'); span.textContent=((ch.label||'').toUpperCase())+') '+(ch.text||''); lab.appendChild(span); list.appendChild(lab); }); box.appendChild(list); } else { const ta=document.createElement('textarea'); ta.rows=3; ta.name='t_'+q.id; ta.placeholder='Type your answer...'; ta.classList.add('rr-w-100'); box.appendChild(ta); } quizContainer.appendChild(box); });
+      const actions=document.createElement('div'); actions.className='lesson-quiz-actions-bar'; const submit=document.createElement('button'); submit.type='button'; submit.className='lesson-btn primary'; submit.textContent='Submit Quiz'; const result=document.createElement('div'); result.className='lesson-quiz-result rr-mt-8'; actions.appendChild(submit); quizContainer.appendChild(actions); quizContainer.appendChild(result); quizContainer.hidden=false; submit.addEventListener('click', ()=>submitQuiz(qs, result)); }
 
     function submitQuiz(qs, resultEl){ let total=0, correct=0; const tasks=[]; qs.forEach(q=>{ if(q.qtype==='MULTIPLE_CHOICE'){ const sel=document.querySelector('input[name="q_'+q.id+'"]:checked'); if(!sel) return; if(q.is_scored) total++; tasks.push(postJSON(attemptUrl,{ question_id:q.id, selected_choice_id: sel.value }).then(resp=>{ if(q.is_scored && resp && resp.is_correct) correct++; }).catch(()=>{})); } else { const ta=document.querySelector('textarea[name="t_'+q.id+'"]'); const text=(ta&&ta.value||'').trim(); if(!text) return; tasks.push(postJSON(attemptUrl,{ question_id:q.id, open_text:text }).catch(()=>{})); } }); Promise.all(tasks).then(()=>{ if(resultEl) resultEl.textContent='You answered '+correct+' of '+total+' correctly.'; }); }
 
-    // Wire YT ended
-    loadYouTubeAPI(()=>{
-      // eslint-disable-next-line no-undef
-      const player = new YT.Player(iframe.id, { events: { onStateChange: (ev)=>{ try{ if(typeof YT!=='undefined' && ev.data===YT.PlayerState.ENDED){ showQuizButton(); } }catch(_){ } } } });
-      modal.__ytPlayer = player;
-    });
+    if (iframe){
+      // Wire YT ended
+      loadYouTubeAPI(()=>{
+        // eslint-disable-next-line no-undef
+        const player = new YT.Player(iframe.id, { events: { onStateChange: (ev)=>{ try{ if(typeof YT!=='undefined' && ev.data===YT.PlayerState.ENDED){ showQuizButton(); } }catch(_){ } } } });
+        modal.__ytPlayer = player;
+      });
+    }
+    if (videoEl){
+      try { videoEl.addEventListener('ended', showQuizButton); } catch(_){ }
+    }
   }
 
   document.addEventListener('DOMContentLoaded', function(){
@@ -51,4 +58,3 @@
     if (modal){ obs.observe(modal, { attributes:true, attributeFilter:['data-lesson','data-iframe-id'] }); }
   });
 })();
-
