@@ -85,7 +85,13 @@ function updateProgress(stepsCompleted) {
   const total = 3;
   const percent = (stepsCompleted / total) * 100;
 
-  document.querySelector(".progress-bar-fill").style.width = `${percent}%`;
+  const fill = document.querySelector('.progress-bar-fill');
+  if (fill){
+    const prev = Array.from(fill.classList).find(c => /^w-\d+$/.test(c));
+    if (prev) fill.classList.remove(prev);
+    const step = Math.max(0, Math.min(100, Math.round(percent/5)*5));
+    fill.classList.add(`w-${step}`);
+  }
   document.getElementById("progressCount").textContent = stepsCompleted;
 }
 
@@ -141,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bindModalEvents();
       })
       .catch(() => {
-        content.innerHTML = '<div style="padding:12px;">Failed to load interviews.</div>';
+        content.innerHTML = '<div class="rr-pad-12">Failed to load interviews.</div>';
         backdrop.classList.remove('hidden');
         modal.classList.remove('hidden');
       });

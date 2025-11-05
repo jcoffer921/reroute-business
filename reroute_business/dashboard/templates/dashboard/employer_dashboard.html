@@ -13,13 +13,13 @@
   <div class="employer-hero-content">
     <h1>Dashboard</h1>
     <p>Take the leap of faith</p>
-    <p style="margin-top:6px; font-size:.9rem;"><a href="{% url 'contact' %}" class="link">Give Feedback</a></p>
+    <p class="mt-6" style="font-size:.9rem;"><a href="{% url 'contact' %}" class="link">Give Feedback</a></p>
   </div>
 </section>
 
 <div class="employer-dashboard container">
   {% if not employer_verified %}
-  <div class="alert warning" role="status" style="margin:12px 0;">
+  <div class="alert warning mb-12 mx-0" role="status">
     <strong>Pending verification:</strong> Your employer account must be verified by ReRoute before you can post jobs. Complete your profile and we’ll review shortly.
   </div>
   {% endif %}
@@ -41,9 +41,9 @@
         <a href="{{ PROFILE_URL }}" class="btn btn-secondary" title="Edit Employer Profile">
           <i class="fas fa-building"></i> Profile
         </a>
-        <form method="get" class="sort-form" style="display:inline-flex; align-items:center; gap:.5rem;">
+        <form method="get" class="sort-form d-inline-flex ai-center gap-8">
           <label for="sort_by">Sort by:</label>
-          <select id="sort_by" name="sort_by" onchange="this.form.submit()">
+          <select id="sort_by" name="sort_by">
             <option value="newest" {% if sort_by == 'newest' or not sort_by %}selected{% endif %}>Newest</option>
             <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Oldest</option>
           </select>
@@ -71,7 +71,7 @@
             </span>
           </td>
           <td>
-            <form method="post" action="{% url 'dashboard:employer_job_toggle' job.id %}" style="display:inline;">
+            <form method="post" action="{% url 'dashboard:employer_job_toggle' job.id %}" class="d-inline">
               {% csrf_token %}
               <button type="submit" class="btn btn-sm {% if job.is_active %}btn-outline{% else %}btn-primary{% endif %}" title="Toggle active/inactive">
                 {% if job.is_active %}Close{% else %}Open{% endif %}
@@ -92,8 +92,8 @@
 
   <!-- 📈 Analytics Summary -->
   <section class="analytics-section">
-    <div class="section-header" style="justify-content: space-between; align-items: center; margin-bottom:.5rem;">
-      <h2 class="section-title" style="margin:0;">Analytics</h2>
+    <div class="section-header d-flex jc-between ai-center mb-8">
+      <h2 class="section-title m-0">Analytics</h2>
       <a href="{% url 'dashboard:employer_analytics' %}" class="btn btn-secondary btn-sm" title="Open full Analytics">Open Analytics</a>
     </div>
     <div class="analytics-cards">
@@ -124,8 +124,8 @@
   </section>
 
   <!-- 🧑‍🤝‍🧑 Matcher (Full-width card) -->
-  <section class="card" style="margin-bottom: 1.5rem;">
-    <div class="section-header" style="margin-bottom:.5rem; justify-content: space-between; align-items:center;">
+  <section class="card mb-12">
+    <div class="section-header mb-8 d-flex jc-between ai-center">
       <h2>Matcher</h2>
       <a href="{% url 'dashboard:employer_matcher' %}" class="btn btn-secondary btn-sm" title="Open full Matcher">Open Matcher</a>
     </div>
@@ -133,7 +133,7 @@
       <ul class="list-group">
         {% for item in matched_seekers %}
           <li>
-            <div style="display:flex; justify-content: space-between; align-items:center; gap:.5rem;">
+            <div class="d-flex jc-between ai-center gap-8">
               <div>
                 <strong>
                   <a href="{% url 'profiles:public_profile' item.user.username %}">
@@ -156,8 +156,8 @@
   <section class="grid-2col">
     <!-- Notifications -->
     <div class="card">
-      <div class="section-header" style="justify-content: space-between; align-items: center;">
-        <h3 style="margin:0;">Notifications</h3>
+      <div class="section-header d-flex jc-between ai-center">
+        <h3 class="m-0">Notifications</h3>
         <form method="post" action="{% url 'dashboard:notifications' %}" style="margin:0;">
           {% csrf_token %}
           <input type="hidden" name="action" value="mark_all_read">
@@ -363,4 +363,7 @@
     document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
   })();
 </script>
+{% endblock %}
+{% block extra_js %}
+  <script src="{% static 'dashboard/js/employer_dashboard.js' %}" defer></script>
 {% endblock %}

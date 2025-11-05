@@ -10,7 +10,7 @@
 
 
 <!-- Login Status Message -->
-<div style="text-align: center; margin-top: 1rem;">
+<div class="rr-center rr-mt-4">
     {% if user.is_authenticated %}
         <p>You are logged in as <strong>{{ user.username }}</strong>.</p>
     {% else %}
@@ -73,7 +73,7 @@
 </section>
 
 <section id="vision" class="vision-split">
-  <div class="vision-inner" style="--vision-overlay: rgba(0,109,160,0.92); --vision-bg: var(--neutral-gray); --vision-min-h: 80vh;">
+  <div class="vision-inner vision-theme-primary">
     <div class="vision-left">
       <h2>Our Vision</h2>
       <p>At ReRoute, our vision is to break down the stigma surrounding men and women navigating the reentry process. We are building a community that embraces second chances, a space where individuals once shut out by society are supported, not judged.</p>

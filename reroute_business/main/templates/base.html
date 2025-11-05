@@ -26,7 +26,7 @@
                     <a href="{% url 'about_us' %}">About Us</a>
                     <a href="{% url 'home' %}">Home</a>
                     <div class="nav-item has-dropdown">
-                        <a href="#" onclick="return false;" aria-haspopup="true" aria-expanded="false">Opportunities</a>
+                        <a href="#" class="no-nav" aria-haspopup="true" aria-expanded="false">Opportunities</a>
                         <div class="nav-dropdown" role="menu" aria-label="Opportunities submenu">
                             <a href="{% url 'opportunities' %}">Jobs</a>
                                 <a href="{% url 'reentry_org:organization_catalog' %}">Reentry Organizations</a>
@@ -48,7 +48,7 @@
                                 <a href="{{ PROFILE_URL }}">Profile</a>
                                 <a href="{% url 'contact' %}">Report Issues</a>
                                 <a href="{% url 'settings' %}">Settings</a>
-                                <form method="POST" action="{% url 'logout' %}" style="margin: 0;">
+                                <form method="POST" action="{% url 'logout' %}" class="m-0">
                                     {% csrf_token %}
                                     <button type="submit" class="logout-btn">Sign out</button>
                                 </form>
@@ -81,7 +81,7 @@
                         <a href="{{ PROFILE_URL }}">Profile</a>
                         <a href="{% url 'contact' %}">Report Issues</a>
                         <a href="{% url 'settings' %}">Settings</a>
-                        <form method="POST" action="{% url 'logout' %}" style="margin: 0;">
+                        <form method="POST" action="{% url 'logout' %}" class="m-0">
                             {% csrf_token %}
                             <button type="submit" class="logout-btn">Sign out</button>
                         </form>
@@ -100,7 +100,7 @@
                 {% for message in messages %}
                     <div class="alert {{ message.tags }}">
                         <span class="alert-text">{{ message }}</span>
-                        <button class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+                        <button class="close-btn" data-close-alert>&times;</button>
                     </div>
                 {% endfor %}
             </div>

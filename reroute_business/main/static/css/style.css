@@ -229,6 +229,39 @@ iframe { max-width: 100%; border: 0; }
   z-index: 1999;
   display: none;                          /* JS shows/hides */
 }
+.mobile-backdrop.show { display: block; }
+.m-0 { margin: 0 !important; }
+.rr-center { text-align: center; }
+.rr-mt-4 { margin-top: 1rem; }
+.rel { position: relative; }
+.cursor-pointer { cursor: pointer; }
+.autocomplete-list { position: absolute; z-index: 100; background: #fff; width: 100%; max-height: 200px; overflow-y: auto; display: none; border: 1px solid #e5e7eb; border-radius: 6px; }
+.autocomplete-list.show { display: block; }
+.autocomplete-item { padding: 8px 10px; cursor: pointer; }
+.autocomplete-item:hover { background: #f3f4f6; }
+.rr-pad-12 { padding: 12px; }
+.opacity-60 { opacity: .6; }
+.opacity-100 { opacity: 1; }
+
+/* Utility layout classes for CSP-safe replacements */
+.d-flex{display:flex}.d-inline{display:inline}.d-inline-flex{display:inline-flex}
+.fw-wrap{flex-wrap:wrap}
+.ai-center{align-items:center}.jc-between{justify-content:space-between}
+.gap-4{gap:.25rem}.gap-6{gap:.375rem}.gap-8{gap:.5rem}.gap-10{gap:.625rem}.gap-12{gap:.75rem}
+.mt-6{margin-top:6px}.mt-8{margin-top:8px}.mt-10{margin-top:10px}
+.mb-6{margin-bottom:6px}.mb-8{margin-bottom:.5rem}.mb-12{margin-bottom:12px}
+.mt-16{margin-top:16px}
+.m-0{margin:0!important}.mx-0{margin-left:0;margin-right:0}
+.px-10{padding-left:10px;padding-right:10px}.py-8{padding-top:8px;padding-bottom:8px}
+.p-8{padding:8px}.p-8-10{padding:8px 10px}
+.min-w-220{min-width:220px}
+.b1-ddd{border:1px solid #ddd}.br-6{border-radius:6px}.br-8{border-radius:8px}
+.flex-1{flex:1}
+.visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
+.text-gray-500{color:#6b7280}
+.mt--4{margin-top:-4px}
+/* Progress width utility classes (5% steps) */
+.w-0{width:0%}.w-5{width:5%}.w-10{width:10%}.w-15{width:15%}.w-20{width:20%}.w-25{width:25%}.w-30{width:30%}.w-35{width:35%}.w-40{width:40%}.w-45{width:45%}.w-50{width:50%}.w-55{width:55%}.w-60{width:60%}.w-65{width:65%}.w-70{width:70%}.w-75{width:75%}.w-80{width:80%}.w-85{width:85%}.w-90{width:90%}.w-95{width:95%}.w-100{width:100%}
 
 @media (max-width: 768px) {
   /* Navbar compresses on mobile */
@@ -1311,4 +1344,23 @@ select {
 .save-btn:hover {
   background-color: #004182;
 }
+
+
+/* Vision theme variables (instead of inline CSS vars) */
+.vision-theme-primary { --vision-overlay: rgba(0,109,160,0.92); --vision-bg: var(--neutral-gray); --vision-min-h: 80vh; }
+
+/* Employer public parallax steps (CSS-driven, 0..10) */
+.employer-public.parallax-step-0  .hero-bg{ transform: translateY(0); opacity: 1; }
+.employer-public.parallax-step-1  .hero-bg{ transform: translateY(2px); opacity: .965; }
+.employer-public.parallax-step-2  .hero-bg{ transform: translateY(4px); opacity: .93; }
+.employer-public.parallax-step-3  .hero-bg{ transform: translateY(6px); opacity: .895; }
+.employer-public.parallax-step-4  .hero-bg{ transform: translateY(8px); opacity: .86; }
+.employer-public.parallax-step-5  .hero-bg{ transform: translateY(10px); opacity: .825; }
+.employer-public.parallax-step-6  .hero-bg{ transform: translateY(12px); opacity: .79; }
+.employer-public.parallax-step-7  .hero-bg{ transform: translateY(14px); opacity: .755; }
+.employer-public.parallax-step-8  .hero-bg{ transform: translateY(16px); opacity: .72; }
+.employer-public.parallax-step-9  .hero-bg{ transform: translateY(18px); opacity: .685; }
+.employer-public.parallax-step-10 .hero-bg{ transform: translateY(20px); opacity: .65; }
+.employer-public.parallax-step-0  .hero-watermark{ transform: translateY(0); opacity: .12; }
+.employer-public.parallax-step-10 .hero-watermark{ transform: translateY(14px); opacity: .08; }
 

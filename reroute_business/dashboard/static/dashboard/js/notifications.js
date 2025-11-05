@@ -50,9 +50,9 @@
 
   function updateEmptyState(filter) {
     // Count visible cards after filter applied
-    const visible = cards.filter(c => c.style.display !== 'none');
+    const visible = cards.filter(c => !c.hasAttribute('hidden'));
     if (visible.length > 0) {
-      if (emptyState) emptyState.style.display = 'none';
+      if (emptyState) emptyState.setAttribute('hidden','');
       return;
     }
     if (!emptyState) return;
@@ -66,7 +66,7 @@
       tips: 'No tips to show yet.'
     };
     emptyState.querySelector('.empty-text').textContent = map[filter] || map.all;
-    emptyState.style.display = '';
+    emptyState.removeAttribute('hidden');
   }
 
   function setActive(tab) {
@@ -75,9 +75,10 @@
     const filter = tab.getAttribute('data-filter');
     cards.forEach(c => {
       if (filter === 'all') {
-        c.style.display = '';
+        c.removeAttribute('hidden');
       } else {
-        c.style.display = (c.getAttribute('data-type') === filter) ? '' : 'none';
+        const ok = (c.getAttribute('data-type') === filter);
+        if (ok) c.removeAttribute('hidden'); else c.setAttribute('hidden','');
       }
     });
     updateEmptyState(filter);
@@ -141,13 +142,9 @@
     drawerMsg.textContent = fromCard.getAttribute('data-message') || '';
     drawerTime.textContent = fromCard.getAttribute('data-time') || '';
     const url = fromCard.getAttribute('data-url');
-    if (url) {
-      drawerLink.style.display = '';
-      drawerLink.setAttribute('href', url);
-    } else {
-      drawerLink.style.display = 'none';
-    }
-    overlay.style.display = 'block';
+    if (url) { drawerLink.removeAttribute('hidden'); drawerLink.setAttribute('href', url); }
+    else { drawerLink.setAttribute('hidden',''); }
+    overlay.removeAttribute('hidden');
     drawer.classList.add('open');
     drawer.setAttribute('aria-hidden', 'false');
 
@@ -163,7 +160,7 @@
     if (!drawer || !overlay) return;
     drawer.classList.remove('open');
     drawer.setAttribute('aria-hidden', 'true');
-    overlay.style.display = 'none';
+    overlay.setAttribute('hidden','');
   }
   closeBtns.forEach(btn => btn && btn.addEventListener('click', closeDrawer));
   if (overlay) overlay.addEventListener('click', closeDrawer);
@@ -210,7 +207,6 @@
           a.appendChild(badge);
         }
         badge.textContent = String(count);
-        badge.style.display = '';
       } else if (badge) {
         badge.remove();
       }

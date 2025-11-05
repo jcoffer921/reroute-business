@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const spinner = btn ? btn.querySelector('.spinner') : null;
     const label   = btn ? btn.querySelector('.btn-text') : null;
     if (btn) btn.disabled = true;
-    if (spinner && label) { spinner.style.display = 'inline-block'; label.style.display = 'none'; }
+    if (spinner && label) { spinner.removeAttribute('hidden'); label.setAttribute('hidden',''); }
 
     try {
       const resp = await fetch(form.action, {
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       alert('Network error. Please try again.');
     } finally {
-      if (spinner && label) { spinner.style.display = 'none'; label.style.display = 'inline'; }
+      if (spinner && label) { spinner.setAttribute('hidden',''); label.removeAttribute('hidden'); }
       if (btn) btn.disabled = false;
     }
   }
@@ -398,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showDropdown(items) {
       if (!dropdown) return;
       dropdown.innerHTML = '';
-      if (!items.length) { dropdown.style.display = 'none'; return; }
+      if (!items.length) { dropdown.setAttribute('hidden',''); return; }
       items.forEach(it => {
         const div = document.createElement('div');
         div.className = 'dropdown-item';
@@ -406,12 +406,10 @@ document.addEventListener('DOMContentLoaded', () => {
         div.addEventListener('click', () => { addSkill(it); input.value=''; });
         dropdown.appendChild(div);
       });
-      dropdown.style.display = 'block';
+      dropdown.removeAttribute('hidden');
     }
 
-    function hideDropdown() {
-      if (dropdown) dropdown.style.display = 'none';
-    }
+    function hideDropdown() { if (dropdown) dropdown.setAttribute('hidden',''); }
 
     /* ---------------- Events ---------------- */
     input.addEventListener('input', () => {
@@ -494,9 +492,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const short = qs('#bioPreview');
     const full  = qs('#fullBio');
     if (!short || !full) return;
-    const showingFull = full.style.display === 'block';
-    full.style.display  = showingFull ? 'none'  : 'block';
-    short.style.display = showingFull ? 'block' : 'none';
+    const showingFull = !full.hasAttribute('hidden');
+    if (showingFull) { full.setAttribute('hidden',''); short.removeAttribute('hidden'); }
+    else { full.removeAttribute('hidden'); short.setAttribute('hidden',''); }
   };
 
   // Show/hide the Bio edit form
@@ -505,10 +503,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const short = qs('#bioPreview');
     const full  = qs('#fullBio');
     if (!form) return;
-    const showing = form.style.display === 'block';
-    form.style.display  = showing ? 'none' : 'block';
-    // Hide the previews when editing; restore short preview when closing
-    if (!showing) { if (short) short.style.display = 'none'; if (full) full.style.display = 'none'; }
-    else          { if (short) short.style.display = 'block'; }
+    const showing = !form.hasAttribute('hidden');
+    if (showing) { form.setAttribute('hidden',''); if (short) short.removeAttribute('hidden'); }
+    else { form.removeAttribute('hidden'); if (short) short.setAttribute('hidden',''); if (full) full.setAttribute('hidden',''); }
   };
 });

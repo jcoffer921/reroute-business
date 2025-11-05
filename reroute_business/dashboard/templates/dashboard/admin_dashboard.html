@@ -139,11 +139,11 @@
           <td>{{ job.flagged_reason|default:"(no reason provided)" }}</td>
           <td>
             <a href="{% url 'admin:job_list_job_change' job.id %}">Review</a> |
-            <form action="{% url 'dashboard:approve_flagged_job' job.id %}" method="post" style="display:inline;" class="js-confirm" data-message="Approve this job? It will be unflagged and activated.">
+            <form action="{% url 'dashboard:approve_flagged_job' job.id %}" method="post" class="js-confirm d-inline" data-message="Approve this job? It will be unflagged and activated.">
               {% csrf_token %}
               <button type="submit" class="link-button">Approve</button>
             </form> |
-            <form action="{% url 'dashboard:remove_flagged_job' job.id %}" method="post" style="display:inline;" class="js-confirm" data-message="Remove (deactivate) this job? It will no longer be visible to seekers.">
+            <form action="{% url 'dashboard:remove_flagged_job' job.id %}" method="post" class="js-confirm d-inline" data-message="Remove (deactivate) this job? It will no longer be visible to seekers.">
               {% csrf_token %}
               <button type="submit" class="link-button danger">Remove</button>
             </form>
@@ -183,24 +183,15 @@
   <button type="button" class="rr-modal__backdrop" aria-label="Close"></button>
 </div>
 <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-<script>
-  window.dashboardData = {
-    dates: {{ dates|safe }},
-    usersByDay: {{ users_by_day|safe }},
-    jobsByDay: {{ jobs_by_day|safe }},
-    applicationsByDay: {{ applications_by_day|default:'[]'|safe }},
-    employersByDay: {{ employers_by_day|default:'[]'|safe }}
-  };
-  // Hide empty slides early if no data
-  document.addEventListener('DOMContentLoaded', function () {
-    const data = window.dashboardData || {};
-    const slides = document.querySelectorAll('.charts-carousel__slide');
-    slides.forEach(slide => {
-      const id = (slide.querySelector('.plotly-chart') || {}).id;
-      if (id === 'applicationsChart' && (!data.applicationsByDay || !data.applicationsByDay.length)) slide.remove();
-      if (id === 'employersChart' && (!data.employersByDay || !data.employersByDay.length)) slide.remove();
-    });
-  });
-  </script>
+<script id="admin-dashboard-data" type="application/json">
+  {
+    "dates": {{ dates|safe }},
+    "usersByDay": {{ users_by_day|safe }},
+    "jobsByDay": {{ jobs_by_day|safe }},
+    "applicationsByDay": {{ applications_by_day|default:'[]'|safe }},
+    "employersByDay": {{ employers_by_day|default:'[]'|safe }}
+  }
+</script>
+<script src="{% static 'dashboard/js/admin_dashboard_boot.js' %}"></script>
 <script src="{% static 'dashboard/js/admin_dashboard.js' %}"></script>
 {% endblock %}

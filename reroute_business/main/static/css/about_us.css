@@ -209,3 +209,35 @@
   .about-cta .btn-primary, .about-cta .btn-secondary{ width:100%; text-align:center; }
 }
 
+/* Progressive mission effects without inline styles (steps 0..10) */
+.about-mission.static .mission-content{ opacity:1; transform:none; }
+.about-mission.static .mission-overlay{ background: rgba(255,255,255,.35); }
+.about-mission .mission-content{ opacity:1; transition: opacity .3s ease, transform .3s ease; }
+/* Map step to overlay opacity and content lift */
+/* step 0 .. 10 → overlay .35..0.95 and translateY 0 .. -20px */
+/* Overlay */
+/* Using multiple classes for clarity */
+@for $i from 0 through 0 {}
+.about-mission.mission-step-0  .mission-overlay{ background: rgba(255,255,255,.35); }
+.about-mission.mission-step-1  .mission-overlay{ background: rgba(255,255,255,.41); }
+.about-mission.mission-step-2  .mission-overlay{ background: rgba(255,255,255,.47); }
+.about-mission.mission-step-3  .mission-overlay{ background: rgba(255,255,255,.53); }
+.about-mission.mission-step-4  .mission-overlay{ background: rgba(255,255,255,.59); }
+.about-mission.mission-step-5  .mission-overlay{ background: rgba(255,255,255,.65); }
+.about-mission.mission-step-6  .mission-overlay{ background: rgba(255,255,255,.71); }
+.about-mission.mission-step-7  .mission-overlay{ background: rgba(255,255,255,.77); }
+.about-mission.mission-step-8  .mission-overlay{ background: rgba(255,255,255,.83); }
+.about-mission.mission-step-9  .mission-overlay{ background: rgba(255,255,255,.89); }
+.about-mission.mission-step-10 .mission-overlay{ background: rgba(255,255,255,.95); }
+/* Content lift */
+.about-mission.mission-step-0  .mission-content{ transform: translateY(0); }
+.about-mission.mission-step-1  .mission-content{ transform: translateY(-2px); }
+.about-mission.mission-step-2  .mission-content{ transform: translateY(-4px); }
+.about-mission.mission-step-3  .mission-content{ transform: translateY(-6px); }
+.about-mission.mission-step-4  .mission-content{ transform: translateY(-8px); }
+.about-mission.mission-step-5  .mission-content{ transform: translateY(-10px); }
+.about-mission.mission-step-6  .mission-content{ transform: translateY(-12px); }
+.about-mission.mission-step-7  .mission-content{ transform: translateY(-14px); }
+.about-mission.mission-step-8  .mission-content{ transform: translateY(-16px); }
+.about-mission.mission-step-9  .mission-content{ transform: translateY(-18px); }
+.about-mission.mission-step-10 .mission-content{ transform: translateY(-20px); }

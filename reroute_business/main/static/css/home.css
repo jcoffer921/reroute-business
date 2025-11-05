@@ -15,13 +15,15 @@
 /* Wrapper holds all slides in a single row */
 .slides-wrapper {
   display: flex;
-  width: 100%;            /* JS will expand this to N*100% */
-  will-change: transform; /* smoother GPU-accelerated transform */
+  width: 100%;
+  overflow: hidden;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
 }
 
 /* Each slide gets an equal fraction of the wrapper width via JS */
 /* Base slide (non-hero contexts) */
-.slide { padding: 1.5rem; box-sizing: border-box; }
+.slide { padding: 1.5rem; box-sizing: border-box; flex: 0 0 100%; scroll-snap-align: start; }
 
 /* Blog hero */
 .blog-hero { background: #0b0f19; border: none; width: 100vw; margin-left: calc(50% - 50vw); border-radius: 0; }
@@ -136,6 +138,19 @@
 
 .slider-btn.prev { left: .75rem; }
 .slider-btn.next { right: .75rem; }
+
+/* reveal-up stagger delay helpers to avoid inline styles */
+.delay-0{transition-delay:0ms}
+.delay-1{transition-delay:120ms}
+.delay-2{transition-delay:240ms}
+.delay-3{transition-delay:360ms}
+.delay-4{transition-delay:480ms}
+.delay-5{transition-delay:600ms}
+.delay-6{transition-delay:720ms}
+.delay-7{transition-delay:840ms}
+.delay-8{transition-delay:960ms}
+.delay-9{transition-delay:1080ms}
+.delay-10{transition-delay:1200ms}
 
 /* Simple triangles using borders */
 .arrow-triangle {

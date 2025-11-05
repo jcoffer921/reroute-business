@@ -26,9 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = it.querySelector('.faq-q span')?.textContent?.toLowerCase() || '';
         const body = it.querySelector('.faq-a')?.textContent?.toLowerCase() || '';
         const match = !q || text.includes(q) || body.includes(q);
-        it.style.display = match ? '' : 'none';
+    if (match) it.removeAttribute('hidden'); else it.setAttribute('hidden','');
       });
     });
   }
 });
-

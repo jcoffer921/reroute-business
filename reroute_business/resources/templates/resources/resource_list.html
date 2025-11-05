@@ -155,41 +155,4 @@
 
 {% block extra_js %}
   <script src="{% static 'resources/js/resource.js' %}" defer></script>
-  <script>
-    (function(){
-      // HTML5 video completion messages
-      document.querySelectorAll('.module-html5').forEach(function(v){
-        v.addEventListener('ended', function(){
-          var t = v.getAttribute('data-completion-target');
-          if (t) {
-            var el = document.getElementById(t);
-            if (el) el.style.display = 'block';
-          }
-        });
-      });
-
-      // YouTube iframe completion via Iframe API
-      var ytIframes = document.querySelectorAll('iframe.yt-embed');
-      if (ytIframes.length) {
-        var tag = document.createElement('script');
-        tag.src = 'https://www.youtube.com/iframe_api';
-        document.head.appendChild(tag);
-        window.onYouTubeIframeAPIReady = function(){
-          ytIframes.forEach(function(ifr){
-            var completeId = ifr.getAttribute('data-completion-target') || '';
-            new YT.Player(ifr.id, {
-              events: {
-                onStateChange: function(e){
-                  if (e.data === YT.PlayerState.ENDED) {
-                    var el = document.getElementById(completeId);
-                    if (el) el.style.display = 'block';
-                  }
-                }
-              }
-            });
-          });
-        };
-      }
-    })();
-  </script>
 {% endblock %}

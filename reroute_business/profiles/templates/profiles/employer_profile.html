@@ -42,10 +42,10 @@
         {% if employer_profile.verified or employer_profile.user.profile.verified %}
           <span class="hero-verified hero-verified--sm">Verified</span>
         {% else %}
-          <span class="hero-verified hero-verified--sm" style="color:#fcd34d;background:rgba(252,211,77,.14);border-color:rgba(252,211,77,.5)">Pending Verification</span>
+          <span class="hero-verified hero-verified--sm hero-verified--pending">Pending Verification</span>
         {% endif %}
       </div>
-      <button id="openEditPanel" class="btn btn-primary" type="button" style="margin-left:12px;">Edit Profile</button>
+      <button id="openEditPanel" class="btn btn-primary" type="button">Edit Profile</button>
     </div>
   </section>
 
@@ -54,7 +54,7 @@
   <section class="section section-about">
     <div class="info-header">
       <h2 class="section-title">About Us</h2>
-      <button class="edit-btn" type="button" onclick="document.getElementById('openEditPanel')?.click()">Edit</button>
+      <button class="edit-btn" type="button" data-open-edit>Edit</button>
     </div>
     <div class="about-text">
       {{ employer_profile.description|default:"Tell candidates about your mission, culture, and values."|linebreaksbr }}
@@ -97,9 +97,9 @@
   <section class="section section-info">
     <div class="info-header">
       <h2 class="section-title">Additional Info</h2>
-      <button class="edit-btn" type="button" onclick="document.getElementById('openEditPanel')?.click()">Edit</button>
+      <button class="edit-btn" type="button" data-open-edit>Edit</button>
     </div>
-    <div class="info-grid" style="background: transparent; border: 0; box-shadow: none; padding: 0;">
+    <div class="info-grid info-grid--plain">
       <div class="info-item">
         <div class="label">Address</div>
         <div class="value">
@@ -163,18 +163,5 @@
 
 {% block extra_js %}
   <script src="{% static 'js/employer_public_profile.js' %}"></script>
-  <script>
-    (function(){
-      const openBtn = document.getElementById('openEditPanel');
-      const panel = document.getElementById('editPanel');
-      const closeBtn = document.getElementById('closeEditPanel');
-      const cancelInside = document.getElementById('cancelInside');
-      function open(){ if(!panel) return; panel.classList.remove('hidden'); panel.classList.add('active'); panel.setAttribute('aria-hidden','false'); }
-      function close(){ if(!panel) return; panel.classList.remove('active'); panel.classList.add('hidden'); panel.setAttribute('aria-hidden','true'); }
-      if (openBtn) openBtn.addEventListener('click', open);
-      if (closeBtn) closeBtn.addEventListener('click', close);
-      if (cancelInside) cancelInside.addEventListener('click', close);
-      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
-    })();
-  </script>
+  <script src="{% static 'js/employer_profile_panel.js' %}" defer></script>
 {% endblock %}

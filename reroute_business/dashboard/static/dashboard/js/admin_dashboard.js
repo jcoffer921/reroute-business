@@ -74,7 +74,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function update() {
       slides = Array.from(carousel.querySelectorAll('.charts-carousel__slide'));
-      track.style.transform = `translateX(-${index * 100}%)`;
+      // Use scroll position on the track container to avoid inline styles
+      const viewport = track.parentElement || carousel;
+      const left = (viewport.clientWidth || 0) * index;
+      try { viewport.scrollTo({ left, behavior: 'smooth' }); } catch(_) { viewport.scrollLeft = left; }
       dotsWrap.querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-selected', i === index ? 'true' : 'false'));
       setTimeout(() => {
         const ids = ['usersChart','jobsChart','applicationsChart','employersChart'];
@@ -83,7 +86,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (target) { try { Plotly.Plots.resize(target); } catch(e){} }
       }, 0);
       const show = slides.length > 1;
-      [prevBtn, nextBtn, dotsWrap].forEach(el => { if (el) el.style.display = show ? '' : 'none'; });
+      [prevBtn, nextBtn, dotsWrap].forEach(el => {
+        if (!el) return;
+        if (show) el.removeAttribute('hidden'); else el.setAttribute('hidden','');
+      });
     }
     function goTo(i) { index = Math.max(0, Math.min(slides.length - 1, i)); update(); }
     function next() { goTo(index + 1); }

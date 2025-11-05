@@ -7,7 +7,7 @@
     grid.querySelectorAll('.learning-video-card').forEach(function(card){
       var c = (card.getAttribute('data-category')||'').toLowerCase();
       var ok = !cat || cat==='all' || c===cat;
-      card.style.display = ok ? '' : 'none';
+      if (ok) card.removeAttribute('hidden'); else card.setAttribute('hidden','');
     });
   }
 
@@ -32,4 +32,3 @@
     applyFilter(cat0.toLowerCase()||'all');
   }catch(_){ applyFilter('all'); }
 })();
-

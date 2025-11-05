@@ -10,12 +10,12 @@
   const bgInput = document.getElementById('bgFileInput');
   const bgPreview = document.getElementById('bgPreview');
 
-  const openBg = () => { if (bgModal) bgModal.style.display = 'block'; };
-  const closeBg = () => { if (bgModal) bgModal.style.display = 'none'; };
+  const openBg = () => { if (bgModal) bgModal.removeAttribute('hidden'); };
+  const closeBg = () => { if (bgModal) bgModal.setAttribute('hidden',''); };
 
   // Open background modal when clicking the hero background
   if (heroBg && bgModal) {
-    heroBg.style.cursor = 'pointer';
+    heroBg.classList.add('cursor-pointer');
     heroBg.addEventListener('click', (e) => {
       // Avoid triggering when clicking inside overlaid content
       if (e.target.closest('.hero-content')) return;
@@ -39,16 +39,13 @@
     let bgObjectURL = null;
     bgInput.addEventListener('change', () => {
       const file = bgInput.files && bgInput.files[0];
-      if (!file) { bgPreview.style.display = 'none'; return; }
+      if (!file) { bgPreview.setAttribute('hidden',''); return; }
       if (bgObjectURL) URL.revokeObjectURL(bgObjectURL);
       bgObjectURL = URL.createObjectURL(file);
       // Show preview inside modal
       bgPreview.src = bgObjectURL;
-      bgPreview.style.display = 'block';
-      // Live-preview on hero background
-      if (heroBg) {
-        heroBg.style.backgroundImage = "url('" + bgObjectURL + "')";
-      }
+      bgPreview.removeAttribute('hidden');
+      // For CSP, skip setting hero background inline; preview remains in modal only
     });
   }
 
@@ -57,22 +54,22 @@
   const profilePicFormInput = document.getElementById('modalPicInput');
   const avatarPreview = document.getElementById('previewImage');
   if (heroLogo && picModal) {
-    heroLogo.style.cursor = 'pointer';
+    heroLogo.classList.add('cursor-pointer');
     heroLogo.addEventListener('click', () => {
-      picModal.style.display = 'block';
+      picModal.removeAttribute('hidden');
       // Trigger file picker immediately for convenience
       if (profilePicFormInput) profilePicFormInput.click();
     });
     document.querySelectorAll('[data-open-avatar]').forEach(el => el.addEventListener('click', () => {
-      picModal.style.display = 'block';
+      picModal.removeAttribute('hidden');
       if (profilePicFormInput) profilePicFormInput.click();
     }));
     // Close when clicking outside inner dialog
     picModal.addEventListener('click', (e) => {
-      if (e.target === picModal) { picModal.style.display = 'none'; }
+      if (e.target === picModal) { picModal.setAttribute('hidden',''); }
     });
     const closeAvatar = document.querySelector('[data-close-avatar]');
-    if (closeAvatar) closeAvatar.addEventListener('click', () => { picModal.style.display = 'none'; });
+    if (closeAvatar) closeAvatar.addEventListener('click', () => { picModal.setAttribute('hidden',''); });
   }
 
   // Live preview profile picture selection (modal + hero)
@@ -80,12 +77,12 @@
     let picObjectURL = null;
     profilePicFormInput.addEventListener('change', () => {
       const file = profilePicFormInput.files && profilePicFormInput.files[0];
-      if (!file) { if (avatarPreview) avatarPreview.style.display = 'none'; return; }
+      if (!file) { if (avatarPreview) avatarPreview.setAttribute('hidden',''); return; }
       if (picObjectURL) URL.revokeObjectURL(picObjectURL);
       picObjectURL = URL.createObjectURL(file);
       if (avatarPreview) {
         avatarPreview.src = picObjectURL;
-        avatarPreview.style.display = 'block';
+        avatarPreview.removeAttribute('hidden');
       }
       // Update hero avatar immediately
       if (heroLogo) {
@@ -95,7 +92,6 @@
           // Replace initials div with an <img>
           const img = document.createElement('img');
           img.className = heroLogo.className;
-          img.style.cssText = heroLogo.style.cssText;
           img.alt = 'Profile avatar preview';
           img.src = picObjectURL;
           heroLogo.replaceWith(img);

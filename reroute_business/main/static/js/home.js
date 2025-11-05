@@ -23,10 +23,8 @@
 
   // 3) Set dynamic widths so each slide fills the viewport
   function setSizes() {
-    const total = slides.length;
-    wrapper.style.width = `${total * 100}%`;
-    slides.forEach(s => { s.style.width = `${100 / total}%`; });
-    goTo(index, false);   // re-apply transform after resize without animation
+    // Using CSS flex + scroll snapping; no inline styles needed.
+    goTo(index, false);
   }
 
   // 4) Build clickable dots
@@ -57,12 +55,9 @@
     if (isAnimating) return;
     index = Math.max(0, Math.min(i, slides.length - 1));
     isAnimating = true;
-
-    // Toggle CSS transition for smooth vs instant
-    wrapper.style.transition = animate ? 'transform 300ms ease' : 'none';
-    wrapper.style.transform = `translateX(-${index * (100 / slides.length)}%)`;
-
-    setTimeout(() => { isAnimating = false; }, animate ? 320 : 0);
+    const left = index * wrapper.clientWidth;
+    try { wrapper.scrollTo({ left, behavior: animate ? 'smooth' : 'auto' }); } catch(_) { wrapper.scrollLeft = left; }
+    setTimeout(() => { isAnimating = false; }, animate ? 350 : 0);
     updateDots();
   }
 
@@ -125,8 +120,8 @@
   }, { threshold: 0.2 });
 
   items.forEach((el, i) => {
-    // Stagger effect via transition delay
-    el.style.transitionDelay = `${i * 120}ms`;
+    const d = Math.min(10, Math.max(0, Math.round(i)));
+    el.classList.add(`delay-${d}`);
     obs.observe(el);
   });
 })();

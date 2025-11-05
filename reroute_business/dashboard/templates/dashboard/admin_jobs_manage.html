@@ -7,9 +7,9 @@
   <h1>Manage Jobs</h1>
 
   <section>
-    <form method="get" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-      <input type="text" name="q" value="{{ q }}" placeholder="Search title, employer, location" style="flex:1; min-width:220px; padding:8px 10px; border:1px solid #ddd; border-radius:8px;" />
-      <select name="status" style="padding:8px 10px; border:1px solid #ddd; border-radius:8px;">
+    <form method="get" class="d-flex gap-10 fw-wrap ai-center">
+      <input type="text" name="q" value="{{ q }}" placeholder="Search title, employer, location" class="flex-1 min-w-220 p-8-10 b1-ddd br-8" />
+      <select name="status" class="p-8-10 b1-ddd br-8">
         <option value="">All</option>
         <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
         <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option>
@@ -40,7 +40,7 @@
         <td>{% if job.is_flagged %}⚠️{% else %}—{% endif %}</td>
         <td>{% if job.created_at %}{{ job.created_at|date:"M d, Y" }}{% else %}—{% endif %}</td>
         <td>
-          <form method="post" action="{% url 'dashboard:admin_job_toggle_active' job.id %}" class="js-confirm" data-message="Toggle active for this job?" style="display:inline;">
+          <form method="post" action="{% url 'dashboard:admin_job_toggle_active' job.id %}" class="js-confirm d-inline" data-message="Toggle active for this job?">
             {% csrf_token %}
             <button type="submit" class="link-button">{% if job.is_active %}Deactivate{% else %}Activate{% endif %}</button>
           </form>

@@ -234,24 +234,11 @@
     <p>This Privacy Policy and Terms of Use outline our commitment to transparency, security, and compliance for all users. By using ReRoute, users agree to these terms.</p>
 
   </div>
-  <button onclick="scrollToTop()" id="backToTopBtn" title="Go to top">↑</button>
+  <button id="backToTopBtn" data-backtotop title="Go to top">↑</button>
 
 </div>
-<script>
-  // Show the button after user scrolls down
-  window.onscroll = function () {
-    const btn = document.getElementById("backToTopBtn");
-    if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
-      btn.style.display = "block";
-    } else {
-      btn.style.display = "none";
-    }
-  };
-
-  // Scroll to top smoothly
-  function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-</script>
+{% block extra_js %}
+  <script src="{% static 'js/legal_backtotop.js' %}" defer></script>
+{% endblock %}
 
 {% endblock %}

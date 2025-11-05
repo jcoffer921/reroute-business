@@ -32,7 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const del = scope.querySelector('input[name$="-DELETE"]');
     if (del) {
       del.addEventListener("change", () => {
-        scope.style.opacity = del.checked ? 0.6 : 1;
+        if (del.checked) { scope.classList.add('opacity-60'); scope.classList.remove('opacity-100'); }
+        else { scope.classList.add('opacity-100'); scope.classList.remove('opacity-60'); }
       });
     }
     // Current job toggle

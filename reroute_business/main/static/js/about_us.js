@@ -16,8 +16,7 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduceMotion) {
     // Keep everything static and reveal quote immediately
-    if (overlay) overlay.style.background = 'rgba(255,255,255,0.35)';
-    if (content) { content.style.transform = 'none'; content.style.opacity = '1'; }
+    section.classList.add('static');
     if (quote) requestAnimationFrame(() => quote.classList.add('visible'));
     return;
   }
@@ -30,7 +29,7 @@
 
   function updateFrame() {
     ticking = false;
-    if (!active || !section || !content || !overlay) return;
+    if (!active || !section) return;
 
     // Use viewport relative metrics to avoid layout thrash
     const rect = section.getBoundingClientRect();
@@ -44,15 +43,11 @@
     // Derived from original formula: progress = 1 - rect.top / height
     const rawProgress = 1 - (rect.top / h);
     const progress    = clamp(rawProgress, 0, 1);  // 0..1
-
-    // Apply subtle effects
-    const alpha   = clamp(progress, 0, 0.95);     // overlay fade up to 0.95
-    const liftPx  = -(progress * 20);             // translate up to -20px
-    const opacity = 1 - (progress * 0.30);        // fade to 70%
-
-    overlay.style.background = `rgba(255,255,255,${alpha.toFixed(3)})`;
-    content.style.transform  = `translateY(${liftPx.toFixed(1)}px)`;
-    content.style.opacity    = opacity.toFixed(3);
+    // Discretize into 0..10 and toggle a class for CSS-driven transitions
+    const step = Math.min(10, Math.max(0, Math.round(progress * 10)));
+    // Remove any previous step classes
+    for (let i=0;i<=10;i++){ section.classList.remove('mission-step-'+i); }
+    section.classList.add('mission-step-'+step);
   }
 
   function onScrollOrResize() {
@@ -112,5 +107,18 @@
     window.removeEventListener('scroll', onScrollOrResize);
     window.removeEventListener('resize', onScrollOrResize);
     if (io) io.disconnect();
+  });
+})();
+
+// Smooth scroll for bio links (CSP-safe)
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('a.bio-link').forEach(function(anchor){
+      anchor.addEventListener('click', function(e){
+        e.preventDefault();
+        var target = document.querySelector(anchor.getAttribute('href'));
+        if (target && target.scrollIntoView) target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
   });
 })();

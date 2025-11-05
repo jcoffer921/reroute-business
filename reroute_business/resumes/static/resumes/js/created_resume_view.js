@@ -63,7 +63,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function setSavingState(isSaving, msg) {
     saving = isSaving;
-    if (spinner) spinner.style.display = isSaving ? "inline-block" : "none";
+    if (spinner) {
+      if (isSaving) spinner.removeAttribute('hidden'); else spinner.setAttribute('hidden','');
+    }
     saveBtn.disabled = isSaving;
     statusEl.textContent = msg || "";
   }

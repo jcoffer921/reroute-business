@@ -14,8 +14,9 @@ bindCounter('requirements', 'reqCount');
 function togglePayFields(type) {
   const hr = document.getElementById('hourly_fields');
   const yr = document.getElementById('yearly_fields');
-  if (type === 'hour') { hr.style.display = ''; yr.style.display = 'none'; }
-  else { hr.style.display = 'none'; yr.style.display = ''; }
+  if (!hr || !yr) return;
+  if (type === 'hour') { hr.removeAttribute('hidden'); yr.setAttribute('hidden',''); }
+  else { hr.setAttribute('hidden',''); yr.removeAttribute('hidden'); }
 }
 // initialize on load
 togglePayFields(document.getElementById('salary_type').value);
@@ -40,7 +41,7 @@ togglePayFields(document.getElementById('salary_type').value);
       x.className = 'chip-x';
       x.setAttribute('aria-label', `Remove ${t}`);
       x.textContent = '×';
-      x.onclick = () => { tags.splice(i,1); sync(); };
+      x.addEventListener('click', () => { tags.splice(i,1); sync(); });
       chip.appendChild(x);
       wrapper.insertBefore(chip, input);
     });

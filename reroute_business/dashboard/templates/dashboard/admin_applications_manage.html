@@ -7,10 +7,10 @@
   <h1>Manage Applications</h1>
 
   <section>
-    <form method="get" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-      <input type="text" name="q" value="{{ q }}" placeholder="Search job title or applicant" style="flex:1; min-width:220px; padding:8px 10px; border:1px solid #ddd; border-radius:8px;" />
+    <form method="get" class="d-flex gap-10 fw-wrap ai-center">
+      <input type="text" name="q" value="{{ q }}" placeholder="Search job title or applicant" class="flex-1 min-w-220 p-8-10 b1-ddd br-8" />
       <label for="status-filter" class="visually-hidden">Filter by status</label>
-      <select id="status-filter" name="status" style="padding:8px 10px; border:1px solid #ddd; border-radius:8px;">
+      <select id="status-filter" name="status" class="p-8-10 b1-ddd br-8">
         <option value="">All Statuses</option>
         {% for val,label in status_choices %}
           <option value="{{ val }}" {% if status == val %}selected{% endif %}>{{ label }}</option>
@@ -37,10 +37,10 @@
         <td>{{ app.get_status_display }}</td>
         <td>{% if app.submitted_at %}{{ app.submitted_at|date:"M d, Y" }}{% else %}—{% endif %}</td>
         <td>
-          <form method="post" action="{% url 'dashboard:admin_application_update_status' app.id %}" style="display:inline-flex; gap:6px; align-items:center;">
+          <form method="post" action="{% url 'dashboard:admin_application_update_status' app.id %}" class="d-inline-flex gap-6 ai-center">
             {% csrf_token %}
             <label for="status-{{ app.id }}" class="visually-hidden">Update status</label>
-            <select id="status-{{ app.id }}" name="status" style="padding:4px 6px; border:1px solid #ddd; border-radius:6px;">
+            <select id="status-{{ app.id }}" name="status" class="b1-ddd br-6 px-10 py-8">
               {% for val,label in status_choices %}
                 <option value="{{ val }}" {% if app.status == val %}selected{% endif %}>{{ label }}</option>
               {% endfor %}

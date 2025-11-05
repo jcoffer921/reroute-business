@@ -12,15 +12,10 @@
     const h = rect.height || hero.offsetHeight || 1;
     const scrolled = Math.min(Math.max(-rect.top, 0), h);
     const progress = scrolled / h; // 0 -> 1
-    // Parallax translate + subtle fade
-    const translate = progress * 20; // px
-    const opacity = 1 - progress * 0.35; // fade to ~0.65
-    bg.style.transform = `translateY(${translate}px)`;
-    bg.style.opacity = String(opacity);
-    if (wm) {
-      wm.style.transform = `translateY(${translate * 0.7}px)`;
-      wm.style.opacity = String(0.12 * (1 - progress * 0.5));
-    }
+    // Discretize to 0..10, add class on root for CSS-driven transforms
+    const step = Math.min(10, Math.max(0, Math.round(progress * 10)));
+    for (let i=0;i<=10;i++){ root.classList.remove('parallax-step-'+i); }
+    root.classList.add('parallax-step-'+step);
   };
 
   window.addEventListener('scroll', onScroll, { passive: true });

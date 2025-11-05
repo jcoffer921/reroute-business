@@ -11,12 +11,12 @@
     <h1>Analytics — Events</h1>
     <p>Insights for the last {{ days }} day(s)</p>
   </div>
-  <div style="margin-top:8px">
+  <div class="mt-8">
     <a href="{% url 'dashboard:admin' %}" class="btn btn-secondary btn-sm">Back to Admin Dashboard</a>
   </div>
-  <form method="get" style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+  <form method="get" class="mt-10 d-flex gap-8 ai-center">
     <label for="days">Window:</label>
-    <select name="days" id="days" onchange="this.form.submit()">
+    <select name="days" id="days">
       <option value="7" {% if days == 7 %}selected{% endif %}>7 days</option>
       <option value="14" {% if days == 14 %}selected{% endif %}>14 days</option>
       <option value="30" {% if days == 30 %}selected{% endif %}>30 days</option>
@@ -114,31 +114,15 @@
 </div>
 
 <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-<script>
-  const pieLabels = {{ pie_labels|default:'[]'|safe }};
-  const pieCounts = {{ pie_counts|default:'[]'|safe }};
-  const colors = ['#2563eb','#22c1dc','#16a34a','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#94a3b8'];
-  const baseLayout = { margin: { l: 30, r: 20, t: 20, b: 30 }, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)' };
-  const baseConfig = { displayModeBar: 'hover', responsive: true, scrollZoom: true };
-
-  // Pie: page views by path
-  Plotly.newPlot('pageViewsPie', [{
-    type: 'pie', labels: pieLabels, values: pieCounts, textinfo: 'label+percent', hoverinfo: 'label+value+percent', marker: { colors: colors }
-  }], { ...baseLayout, showlegend: true, legend: { orientation: 'v', x: 1, y: 0.5 } }, baseConfig);
-
-  // Line: views by day
-  const lineLabels = {{ views_by_day_labels|default:'[]'|safe }};
-  const lineCounts = {{ views_by_day_counts|default:'[]'|safe }};
-  Plotly.newPlot('pageViewsLine', [{
-    type: 'scatter', mode: 'lines', name: 'Page Views', x: lineLabels, y: lineCounts, line: { color: '#2563eb' }, fill: 'tozeroy', fillcolor: 'rgba(37,99,235,0.2)'
-  }], { ...baseLayout, hovermode: 'x unified' }, baseConfig);
-
-  // Stacked: authed vs anon per day
-  const authed = {{ views_by_day_authed|default:'[]'|safe }};
-  const anon = {{ views_by_day_anon|default:'[]'|safe }};
-  Plotly.newPlot('viewsStacked', [
-    { type: 'bar', name: 'Authenticated', x: lineLabels, y: authed, marker: { color: '#16a34a' } },
-    { type: 'bar', name: 'Anonymous', x: lineLabels, y: anon, marker: { color: '#94a3b8' } }
-  ], { ...baseLayout, barmode: 'stack' }, baseConfig);
+<script id="analytics-events-data" type="application/json">
+  {
+    "pieLabels": {{ pie_labels|default:'[]'|safe }},
+    "pieCounts": {{ pie_counts|default:'[]'|safe }},
+    "lineLabels": {{ views_by_day_labels|default:'[]'|safe }},
+    "lineCounts": {{ views_by_day_counts|default:'[]'|safe }},
+    "authed": {{ views_by_day_authed|default:'[]'|safe }},
+    "anon": {{ views_by_day_anon|default:'[]'|safe }}
+  }
 </script>
+<script src="{% static 'dashboard/js/admin_analytics_events.js' %}"></script>
 {% endblock %}

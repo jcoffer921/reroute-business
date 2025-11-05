@@ -22,11 +22,8 @@
   if (!backdrop && mobileMenu) {
     backdrop = document.createElement('div');
     backdrop.id = 'mobileBackdrop';
-    backdrop.style.position = 'fixed';
-    backdrop.style.inset = '0';
-    backdrop.style.background = 'rgba(0,0,0,.4)';
-    backdrop.style.zIndex = '1999';
-    backdrop.style.display = 'none';
+    backdrop.className = 'mobile-backdrop';
+    backdrop.setAttribute('hidden', '');
     document.body.appendChild(backdrop);
   }
 
@@ -52,10 +49,7 @@
     hamburgerBtn?.setAttribute('aria-expanded', 'true');
 
     // Show backdrop
-    if (backdrop) {
-      backdrop.style.display = 'block';
-      backdrop.removeAttribute('hidden');
-    }
+    if (backdrop) { backdrop.classList.add('show'); backdrop.removeAttribute('hidden'); }
 
     // Move focus inside drawer (first focusable, otherwise drawer itself)
     const first = getFocusable(mobileMenu)[0] || mobileMenu;
@@ -70,10 +64,7 @@
     document.body.classList.remove('no-scroll');
     hamburgerBtn?.setAttribute('aria-expanded', 'false');
 
-    if (backdrop) {
-      backdrop.style.display = 'none';
-      backdrop.setAttribute('hidden', '');
-    }
+    if (backdrop) { backdrop.classList.remove('show'); backdrop.setAttribute('hidden', ''); }
 
     // Restore focus to whatever had it before open
     if (lastFocusedBeforeOpen && document.contains(lastFocusedBeforeOpen)) {
@@ -175,4 +166,18 @@
     });
     on(window, 'resize', () => { if (window.innerWidth < DESKTOP_MIN) closeProfile(); });
   }
+
+  /* -------------------------- CSP helpers --------------------------- */
+  // Prevent default navigation for menu items purely used to open dropdowns
+  document.querySelectorAll('.nav-item.has-dropdown > a.no-nav').forEach(a => {
+    a.addEventListener('click', (e) => { e.preventDefault(); });
+  });
+  // Close flash alerts without inline handlers
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-close-alert]');
+    if (btn) {
+      const alert = btn.closest('.alert');
+      if (alert) alert.remove();
+    }
+  });
 })();

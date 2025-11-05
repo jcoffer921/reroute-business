@@ -131,17 +131,7 @@
   </div>
 </section>
 
-<script>
-  document.querySelectorAll('a.bio-link').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-      e.preventDefault();
-      document.querySelector(this.getAttribute('href')).scrollIntoView({
-        behavior: 'smooth'
-      });
-    });
-  });
-</script>
-<script src="{% static 'js/about_us.js' %}"></script>
+<script src="{% static 'js/about_us.js' %}" defer></script>
 
 {% endblock %}
 

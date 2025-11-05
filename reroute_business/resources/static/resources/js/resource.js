@@ -33,7 +33,7 @@
       } catch(_){}
     }
     modal.removeAttribute('hidden');
-    document.body.style.overflow = 'hidden';
+    document.body.classList.add('no-scroll');
     try {
       modalVideo.muted = false;
       modalVideo.controls = true;
@@ -45,7 +45,7 @@
   const closeModal = () => {
     try { modalVideo.pause(); } catch(_){}
     modal.setAttribute('hidden', '');
-    document.body.style.overflow = '';
+    document.body.classList.remove('no-scroll');
     playBg();
   };
 
@@ -89,4 +89,44 @@
       if (bgVideo && bgVideo.paused) playBg();
     }
   });
+})();
+
+// Module completion handlers (HTML5 and YouTube) – CSP-safe
+(function(){
+  // HTML5 video completion messages
+  document.querySelectorAll('.module-html5').forEach(function(v){
+    v.addEventListener('ended', function(){
+      var t = v.getAttribute('data-completion-target');
+      if (t) {
+        var el = document.getElementById(t);
+        if (el) el.removeAttribute('hidden');
+      }
+    });
+  });
+
+  // YouTube iframe completion via Iframe API
+  var ytIframes = document.querySelectorAll('iframe.yt-embed');
+  if (ytIframes.length) {
+    var tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+    var prev = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = function(){
+      if (typeof prev === 'function') { try { prev(); } catch(_){} }
+      ytIframes.forEach(function(ifr){
+        var completeId = ifr.getAttribute('data-completion-target') || '';
+        // eslint-disable-next-line no-undef
+        new YT.Player(ifr.id, {
+          events: {
+            onStateChange: function(e){
+              try { if (typeof YT !== 'undefined' && e.data === YT.PlayerState.ENDED) {
+                var el = document.getElementById(completeId);
+                if (el) el.removeAttribute('hidden');
+              } } catch(_){ }
+            }
+          }
+        });
+      });
+    };
+  }
 })();
