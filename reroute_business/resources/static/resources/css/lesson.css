@@ -28,3 +28,11 @@
   .lesson-dialog-inner, .lesson-complete-inner { padding: 16px; }
 }
 
+/* New simplified post-video quiz */
+.lesson-quiz-actions { margin-top: 16px; display: flex; justify-content: center; }
+.lesson-quiz-container { margin-top: 16px; display: grid; gap: 16px; }
+.lesson-quiz-question { background: #fff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; }
+.lesson-quiz-question h3 { margin: 0 0 10px; font-size: 18px; border-left: 6px solid #1b3b82; padding-left: 10px; }
+.lesson-quiz-choices { display: grid; gap: 8px; }
+.lesson-quiz-actions-bar { display: flex; gap: 12px; justify-content: center; }
+.lesson-quiz-result { text-align: center; font-weight: 600; color: #1b3b82; }

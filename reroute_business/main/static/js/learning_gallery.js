@@ -23,10 +23,10 @@
 
   function resetOverlays(){
     if (!modal) return;
-    // Hide any overlays from previous session
-    modal.querySelectorAll('.lesson-overlay, .lesson-dialog, .lesson-complete').forEach(function(el){
-      el.hidden = true; el.setAttribute('aria-hidden','true');
-    });
+    // Hide any legacy overlays or quiz containers from previous session
+    modal.querySelectorAll('.lesson-overlay, .lesson-dialog, .lesson-complete').forEach(function(el){ el.hidden = true; el.setAttribute('aria-hidden','true'); });
+    var qa = document.getElementById('galleryQuizActions'); if (qa) qa.hidden = true;
+    var qc = document.getElementById('galleryQuizContainer'); if (qc) { qc.hidden = true; qc.innerHTML = ''; }
     var fb = modal.querySelector('.lesson-feedback'); if (fb) fb.textContent = '';
     var sum = modal.querySelector('.lesson-complete-summary'); if (sum) sum.textContent = '';
     // Clear previous answered state marker

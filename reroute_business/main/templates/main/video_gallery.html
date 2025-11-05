@@ -107,29 +107,10 @@
       <div id="galleryModalContainer" style="width:100%; height:100%; background:#000;"></div>
 
       <!-- Inline lesson overlays (used when card has data-lesson) -->
-      <div class="lesson-overlay" hidden aria-hidden="true"></div>
-      <div class="lesson-dialog" hidden role="dialog" aria-modal="true">
-        <div class="lesson-dialog-inner">
-          <h2 class="lesson-prompt"></h2>
-          <div class="lesson-choices"></div>
-          <div class="lesson-open-ended" hidden>
-            <textarea class="lesson-textarea" rows="3" placeholder="Type your answer..." aria-label="Your answer"></textarea>
-            <button class="lesson-submit-open lesson-btn primary">Submit</button>
-          </div>
-          <div class="lesson-feedback" aria-live="polite"></div>
-        </div>
+      <div id="galleryQuizActions" class="lesson-quiz-actions" hidden>
+        <button id="galleryStartQuiz" type="button" class="lesson-btn primary">Take the Quiz</button>
       </div>
-      <div class="lesson-overlay lesson-complete-overlay" hidden aria-hidden="true"></div>
-      <div class="lesson-complete" hidden role="dialog" aria-modal="true">
-        <div class="lesson-complete-inner">
-          <h3>✅ Lesson Complete</h3>
-          <p class="lesson-complete-summary"></p>
-          <div class="lesson-complete-actions">
-            <a href="{% url 'resource_list' %}" class="lesson-btn">Explore more resources</a>
-            <button type="button" class="lesson-complete-close lesson-btn primary">Close</button>
-          </div>
-        </div>
-      </div>
+      <div id="galleryQuizContainer" class="lesson-quiz-container" hidden aria-live="polite"></div>
     </div>
   </div>
 </section>
