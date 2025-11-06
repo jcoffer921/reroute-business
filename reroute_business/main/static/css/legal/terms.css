@@ -19,7 +19,6 @@
 }
 
 #backToTopBtn {
-  display: none;
   position: fixed;
   bottom: 40px;
   right: 30px;
@@ -35,6 +34,8 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease;
 }
+
+#backToTopBtn[hidden] { display: none; }
 
 #backToTopBtn:hover {
   background-color: #0056b3;

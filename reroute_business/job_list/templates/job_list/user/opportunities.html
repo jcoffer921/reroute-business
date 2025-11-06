@@ -6,42 +6,6 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'user/css/job_list.css' %}">
-<style>
-  .opportunities-page { position: relative; }
-  .jobs-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(17, 24, 39, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 50;
-    padding: 1rem;
-  }
-  .jobs-overlay-card {
-    max-width: 720px;
-    width: 100%;
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    padding: 24px;
-    text-align: center;
-  }
-  .jobs-overlay-card h2 { margin: 0 0 8px; font-size: 1.5rem; }
-  .jobs-overlay-card p { margin: 0 0 16px; color: #374151; }
-  .jobs-overlay-card .btn { display: inline-block; }
-  @media (min-width: 640px) {
-    .jobs-overlay-card { padding: 32px; }
-    .jobs-overlay-card h2 { font-size: 1.75rem; }
-  }
-  /* Prevent interaction with underlying content when overlay is shown */
-  .opportunities-page.overlay-active > *:not(.jobs-overlay) {
-    filter: blur(2px);
-    pointer-events: none;
-    user-select: none;
-  }
-  .jobs-overlay-card .subtle { font-size: .95rem; color: #6b7280; }
-</style>
 
 <div class="opportunities-page overlay-active">
   <!-- Cover the entire page content area (not navbar/footer) -->
@@ -64,7 +28,7 @@
           <input type="text" name="q" placeholder="Job title, keywords" value="{{ q }}" aria-label="Job title or keywords">
           <input type="text" name="zip" placeholder="Location (ZIP)" value="{{ user_zip }}" aria-label="Location by ZIP">
           <button type="submit" class="btn btn-primary">Search</button>
-          <button type="button" class="mobile-filter-toggle" onclick="toggleFilters()">Filters</button>
+          <button type="button" class="mobile-filter-toggle">Filters</button>
         </div>
       </form>
     </div>
@@ -80,7 +44,7 @@
         <!-- Filters Sidebar -->
         <aside class="filters-sidebar" id="filtersSidebar" aria-label="Job filters" aria-hidden="true">
           <div class="filters-card">
-            <button type="button" class="filters-close" onclick="toggleFilters()" aria-label="Close filters">✕ Close</button>
+            <button type="button" class="filters-close" aria-label="Close filters">✕ Close</button>
             <h3 class="filters-title">Job Type</h3>
             <div class="pill-group">
               <label class="pill">
@@ -129,7 +93,7 @@
             <!-- Future filters (disabled for now) -->
             <hr>
             <h3 class="filters-title">More Filters</h3>
-            <label class="filters-title" style="font-weight:600; font-size:.95rem;">Salary Range (Coming Soon)</label>
+            <label class="filters-title filters-subtitle">Salary Range (Coming Soon)</label>
             <input type="range" min="0" max="200" value="100" disabled>
             <div class="pill-group" aria-disabled="true">
               <label class="pill"><input type="checkbox" disabled><span>Entry</span></label>
@@ -150,10 +114,7 @@
 </div>
 
 
-<script>
-  const toggleSaveUrl = "{% url 'toggle_saved_job' %}";
-  const csrfToken = "{{ csrf_token }}";
-</script>
+<div id="jobListBoot" data-toggle-save-url="{% url 'toggle_saved_job' %}"></div>
 <script src="{% static 'user/js/job_list.js' %}"></script>
 
 {% endblock %}

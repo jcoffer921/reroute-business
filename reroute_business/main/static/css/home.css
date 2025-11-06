@@ -55,6 +55,9 @@
 }
 .hero-btn:hover { filter: brightness(.95); box-shadow: 0 10px 22px rgba(0,0,0,.22); }
 .hero-media--logo { background-color: #000; background-size: contain; background-repeat: no-repeat; background-position: center; }
+/* Provide logo background without inline styles (CSP-safe) */
+.hero-media--logo { background-image: url('/static/images/reroute-trans-logo.png'); }
+.post-media--logo { background-image: url('/static/images/reroute-trans-logo.png'); background-size: contain; background-repeat: no-repeat; background-position: center; background-color:#000; }
 
 /* Coming Soon badge */
 .badge-soon {

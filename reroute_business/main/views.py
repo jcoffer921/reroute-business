@@ -361,6 +361,31 @@ def signup_view(request):
 
     if request.method == 'POST':
         try:
+            # reCAPTCHA validation (optional but enforced if configured)
+            recaptcha_token = request.POST.get('g-recaptcha-response')
+            if requests and getattr(settings, 'RECAPTCHA_SECRET_KEY', None):
+                if not recaptcha_token:
+                    messages.error(request, 'Please complete the reCAPTCHA challenge.')
+                    return render(request, 'main/signup.html', {
+                        'user_form': user_form,
+                        'recaptcha_site_key': getattr(settings, 'RECAPTCHA_SITE_KEY', None),
+                    }, status=400)
+                try:
+                    r = requests.post(
+                        'https://www.google.com/recaptcha/api/siteverify',
+                        data={'secret': settings.RECAPTCHA_SECRET_KEY, 'response': recaptcha_token},
+                        timeout=5,
+                    )
+                    ok = r.ok and r.json().get('success')
+                except Exception:
+                    ok = False
+                    logger.warning('reCAPTCHA verification failed for signup')
+                if not ok:
+                    messages.error(request, 'reCAPTCHA verification failed. Please try again.')
+                    return render(request, 'main/signup.html', {
+                        'user_form': user_form,
+                        'recaptcha_site_key': getattr(settings, 'RECAPTCHA_SITE_KEY', None),
+                    }, status=400)
             if user_form.is_valid():
                 # Create the user account
                 user = user_form.save()
@@ -383,7 +408,10 @@ def signup_view(request):
             # Log full traceback to server logs and fall through to re-render
             logger.exception("Signup exception: %s", e)
 
-    return render(request, 'main/signup.html', {'user_form': user_form})
+    return render(request, 'main/signup.html', {
+        'user_form': user_form,
+        'recaptcha_site_key': getattr(settings, 'RECAPTCHA_SITE_KEY', None),
+    })
 
 
 @csrf_protect
@@ -693,7 +721,9 @@ def employer_signup_view(request):
     - Side effects: creates EmployerProfile, adds Employer group, logs in user
     """
     if request.method == "GET":
-        return render(request, "main/employer_signup.html")
+        return render(request, "main/employer_signup.html", {
+            'recaptcha_site_key': getattr(settings, 'RECAPTCHA_SITE_KEY', None)
+        })
 
     # ---- Collect fields from POST ----
     first_name   = (request.POST.get("first_name") or "").strip()
@@ -729,6 +759,23 @@ def employer_signup_view(request):
         except ValidationError as ve:
             errors["password1"] = " ".join(ve.messages)
 
+    # reCAPTCHA validation (optional but enforced if configured)
+    if not errors and requests and getattr(settings, 'RECAPTCHA_SECRET_KEY', None):
+        recaptcha_token = request.POST.get('g-recaptcha-response')
+        if not recaptcha_token:
+            errors['recaptcha'] = 'Please complete the reCAPTCHA challenge.'
+        else:
+            try:
+                rr = requests.post(
+                    'https://www.google.com/recaptcha/api/siteverify',
+                    data={'secret': settings.RECAPTCHA_SECRET_KEY, 'response': recaptcha_token},
+                    timeout=5,
+                )
+                if not (rr.ok and rr.json().get('success')):
+                    errors['recaptcha'] = 'reCAPTCHA verification failed. Please try again.'
+            except Exception:
+                errors['recaptcha'] = 'reCAPTCHA verification failed. Please try again.'
+
     if errors:
         # Re-render with inline field errors and keep safe prefill values
         return render(request, "main/employer_signup.html", {
@@ -740,7 +787,8 @@ def employer_signup_view(request):
                 "company_name": company_name,
                 "website": website,
                 "description": description,
-            }
+            },
+            'recaptcha_site_key': getattr(settings, 'RECAPTCHA_SITE_KEY', None),
         }, status=400)
 
     # ---- Create user + employer profile ----

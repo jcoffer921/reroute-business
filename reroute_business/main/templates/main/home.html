@@ -230,7 +230,7 @@
             {% if post.image %}
               <a href="{% url 'blog_detail' slug=post.slug %}" class="post-media" style="background-image:url('{{ post.image.url }}');" aria-label="{{ post.title }}"></a>
             {% else %}
-              <a href="{% url 'blog_detail' slug=post.slug %}" class="post-media post-media--logo" style="background-image:url('{% static 'images/reroute-trans-logo.png' %}');" aria-label="{{ post.title }}"></a>
+              <a href="{% url 'blog_detail' slug=post.slug %}" class="post-media post-media--logo" aria-label="{{ post.title }}"></a>
             {% endif %}
             <div class="post-body">
               <h4 class="post-title"><a href="{% url 'blog_detail' slug=post.slug %}">{{ post.title }}</a> <span class="badge-soon">Coming Soon</span></h4>
@@ -261,7 +261,7 @@
           </div>
         </article>
         <article class="slide hero-slide">
-          <div class="hero-media hero-media--logo" style="background-image:url('{% static 'images/reroute-trans-logo.png' %}');"></div>
+      <div class="hero-media hero-media--logo"></div>
           <div class="hero-overlay"></div>
           <div class="hero-content">
             <h3 class="hero-title">Resources that make a difference</h3>

@@ -28,6 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const results = document.getElementById('jobResults');
   const sidebar = document.getElementById('filtersSidebar');
   const backdrop = document.getElementById('filtersBackdrop');
+  const openBtn = document.querySelector('.mobile-filter-toggle');
+  const closeBtn = document.querySelector('.filters-close');
 
   function collectFilters() {
     const params = new URLSearchParams();
@@ -104,6 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
       toggleFilters();
     }
   });
+  if (openBtn) openBtn.addEventListener('click', toggleFilters);
+  if (closeBtn) closeBtn.addEventListener('click', toggleFilters);
 
   // When resizing to desktop, ensure drawer state is reset
   let lastIsMobile = window.innerWidth <= 1023;
@@ -126,10 +130,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (!toggleSaveUrl || !csrfToken) {
-    console.error("Missing toggleSaveUrl or csrfToken.");
-    return;
-  }
+  function getCookie(name){ const m=document.cookie.match(new RegExp('(?:^|; )'+name+'=([^;]+)')); return m?decodeURIComponent(m[1]):''; }
+  const boot = document.getElementById('jobListBoot');
+  const toggleSaveUrl = (boot && boot.dataset.toggleSaveUrl) || (typeof window.toggleSaveUrl!=='undefined' ? window.toggleSaveUrl : '');
+  const csrfToken = (boot && boot.dataset.csrf) || getCookie('csrftoken');
+  if (!toggleSaveUrl || !csrfToken) { console.error('Missing toggleSaveUrl or CSRF.'); }
 
   // Use event delegation on the container
   document.body.addEventListener('click', async (event) => {

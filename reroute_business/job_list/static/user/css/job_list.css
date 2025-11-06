@@ -233,6 +233,45 @@
   margin-bottom: 1.5rem;
 }
 
+/* ===== Jobs Coming Soon overlay ===== */
+.opportunities-page { position: relative; }
+.jobs-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 1rem;
+}
+.jobs-overlay-card {
+  max-width: 720px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  padding: 24px;
+  text-align: center;
+}
+.jobs-overlay-card h2 { margin: 0 0 8px; font-size: 1.5rem; }
+.jobs-overlay-card p { margin: 0 0 16px; color: #374151; }
+.jobs-overlay-card .btn { display: inline-block; }
+@media (min-width: 640px) {
+  .jobs-overlay-card { padding: 32px; }
+  .jobs-overlay-card h2 { font-size: 1.75rem; }
+}
+/* Blur page content while overlay active */
+.opportunities-page.overlay-active > *:not(.jobs-overlay) {
+  filter: blur(2px);
+  pointer-events: none;
+  user-select: none;
+}
+.jobs-overlay-card .subtle { font-size: .95rem; color: #6b7280; }
+
+/* Filters subtitle helper */
+.filters-subtitle { font-weight: 600; font-size: .95rem; }
+
 .job-card:hover { box-shadow: 0 12px 28px rgba(0,0,0,.12); transform: translateY(-3px); transition: box-shadow .18s ease, transform .18s ease; border-color: rgba(0,109,160,.35); }
 
 /* Header with logo and job title/info side-by-side */

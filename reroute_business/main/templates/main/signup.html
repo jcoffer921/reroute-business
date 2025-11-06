@@ -95,6 +95,9 @@
       <a href="{% url 'privacy' %}">Privacy Policy</a>.
     </p>
 
+    {% if recaptcha_site_key %}
+      <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+    {% endif %}
     <button type="submit" class="submit-btn">Create account</button>
   </form>
 
@@ -105,6 +108,9 @@
 {% endblock %}
 
 {% block extra_js %}
-{# Optional: external JS if you keep your auth JS separate #}
-<script src="{% static 'js/signup.js' %}"></script>
+  {# Optional: external JS if you keep your auth JS separate #}
+  <script src="{% static 'js/signup.js' %}"></script>
+  {% if recaptcha_site_key %}
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  {% endif %}
 {% endblock %}

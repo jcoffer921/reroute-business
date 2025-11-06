@@ -93,6 +93,9 @@
       {% if errors.agree_terms %}<div class="field-error">{{ errors.agree_terms }}</div>{% endif %}
     </div>
 
+    {% if recaptcha_site_key %}
+      <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+    {% endif %}
     <button type="submit" class="btn-pill">Create employer account</button>
 
     <div class="secondary-actions">
@@ -104,4 +107,7 @@
 </section>
 
 <script src="{% static 'js/employer_signup.js' %}"></script>
+{% if recaptcha_site_key %}
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endif %}
 {% endblock %}
