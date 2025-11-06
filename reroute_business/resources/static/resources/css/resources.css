@@ -269,37 +269,50 @@ html { scroll-behavior: smooth; }
   left: 50%;
   transform: translate(-50%, -50%);
   width: min(92vw, 1080px);
-  aspect-ratio: 16 / 9;
-  height: auto;
   background: #000;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-  position: relative; /* allow overlayed quiz UI */
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;              /* keep dialog within viewport */
+  -webkit-overflow-scrolling: touch;
 }
-#galleryModalContainer { position: relative; width: 100%; height: 100%; }
+#galleryModalContainer {
+  position: relative;
+  width: 100%;
+  /* Maintain 16:9 video area */
+  aspect-ratio: 16 / 9;
+  background: #000;
+  flex: 0 0 auto;                /* fixed video height */
+}
 #galleryModalContainer iframe,
-#galleryModalContainer video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-
-/* Quiz UI inside gallery modal overlays video to ensure visibility */
-#galleryVideoModal .lesson-quiz-actions {
-  position: absolute;
-  left: 0; right: 0; bottom: 12px;
-  display: flex; justify-content: center;
-  z-index: 5;
-  pointer-events: auto;
-}
-#galleryVideoModal .lesson-quiz-container {
+#galleryModalContainer video {
   position: absolute;
   inset: 0;
-  overflow: auto;
-  padding: 16px;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(2px);
-  z-index: 4;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
-/* Keep close/fullscreen buttons above overlays */
-#galleryVideoModal .hero2-modal-close { z-index: 6; }
+
+/* Quiz UI sits below the video inside the dialog */
+#galleryVideoModal .lesson-quiz-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: #0b0b0b;
+  flex: 0 0 auto;                /* keep actions bar fixed height */
+}
+#galleryVideoModal .lesson-quiz-container {
+  padding: 16px;
+  background: #0b0b0b;
+  color: #e5e7eb;
+  flex: 1 1 auto;                /* grow to take remaining space */
+  min-height: 0;                 /* allow overflow area to size correctly */
+  overflow-y: auto;              /* scroll quiz content if long */
+}
+#galleryVideoModal .lesson-quiz-container[hidden] { display: none !important; }
 
 /* ===== Resource Categories (Cards) ===== */
 .resource-categories-section {
