@@ -1,94 +1,34 @@
-// Hero 2 video controls: background playback + modal playback
+// Hero 2 video controls: background playback (modal removed)
 (function(){
   const bgVideo = document.getElementById('hero2BgVideo');
-  const heroPlayBtn = document.getElementById('hero2Play');
   const modal = document.getElementById('hero2Modal');
   const modalVideo = document.getElementById('hero2ModalVideo');
-  const closeBtn = document.getElementById('hero2Close');
-
-  if (!modal || !modalVideo) return;
 
   const playBg = () => {
     try {
       if (bgVideo) {
         bgVideo.muted = true;
         const p = bgVideo.play();
-        if (p && typeof p.then === 'function') p.catch(()=>{
-          // Retry after metadata/canplay or visibility change
-        });
+        if (p && typeof p.then === 'function') p.catch(()=>{});
       }
     } catch(_){}
   };
 
-  const pauseBg = () => { try { if (bgVideo) bgVideo.pause(); } catch(_){} };
-
-  const openModalWithSrc = (src) => {
-    pauseBg();
-    if (src) {
-      try {
-        modalVideo.pause();
-        modalVideo.removeAttribute('src');
-        modalVideo.src = src;
-        modalVideo.load();
-      } catch(_){}
-    }
-    modal.removeAttribute('hidden');
-    document.body.classList.add('no-scroll');
-    try {
-      modalVideo.muted = false;
-      modalVideo.controls = true;
-      const p = modalVideo.play();
-      if (p && typeof p.then === 'function') { p.catch(()=>{}); }
-    } catch(_){}
-  };
-
-  const closeModal = () => {
-    try { modalVideo.pause(); } catch(_){}
-    modal.setAttribute('hidden', '');
-    document.body.classList.remove('no-scroll');
-    playBg();
-  };
-
-  // Hero play button opens modal with same hero video
-  heroPlayBtn && heroPlayBtn.addEventListener('click', () => {
-    const src = (bgVideo && bgVideo.currentSrc) || (bgVideo && bgVideo.querySelector('source')?.src) || '';
-    openModalWithSrc(src);
-  });
-
-  // Generic openers for video cards
-  document.querySelectorAll('[data-video-open]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const src = btn.getAttribute('data-video-src');
-      openModalWithSrc(src);
-    });
-  });
-
-  closeBtn && closeBtn.addEventListener('click', closeModal);
-  modal.addEventListener('click', (e) => {
-    if (e.target && e.target.hasAttribute('data-hero2-close')) closeModal();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !modal.hasAttribute('hidden')) closeModal();
-  });
-
-  // Try to start background playback once handlers are wired up
-  // (autoplay is allowed for muted video in most browsers)
+  // Start/maintain background playback regardless of modal presence
   playBg();
-
-  // Improve reliability: attempt again when media can play, and when tab becomes visible
   if (bgVideo) {
-    bgVideo.addEventListener('loadeddata', () => {
-      if (bgVideo.paused) playBg();
-    });
-    bgVideo.addEventListener('canplay', () => {
-      if (bgVideo.paused) playBg();
-    });
+    bgVideo.addEventListener('loadeddata', () => { if (bgVideo.paused) playBg(); });
+    bgVideo.addEventListener('canplay', () => { if (bgVideo.paused) playBg(); });
   }
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
-      if (bgVideo && bgVideo.paused) playBg();
-    }
+    if (!document.hidden) { if (bgVideo && bgVideo.paused) playBg(); }
   });
+
+  // Legacy modal logic removed; keep no-op guards if DOM elements exist
+  if (modal && modalVideo) {
+    // If a downstream template still includes these, keep them hidden
+    try { modal.setAttribute('hidden',''); } catch(_){}
+  }
 })();
 
 // Module completion handlers (HTML5 and YouTube) – CSP-safe

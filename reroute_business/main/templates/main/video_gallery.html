@@ -25,30 +25,31 @@
         {% for video in videos %}
           {% firstof video.youtube_id video.youtube_id2 as vid %}
           <article class="learning-video-card"
-            {% if video.lesson_slug %}
-              data-lesson="1"
-              data-lesson-slug="{{ video.lesson_slug }}"
-              data-schema-url="{% url 'lesson_schema' video.lesson_slug %}"
-              data-attempt-url="{% url 'lesson_attempt' video.lesson_slug %}"
-              data-progress-url="{% url 'lesson_progress' video.lesson_slug %}"
-            {% endif %}
             data-category="{{ video.effective_category|default:video.category|default:'other' }}"
             data-tags="{{ video.effective_tags }}"
           >
-            <div class="video-thumb-container" data-video-id="{{ vid }}" {% if not vid and video.mp4_static_path %}data-mp4-src="{{ video.mp4_static_path }}"{% endif %}>
+            {% comment %} Determine the click-through URL per item {% endcomment %}
+            {% if video.lesson_slug %}
+              {% url 'lesson_detail' video.lesson_slug as item_href %}
+            {% elif video.mp4_static_path %}
+              {% firstof video.mp4_static_path as item_href %}
+            {% else %}
+              {% firstof video.video_url '#' as item_href %}
+            {% endif %}
+
+            <a class="video-thumb-container" href="{{ item_href }}">
               {% if vid %}
                 <img src="https://i.ytimg.com/vi/{{ vid }}/hqdefault.jpg" alt="{{ video.title }} thumbnail">
               {% else %}
                 <img src="{{ video.poster|default:'/static/images/dont_say_interview.png' }}" alt="{{ video.title }} thumbnail">
               {% endif %}
-              <button class="video-play-btn" aria-label="Play {{ video.title }}">
-                <span>▶</span>
-              </button>
-            </div>
+            </a>
             <div class="video-card-body">
               {% if video.lesson_slug %}<span class="video-badge">Interactive Quiz</span>{% endif %}
               <div class="video-category">Learning videos</div>
-              <div class="video-card-title">{{ video.title }}</div>
+              <div class="video-card-title">
+                <a href="{{ item_href }}">{{ video.title }}</a>
+              </div>
               <div class="video-meta">
                 <img class="video-author-img" src="{{ video.author_avatar|default:'/static/images/reroute-trans-logo.png' }}" alt="{{ video.author|default:'ReRoute Team' }}">
                 <span class="video-author">{{ video.author|default:'ReRoute Team' }}</span>
@@ -61,33 +62,6 @@
                   <span class="video-time">Recently</span>
                 {% endif %}
               </div>
-
-              {% if video.lesson_slug %}
-                <!-- Inline overlays for questions -->
-                <div class="lesson-overlay" hidden aria-hidden="true"></div>
-                <div class="lesson-dialog" hidden role="dialog" aria-modal="true">
-                  <div class="lesson-dialog-inner">
-                    <h2 class="lesson-prompt"></h2>
-                    <div class="lesson-choices"></div>
-                    <div class="lesson-open-ended" hidden>
-                      <textarea class="lesson-textarea" rows="3" placeholder="Type your answer..." aria-label="Your answer"></textarea>
-                      <button class="lesson-submit-open lesson-btn primary">Submit</button>
-                    </div>
-                    <div class="lesson-feedback" aria-live="polite"></div>
-                  </div>
-                </div>
-                <div class="lesson-overlay lesson-complete-overlay" hidden aria-hidden="true"></div>
-                <div class="lesson-complete" hidden role="dialog" aria-modal="true">
-                  <div class="lesson-complete-inner">
-                    <h3>✅ Lesson Complete</h3>
-                    <p class="lesson-complete-summary"></p>
-                    <div class="lesson-complete-actions">
-                      <a href="{% url 'resource_list' %}" class="lesson-btn">Explore more resources</a>
-                      <button type="button" class="lesson-complete-close lesson-btn primary">Close</button>
-                    </div>
-                  </div>
-                </div>
-              {% endif %}
             </div>
           </article>
         {% endfor %}
@@ -97,28 +71,10 @@
     {% endif %}
   </div>
 
-<!-- Global modal for gallery videos -->
-<section>
-  <div id="galleryVideoModal" class="hero2-modal" hidden>
-    <div class="hero2-modal-backdrop" data-gallery-close></div>
-    <div class="hero2-modal-dialog" role="dialog" aria-modal="true" aria-label="Video player">
-      <button id="galleryModalClose" class="hero2-modal-close" aria-label="Close video">✕</button>
-      <button id="galleryModalFullscreen" class="hero2-modal-close hero2-modal-fs" aria-label="Toggle fullscreen">⤢</button>
-      <div id="galleryModalContainer"></div>
-
-      <!-- Inline lesson overlays (used when card has data-lesson) -->
-      <div id="galleryQuizActions" class="lesson-quiz-actions" hidden>
-        <button id="galleryStartQuiz" type="button" class="lesson-btn primary">Take the Quiz</button>
-      </div>
-      <div id="galleryQuizContainer" class="lesson-quiz-container" hidden aria-live="polite"></div>
-    </div>
-  </div>
-</section>
+{# Modal removed: videos now link directly to their page or source #}
 
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/learning_gallery.js' %}" defer></script>
   <script src="{% static 'js/learning_filters.js' %}" defer></script>
-  <script src="{% static 'js/gallery_lessons.js' %}" defer></script>
 {% endblock %}

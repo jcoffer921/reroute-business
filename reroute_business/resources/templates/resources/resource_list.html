@@ -22,22 +22,10 @@
       <a href="#resource-categories" class="hero2-cta">View All Categories</a>
       <a href="#resource-library" class="hero2-cta alt">Explore All Resources</a>
       <a href="{% url 'video_gallery' %}" class="hero2-cta alt">Modules</a>
-      <button id="hero2Play" class="hero2-play-button" aria-label="Play video">
-        <span class="hero2-play-icon">▶</span>
-      </button>
+      {# Removed modal-based hero play button #}
     </div>
   </div>
 
-  <!-- Fullscreen Modal for Video Playback with Sound -->
-  <div id="hero2Modal" class="hero2-modal" hidden>
-    <div class="hero2-modal-backdrop" data-hero2-close></div>
-    <div class="hero2-modal-dialog" role="dialog" aria-modal="true" aria-label="Hero video">
-      <button id="hero2Close" class="hero2-modal-close" aria-label="Close video">✕</button>
-      <video id="hero2ModalVideo" class="hero2-modal-video" controls preload="metadata">
-        <source src="/static/resources/videos/dontSayInInterview.mp4" type="video/mp4">
-        </video>
-    </div>
-  </div>
 </section>
 
 <!-- Categories Section (cards) -->
@@ -121,10 +109,7 @@
                    poster="{% static 'images/dont_say_interview.png' %}">
               <source src="/static/resources/videos/dontSayInInterview.mp4" type="video/mp4">
             </video>
-            <button class="video-play-overlay" aria-label="Play video"
-                    data-video-open data-video-src="/static/resources/videos/dontSayInInterview.mp4">
-              <span>▶</span>
-            </button>
+            {# Removed modal trigger overlay #}
           </div>
           <div class="video-info">
             <h3>5 Things to Never Say in an Interview – 1 minute tip</h3>
