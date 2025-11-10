@@ -60,6 +60,17 @@ class ResourceModule(models.Model):
     # Optional internal rich content (future: lessons, text, steps)
     internal_content = models.TextField(blank=True, null=True)
 
+    # Optional inline quiz schema (client-side evaluated)
+    # Example structure:
+    # {
+    #   "questions": [
+    #     {"id": 1, "prompt": "...", "choices": [
+    #        {"id": "a", "text": "...", "is_correct": true}, ...
+    #     ]}
+    #   ]
+    # }
+    quiz_data = models.JSONField(blank=True, null=True)
+
     # Timestamp for ordering by recency in the Resources page
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path('', views.resource_list, name='resource_list'),
+    path('modules/<int:pk>/', views.module_detail, name='module_detail'),
 
     # Job tools resources
     path('job-tools/', views.job_tools_index, name='job_tools_index'),

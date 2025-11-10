@@ -31,6 +31,44 @@ def resource_list(request):
     })
 
 
+# ------------------ Module Detail (video + quiz) ------------------
+
+def _extract_youtube_id_simple(url: str) -> str:
+    try:
+        from urllib.parse import urlparse, parse_qs
+        u = urlparse(url or '')
+        host = (u.netloc or '').lower()
+        path = u.path or ''
+        if 'youtube.com/embed/' in url:
+            return path.rstrip('/').split('/')[-1]
+        if host.endswith('youtu.be'):
+            return path.lstrip('/').split('/')[0]
+        if 'watch' in path:
+            q = parse_qs(u.query or '')
+            return (q.get('v') or [''])[0]
+        if '/shorts/' in path:
+            parts = [p for p in path.split('/') if p]
+            try:
+                i = parts.index('shorts')
+                return parts[i+1]
+            except Exception:
+                return ''
+    except Exception:
+        return ''
+    return ''
+
+
+def module_detail(request, pk: int):
+    module = get_object_or_404(ResourceModule, pk=pk)
+    yt_id = _extract_youtube_id_simple(module.video_url or '') if module.video_url else ''
+    quiz = module.quiz_data or None
+    return render(request, 'resources/modules/module_detail.html', {
+        'module': module,
+        'yt_id': yt_id,
+        'quiz': quiz,
+    })
+
+
 def interview_prep(request):
     return render(request, 'resources/job_tools/interview_prep.html')
 

@@ -66,6 +66,11 @@ try:
     from reroute_business.resources.models import Lesson
 except Exception:
     Lesson = None
+try:
+    # Optional: map gallery videos to ResourceModule pages by YouTube ID
+    from reroute_business.resources.models import ResourceModule
+except Exception:
+    ResourceModule = None
 
 # Try to import a custom password form; if unavailable, we use Django's default.
 try:
@@ -588,25 +593,33 @@ def video_gallery(request):
     req_cat = (request.GET.get('cat') or '').strip().lower()
     videos = list(YouTubeVideo.objects.all().order_by('-created_at'))
 
+    # Helper to extract YouTube ID from various URL formats
+    def extract_vid(url: str) -> str:
+        from urllib.parse import urlparse, parse_qs
+        u = urlparse(url or '')
+        host = (u.netloc or '').lower()
+        path = u.path or ''
+        qs = parse_qs(u.query or '')
+        if 'youtube.com/embed/' in (url or ''):
+            try:
+                return path.rstrip('/').split('/')[-1]
+            except Exception:
+                return ''
+        if host.endswith('youtu.be'):
+            return path.lstrip('/').split('/')[0]
+        if host.endswith('youtube.com') and path.startswith('/watch'):
+            return (qs.get('v') or [''])[0]
+        if '/shorts/' in path:
+            parts = [p for p in path.split('/') if p]
+            try:
+                i = parts.index('shorts')
+                return parts[i + 1]
+            except Exception:
+                return ''
+        return ''
+
     # Attach a related interactive lesson slug when available by matching YouTube IDs
     if Lesson:
-        def extract_vid(url: str) -> str:
-            from urllib.parse import urlparse, parse_qs
-            u = urlparse(url or '')
-            host = (u.netloc or '').lower()
-            path = u.path or ''
-            qs = parse_qs(u.query or '')
-            if 'youtube.com/embed/' in url:
-                try:
-                    return path.rstrip('/').split('/')[-1]
-                except Exception:
-                    return ''
-            if host.endswith('youtu.be'):
-                return path.lstrip('/').split('/')[0]
-            if host.endswith('youtube.com') and path.startswith('/watch'):
-                return (qs.get('v') or [''])[0]
-            return ''
-
         ids = {}
         for v in videos:
             vid = extract_vid(v.embed_url())
@@ -620,11 +633,29 @@ def video_gallery(request):
                 vid = ids.get(v.id)
                 if vid and vid in by_id:
                     setattr(v, 'lesson_slug', by_id[vid])
+
+    # Attach a ResourceModule id when a module has the same YouTube ID
+    if ResourceModule:
+        try:
+            mod_map = {}
+            # Build map of yt_id -> module_id
+            for m in ResourceModule.objects.all().only('id', 'video_url'):
+                vid = extract_vid(getattr(m, 'video_url', '') or '')
+                if vid:
+                    mod_map[vid] = m.id
+            # Assign mapping to video items
+            for v in videos:
+                vid = getattr(v, 'youtube_id2', None) or extract_vid(v.embed_url())
+                if vid and vid in mod_map:
+                    setattr(v, 'module_id', mod_map[vid])
+        except Exception:
+            pass
     # Compute an effective category for filtering and rendering
     for v in videos:
         eff = (v.category or '').strip().lower()
         if not eff:
-            if getattr(v, 'lesson_slug', None):
+            # Treat either a mapped ResourceModule or a mapped Lesson as a Module
+            if getattr(v, 'module_id', None) or getattr(v, 'lesson_slug', None):
                 eff = 'module'
             elif getattr(v, 'mp4_static_path', ''):
                 eff = 'quick'

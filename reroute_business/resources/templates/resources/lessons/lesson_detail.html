@@ -7,9 +7,10 @@
 <link rel="stylesheet" href="{% static 'resources/css/lesson.css' %}">
 <style>
   .lesson-layout { display: grid; grid-template-columns: 1fr; gap: 24px; }
-  @media (min-width: 960px){ .lesson-layout { grid-template-columns: 7fr 3fr; align-items: start; } }
+  /* Use a slightly smaller breakpoint so two-column shows on more screens */
+  @media (min-width: 768px){ .lesson-layout { grid-template-columns: 7fr 3fr; align-items: start; } }
   .lesson-side { position: static; }
-  @media (min-width: 960px){ .lesson-side { position: sticky; top: 88px; } }
+  @media (min-width: 768px){ .lesson-side { position: sticky; top: 88px; } }
   .quiz-panel { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
   .quiz-panel h2 { font-size: 1.25rem; margin: 0 0 .5rem; }
   .lesson-quiz-container[hidden] { display: none !important; }

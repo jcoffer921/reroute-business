@@ -29,7 +29,9 @@
             data-tags="{{ video.effective_tags }}"
           >
             {% comment %} Determine the click-through URL per item {% endcomment %}
-            {% if video.lesson_slug %}
+            {% if video.module_id %}
+              {% url 'module_detail' video.module_id as item_href %}
+            {% elif video.lesson_slug %}
               {% url 'lesson_detail' video.lesson_slug as item_href %}
             {% elif video.mp4_static_path %}
               {% firstof video.mp4_static_path as item_href %}
@@ -43,9 +45,16 @@
               {% else %}
                 <img src="{{ video.poster|default:'/static/images/dont_say_interview.png' }}" alt="{{ video.title }} thumbnail">
               {% endif %}
+              <span class="video-play-btn" aria-hidden="true">
+                <span>▶</span>
+              </span>
             </a>
             <div class="video-card-body">
-              {% if video.lesson_slug %}<span class="video-badge">Interactive Quiz</span>{% endif %}
+              {% if video.module_id %}
+                <span class="video-badge">Module</span>
+              {% elif video.lesson_slug %}
+                <span class="video-badge">Interactive Quiz</span>
+              {% endif %}
               <div class="video-category">Learning videos</div>
               <div class="video-card-title">
                 <a href="{{ item_href }}">{{ video.title }}</a>

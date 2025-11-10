@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ReRoute | {{ module.title }}{% endblock %}
+
+{% block content %}
+<style>
+  .mod-container { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
+  .mod-flex { display: flex; gap: 2rem; align-items: flex-start; }
+  .mod-left { flex: 1; background: #f7f9fc; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(10,34,80,0.06); }
+  .mod-right { flex: 2; min-width: 0; }
+  .mod-sticky { position: sticky; top: 1rem; }
+
+  .mod-title { margin: .75rem 0 .25rem; font-size: 1.6rem; font-weight: 800; color: #1b3b82; }
+  .mod-desc { color: #475569; margin-bottom: .75rem; }
+  .mod-video-wrap { width: 100%; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: #000; box-shadow: 0 8px 24px rgba(10,34,80,0.12); }
+  .mod-video-wrap iframe, .mod-video-wrap video, .mod-video-wrap embed { width: 100%; height: 100%; border: 0; display: block; }
+
+  .mod-section { margin-top: 1rem; }
+  .mod-section h3 { margin: .25rem 0 .5rem; font-size: 1.1rem; color: #0F172A; }
+  .mod-notes { color: #334155; }
+
+  .quiz-title { font-weight: 800; color: #0F172A; margin: 0 0 .75rem; font-size: 1.15rem; }
+  .quiz-q { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: .85rem; margin-bottom: .75rem; }
+  .quiz-q h4 { margin: 0 0 .5rem; font-size: 1rem; color: #0F172A; }
+  .quiz-choices { display: grid; gap: .5rem; }
+  .quiz-choices label { display: flex; align-items: center; gap: .5rem; }
+  .quiz-actions { display: flex; justify-content: flex-end; }
+  .quiz-submit { background: #1b3b82; color: #fff; border: none; padding: .6rem .9rem; border-radius: 8px; cursor: pointer; }
+  .quiz-result { margin-top: .5rem; font-weight: 700; color: #1b3b82; }
+
+  @media (max-width: 900px) {
+    .mod-flex { flex-direction: column; }
+    .mod-left { order: 1; }
+    .mod-right { order: 2; }
+  }
+</style>
+
+<div class="mod-container">
+  <div class="mod-flex">
+    <!-- Left: Quiz -->
+    <aside class="mod-left mod-sticky">
+      <div class="quiz-title">Knowledge Check</div>
+      <div id="quizPanel">
+        {% if quiz and quiz.questions %}
+          {% comment %} Client script renders from JSON below {% endcomment %}
+        {% else %}
+          <div class="quiz-q">No quiz available for this module.</div>
+        {% endif %}
+      </div>
+      <div class="quiz-actions">
+        <button id="quizSubmit" class="quiz-submit">Submit Quiz</button>
+      </div>
+      <div id="quizResult" class="quiz-result"></div>
+    </aside>
+
+    <!-- Right: Video + content -->
+    <main class="mod-right">
+      <div class="mod-video-wrap">
+        {% if yt_id %}
+          <iframe src="https://www.youtube-nocookie.com/embed/{{ yt_id }}?rel=0&modestbranding=1&playsinline=1"
+                  title="Module video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        {% elif module.video_url and module.video_url|lower|endswith:'.mp4' %}
+          <video controls playsinline preload="metadata">
+            <source src="{{ module.video_url }}" type="video/mp4">
+          </video>
+        {% elif module.embed_html %}
+          {{ module.embed_html|safe }}
+        {% endif %}
+      </div>
+
+      <h1 class="mod-title">{{ module.title }}</h1>
+      <p class="mod-desc">{{ module.description }}</p>
+
+      <div class="mod-section">
+        <h3>Key Takeaways</h3>
+        <div class="mod-notes">
+          {% if module.internal_content %}
+            {{ module.internal_content|safe }}
+          {% else %}
+            <ul>
+              <li>Watch the video and follow along.</li>
+              <li>Use the quiz to reinforce your learning.</li>
+              <li>Revisit sections that need more practice.</li>
+            </ul>
+          {% endif %}
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+  // Render quiz from server-provided JSON (module.quiz_data)
+  (function(){
+    const data = {{ quiz|default:{}|safe }};
+    const root = document.getElementById('quizPanel');
+    const submit = document.getElementById('quizSubmit');
+    const resultEl = document.getElementById('quizResult');
+
+    if (!root || !submit) return;
+
+    const qs = (data && data.questions) || [];
+    if (qs.length) {
+      root.innerHTML = '';
+      qs.forEach(q => {
+        const box = document.createElement('div'); box.className = 'quiz-q';
+        const h = document.createElement('h4'); h.textContent = q.prompt || ''; box.appendChild(h);
+        const list = document.createElement('div'); list.className = 'quiz-choices';
+        (q.choices||[]).forEach(ch => {
+          const id = `q${q.id}_${ch.id}`;
+          const lab = document.createElement('label'); lab.setAttribute('for', id);
+          const inp = document.createElement('input'); inp.type='radio'; inp.name=`q_${q.id}`; inp.value = ch.id; inp.id = id;
+          const span = document.createElement('span'); span.textContent = ch.text || '';
+          lab.appendChild(inp); lab.appendChild(span); list.appendChild(lab);
+        });
+        box.appendChild(list); root.appendChild(box);
+      });
+    }
+
+    submit.addEventListener('click', () => {
+      if (!qs.length) return;
+      let total = 0, correct = 0;
+      qs.forEach(q => {
+        const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
+        if (!selected) return;
+        total++;
+        const picked = String(selected.value);
+        // Correctness comparison is client-side using quiz_data
+        const match = (q.choices||[]).find(c => String(c.id) === picked);
+        if (match && (match.is_correct === true || match.correct === true)) correct++;
+      });
+      if (resultEl) resultEl.textContent = `You answered ${correct} of ${total} correctly.`;
+    });
+  })();
+</script>
+{% endblock %}
+
