@@ -635,7 +635,15 @@ html { scroll-behavior: smooth; }
 }
 .learning-video-card:hover{ transform: translateY(-2px); box-shadow: 0 10px 24px rgba(10,34,80,0.12); }
 .video-thumb-container{ position: relative; aspect-ratio: 16 / 9; background:#f3f4f6; }
-.video-thumb-container img{ width:100%; height:100%; object-fit: cover; display:block; }
+.video-thumb-container img{ width:100%; height:100%; object-fit: cover; display:block; transition: transform .2s ease, filter .2s ease; }
+/* Subtle readability gradient and hover emphasis */
+.video-thumb-container::after{
+  content:""; position:absolute; inset:0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 60%, rgba(0,0,0,0.35) 100%);
+  opacity: 0; transition: opacity .2s ease;
+}
+.learning-video-card:hover .video-thumb-container img{ transform: scale(1.03); filter: brightness(1.05); }
+.learning-video-card:hover .video-thumb-container::after{ opacity: 1; }
 .video-play-btn{
   position:absolute; inset:0; display:grid; place-items:center; background: radial-gradient(circle at center, rgba(0,0,0,0.12), rgba(0,0,0,0.35));
   border:0; cursor:pointer; color:#fff; transition: background .15s ease;
@@ -644,8 +652,9 @@ html { scroll-behavior: smooth; }
 .video-play-btn span{ width:58px; height:58px; display:inline-flex; align-items:center; justify-content:center; border-radius:999px; border:2px solid rgba(255,255,255,0.9); background: rgba(100,149,237,0.85); box-shadow: 0 6px 20px rgba(100,149,237,0.35); }
 .video-card-body{ padding: .9rem .9rem 1rem; }
 .video-badge{ display:inline-block; padding:.15rem .5rem; border-radius:999px; background:rgba(100,149,237,.12); color:#0F172A; font-weight:700; font-size:.72rem; margin-bottom:.35rem; border:1px solid rgba(100,149,237,.35); }
-.video-category{ color:#4361ee; font-weight:700; font-size:.8rem; letter-spacing:.02em; }
-.video-card-title{ margin:.4rem 0 .6rem; font-size:1.05rem; font-weight:800; color:#0F172A; }
-.video-meta{ display:flex; align-items:center; gap:.6rem; color:#475569; font-size:.9rem; }
+.video-card-title{ margin:.4rem 0 .2rem; font-size:1.05rem; font-weight:800; color:#0F172A; }
+.video-card-title a{ color:inherit; text-decoration:none; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.video-meta{ display:flex; align-items:center; gap:.35rem; color:#6b7280; font-size:.9rem; }
+.video-meta svg{ width:14px; height:14px; color:#6b7280; }
 .video-author-img{ width:28px; height:28px; border-radius:999px; object-fit:cover; border:1px solid #e6ecfb; }
 @media (max-width: 420px){ .video-gallery-grid{ grid-template-columns: 1fr; } }

@@ -7,8 +7,8 @@
 <link rel="stylesheet" href="{% static 'resources/css/lesson.css' %}">
 <style>
   .lesson-layout { display: grid; grid-template-columns: 1fr; gap: 24px; }
-  /* Use a slightly smaller breakpoint so two-column shows on more screens */
-  @media (min-width: 768px){ .lesson-layout { grid-template-columns: 7fr 3fr; align-items: start; } }
+  /* Two-column: left (quiz 30%), right (video 70%) */
+  @media (min-width: 768px){ .lesson-layout { grid-template-columns: 3fr 7fr; align-items: start; } }
   .lesson-side { position: static; }
   @media (min-width: 768px){ .lesson-side { position: sticky; top: 88px; } }
   .quiz-panel { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
@@ -19,9 +19,9 @@
   .lesson-btn.primary { background:#1b3b82; color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; }
   .lesson-quiz-actions-bar { display:flex; justify-content:flex-end; margin-top: 8px; }
   .lesson-quiz-result { color:#1b3b82; font-weight:600; margin-top:8px; }
-  .yt-embed-fit { width: 100%; height: 0; padding-bottom: 56.25%; position: relative; }
+  .yt-embed-fit { width: 100%; height: 0; padding-bottom: 56.25%; position: relative; max-height: 65vh; }
   .yt-embed-fit iframe, .yt-embed-fit embed { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .lesson-video { width: 100%; max-height: 70vh; background: #000; }
+  .lesson-video { width: 100%; max-height: 65vh; background: #000; }
   .rr-mb-12 { margin-bottom: 12px; }
   .rr-w-100 { width: 100%; }
   .rr-flex-row-8 { display:flex; gap:8px; align-items:center; }
@@ -32,6 +32,17 @@
 </style>
 
 <section class="lesson-layout">
+  <aside class="lesson-side">
+    <div class="quiz-panel">
+      <h2>Quiz</h2>
+      <div id="lessonQuizContainer" class="lesson-quiz-container" aria-live="polite"></div>
+      <div class="lesson-quiz-actions-bar">
+        <button id="lessonQuizSubmit" type="button" class="lesson-btn primary">Submit</button>
+      </div>
+      <div id="lessonQuizResult" class="lesson-quiz-result"></div>
+    </div>
+  </aside>
+
   <div>
     <header class="lesson-header">
       <h1 class="lesson-title">{{ lesson.title }}</h1>
@@ -51,17 +62,6 @@
 
     <p class="muted-note">Watch the video and answer the questions on the right. Submit anytime.</p>
   </div>
-
-  <aside class="lesson-side">
-    <div class="quiz-panel">
-      <h2>Quiz</h2>
-      <div id="lessonQuizContainer" class="lesson-quiz-container" aria-live="polite"></div>
-      <div class="lesson-quiz-actions-bar">
-        <button id="lessonQuizSubmit" type="button" class="lesson-btn primary">Submit</button>
-      </div>
-      <div id="lessonQuizResult" class="lesson-quiz-result"></div>
-    </div>
-  </aside>
 </section>
 
 <script>

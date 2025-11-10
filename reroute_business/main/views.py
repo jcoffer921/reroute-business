@@ -648,6 +648,23 @@ def video_gallery(request):
                 vid = getattr(v, 'youtube_id2', None) or extract_vid(v.embed_url())
                 if vid and vid in mod_map:
                     setattr(v, 'module_id', mod_map[vid])
+            # Fallback: title-slug match when video_url is missing or IDs don't match
+            from django.utils.text import slugify
+            title_map = {}
+            for m in ResourceModule.objects.all().only('id', 'title'):
+                try:
+                    title_map[slugify(m.title or '')] = m.id
+                except Exception:
+                    continue
+            for v in videos:
+                if getattr(v, 'module_id', None):
+                    continue
+                try:
+                    vt = slugify(getattr(v, 'title', '') or '')
+                    if vt and vt in title_map:
+                        setattr(v, 'module_id', title_map[vt])
+                except Exception:
+                    continue
         except Exception:
             pass
     # Compute an effective category for filtering and rendering

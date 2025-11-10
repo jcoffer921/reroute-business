@@ -55,21 +55,28 @@
               {% elif video.lesson_slug %}
                 <span class="video-badge">Interactive Quiz</span>
               {% endif %}
-              <div class="video-category">Learning videos</div>
               <div class="video-card-title">
                 <a href="{{ item_href }}">{{ video.title }}</a>
               </div>
               <div class="video-meta">
-                <img class="video-author-img" src="{{ video.author_avatar|default:'/static/images/reroute-trans-logo.png' }}" alt="{{ video.author|default:'ReRoute Team' }}">
-                <span class="video-author">{{ video.author|default:'ReRoute Team' }}</span>
-                <span>•</span>
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M12 7v6l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
                 {% if video.edited_time %}
                   <span class="video-time">{{ video.edited_time }}</span>
-                {% elif video.created_at %}
-                  <span class="video-time">{{ video.created_at|timesince }} ago</span>
                 {% else %}
-                  <span class="video-time">Recently</span>
+                  <span class="video-time">—</span>
                 {% endif %}
+                <span>•</span>
+                {% with (video.effective_category|default:video.category)|default:'other' as cat %}
+                  {% if cat == 'module' %}<span>Module</span>
+                  {% elif cat == 'quick' %}<span>Quick Tip</span>
+                  {% elif cat == 'lecture' %}<span>Lecture</span>
+                  {% elif cat == 'webinar' %}<span>Webinar</span>
+                  {% else %}<span>Other</span>
+                  {% endif %}
+                {% endwith %}
               </div>
             </div>
           </article>
