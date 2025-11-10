@@ -4,9 +4,9 @@
   const endpoints = window.__LESSON_ENDPOINTS__ || {};
   const csrfToken = getCookie('csrftoken');
 
-  const quizActions = $('#lessonQuizActions');
-  const startQuizBtn = $('#lessonStartQuiz');
   const quizContainer = $('#lessonQuizContainer');
+  const submitBtn = document.querySelector('#lessonQuizSubmit');
+  const resultEl = document.querySelector('#lessonQuizResult');
 
   let schema = null;
   let useYouTube = false;
@@ -20,6 +20,8 @@
       useYouTube = !!(schema && schema.lesson && schema.lesson.youtube_video_id);
       if (useYouTube) bootYouTube(schema.lesson.youtube_video_id);
       else bootHTML5();
+      // Immediately render quiz in sidebar
+      renderQuiz();
     })
     .catch(()=>{});
 
@@ -72,16 +74,7 @@
     });
   }
 
-  function onVideoEnded(){
-    if (quizActions) { quizActions.hidden = false; }
-  }
-
-  if (startQuizBtn){
-    startQuizBtn.addEventListener('click', () => {
-      if (quizActions) quizActions.hidden = true;
-      renderQuiz();
-    });
-  }
+  function onVideoEnded(){ /* no-op: quiz is available anytime */ }
 
   function renderQuiz(){
     if (!quizContainer || !schema) return;
@@ -110,15 +103,12 @@
       quizContainer.appendChild(box);
     });
 
-    const actions = document.createElement('div'); actions.className='lesson-quiz-actions-bar';
-    const submit = document.createElement('button'); submit.type='button'; submit.className='lesson-btn primary'; submit.textContent='Submit Quiz';
-    const result = document.createElement('div'); result.className='lesson-quiz-result rr-mt-8';
-    actions.appendChild(submit);
-    quizContainer.appendChild(actions);
-    quizContainer.appendChild(result);
-    quizContainer.hidden = false;
-
-    submit.addEventListener('click', () => submitQuiz(qs, result));
+    // Use existing sidebar action controls
+    if (quizContainer) { quizContainer.hidden = false; }
+    if (submitBtn) {
+      // Prevent duplicate bindings on hot reloads
+      submitBtn.onclick = () => submitQuiz(qs, resultEl);
+    }
   }
 
   function submitQuiz(qs, resultEl){
