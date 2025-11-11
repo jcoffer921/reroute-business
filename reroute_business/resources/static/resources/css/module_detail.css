@@ -1,8 +1,12 @@
 /* Module detail two-column layout (CSP-safe external stylesheet) */
 .mod-container { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
-.mod-flex { display: flex; gap: 2rem; align-items: flex-start; }
-.mod-left { flex: 1; background: #f7f9fc; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(10,34,80,0.06); }
-.mod-right { flex: 2; min-width: 0; }
+.mod-flex { display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: start; }
+.mod-left { background: #f7f9fc; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(10,34,80,0.06); }
+.mod-right { min-width: 0; }
+.mod-flex { grid-auto-flow: row; }
+@media (min-width: 900px){
+  .mod-flex { grid-template-columns: 3fr 7fr; }
+}
 .mod-sticky { position: sticky; top: 1rem; }
 
 .mod-title { margin: .75rem 0 .25rem; font-size: 1.6rem; font-weight: 800; color: #1b3b82; }
@@ -28,4 +32,3 @@
   .mod-left { order: 1; }
   .mod-right { order: 2; }
 }
-

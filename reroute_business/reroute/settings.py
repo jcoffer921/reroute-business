@@ -252,9 +252,17 @@ class AddCSPHeaderMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
         response["Content-Security-Policy"] = (
             "default-src 'self'; "
-            "frame-src https://www.youtube.com https://www.youtube-nocookie.com; "
-            "script-src 'self' 'unsafe-inline' https://www.youtube.com https://www.gstatic.com; "
-            "img-src 'self' data: https://i.ytimg.com; "
+            # Allow YouTube and Google reCAPTCHA iframes
+            "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://www.google.com https://recaptcha.google.com; "
+            # Scripts from self, YouTube helpers, and Google reCAPTCHA
+            "script-src 'self' https://www.youtube.com https://www.gstatic.com https://www.google.com https://www.gstatic.com/recaptcha; "
+            # Explicit style policy (no inline styles)
+            "style-src 'self'; "
+            # Images from self, data URIs, YouTube thumbnails, and gstatic
+            "img-src 'self' data: https://i.ytimg.com https://www.gstatic.com; "
+            # XHR/fetch to self and Google (reCAPTCHA)
+            "connect-src 'self' https://www.google.com; "
+            # Media (video) from self and YouTube
             "media-src 'self' https://www.youtube.com;"
         )
         return response
