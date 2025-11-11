@@ -70,19 +70,5 @@
 {% endblock %}
 
 {% block extra_css %}
-<style>
-  .candidate-strip { display:flex; gap:.75rem; padding: .5rem .75rem 1rem; }
-  .candidate-card { display:flex; align-items:center; gap:.6rem; padding:.5rem .6rem; background:#fff; border:1px solid #e5e7eb; border-radius:10px; text-decoration:none; color:inherit; min-width: 0; }
-  .candidate-card:hover { border-color:#d1d5db; box-shadow:0 2px 8px rgba(0,0,0,.04); }
-  .avatar-outer { flex-shrink:0; }
-  .avatar-sm { width:40px; height:40px; border-radius:50%; object-fit:cover; display:inline-block; }
-  .avatar-sm.initials { display:inline-flex; align-items:center; justify-content:center; background:#eef2ff; color:#1e3a8a; font-weight:700; }
-  .c-meta { display:flex; flex-direction:column; line-height:1.25; min-width:0; }
-  .c-top { display:flex; align-items:center; gap:.4rem; min-width:0; }
-  .c-name { font-weight:600; font-size:.95rem; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 16ch; }
-  .c-snippet { color:#6b7280; font-size:.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 28ch; }
-  .score-badge { display:inline-flex; align-items:center; justify-content:center; padding:2px 6px; border-radius:999px; font-size:.75rem; font-weight:700; background:#e6f7ec; color:#166534; border:1px solid #bbf7d0; }
-  .muted { color:#9ca3af; }
-  @media (max-width: 640px){ .candidate-card { padding:.45rem; } .c-snippet{ display:none; } }
-</style>
+<link rel="stylesheet" href="{% static 'dashboard/css/employer_matcher.css' %}">
 {% endblock %}

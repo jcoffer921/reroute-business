@@ -1,7 +1,20 @@
 // Simplified lesson flow: show quiz after video ends (no timestamps)
 (function(){
   const $ = (sel) => document.querySelector(sel);
-  const endpoints = window.__LESSON_ENDPOINTS__ || {};
+  var endpoints = window.__LESSON_ENDPOINTS__ || {};
+  // Allow CSP-safe data attributes instead of inline JS globals
+  (function(){
+    if (endpoints && endpoints.schema) return; // already provided
+    var root = document.getElementById('lessonRoot');
+    if (!root) return;
+    var schemaUrl = root.getAttribute('data-schema-url');
+    var attemptUrl = root.getAttribute('data-attempt-url');
+    var ytId = root.getAttribute('data-yt-id');
+    if (!endpoints) endpoints = {};
+    if (schemaUrl) endpoints.schema = schemaUrl;
+    if (attemptUrl) endpoints.attempt = attemptUrl;
+    if (ytId) { window.__LESSON_YT_ID__ = ytId; }
+  })();
   const csrfToken = getCookie('csrftoken');
 
   const quizContainer = $('#lessonQuizContainer');
@@ -13,6 +26,7 @@
   let player = null;
   let ytEndPoll = null;
 
+  if (!endpoints || !endpoints.schema) return; // nothing to do
   fetch(endpoints.schema, { credentials: 'same-origin' })
     .then(r => r.json())
     .then(data => {

@@ -1,0 +1,6 @@
+.watch-wrap { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem; }
+.watch-player { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(10,34,80,0.12); }
+.watch-player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.watch-title { margin: .75rem 0 .25rem; font-size: 1.6rem; font-weight: 800; color: #1b3b82; }
+.watch-desc { color: #475569; }
+

@@ -5,20 +5,14 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'resources/css/resources.css' %}">
-<style>
-  .watch-wrap { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem; }
-  .watch-player { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(10,34,80,0.12); }
-  .watch-player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-  .watch-title { margin: .75rem 0 .25rem; font-size: 1.6rem; font-weight: 800; color: #1b3b82; }
-  .watch-desc { color: #475569; }
-</style>
+<link rel="stylesheet" href="{% static 'resources/css/video_watch.css' %}">
 {% endblock %}
 
 {% block content %}
 <section class="watch-wrap">
   <div class="watch-player">
     {% if embed_url %}
-      <iframe src="{{ embed_url }}" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      <iframe src="{{ embed_url }}" title="YouTube video player" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     {% endif %}
   </div>
   <h1 class="watch-title">{{ video.title }}</h1>
@@ -27,4 +21,3 @@
   {% endif %}
 </section>
 {% endblock %}
-

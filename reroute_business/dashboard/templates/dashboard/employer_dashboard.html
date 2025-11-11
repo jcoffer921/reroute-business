@@ -292,78 +292,9 @@
 </div>
 
 <script src="{% static 'dashboard/js/employer_dashboard.js' %}" defer></script>
-<script>
-  (function(){
-    const openBtn = document.getElementById('openScheduleInterview');
-    const modal = document.getElementById('scheduleInterviewModal');
-    const backdrop = document.getElementById('scheduleInterviewBackdrop');
-    const closeBtn = document.getElementById('scheduleInterviewClose');
-    function open(){ modal.classList.remove('hidden'); backdrop.classList.remove('hidden'); }
-    function close(){ modal.classList.add('hidden'); backdrop.classList.add('hidden'); }
-    if (openBtn) openBtn.addEventListener('click', open);
-    if (backdrop) backdrop.addEventListener('click', close);
-    if (closeBtn) closeBtn.addEventListener('click', close);
-    const closeBtn2 = document.getElementById('scheduleInterviewClose2');
-    if (closeBtn2) closeBtn2.addEventListener('click', close);
-  })();
-
-  // Reschedule modal wiring
-  (function(){
-    // Dropdown toggles
-    document.addEventListener('click', (e) => {
-      const toggle = e.target.closest('.dropdown-toggle');
-      // Close all menus if clicking outside
-      if (!toggle && !e.target.closest('.actions-dropdown')) {
-        document.querySelectorAll('.actions-dropdown .dropdown-menu').forEach(m => m.classList.remove('show'));
-        return;
-      }
-      if (toggle) {
-        const id = toggle.getAttribute('data-menu-id');
-        const menu = document.getElementById(id);
-        if (menu) {
-          const isOpen = menu.classList.contains('show');
-          document.querySelectorAll('.actions-dropdown .dropdown-menu').forEach(m => m.classList.remove('show'));
-          if (!isOpen) menu.classList.add('show');
-        }
-      }
-    });
-
-    const openBtns = document.querySelectorAll('.openReschedule');
-    const modal = document.getElementById('rescheduleInterviewModal');
-    const backdrop = document.getElementById('rescheduleInterviewBackdrop');
-    const closeBtn = document.getElementById('rescheduleInterviewClose');
-    const closeBtn2 = document.getElementById('rescheduleInterviewClose2');
-    const idInput = document.getElementById('rescheduleInterviewId');
-    const dtInput = document.getElementById('rescheduleDt');
-
-    function open(interviewId, dt) {
-      if (!modal) return;
-      idInput.value = interviewId || '';
-      if (dt) dtInput.value = dt;
-      modal.classList.remove('hidden');
-      backdrop.classList.remove('hidden');
-      // Close any open dropdowns
-      document.querySelectorAll('.actions-dropdown .dropdown-menu').forEach(m => m.classList.remove('show'));
-    }
-    function close(){
-      if (!modal) return;
-      modal.classList.add('hidden');
-      backdrop.classList.add('hidden');
-    }
-    openBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = btn.getAttribute('data-interview');
-        const dt = btn.getAttribute('data-datetime');
-        open(id, dt);
-      });
-    });
-    if (backdrop) backdrop.addEventListener('click', close);
-    if (closeBtn) closeBtn.addEventListener('click', close);
-    if (closeBtn2) closeBtn2.addEventListener('click', close);
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
-  })();
-</script>
+<script src="{% static 'dashboard/js/employer_dashboard_modals.js' %}" defer></script>
 {% endblock %}
 {% block extra_js %}
   <script src="{% static 'dashboard/js/employer_dashboard.js' %}" defer></script>
+  <script src="{% static 'dashboard/js/employer_dashboard_modals.js' %}" defer></script>
 {% endblock %}
