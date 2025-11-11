@@ -69,7 +69,7 @@
                   <span class="video-time">—</span>
                 {% endif %}
                 <span>•</span>
-                {% with (video.effective_category|default:video.category)|default:'other' as cat %}
+                {% with video.effective_category|default:video.category|default:'other' as cat %}
                   {% if cat == 'module' %}<span>Module</span>
                   {% elif cat == 'quick' %}<span>Quick Tip</span>
                   {% elif cat == 'lecture' %}<span>Lecture</span>
