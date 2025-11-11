@@ -61,12 +61,17 @@ def _extract_youtube_id_simple(url: str) -> str:
 def module_detail(request, pk: int):
     module = get_object_or_404(ResourceModule, pk=pk)
     yt_id = _extract_youtube_id_simple(module.video_url or '') if module.video_url else ''
-    quiz = module.quiz_data or None
     return render(request, 'resources/modules/module_detail.html', {
         'module': module,
         'yt_id': yt_id,
-        'quiz': quiz,
     })
+
+
+@require_GET
+def module_quiz_schema(request, pk: int):
+    module = get_object_or_404(ResourceModule, pk=pk)
+    data = module.quiz_data or {}
+    return JsonResponse(data)
 
 
 def interview_prep(request):
