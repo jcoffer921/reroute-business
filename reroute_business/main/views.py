@@ -687,6 +687,21 @@ def video_gallery(request):
 
     return render(request, 'main/video_gallery.html', {'videos': videos, 'active_cat': req_cat})
 
+
+# ===============================
+# Video Watch (embed detail)
+# ===============================
+def video_watch(request, pk: int):
+    video = get_object_or_404(YouTubeVideo, pk=pk)
+    try:
+        embed = video.embed_url()
+    except Exception:
+        embed = ''
+    return render(request, 'main/video_watch.html', {
+        'video': video,
+        'embed_url': embed,
+    })
+
 # =========================================================================
 # Email Verification Helpers
 # =========================================================================

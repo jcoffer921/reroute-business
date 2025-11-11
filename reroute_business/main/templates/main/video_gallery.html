@@ -28,15 +28,17 @@
             data-category="{{ video.effective_category|default:video.category|default:'other' }}"
             data-tags="{{ video.effective_tags }}"
           >
-            {% comment %} Determine the click-through URL per item {% endcomment %}
+            {% comment %} Determine the click-through URL per item (stay on-site) {% endcomment %}
             {% if video.module_id %}
               {% url 'module_detail' video.module_id as item_href %}
             {% elif video.lesson_slug %}
               {% url 'lesson_detail' video.lesson_slug as item_href %}
+            {% elif vid %}
+              {% url 'video_watch' video.id as item_href %}
             {% elif video.mp4_static_path %}
               {% firstof video.mp4_static_path as item_href %}
             {% else %}
-              {% firstof video.video_url '#' as item_href %}
+              {% url 'video_watch' video.id as item_href %}
             {% endif %}
 
             <a class="video-thumb-container" href="{{ item_href }}">
@@ -48,6 +50,7 @@
               <span class="video-play-btn" aria-hidden="true">
                 <span>▶</span>
               </span>
+              <span class="video-thumb-title">{{ video.title }}</span>
             </a>
             <div class="video-card-body">
               {% if video.module_id %}
@@ -55,9 +58,6 @@
               {% elif video.lesson_slug %}
                 <span class="video-badge">Interactive Quiz</span>
               {% endif %}
-              <div class="video-card-title">
-                <a href="{{ item_href }}">{{ video.title }}</a>
-              </div>
               <div class="video-meta">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                   <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>

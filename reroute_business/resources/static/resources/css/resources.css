@@ -644,6 +644,12 @@ html { scroll-behavior: smooth; }
 }
 .learning-video-card:hover .video-thumb-container img{ transform: scale(1.03); filter: brightness(1.05); }
 .learning-video-card:hover .video-thumb-container::after{ opacity: 1; }
+/* Title badge over thumbnail for quick scanning */
+.video-thumb-title{
+  position:absolute; left:8px; right:8px; bottom:8px; color:#fff; font-weight:800; font-size:.95rem;
+  text-shadow: 0 2px 6px rgba(0,0,0,.45);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 .video-play-btn{
   position:absolute; inset:0; display:grid; place-items:center; background: radial-gradient(circle at center, rgba(0,0,0,0.12), rgba(0,0,0,0.35));
   border:0; cursor:pointer; color:#fff; transition: background .15s ease;
