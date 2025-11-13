@@ -4,8 +4,11 @@ from . import views
 
 urlpatterns = [
     path('', views.resource_list, name='resource_list'),
-    path('modules/<int:pk>/', views.module_detail, name='module_detail'),
-    path('api/modules/<int:pk>/quiz/', views.module_quiz_schema, name='module_quiz_schema'),
+    path('module/<int:pk>/', views.module_detail, name='module_detail'),
+    path('modules/<int:pk>/', views.module_detail),  # legacy alias
+    path('module/<int:pk>/quiz/schema/', views.module_quiz_schema, name='module_quiz_schema'),
+    path('module/<int:pk>/quiz/submit/', views.module_quiz_submit, name='module_quiz_submit'),
+    path('api/modules/<int:pk>/quiz/', views.module_quiz_schema),  # legacy API alias
 
     # Job tools resources
     path('job-tools/', views.job_tools_index, name='job_tools_index'),

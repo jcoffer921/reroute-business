@@ -67,10 +67,10 @@ try:
 except Exception:
     Lesson = None
 try:
-    # Optional: map gallery videos to ResourceModule pages by YouTube ID
-    from reroute_business.resources.models import ResourceModule
+    # Optional: map gallery videos to Module pages by YouTube ID
+    from reroute_business.resources.models import Module
 except Exception:
-    ResourceModule = None
+    Module = None
 
 # Try to import a custom password form; if unavailable, we use Django's default.
 try:
@@ -634,12 +634,12 @@ def video_gallery(request):
                 if vid and vid in by_id:
                     setattr(v, 'lesson_slug', by_id[vid])
 
-    # Attach a ResourceModule id when a module has the same YouTube ID
-    if ResourceModule:
+    # Attach a Module id when a module has the same YouTube ID
+    if Module:
         try:
             mod_map = {}
             # Build map of yt_id -> module_id
-            for m in ResourceModule.objects.all().only('id', 'video_url'):
+            for m in Module.objects.all().only('id', 'video_url'):
                 vid = extract_vid(getattr(m, 'video_url', '') or '')
                 if vid:
                     mod_map[vid] = m.id
@@ -651,7 +651,7 @@ def video_gallery(request):
             # Fallback: title-slug match when video_url is missing or IDs don't match
             from django.utils.text import slugify
             title_map = {}
-            for m in ResourceModule.objects.all().only('id', 'title'):
+            for m in Module.objects.all().only('id', 'title'):
                 try:
                     title_map[slugify(m.title or '')] = m.id
                 except Exception:
@@ -671,7 +671,7 @@ def video_gallery(request):
     for v in videos:
         eff = (v.category or '').strip().lower()
         if not eff:
-            # Treat either a mapped ResourceModule or a mapped Lesson as a Module
+            # Treat either a mapped Module or a mapped Lesson as a Module category
             if getattr(v, 'module_id', None) or getattr(v, 'lesson_slug', None):
                 eff = 'module'
             elif getattr(v, 'mp4_static_path', ''):

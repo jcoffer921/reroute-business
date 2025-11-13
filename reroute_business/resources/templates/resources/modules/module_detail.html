@@ -11,11 +11,39 @@
     <!-- Left: Quiz -->
     <aside class="mod-left mod-sticky">
       <div class="quiz-title">Knowledge Check</div>
-      <div id="quizPanel" data-quiz-url="{% url 'module_quiz_schema' module.id %}"></div>
-      <div class="quiz-actions">
-        <button id="quizSubmit" class="quiz-submit">Submit Quiz</button>
+      <div class="quiz-status">
+        {% if user_score %}
+          <div class="quiz-status__label">Last Score</div>
+          <div class="quiz-status__value">{{ user_score.score }} / {{ user_score.total_questions }}</div>
+          <div class="quiz-status__meta">Updated {{ user_score.updated_at|date:"M j, Y g:i a" }}</div>
+        {% elif not can_submit_quiz %}
+          <div class="quiz-status__meta">Log in to take this quiz and save your score.</div>
+        {% elif question_count %}
+          <div class="quiz-status__meta">
+            {{ question_count }} question{% if question_count|default:0 != 1 %}s{% endif %}. Submit to track your progress.
+          </div>
+        {% else %}
+          <div class="quiz-status__meta">Quiz questions are being prepared for this module.</div>
+        {% endif %}
       </div>
-      <div id="quizResult" class="quiz-result"></div>
+      <div
+        id="quizPanel"
+        data-quiz-url="{% url 'module_quiz_schema' module.id %}"
+        data-submit-url="{% url 'module_quiz_submit' module.id %}"
+        data-can-submit="{{ can_submit_quiz|yesno:'true,false' }}"
+      ></div>
+      <div class="quiz-actions">
+        <button
+          id="quizSubmit"
+          class="quiz-submit"
+          data-submit-url="{% url 'module_quiz_submit' module.id %}"
+          data-can-submit="{{ can_submit_quiz|yesno:'true,false' }}"
+          {% if not can_submit_quiz %}disabled aria-disabled="true"{% endif %}
+        >
+          {% if can_submit_quiz %}Submit Quiz{% else %}Log In to Submit{% endif %}
+        </button>
+      </div>
+      <div id="quizResult" class="quiz-result" role="status" aria-live="polite"></div>
     </aside>
 
     <!-- Right: Video + content -->
@@ -40,15 +68,23 @@
       <div class="mod-section">
         <h3>Key Takeaways</h3>
         <div class="mod-notes">
-          {% if module.internal_content %}
-            {{ module.internal_content|safe }}
-          {% else %}
-            <ul>
-              <li>Watch the video and follow along.</li>
-              <li>Use the quiz to reinforce your learning.</li>
-              <li>Revisit sections that need more practice.</li>
-            </ul>
-          {% endif %}
+          {% with takeaways=module.key_takeaways_list %}
+            {% if takeaways %}
+              <ul>
+                {% for note in takeaways %}
+                  <li>{{ note }}</li>
+                {% endfor %}
+              </ul>
+            {% elif module.internal_content %}
+              {{ module.internal_content|safe }}
+            {% else %}
+              <ul>
+                <li>Watch the video and follow along.</li>
+                <li>Use the quiz to reinforce your learning.</li>
+                <li>Revisit sections that need more practice.</li>
+              </ul>
+            {% endif %}
+          {% endwith %}
         </div>
       </div>
     </main>
@@ -57,4 +93,3 @@
 
 <script src="{% static 'resources/js/module_quiz_csp.js' %}" defer></script>
 {% endblock %}
-

@@ -1,19 +1,19 @@
 from django.core.management.base import BaseCommand
 
-# Import the ResourceModule model used for Learning Modules
-from reroute_business.resources.models import ResourceModule
+# Import the Module model used for Learning Modules
+from reroute_business.resources.models import Module
 
 
 class Command(BaseCommand):
     """
-    Seed example ResourceModule cards without external embeds.
+    Seed example Module cards without external embeds.
 
     Removes legacy Edpuzzle usage by leaving `embed_html` empty so the
     Resources page shows native lessons only (or a Coming Soon placeholder).
     Safe to run multiple times.
     """
 
-    help = "Seed demo ResourceModule cards without external embeds."
+    help = "Seed demo Module cards without external embeds."
 
     def handle(self, *args, **options):
         # Optional internal notes/content for future expansion
@@ -25,10 +25,10 @@ class Command(BaseCommand):
         )
 
         # Interview Prep 101 card without external embed
-        obj, created = ResourceModule.objects.update_or_create(
+        obj, created = Module.objects.update_or_create(
             title="Interview Prep 101",
             defaults={
-                "category": ResourceModule.CATEGORY_WORKFORCE,
+                "category": Module.CATEGORY_WORKFORCE,
                 "description": (
                     "Learn how to prepare for your next interview with confidence. "
                     "Covers research, common questions, and how to leave a strong impression."
@@ -37,23 +37,28 @@ class Command(BaseCommand):
                 "video_url": "",
                 "embed_html": "",
                 "internal_content": internal_notes,
+                "key_takeaways": [
+                    "Research company values and practice storytelling.",
+                    "Use the STAR method to structure responses.",
+                    "Plan confident follow-up messages within 24 hours.",
+                ],
             },
         )
 
         if created:
             self.stdout.write(self.style.SUCCESS(
-                "Created ResourceModule: 'Interview Prep 101'"
+                "Created Module: 'Interview Prep 101'"
             ))
         else:
             self.stdout.write(self.style.WARNING(
-                "Updated ResourceModule: 'Interview Prep 101'"
+                "Updated Module: 'Interview Prep 101'"
             ))
 
         # Resume Basics 101 card without external embed; interactive lesson is separate
-        obj2, created2 = ResourceModule.objects.update_or_create(
+        obj2, created2 = Module.objects.update_or_create(
             title="Resume Basics 101",
             defaults={
-                "category": ResourceModule.CATEGORY_WORKFORCE,
+                "category": Module.CATEGORY_WORKFORCE,
                 "description": (
                     "Build a strong resume that highlights your skills and experience. "
                     "This quick lesson covers structure, strong statements, and soft skills."
@@ -65,20 +70,25 @@ class Command(BaseCommand):
                     "Focus on accomplishments, tailor for each job, and keep it concise.\n"
                     "Use action verbs and quantify results where possible.\n"
                 ),
+                "key_takeaways": [
+                    "Start with a strong summary that matches the job posting.",
+                    "Use bullet points that highlight impact, not job duties.",
+                    "Keep it to one page unless you have a decade of experience.",
+                ],
             },
         )
 
         if created2:
             self.stdout.write(self.style.SUCCESS(
-                "Created ResourceModule: 'Resume Basics 101'"
+                "Created Module: 'Resume Basics 101'"
             ))
         else:
             self.stdout.write(self.style.WARNING(
-                "Updated ResourceModule: 'Resume Basics 101'"
+                "Updated Module: 'Resume Basics 101'"
             ))
 
         # Ensure we do NOT keep a local MP4 module in the Learning Modules grid
-        removed = ResourceModule.objects.filter(title="What Not to Say in an Interview").delete()
+        removed = Module.objects.filter(title="What Not to Say in an Interview").delete()
         if removed[0]:
             self.stdout.write(self.style.WARNING("Removed local MP4 module from Learning Modules."))
 

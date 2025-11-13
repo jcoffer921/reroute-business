@@ -22,16 +22,13 @@ class Resource(models.Model):
         return self.title
 
 
-class ResourceModule(models.Model):
+class Module(models.Model):
     """
-    ResourceModule represents a structured learning resource that displays
-    directly on the site (no redirects). It includes a title, short
-    description, a category (with predefined choices), optional internal
-    content, and an optional embed HTML (e.g., an iframe) for inline video.
-    A creation timestamp supports ordering by most recent in the UI.
+    Module represents a structured learning video with an associated quiz.
+    The model replaces the prior ResourceModule concept and powers the new
+    AJAX quiz endpoints.
     """
 
-    # Category choices for grouping modules on the page
     CATEGORY_WORKFORCE = "workforce"
     CATEGORY_DIGITAL = "digital"
     CATEGORY_REENTRY = "reentry"
@@ -44,34 +41,14 @@ class ResourceModule(models.Model):
         (CATEGORY_LIFE, "Life Skills"),
     ]
 
-    # Core module fields
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
-
-    # Optional video URL (YouTube or local static path). If present, UI
-    # auto-detects the correct player (iframe vs <video>). Prefer this over
-    # embed_html for new content.
     video_url = models.CharField(max_length=500, blank=True, null=True)
-
-    # Optional embedded video HTML (iframe); used to render inline player
     embed_html = models.TextField(blank=True, null=True)
-
-    # Optional internal rich content (future: lessons, text, steps)
     internal_content = models.TextField(blank=True, null=True)
-
-    # Optional inline quiz schema (client-side evaluated)
-    # Example structure:
-    # {
-    #   "questions": [
-    #     {"id": 1, "prompt": "...", "choices": [
-    #        {"id": "a", "text": "...", "is_correct": true}, ...
-    #     ]}
-    #   ]
-    # }
     quiz_data = models.JSONField(blank=True, null=True)
-
-    # Timestamp for ordering by recency in the Resources page
+    key_takeaways = models.JSONField(blank=True, default=list)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -79,8 +56,78 @@ class ResourceModule(models.Model):
         verbose_name_plural = "Learning Modules"
 
     def __str__(self):
-        # Helpful for admin listings
         return f"{self.title} ({self.get_category_display()})"
+
+    def key_takeaways_list(self):
+        """
+        Normalize key takeaways to a list of trimmed strings regardless
+        of whether the field stores JSON, a newline-delimited string, or
+        is left blank.
+        """
+        data = self.key_takeaways
+        if isinstance(data, str):
+            items = [line.strip() for line in data.splitlines()]
+            return [item for item in items if item]
+        if isinstance(data, (list, tuple)):
+            formatted = []
+            for item in data:
+                text = str(item).strip()
+                if text:
+                    formatted.append(text)
+            return formatted
+        return []
+
+
+class QuizQuestion(models.Model):
+    module = models.ForeignKey(Module, related_name="questions", on_delete=models.CASCADE)
+    prompt = models.TextField()
+    order = models.PositiveIntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("order", "id")
+
+    def __str__(self):
+        return f"{self.module.title}: Q{self.order}"
+
+
+class QuizAnswer(models.Model):
+    question = models.ForeignKey(QuizQuestion, related_name="answers", on_delete=models.CASCADE)
+    text = models.CharField(max_length=255)
+    is_correct = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("id",)
+
+    def __str__(self):
+        return f"{self.question_id} - {self.text[:40]}"
+
+
+class ModuleQuizScore(models.Model):
+    module = models.ForeignKey(Module, related_name="scores", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="module_quiz_scores",
+        on_delete=models.CASCADE,
+    )
+    score = models.PositiveIntegerField(default=0)
+    total_questions = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("module", "user"),
+                name="unique_user_module_score",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.user} - {self.module} ({self.score}/{self.total_questions})"
 
 
 # --- Interactive Lesson Models ---

@@ -8,7 +8,8 @@ from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
 from reroute_business.blog.models import BlogPost
 from .models import (
-    ResourceModule,
+    Module,
+    ModuleQuizScore,
     Lesson,
     LessonQuestion,
     LessonChoice,
@@ -20,10 +21,10 @@ from .models import (
 def resource_list(request):
     """
     Resources landing page with inline Learning Modules.
-    - Queries all ResourceModule records ordered by most recent, passing them
+    - Queries all Module records ordered by most recent, passing them
       to the template so videos can render inline (no external redirects).
     """
-    modules = ResourceModule.objects.all().order_by('-created_at')
+    modules = Module.objects.all().order_by('-created_at')
     lessons = Lesson.objects.filter(is_active=True).order_by('-created_at')
     return render(request, 'resources/resource_list.html', {
         'modules': modules,
@@ -58,20 +59,114 @@ def _extract_youtube_id_simple(url: str) -> str:
     return ''
 
 
+@ensure_csrf_cookie
 def module_detail(request, pk: int):
-    module = get_object_or_404(ResourceModule, pk=pk)
+    module = get_object_or_404(Module, pk=pk)
     yt_id = _extract_youtube_id_simple(module.video_url or '') if module.video_url else ''
+    user_score = None
+    if request.user.is_authenticated:
+        user_score = ModuleQuizScore.objects.filter(module=module, user=request.user).first()
     return render(request, 'resources/modules/module_detail.html', {
         'module': module,
         'yt_id': yt_id,
+        'user_score': user_score,
+        'can_submit_quiz': request.user.is_authenticated,
+        'question_count': module.questions.count(),
     })
 
 
 @require_GET
 def module_quiz_schema(request, pk: int):
-    module = get_object_or_404(ResourceModule, pk=pk)
-    data = module.quiz_data or {}
-    return JsonResponse(data)
+    module = get_object_or_404(Module.objects.prefetch_related('questions__answers'), pk=pk)
+    questions_payload = []
+    for question in module.questions.all().order_by('order', 'id'):
+        choices = []
+        for choice in question.answers.all().order_by('id'):
+            choices.append({
+                'id': choice.id,
+                'text': choice.text,
+                'is_correct': choice.is_correct,
+            })
+        questions_payload.append({
+            'id': question.id,
+            'prompt': question.prompt,
+            'order': question.order,
+            'choices': choices,
+        })
+
+    payload = {
+        'module_id': module.id,
+        'title': module.title,
+        'questions': questions_payload,
+    }
+
+    if request.user.is_authenticated:
+        existing = ModuleQuizScore.objects.filter(module=module, user=request.user).first()
+        if existing:
+            payload['user_score'] = {
+                'score': existing.score,
+                'total_questions': existing.total_questions,
+                'updated_at': existing.updated_at.isoformat(),
+            }
+
+    return JsonResponse(payload)
+
+
+@require_POST
+@csrf_protect
+def module_quiz_submit(request, pk: int):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required.'}, status=403)
+    module = get_object_or_404(Module.objects.prefetch_related('questions__answers'), pk=pk)
+    try:
+        data = json.loads(request.body.decode('utf-8')) if request.body else request.POST
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON payload.'}, status=400)
+
+    answers = data.get('answers') or []
+    if not isinstance(answers, list):
+        return JsonResponse({'error': 'Answers must be a list.'}, status=400)
+
+    # Build lookup of submitted answers keyed by question id
+    submitted = {}
+    for item in answers:
+        try:
+            qid = int(item.get('question_id'))
+            aid = int(item.get('answer_id'))
+        except (TypeError, ValueError):
+            continue
+        if qid and aid:
+            submitted[qid] = aid
+
+    questions = list(module.questions.all().order_by('order', 'id'))
+    total_questions = len(questions)
+    attempted = 0
+    correct = 0
+
+    for question in questions:
+        selected_id = submitted.get(question.id)
+        if not selected_id:
+            continue
+        attempted += 1
+        choice = next((choice for choice in question.answers.all() if choice.id == selected_id), None)
+        if choice and choice.is_correct:
+            correct += 1
+
+    score_obj, _ = ModuleQuizScore.objects.update_or_create(
+        module=module,
+        user=request.user,
+        defaults={'score': correct, 'total_questions': total_questions},
+    )
+
+    payload = {
+        'message': 'Score saved.',
+        'score': correct,
+        'total_questions': total_questions,
+        'attempted': attempted,
+        'percent': round((correct / total_questions) * 100, 2) if total_questions else 0.0,
+        'updated_at': score_obj.updated_at.isoformat(),
+    }
+    return JsonResponse(payload)
 
 
 def interview_prep(request):

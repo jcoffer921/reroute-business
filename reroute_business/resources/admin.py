@@ -1,6 +1,9 @@
 from django.contrib import admin
 from .models import (
-    ResourceModule,
+    Module,
+    QuizQuestion,
+    QuizAnswer,
+    ModuleQuizScore,
     Lesson,
     LessonQuestion,
     LessonChoice,
@@ -10,30 +13,58 @@ from .models import (
 from .templatetags.resources_extras import youtube_embed_url
 
 
-@admin.register(ResourceModule)
-class ResourceModuleAdmin(admin.ModelAdmin):
+class QuizAnswerInline(admin.TabularInline):
+    model = QuizAnswer
+    extra = 0
+
+
+class QuizQuestionInline(admin.TabularInline):
+    model = QuizQuestion
+    extra = 0
+    show_change_link = True
+
+
+@admin.register(Module)
+class ModuleAdmin(admin.ModelAdmin):
     """
-    Admin configuration to manage Learning Modules.
-    - Search by title and description for quick discovery.
-    - Filter by category to narrow down content.
-    - Default ordering shows most recent first.
+    Manage learning modules along with their quiz questions and answers.
     """
 
     list_display = ("title", "category", "video_url", "created_at")
     list_filter = ("category",)
     search_fields = ("title", "description", "video_url")
     ordering = ("-created_at",)
-    fields = ("title", "description", "category", "video_url", "embed_html", "internal_content")
+    fieldsets = (
+        (None, {"fields": ("title", "description", "category", "key_takeaways")}),
+        ("Media", {"fields": ("video_url", "embed_html")}),
+        ("Content", {"fields": ("internal_content",)}),
+    )
+    inlines = [QuizQuestionInline]
 
     def save_model(self, request, obj, form, change):
-        # Normalize any YouTube or pasted iframe into a clean embed URL
         if obj.video_url:
             try:
                 obj.video_url = youtube_embed_url(obj.video_url).strip()
             except Exception:
-                # If normalization fails, keep original to avoid data loss
                 pass
         super().save_model(request, obj, form, change)
+
+
+@admin.register(QuizQuestion)
+class QuizQuestionAdmin(admin.ModelAdmin):
+    list_display = ("module", "order", "prompt")
+    list_filter = ("module",)
+    search_fields = ("prompt", "module__title")
+    ordering = ("module", "order")
+    inlines = [QuizAnswerInline]
+
+
+@admin.register(ModuleQuizScore)
+class ModuleQuizScoreAdmin(admin.ModelAdmin):
+    list_display = ("module", "user", "score", "total_questions", "updated_at")
+    list_filter = ("module",)
+    search_fields = ("module__title", "user__username")
+    ordering = ("-updated_at",)
 
 
 class LessonChoiceInline(admin.TabularInline):
