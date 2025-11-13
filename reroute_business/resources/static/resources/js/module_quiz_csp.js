@@ -159,13 +159,10 @@
         if (choice && (choice.is_correct === true || choice.correct === true)){
           correct += 1;
         }
-        var numericValue = parseInt(value, 10);
-        if (!Number.isNaN(numericValue)){
-          answers.push({
-            question_id: q.id,
-            answer_id: numericValue
-          });
-        }
+        answers.push({
+          question_id: q.id,
+          answer_id: value
+        });
       });
 
       showMessage(resultEl, 'You answered ' + correct + ' of ' + attempted + ' attempted questions correctly.');

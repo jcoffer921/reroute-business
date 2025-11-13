@@ -63,7 +63,17 @@
       </div>
 
       <h1 class="mod-title">{{ module.title }}</h1>
-      <p class="mod-desc">{{ module.description }}</p>
+      {% with desc=module.description|default:module.internal_content %}
+        {% if desc %}
+          <p class="mod-desc">
+            {% if desc == module.description %}
+              {{ desc }}
+            {% else %}
+              {{ desc|safe }}
+            {% endif %}
+          </p>
+        {% endif %}
+      {% endwith %}
 
       <div class="mod-section">
         <h3>Key Takeaways</h3>

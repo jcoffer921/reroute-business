@@ -8,15 +8,7 @@ import os
 import re
 import time
 import zlib
-from typing import Any, NamedTuple
-
-TYPE_CHECKING = False
-if TYPE_CHECKING:
-    from typing import IO
-
-    _DictBase = collections.UserDict[str | bytes, Any]
-else:
-    _DictBase = collections.UserDict
+from typing import IO, Any, NamedTuple, Union
 
 
 # see 7.9.2.2 Text String Type on page 86 and D.3 PDFDocEncoding Character Set
@@ -257,6 +249,13 @@ class PdfName:
 class PdfArray(list[Any]):
     def __bytes__(self) -> bytes:
         return b"[ " + b" ".join(pdf_repr(x) for x in self) + b" ]"
+
+
+TYPE_CHECKING = False
+if TYPE_CHECKING:
+    _DictBase = collections.UserDict[Union[str, bytes], Any]
+else:
+    _DictBase = collections.UserDict
 
 
 class PdfDict(_DictBase):

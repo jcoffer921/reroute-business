@@ -74,3 +74,54 @@ class ModuleQuizTests(TestCase):
         score = ModuleQuizScore.objects.get(module=self.module, user=self.user)
         self.assertEqual(score.score, 1)
         self.assertEqual(score.total_questions, 1)
+
+    def test_inline_quiz_schema_fallback(self):
+        self.module.questions.all().delete()
+        self.module.quiz_data = {
+            "questions": [
+                {
+                    "id": "intro",
+                    "prompt": "Pick A",
+                    "choices": [
+                        {"id": "a", "text": "A", "is_correct": True},
+                        {"id": "b", "text": "B", "is_correct": False},
+                    ],
+                }
+            ]
+        }
+        self.module.save()
+
+        url = reverse("module_quiz_schema", args=[self.module.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(len(payload["questions"]), 1)
+        self.assertEqual(payload["questions"][0]["choices"][0]["id"], "a")
+
+    def test_inline_quiz_submit_fallback(self):
+        self.client.login(username="quizuser", password="safe-password-123")
+        self.module.questions.all().delete()
+        self.module.quiz_data = {
+            "questions": [
+                {
+                    "id": "intro",
+                    "prompt": "Pick A",
+                    "choices": [
+                        {"id": "a", "text": "A", "is_correct": True},
+                        {"id": "b", "text": "B", "is_correct": False},
+                    ],
+                }
+            ]
+        }
+        self.module.save()
+
+        url = reverse("module_quiz_submit", args=[self.module.id])
+        response = self.client.post(
+            url,
+            data=json.dumps({
+                "answers": [{"question_id": "intro", "answer_id": "a"}],
+            }),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["score"], 1)

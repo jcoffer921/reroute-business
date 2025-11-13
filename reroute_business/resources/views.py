@@ -18,6 +18,57 @@ from .models import (
 )
 
 
+def _inline_quiz_questions(module):
+    """
+    Backwards compatibility helper: normalize Module.quiz_data->questions into the
+    same structure returned by relational QuizQuestion/QuizAnswer objects.
+    """
+    questions = []
+    data = module.quiz_data or {}
+    raw_questions = data.get('questions') if isinstance(data, dict) else None
+    if not isinstance(raw_questions, list):
+        return questions
+
+    for idx, raw in enumerate(raw_questions, 1):
+        if not isinstance(raw, dict):
+            continue
+        prompt = (raw.get('prompt') or '').strip()
+        if not prompt:
+            continue
+        raw_choices = raw.get('choices')
+        if not isinstance(raw_choices, list):
+            continue
+
+        norm_choices = []
+        for c_idx, choice in enumerate(raw_choices, 1):
+            if not isinstance(choice, dict):
+                continue
+            text = (choice.get('text') or '').strip()
+            if not text:
+                continue
+            choice_id = choice.get('id')
+            if choice_id in (None, ''):
+                choice_id = f"{idx}_{c_idx}"
+            norm_choices.append({
+                'id': str(choice_id),
+                'text': text,
+                'is_correct': bool(choice.get('is_correct') or choice.get('correct')),
+            })
+        if not norm_choices:
+            continue
+
+        q_id = raw.get('id')
+        if q_id in (None, ''):
+            q_id = str(idx)
+        questions.append({
+            'id': str(q_id),
+            'prompt': prompt,
+            'order': raw.get('order') or idx,
+            'choices': norm_choices,
+        })
+    return questions
+
+
 def resource_list(request):
     """
     Resources landing page with inline Learning Modules.
@@ -66,33 +117,41 @@ def module_detail(request, pk: int):
     user_score = None
     if request.user.is_authenticated:
         user_score = ModuleQuizScore.objects.filter(module=module, user=request.user).first()
+    question_count = module.questions.count()
+    if not question_count:
+        question_count = len(_inline_quiz_questions(module))
     return render(request, 'resources/modules/module_detail.html', {
         'module': module,
         'yt_id': yt_id,
         'user_score': user_score,
         'can_submit_quiz': request.user.is_authenticated,
-        'question_count': module.questions.count(),
+        'question_count': question_count,
     })
 
 
 @require_GET
 def module_quiz_schema(request, pk: int):
     module = get_object_or_404(Module.objects.prefetch_related('questions__answers'), pk=pk)
-    questions_payload = []
-    for question in module.questions.all().order_by('order', 'id'):
-        choices = []
-        for choice in question.answers.all().order_by('id'):
-            choices.append({
-                'id': choice.id,
-                'text': choice.text,
-                'is_correct': choice.is_correct,
+
+    qs = list(module.questions.all().order_by('order', 'id'))
+    if qs:
+        questions_payload = []
+        for question in qs:
+            choices = []
+            for choice in question.answers.all().order_by('id'):
+                choices.append({
+                    'id': str(choice.id),
+                    'text': choice.text,
+                    'is_correct': choice.is_correct,
+                })
+            questions_payload.append({
+                'id': str(question.id),
+                'prompt': question.prompt,
+                'order': question.order,
+                'choices': choices,
             })
-        questions_payload.append({
-            'id': question.id,
-            'prompt': question.prompt,
-            'order': question.order,
-            'choices': choices,
-        })
+    else:
+        questions_payload = _inline_quiz_questions(module)
 
     payload = {
         'module_id': module.id,
@@ -118,6 +177,7 @@ def module_quiz_submit(request, pk: int):
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'Authentication required.'}, status=403)
     module = get_object_or_404(Module.objects.prefetch_related('questions__answers'), pk=pk)
+    has_relational_questions = module.questions.exists()
     try:
         data = json.loads(request.body.decode('utf-8')) if request.body else request.POST
     except json.JSONDecodeError:
@@ -130,27 +190,48 @@ def module_quiz_submit(request, pk: int):
     # Build lookup of submitted answers keyed by question id
     submitted = {}
     for item in answers:
-        try:
-            qid = int(item.get('question_id'))
-            aid = int(item.get('answer_id'))
-        except (TypeError, ValueError):
-            continue
-        if qid and aid:
-            submitted[qid] = aid
+        if has_relational_questions:
+            try:
+                qid = int(item.get('question_id'))
+                aid = int(item.get('answer_id'))
+            except (TypeError, ValueError):
+                continue
+            if qid and aid:
+                submitted[qid] = aid
+        else:
+            qid = str(item.get('question_id') or '').strip()
+            aid = str(item.get('answer_id') or '').strip()
+            if qid and aid:
+                submitted[qid] = aid
 
-    questions = list(module.questions.all().order_by('order', 'id'))
-    total_questions = len(questions)
+    if has_relational_questions:
+        questions = list(module.questions.all().order_by('order', 'id'))
+        total_questions = len(questions)
+    else:
+        questions = _inline_quiz_questions(module)
+        total_questions = len(questions)
     attempted = 0
     correct = 0
 
     for question in questions:
-        selected_id = submitted.get(question.id)
-        if not selected_id:
-            continue
-        attempted += 1
-        choice = next((choice for choice in question.answers.all() if choice.id == selected_id), None)
-        if choice and choice.is_correct:
-            correct += 1
+        if has_relational_questions:
+            selected_id = submitted.get(question.id)
+            if not selected_id:
+                continue
+            attempted += 1
+            choice = next((choice for choice in question.answers.all() if choice.id == selected_id), None)
+            if choice and choice.is_correct:
+                correct += 1
+        else:
+            qid = str(question['id'])
+            selected_id = submitted.get(qid)
+            if not selected_id:
+                continue
+            attempted += 1
+            choices = question.get('choices') or []
+            match = next((choice for choice in choices if str(choice.get('id')) == selected_id), None)
+            if match and match.get('is_correct'):
+                correct += 1
 
     score_obj, _ = ModuleQuizScore.objects.update_or_create(
         module=module,
