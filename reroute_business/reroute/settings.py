@@ -124,6 +124,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
 ]
 
+# ---------- SITES FRAMEWORK ----------
+SITE_ID = 1
+
 
 
 # ---------- MIDDLEWARE ----------
