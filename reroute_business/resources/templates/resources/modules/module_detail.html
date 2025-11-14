@@ -12,69 +12,16 @@
   <header class="module-hero">
     <p class="module-kicker">{{ module.get_category_display }}</p>
     <h1 class="module-title">{{ module.title }}</h1>
-    {% if question_count %}
-      <p class="module-meta">
-        {{ question_count }} quiz question{% if question_count|default:0 != 1 %}s{% endif %} • Learn, check understanding, and jot down takeaways.
-      </p>
-    {% endif %}
+    <p class="module-meta">
+      {% if question_count %}
+        {{ question_count }} quiz question{% if question_count|default:0 != 1 %}s{% endif %} •
+      {% endif %}
+      Learn, watch, and check your progress all in one place.
+    </p>
   </header>
 
-  <nav class="module-tabs" role="tablist" aria-label="Module content tabs">
-    <button id="tab-video" class="module-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-video" data-target="panel-video">Video</button>
-    <button id="tab-quiz" class="module-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-quiz" data-target="panel-quiz">Quiz</button>
-    <button id="tab-notes" class="module-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-notes" data-target="panel-notes">Notes/Takeaways</button>
-  </nav>
-
-  <div class="module-panels">
-    <section id="panel-video" class="module-panel is-active" role="tabpanel" aria-labelledby="tab-video">
-      <div class="module-media">
-        {% if yt_id %}
-          <iframe src="https://www.youtube-nocookie.com/embed/{{ yt_id }}?rel=0&modestbranding=1&playsinline=1"
-                  title="Module video" referrerpolicy="strict-origin-when-cross-origin"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-        {% elif module.video_url and module.video_url|endswith:'.mp4' %}
-          <video controls playsinline preload="metadata">
-            <source src="{{ module.video_url }}" type="video/mp4">
-          </video>
-        {% elif module.embed_html %}
-          {{ module.embed_html|safe }}
-        {% else %}
-          <div class="module-media__placeholder">
-            Video coming soon for this module.
-          </div>
-        {% endif %}
-      </div>
-
-      {% if module.description %}
-        <div class="module-section">
-          <h3>About this module</h3>
-          <p class="module-desc">{{ module.description }}</p>
-        </div>
-      {% endif %}
-
-      <div class="module-section">
-        <h3>Key Takeaways</h3>
-        <div class="module-notes">
-          {% with takeaways=module.key_takeaways_list %}
-            {% if takeaways %}
-              <ul>
-                {% for note in takeaways %}
-                  <li>{{ note }}</li>
-                {% endfor %}
-              </ul>
-            {% else %}
-              <ul>
-                <li>Watch the video and follow along.</li>
-                <li>Use the quiz to reinforce your learning.</li>
-                <li>Revisit sections that need more practice.</li>
-              </ul>
-            {% endif %}
-          {% endwith %}
-        </div>
-      </div>
-    </section>
-
-    <section id="panel-quiz" class="module-panel" role="tabpanel" aria-labelledby="tab-quiz" hidden>
+  <div class="module-grid">
+    <aside class="module-sidebar">
       <div class="quiz-card">
         <div class="quiz-title">Knowledge Check</div>
         <div class="quiz-status">
@@ -113,22 +60,66 @@
         </div>
         <div id="quizResult" class="quiz-result" role="status" aria-live="polite"></div>
       </div>
-    </section>
+    </aside>
 
-    <section id="panel-notes" class="module-panel" role="tabpanel" aria-labelledby="tab-notes" hidden>
-      <div class="module-section">
-        <h3>Notes &amp; Additional Content</h3>
-        <div class="module-notes">
-          {% if module.internal_content %}
-            {{ module.internal_content|safe }}
-          {% elif module.description %}
-            {{ module.description }}
-          {% else %}
-            <p>Additional notes for this module will be added soon.</p>
-          {% endif %}
-        </div>
+    <main class="module-content">
+      <div class="module-media">
+        {% if yt_id %}
+          <iframe src="https://www.youtube-nocookie.com/embed/{{ yt_id }}?rel=0&modestbranding=1&playsinline=1"
+                  title="Module video" referrerpolicy="strict-origin-when-cross-origin"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        {% elif module.video_url and module.video_url|endswith:'.mp4' %}
+          <video controls playsinline preload="metadata">
+            <source src="{{ module.video_url }}" type="video/mp4">
+          </video>
+        {% elif module.embed_html %}
+          {{ module.embed_html|safe }}
+        {% else %}
+          <div class="module-media__placeholder">
+            Video coming soon for this module.
+          </div>
+        {% endif %}
       </div>
-    </section>
+
+      <section class="module-section">
+        <h3>About this module</h3>
+        {% if module.description %}
+          <p class="module-desc">{{ module.description }}</p>
+        {% else %}
+          <p class="module-desc">Watch the lesson, then take the quiz to check what stuck.</p>
+        {% endif %}
+      </section>
+
+      <section class="module-section">
+        <h3>Key Takeaways</h3>
+        <div class="module-notes">
+          {% with takeaways=module.key_takeaways_list %}
+            {% if takeaways %}
+              <ul>
+                {% for note in takeaways %}
+                  <li>{{ note }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <ul>
+                <li>Watch the video and follow along.</li>
+                <li>Use the quiz to reinforce your learning.</li>
+                <li>Revisit sections that need more practice.</li>
+              </ul>
+            {% endif %}
+          {% endwith %}
+        </div>
+      </section>
+
+      {% if module.internal_content %}
+        <section class="module-section">
+          <h3>Notes &amp; Additional Content</h3>
+          <div class="module-notes">
+            {{ module.internal_content|safe }}
+          </div>
+        </section>
+      {% endif %}
+    </main>
   </div>
 </div>
 
@@ -136,36 +127,4 @@
 
 {% block extra_js %}
 <script src="{% static 'resources/js/module_quiz_csp.js' %}" defer></script>
-<script defer>
-  (function(){
-    function onReady(fn){
-      if (document.readyState !== 'loading'){ fn(); }
-      else { document.addEventListener('DOMContentLoaded', fn); }
-    }
-
-    onReady(function(){
-      var tabs = document.querySelectorAll('.module-tab');
-      var panels = document.querySelectorAll('.module-panel');
-      if (!tabs.length || !panels.length) return;
-
-      tabs.forEach(function(tab){
-        tab.addEventListener('click', function(){
-          var targetId = tab.getAttribute('data-target');
-          if (!targetId) return;
-
-          tabs.forEach(function(btn){
-            btn.classList.toggle('is-active', btn === tab);
-            btn.setAttribute('aria-selected', btn === tab ? 'true' : 'false');
-          });
-
-          panels.forEach(function(panel){
-            var isMatch = panel.id === targetId;
-            panel.classList.toggle('is-active', isMatch);
-            panel.hidden = !isMatch;
-          });
-        });
-      });
-    });
-  })();
-</script>
 {% endblock %}

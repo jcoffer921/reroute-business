@@ -91,7 +91,7 @@ def _extract_youtube_id_simple(url: str) -> str:
         u = urlparse(url or '')
         host = (u.netloc or '').lower()
         path = u.path or ''
-        if 'youtube.com/embed/' in url:
+        if 'youtube.com/embed/' in url or 'youtube-nocookie.com/embed/' in url:
             return path.rstrip('/').split('/')[-1]
         if host.endswith('youtu.be'):
             return path.lstrip('/').split('/')[0]
