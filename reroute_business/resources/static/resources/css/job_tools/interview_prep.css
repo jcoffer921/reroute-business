@@ -50,3 +50,12 @@
 .cta-actions { display: flex; justify-content: center; gap: .6rem; }
 .btn-pill { display: inline-block; padding: .65rem 1.1rem; background: #6495ED; color: #fff; border-radius: 999px; text-decoration: none; font-weight: 800; box-shadow: 0 8px 22px rgba(100,149,237,.35); }
 .btn-pill:hover { background: #5a86d6; }
+
+@media (max-width: 640px){
+  .ip-section { padding: 1.8rem 1rem; }
+  .ip-card,
+  .ip-dd-card { padding: 1rem; }
+  .acc-toggle { grid-template-columns: auto 1fr auto; padding: .85rem .85rem; }
+  .cta-actions { flex-direction: column; }
+  .btn-pill { width: 100%; text-align: center; }
+}

@@ -55,3 +55,14 @@
 .cs-sources a { color: #2563eb; text-decoration: none; font-weight: 700; font-size: .95rem; }
 .cs-sources a:hover { text-decoration: underline; }
 .cs-updated { margin: .5rem 0 0; color: #6b7280; font-size: .9rem; }
+
+@media (max-width: 640px){
+  .cs-hero { padding: 3.5rem 1rem 2.5rem; }
+  .cs-section { padding: 2rem 1rem; }
+  .cs-card { padding: 1rem; }
+  .cs-highlight { grid-template-columns: 1fr; text-align: left; }
+  .cs-card-grid { gap: .75rem; }
+  .cs-footer-inner { padding: 1rem; }
+  .btn-pill { width: 100%; text-align: center; }
+  .cs-sources { flex-direction: column; }
+}

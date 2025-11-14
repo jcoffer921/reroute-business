@@ -62,6 +62,27 @@
     };
     var isUnlocked = false;
 
+    function getQuestionType(question){
+      return (question.qtype || 'mc');
+    }
+
+    function getAnswerRecord(questionId){
+      return state.answers[questionId] || null;
+    }
+
+    function setAnswerValue(questionId, qtype, value){
+      state.answers[questionId] = { value: value, qtype: qtype };
+    }
+
+    function hasAnswer(questionId, qtype){
+      var record = getAnswerRecord(questionId);
+      if (!record) return false;
+      if (qtype === 'open'){
+        return !!record.value && record.value.trim().length > 0;
+      }
+      return record.value !== null && record.value !== undefined && record.value !== '';
+    }
+
     function unlockQuiz(){
       if (isUnlocked) return;
       isUnlocked = true;
@@ -158,7 +179,9 @@
       var total = state.questions.length;
       state.current = clamp(state.current, 0, total - 1);
       var question = state.questions[state.current];
-      var answered = state.answers[question.id];
+      var qtype = getQuestionType(question);
+      var answerRecord = getAnswerRecord(question.id) || {};
+      var answeredValue = answerRecord.value;
 
       if (progressLabel){
         progressLabel.textContent = 'Question ' + (state.current + 1) + ' of ' + total;
@@ -174,42 +197,58 @@
       title.textContent = question.prompt || 'Untitled question';
       questionStage.appendChild(title);
 
-      var list = document.createElement('ul');
-      (question.choices || []).forEach(function(choice){
-        var choiceId = String(choice.id);
-        var label = document.createElement('label');
-        label.className = 'quiz-choice';
-
-        var input = document.createElement('input');
-        input.type = 'radio';
-        input.name = 'active_question';
-        input.value = choiceId;
-
-        if (String(answered) === choiceId){
-          input.checked = true;
-          label.classList.add('is-selected');
-        }
-
-        input.addEventListener('change', function(){
-          state.answers[question.id] = choiceId;
-          state.hasSubmitted = false;
-          state.evaluation = {};
-          renderQuestion();
+      if (qtype === 'open'){
+        var openWrap = document.createElement('div');
+        openWrap.className = 'quiz-open-wrap';
+        var textArea = document.createElement('textarea');
+        textArea.className = 'quiz-open-input';
+        textArea.placeholder = 'Type your response...';
+        textArea.value = answeredValue || '';
+        textArea.addEventListener('input', function(){
+          setAnswerValue(question.id, qtype, textArea.value);
           updateNavState();
+          updateSubmitState();
         });
+        openWrap.appendChild(textArea);
+        questionStage.appendChild(openWrap);
+      } else {
+        var list = document.createElement('ul');
+        (question.choices || []).forEach(function(choice){
+          var choiceId = String(choice.id);
+          var label = document.createElement('label');
+          label.className = 'quiz-choice';
 
-        label.appendChild(input);
-        var span = document.createElement('span');
-        span.textContent = choice.text || '';
-        label.appendChild(span);
-        list.appendChild(label);
+          var input = document.createElement('input');
+          input.type = 'radio';
+          input.name = 'active_question';
+          input.value = choiceId;
 
-        applySubmissionStyles(label, choice, question.id);
-      });
-      questionStage.appendChild(list);
+          if (String(answeredValue) === choiceId){
+            input.checked = true;
+            label.classList.add('is-selected');
+          }
+
+          input.addEventListener('change', function(){
+            setAnswerValue(question.id, qtype, choiceId);
+            state.hasSubmitted = false;
+            state.evaluation = {};
+            renderQuestion();
+            updateNavState();
+          });
+
+          label.appendChild(input);
+          var span = document.createElement('span');
+          span.textContent = choice.text || '';
+          label.appendChild(span);
+          list.appendChild(label);
+
+          applySubmissionStyles(label, choice, question.id);
+        });
+        questionStage.appendChild(list);
+      }
 
       if (state.hasSubmitted){
-        appendFeedback(question.id);
+        appendFeedback(question);
       }
 
       updateNavState();
@@ -224,16 +263,26 @@
       if (choiceId === evaluation.correctChoiceId){
         label.classList.add('is-correct');
       }
-      if (String(state.answers[questionId]) === choiceId && !evaluation.isUserCorrect){
+      var record = getAnswerRecord(questionId);
+      var answerValue = record ? record.value : null;
+      if (String(answerValue) === choiceId && !evaluation.isUserCorrect){
         label.classList.add('is-incorrect');
       }
-      if (String(state.answers[questionId]) === choiceId){
+      if (String(answerValue) === choiceId){
         label.classList.add('is-selected');
       }
     }
 
-    function appendFeedback(questionId){
-      var evaluation = state.evaluation[questionId];
+    function appendFeedback(question){
+      var qtype = getQuestionType(question);
+      if (qtype === 'open'){
+        var savedNote = document.createElement('p');
+        savedNote.className = 'quiz-feedback-line';
+        savedNote.textContent = 'Response saved for review.';
+        questionStage.appendChild(savedNote);
+        return;
+      }
+      var evaluation = state.evaluation[question.id];
       if (!evaluation) return;
       var note = document.createElement('p');
       note.className = 'quiz-feedback-line';
@@ -250,7 +299,8 @@
       var total = state.questions.length;
       if (!prevBtn || !nextBtn) return;
       prevBtn.disabled = state.current === 0;
-      var answeredCurrent = !!state.answers[state.questions[state.current].id];
+      var currentQuestion = state.questions[state.current];
+      var answeredCurrent = hasAnswer(currentQuestion.id, getQuestionType(currentQuestion));
       var atEnd = state.current >= total - 1;
       nextBtn.disabled = atEnd || !answeredCurrent;
       nextBtn.textContent = atEnd ? 'End of Quiz' : 'Next Question';
@@ -262,9 +312,9 @@
         submitBtn.disabled = true;
         return;
       }
-      var answeredCount = Object.keys(state.answers).length;
-      var total = state.questions.length;
-      var ready = answeredCount >= total;
+      var ready = state.questions.every(function(question){
+        return hasAnswer(question.id, getQuestionType(question));
+      });
       submitBtn.disabled = !ready;
       submitBtn.setAttribute('aria-disabled', ready ? 'false' : 'true');
     }
@@ -281,7 +331,8 @@
       nextBtn.addEventListener('click', function(){
         var total = state.questions.length;
         if (state.current >= total - 1) return;
-        if (!state.answers[state.questions[state.current].id]) return;
+        var nextQuestion = state.questions[state.current];
+        if (!hasAnswer(nextQuestion.id, getQuestionType(nextQuestion))) return;
         state.current += 1;
         renderQuestion();
       });
@@ -315,35 +366,55 @@
         showResult('Quiz is still loading.', false);
         return;
       }
-      var answeredCount = Object.keys(state.answers).length;
+      var answeredCount = 0;
       var total = state.questions.length;
-      if (answeredCount < total){
-        showResult('Answer every question before submitting.', false);
-        return;
-      }
-
       var answersPayload = [];
       var score = 0;
       var evaluation = {};
 
       state.questions.forEach(function(question){
-        var selected = state.answers[question.id];
+        var qtype = getQuestionType(question);
+        var record = getAnswerRecord(question.id);
+        var value = record ? record.value : '';
+        if (typeof value === 'string'){
+          value = value.trim();
+        }
+        if (value){
+          answeredCount += 1;
+        }
+
+        if (qtype === 'open'){
+          answersPayload.push({
+            question_id: question.id,
+            text_answer: value || '',
+          });
+          return;
+        }
+
+        answersPayload.push({
+          question_id: question.id,
+          answer_id: value,
+        });
+
         var choices = Array.isArray(question.choices) ? question.choices : [];
         var correctChoice = choices.find(function(choice){
           return choice.is_correct === true || choice.correct === true;
         });
-        var isCorrect = correctChoice && String(selected) === String(correctChoice.id);
-        if (isCorrect) score += 1;
+        var isCorrect = correctChoice && String(value || '') === String(correctChoice.id);
+        if (isCorrect){
+          score += 1;
+        }
         evaluation[question.id] = {
           correctChoiceId: correctChoice ? String(correctChoice.id) : '',
           correctText: correctChoice ? correctChoice.text : '',
           isUserCorrect: !!isCorrect,
         };
-        answersPayload.push({
-          question_id: question.id,
-          answer_id: selected,
-        });
       });
+
+      if (answeredCount < total){
+        showResult('Answer every question before submitting.', false);
+        return;
+      }
 
       state.hasSubmitted = true;
       state.evaluation = evaluation;

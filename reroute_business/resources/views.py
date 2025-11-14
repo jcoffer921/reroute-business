@@ -12,6 +12,8 @@ from reroute_business.blog.models import BlogPost
 from .models import (
     Module,
     ModuleQuizScore,
+    ModuleQuizOpenResponse,
+    QuizQuestion,
     Lesson,
     LessonQuestion,
     LessonChoice,
@@ -66,6 +68,7 @@ def _inline_quiz_questions(module):
             'id': str(q_id),
             'prompt': prompt,
             'order': raw.get('order') or idx,
+            'qtype': QuizQuestion.QTYPE_MULTIPLE_CHOICE,
             'choices': norm_choices,
         })
     return questions
@@ -192,6 +195,7 @@ def module_quiz_schema(request, pk: int):
                 'id': str(question.id),
                 'prompt': question.prompt,
                 'order': question.order,
+                'qtype': question.qtype,
                 'choices': choices,
             })
     else:
@@ -234,19 +238,28 @@ def module_quiz_submit(request, pk: int):
     # Build lookup of submitted answers keyed by question id
     submitted = {}
     for item in answers:
+        raw_qid = item.get('question_id')
+        if raw_qid in (None, ''):
+            continue
         if has_relational_questions:
             try:
-                qid = int(item.get('question_id'))
-                aid = int(item.get('answer_id'))
+                key = int(raw_qid)
             except (TypeError, ValueError):
                 continue
-            if qid and aid:
-                submitted[qid] = aid
         else:
-            qid = str(item.get('question_id') or '').strip()
-            aid = str(item.get('answer_id') or '').strip()
-            if qid and aid:
-                submitted[qid] = aid
+            key = str(raw_qid)
+        record = submitted.setdefault(key, {})
+        answer_id = item.get('answer_id')
+        if answer_id not in (None, ''):
+            if has_relational_questions:
+                try:
+                    record['answer_id'] = int(answer_id)
+                except (TypeError, ValueError):
+                    pass
+            else:
+                record['answer_id'] = str(answer_id)
+        if 'text_answer' in item:
+            record['text_answer'] = item.get('text_answer')
 
     if has_relational_questions:
         questions = list(module.questions.all().order_by('order', 'id'))
@@ -259,19 +272,41 @@ def module_quiz_submit(request, pk: int):
 
     for question in questions:
         if has_relational_questions:
-            selected_id = submitted.get(question.id)
-            if not selected_id:
-                continue
-            attempted += 1
+            key = question.id
+            qtype = question.qtype
+        else:
+            key = str(question['id'])
+            qtype = QuizQuestion.QTYPE_MULTIPLE_CHOICE
+
+        record = submitted.get(key) or {}
+
+        if qtype == QuizQuestion.QTYPE_OPEN:
+            text_answer = (record.get('text_answer') or '').strip()
+            if text_answer:
+                attempted += 1
+                ModuleQuizOpenResponse.objects.update_or_create(
+                    module=module,
+                    question=question,
+                    user=request.user,
+                    defaults={'response_text': text_answer},
+                )
+            else:
+                ModuleQuizOpenResponse.objects.filter(
+                    module=module,
+                    question=question,
+                    user=request.user,
+                ).delete()
+            continue
+
+        selected_id = record.get('answer_id')
+        if not selected_id:
+            continue
+        attempted += 1
+        if has_relational_questions:
             choice = next((choice for choice in question.answers.all() if choice.id == selected_id), None)
             if choice and choice.is_correct:
                 correct += 1
         else:
-            qid = str(question['id'])
-            selected_id = submitted.get(qid)
-            if not selected_id:
-                continue
-            attempted += 1
             choices = question.get('choices') or []
             match = next((choice for choice in choices if str(choice.get('id')) == selected_id), None)
             if match and match.get('is_correct'):

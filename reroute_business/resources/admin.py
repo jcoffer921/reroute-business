@@ -52,11 +52,16 @@ class ModuleAdmin(admin.ModelAdmin):
 
 @admin.register(QuizQuestion)
 class QuizQuestionAdmin(admin.ModelAdmin):
-    list_display = ("module", "order", "prompt")
-    list_filter = ("module",)
+    list_display = ("module", "order", "qtype", "prompt")
+    list_filter = ("module", "qtype")
     search_fields = ("prompt", "module__title")
     ordering = ("module", "order")
     inlines = [QuizAnswerInline]
+
+    def get_inlines(self, request, obj=None):
+        if obj and obj.qtype == QuizQuestion.QTYPE_OPEN:
+            return []
+        return [QuizAnswerInline]
 
 
 @admin.register(ModuleQuizScore)

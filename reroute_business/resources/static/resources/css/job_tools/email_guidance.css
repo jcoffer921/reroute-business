@@ -50,3 +50,20 @@
 .eg-cta h3 { margin: 0 0 .6rem; font-size: clamp(1.4rem, 2.8vw, 1.8rem); font-weight: 900; color: #0F172A; }
 .btn-pill { display: inline-block; padding: .65rem 1.1rem; background: #6495ED; color: #fff; border-radius: 999px; text-decoration: none; font-weight: 800; box-shadow: 0 8px 22px rgba(100,149,237,.35); }
 .btn-pill:hover { background: #5a86d6; }
+
+@media (max-width: 640px){
+  .eg-section { padding: 1.8rem 1rem; }
+  .eg-info-card { padding: .9rem; }
+  .eg-template-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .eg-copy {
+    width: 100%;
+    text-align: center;
+  }
+  .eg-code { font-size: .85rem; }
+  .eg-template-title { width: 100%; }
+  .eg-dosdonts { gap: .75rem; }
+  .btn-pill { width: 100%; text-align: center; }
+}

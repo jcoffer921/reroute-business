@@ -478,6 +478,25 @@
   background: rgba(248, 113, 113, 0.1);
 }
 
+.quiz-open-wrap { margin-top: 1rem; }
+.quiz-open-input {
+  width: 100%;
+  min-height: 150px;
+  border-radius: 14px;
+  border: 1px solid rgba(74,108,255,0.2);
+  padding: .85rem 1rem;
+  font-family: inherit;
+  font-size: 1rem;
+  background: #fff;
+  resize: vertical;
+  transition: border .2s ease, box-shadow .2s ease;
+}
+.quiz-open-input:focus {
+  outline: none;
+  border-color: #4a6cff;
+  box-shadow: 0 0 0 3px rgba(74,108,255,0.18);
+}
+
 .quiz-nav {
   display: flex;
   gap: 1rem;

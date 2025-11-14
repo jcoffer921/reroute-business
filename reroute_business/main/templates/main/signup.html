@@ -4,105 +4,112 @@
 {% block title %}ReRoute | Sign Up{% endblock %}
 
 {% block content %}
-{# Uses your uploaded CSS. Adjust the path if your static structure differs. #}
 <link rel="stylesheet" href="{% static 'css/signup.css' %}">
 
-<div class="signup-container">
-  <h1 class="auth-title">Create your account</h1>
-
-  {# ── Show a simple list of validation errors (helpful while testing) ── #}
-  {% if user_form.errors %}
-    <div class="error-box" role="alert" aria-live="polite">
-      <ul>
-        {% for field in user_form %}
-          {% for error in field.errors %}
-            <li>{{ error }}</li>
-          {% endfor %}
-        {% endfor %}
-        {% for error in user_form.non_field_errors %}
-          <li>{{ error }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-  {% endif %}
-
-  {# ── Post back to the same view; Django will re-render with errors if invalid ── #}
-  <form method="post" action="{% url 'signup' %}" novalidate>
-    {% csrf_token %}
-
-    {# Preserve ?next= so you can land users where you want after signup #}
-    <input type="hidden" name="next" value="{{ request.GET.next|default:'/dashboard/' }}">
-
-    <div class="two-col">
-      <div class="form-group">
-        <label for="{{ user_form.first_name.id_for_label }}">First name</label>
-        {{ user_form.first_name }}
-        {% if user_form.first_name.errors %}<div class="field-error">{{ user_form.first_name.errors.0 }}</div>{% endif %}
-      </div>
-
-      <div class="form-group">
-        <label for="{{ user_form.last_name.id_for_label }}">Last name</label>
-        {{ user_form.last_name }}
-        {% if user_form.last_name.errors %}<div class="field-error">{{ user_form.last_name.errors.0 }}</div>{% endif %}
+<div class="auth-shell">
+  <div class="auth-grid">
+    <div class="auth-visual" aria-hidden="true">
+      <div class="auth-visual-layer">
+        <span class="auth-pill">Ready to begin?</span>
+        <h2 class="auth-slogan clarify-text">ReBuild. ReClaim. ReRoute.</h2>
+        <p class="auth-slogan-sub">Create your account and keep momentum going.</p>
       </div>
     </div>
 
-    <!-- Username -->
-    <div class="form-group">
-      <label for="{{ user_form.username.id_for_label }}">Username</label>
-      {{ user_form.username }}
-      {% if user_form.username.errors %}
-        <div class="field-error">{{ user_form.username.errors.0 }}</div>
-      {% endif %}
-    </div>
+    <div class="auth-panel">
+      <div class="auth-panel-card signup-card">
+        <h1 class="auth-title">Create your account</h1>
 
-    <div class="form-group">
-      <label for="{{ user_form.email.id_for_label }}">Email address</label>
-      {{ user_form.email }}
-      {% if user_form.email.errors %}<div class="field-error">{{ user_form.email.errors.0 }}</div>{% endif %}
-    </div>
+        {% if user_form.errors %}
+          <div class="error-box" role="alert" aria-live="polite">
+            <ul>
+              {% for field in user_form %}
+                {% for error in field.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              {% endfor %}
+              {% for error in user_form.non_field_errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
 
-    {# Password: your CSS expects a .pwd-wrap with a .pwd-toggle-text overlay #}
-    <div class="form-group">
-      <div class="label-row">
-        <label for="{{ user_form.password.id_for_label }}">Password</label>
-        <span class="micro-hint">At least 8 chars incl. upper, lower, number, special.</span>
+        <form method="post" action="{% url 'signup' %}" novalidate>
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.GET.next|default:'/dashboard/' }}">
+
+          <div class="two-col">
+            <div class="form-group">
+              <label for="{{ user_form.first_name.id_for_label }}">First name</label>
+              {{ user_form.first_name }}
+              {% if user_form.first_name.errors %}<div class="field-error">{{ user_form.first_name.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ user_form.last_name.id_for_label }}">Last name</label>
+              {{ user_form.last_name }}
+              {% if user_form.last_name.errors %}<div class="field-error">{{ user_form.last_name.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="{{ user_form.username.id_for_label }}">Username</label>
+            {{ user_form.username }}
+            {% if user_form.username.errors %}
+              <div class="field-error">{{ user_form.username.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="form-group">
+            <label for="{{ user_form.email.id_for_label }}">Email address</label>
+            {{ user_form.email }}
+            {% if user_form.email.errors %}<div class="field-error">{{ user_form.email.errors.0 }}</div>{% endif %}
+          </div>
+
+          <div class="form-group">
+            <div class="label-row">
+              <label for="{{ user_form.password.id_for_label }}">Password</label>
+              <span class="micro-hint">At least 8 chars incl. upper, lower, number, special.</span>
+            </div>
+
+            <div class="pwd-wrap">
+              {{ user_form.password }}
+              <span class="pwd-toggle-text" tabindex="0"
+                    role="button"
+                    aria-controls="{{ user_form.password.id_for_label }}"
+                    data-target="{{ user_form.password.id_for_label }}">
+                Show Password
+              </span>
+            </div>
+
+            {% if user_form.password.errors %}<div class="field-error">{{ user_form.password.errors.0 }}</div>{% endif %}
+            <div id="password-strength" class="field-hint" aria-live="polite"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="{{ user_form.confirm_password.id_for_label }}">Confirm password</label>
+            {{ user_form.confirm_password }}
+            {% if user_form.confirm_password.errors %}<div class="field-error">{{ user_form.confirm_password.errors.0 }}</div>{% endif %}
+          </div>
+
+          <p class="terms-text">
+            By signing up you agree to our
+            <a href="{% url 'terms' %}">Terms and Conditions</a> and
+            <a href="{% url 'privacy' %}">Privacy Policy</a>.
+          </p>
+
+          {% if recaptcha_site_key %}
+            <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+          {% endif %}
+          <button type="submit" class="submit-btn">Create account</button>
+        </form>
+
+        <div class="secondary-actions">
+          <p class="muted">Already have an account? <a href="{% url 'login' %}">Log in</a>.</p>
+        </div>
       </div>
-
-      <div class="pwd-wrap">
-        {{ user_form.password }}
-        <span class="pwd-toggle-text" tabindex="0"
-              role="button"
-              aria-controls="{{ user_form.password.id_for_label }}"
-              data-target="{{ user_form.password.id_for_label }}">
-          Show Password
-        </span>
-      </div>
-
-      {% if user_form.password.errors %}<div class="field-error">{{ user_form.password.errors.0 }}</div>{% endif %}
-      <div id="password-strength" class="field-hint" aria-live="polite"></div>
     </div>
-
-    <div class="form-group">
-      <label for="{{ user_form.confirm_password.id_for_label }}">Confirm password</label>
-      {{ user_form.confirm_password }}
-      {% if user_form.confirm_password.errors %}<div class="field-error">{{ user_form.confirm_password.errors.0 }}</div>{% endif %}
-    </div>
-
-    <p class="terms-text">
-      By signing up you agree to our
-      <a href="{% url 'terms' %}">Terms and Conditions</a> and
-      <a href="{% url 'privacy' %}">Privacy Policy</a>.
-    </p>
-
-    {% if recaptcha_site_key %}
-      <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
-    {% endif %}
-    <button type="submit" class="submit-btn">Create account</button>
-  </form>
-
-  <div class="secondary-actions">
-    <p class="muted">Already have an account? <a href="{% url 'login' %}">Log in</a>.</p>
   </div>
 </div>
 {% endblock %}

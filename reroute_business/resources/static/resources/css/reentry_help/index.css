@@ -41,3 +41,10 @@
 .rehelp-cta { background: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%); padding: 2.2rem 1.5rem; }
 .rehelp-cta-inner { max-width: 900px; margin: 0 auto; text-align: center; }
 .rehelp-cta h3 { margin: 0 0 .6rem; font-size: clamp(1.5rem, 3vw, 1.9rem); font-weight: 900; color: #0F172A; }
+
+@media (max-width: 640px){
+  .rehelp-section { padding: 2.2rem 1rem; }
+  .rehelp-card { padding: 1rem; }
+  .rehelp-cta { padding: 2rem 1rem; }
+  .btn-pill { width: 100%; text-align: center; }
+}

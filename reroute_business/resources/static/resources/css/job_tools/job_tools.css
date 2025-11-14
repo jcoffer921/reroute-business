@@ -53,3 +53,13 @@
 
 .jobtools-cta { text-align: center; margin-top: 1.75rem; }
 
+@media (max-width: 768px){
+  .jobtools-hero {
+    padding: 6rem 1.25rem 3rem;
+    text-align: center;
+  }
+  .jobtools-hero-content { text-align: center; }
+  .jobtools-section { padding: 2rem 1rem 3rem; }
+  .jobtool-card { padding: 1rem; }
+  .btn-pill { width: 100%; text-align: center; }
+}

@@ -79,9 +79,17 @@ class Module(models.Model):
 
 
 class QuizQuestion(models.Model):
+    QTYPE_MULTIPLE_CHOICE = "mc"
+    QTYPE_OPEN = "open"
+    QTYPE_CHOICES = [
+        (QTYPE_MULTIPLE_CHOICE, "Multiple Choice"),
+        (QTYPE_OPEN, "Open Ended"),
+    ]
+
     module = models.ForeignKey(Module, related_name="questions", on_delete=models.CASCADE)
     prompt = models.TextField()
     order = models.PositiveIntegerField(default=1)
+    qtype = models.CharField(max_length=10, choices=QTYPE_CHOICES, default=QTYPE_MULTIPLE_CHOICE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -128,6 +136,30 @@ class ModuleQuizScore(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.module} ({self.score}/{self.total_questions})"
+
+
+class ModuleQuizOpenResponse(models.Model):
+    module = models.ForeignKey(Module, related_name="open_responses", on_delete=models.CASCADE)
+    question = models.ForeignKey(QuizQuestion, related_name="open_responses", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="module_quiz_open_responses",
+        on_delete=models.CASCADE,
+    )
+    response_text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("module", "question", "user"),
+                name="unique_open_response",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.user} - {self.question_id}"
 
 
 # --- Interactive Lesson Models ---

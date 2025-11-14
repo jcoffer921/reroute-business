@@ -48,3 +48,13 @@
 .hs-tip { display: grid; grid-template-columns: auto 1fr; gap: .5rem; align-items: start; padding: .8rem 1rem; border: 1px solid #e6ecfb; border-radius: 12px; background: #f7faff; }
 .hs-tip-icon { width: 28px; height: 28px; border-radius: 999px; background: rgba(22,163,74,.12); display: inline-flex; align-items: center; justify-content: center; }
 .hs-updated { margin-top: 1rem; text-align: center; color: #6b7280; font-size: .9rem; }
+
+@media (max-width: 640px){
+  .hs-hero { padding: 3.5rem 1rem 2.5rem; }
+  .hs-section { padding: 2rem 1rem; }
+  .hs-rights-grid { padding: 1rem .75rem; }
+  .hs-card,
+  .hs-highlight,
+  .hs-rights-card { padding: .85rem; }
+  .btn-pill { width: 100%; text-align: center; }
+}
