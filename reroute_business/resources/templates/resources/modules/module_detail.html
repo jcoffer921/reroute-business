@@ -3,52 +3,31 @@
 
 {% block title %}ReRoute | {{ module.title }}{% endblock %}
 
-{% block content %}
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'resources/css/module_detail.css' %}">
+{% endblock %}
 
-<div class="mod-container">
-  <div class="mod-flex">
-    <!-- Left: Quiz -->
-    <aside class="mod-left mod-sticky">
-      <div class="quiz-title">Knowledge Check</div>
-      <div class="quiz-status">
-        {% if user_score %}
-          <div class="quiz-status__label">Last Score</div>
-          <div class="quiz-status__value">{{ user_score.score }} / {{ user_score.total_questions }}</div>
-          <div class="quiz-status__meta">Updated {{ user_score.updated_at|date:"M j, Y g:i a" }}</div>
-        {% elif not can_submit_quiz %}
-          <div class="quiz-status__meta">Log in to take this quiz and save your score.</div>
-        {% elif question_count %}
-          <div class="quiz-status__meta">
-            {{ question_count }} question{% if question_count|default:0 != 1 %}s{% endif %}. Submit to track your progress.
-          </div>
-        {% else %}
-          <div class="quiz-status__meta">Quiz questions are being prepared for this module.</div>
-        {% endif %}
-      </div>
-      <div
-        id="quizPanel"
-        data-quiz-url="{% url 'module_quiz_schema' module.id %}"
-        data-submit-url="{% url 'module_quiz_submit' module.id %}"
-        data-can-submit="{{ can_submit_quiz|yesno:'true,false' }}"
-      ></div>
-      <div class="quiz-actions">
-        <button
-          id="quizSubmit"
-          class="quiz-submit"
-          data-submit-url="{% url 'module_quiz_submit' module.id %}"
-          data-can-submit="{{ can_submit_quiz|yesno:'true,false' }}"
-          {% if not can_submit_quiz %}disabled aria-disabled="true"{% endif %}
-        >
-          {% if can_submit_quiz %}Submit Quiz{% else %}Log In to Submit{% endif %}
-        </button>
-      </div>
-      <div id="quizResult" class="quiz-result" role="status" aria-live="polite"></div>
-    </aside>
+{% block content %}
+<div class="module-shell">
+  <header class="module-hero">
+    <p class="module-kicker">{{ module.get_category_display }}</p>
+    <h1 class="module-title">{{ module.title }}</h1>
+    {% if question_count %}
+      <p class="module-meta">
+        {{ question_count }} quiz question{% if question_count|default:0 != 1 %}s{% endif %} • Learn, check understanding, and jot down takeaways.
+      </p>
+    {% endif %}
+  </header>
 
-    <!-- Right: Video + content -->
-    <main class="mod-right">
-      <div class="mod-video-wrap">
+  <nav class="module-tabs" role="tablist" aria-label="Module content tabs">
+    <button id="tab-video" class="module-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-video" data-target="panel-video">Video</button>
+    <button id="tab-quiz" class="module-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-quiz" data-target="panel-quiz">Quiz</button>
+    <button id="tab-notes" class="module-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-notes" data-target="panel-notes">Notes/Takeaways</button>
+  </nav>
+
+  <div class="module-panels">
+    <section id="panel-video" class="module-panel is-active" role="tabpanel" aria-labelledby="tab-video">
+      <div class="module-media">
         {% if yt_id %}
           <iframe src="https://www.youtube-nocookie.com/embed/{{ yt_id }}?rel=0&modestbranding=1&playsinline=1"
                   title="Module video" referrerpolicy="strict-origin-when-cross-origin"
@@ -59,25 +38,23 @@
           </video>
         {% elif module.embed_html %}
           {{ module.embed_html|safe }}
+        {% else %}
+          <div class="module-media__placeholder">
+            Video coming soon for this module.
+          </div>
         {% endif %}
       </div>
 
-      <h1 class="mod-title">{{ module.title }}</h1>
-      {% with desc=module.description|default:module.internal_content %}
-        {% if desc %}
-          <p class="mod-desc">
-            {% if desc == module.description %}
-              {{ desc }}
-            {% else %}
-              {{ desc|safe }}
-            {% endif %}
-          </p>
-        {% endif %}
-      {% endwith %}
+      {% if module.description %}
+        <div class="module-section">
+          <h3>About this module</h3>
+          <p class="module-desc">{{ module.description }}</p>
+        </div>
+      {% endif %}
 
-      <div class="mod-section">
+      <div class="module-section">
         <h3>Key Takeaways</h3>
-        <div class="mod-notes">
+        <div class="module-notes">
           {% with takeaways=module.key_takeaways_list %}
             {% if takeaways %}
               <ul>
@@ -85,8 +62,6 @@
                   <li>{{ note }}</li>
                 {% endfor %}
               </ul>
-            {% elif module.internal_content %}
-              {{ module.internal_content|safe }}
             {% else %}
               <ul>
                 <li>Watch the video and follow along.</li>
@@ -97,9 +72,100 @@
           {% endwith %}
         </div>
       </div>
-    </main>
+    </section>
+
+    <section id="panel-quiz" class="module-panel" role="tabpanel" aria-labelledby="tab-quiz" hidden>
+      <div class="quiz-card">
+        <div class="quiz-title">Knowledge Check</div>
+        <div class="quiz-status">
+          {% if user_score %}
+            <div class="quiz-status__label">Last Score</div>
+            <div class="quiz-status__value">{{ user_score.score }} / {{ user_score.total_questions }}</div>
+            <div class="quiz-status__meta">Updated {{ user_score.updated_at|date:"M j, Y g:i a" }}</div>
+          {% elif not can_submit_quiz %}
+            <div class="quiz-status__meta">Log in to take this quiz and save your score.</div>
+          {% elif question_count %}
+            <div class="quiz-status__meta">
+              {{ question_count }} question{% if question_count|default:0 != 1 %}s{% endif %}. Submit to track your progress.
+            </div>
+          {% else %}
+            <div class="quiz-status__meta">Quiz questions are being prepared for this module.</div>
+          {% endif %}
+        </div>
+
+        <div
+          id="quizPanel"
+          data-quiz-url="{% url 'module_quiz_schema' module.id %}"
+          data-submit-url="{% url 'module_quiz_submit' module.id %}"
+          data-can-submit="{{ can_submit_quiz|yesno:'true,false' }}"
+        ></div>
+
+        <div class="quiz-actions">
+          <button
+            id="quizSubmit"
+            class="quiz-submit"
+            data-submit-url="{% url 'module_quiz_submit' module.id %}"
+            data-can-submit="{{ can_submit_quiz|yesno:'true,false' }}"
+            {% if not can_submit_quiz %}disabled aria-disabled="true"{% endif %}
+          >
+            {% if can_submit_quiz %}Submit Quiz{% else %}Log In to Submit{% endif %}
+          </button>
+        </div>
+        <div id="quizResult" class="quiz-result" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="panel-notes" class="module-panel" role="tabpanel" aria-labelledby="tab-notes" hidden>
+      <div class="module-section">
+        <h3>Notes &amp; Additional Content</h3>
+        <div class="module-notes">
+          {% if module.internal_content %}
+            {{ module.internal_content|safe }}
+          {% elif module.description %}
+            {{ module.description }}
+          {% else %}
+            <p>Additional notes for this module will be added soon.</p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
   </div>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
 <script src="{% static 'resources/js/module_quiz_csp.js' %}" defer></script>
+<script defer>
+  (function(){
+    function onReady(fn){
+      if (document.readyState !== 'loading'){ fn(); }
+      else { document.addEventListener('DOMContentLoaded', fn); }
+    }
+
+    onReady(function(){
+      var tabs = document.querySelectorAll('.module-tab');
+      var panels = document.querySelectorAll('.module-panel');
+      if (!tabs.length || !panels.length) return;
+
+      tabs.forEach(function(tab){
+        tab.addEventListener('click', function(){
+          var targetId = tab.getAttribute('data-target');
+          if (!targetId) return;
+
+          tabs.forEach(function(btn){
+            btn.classList.toggle('is-active', btn === tab);
+            btn.setAttribute('aria-selected', btn === tab ? 'true' : 'false');
+          });
+
+          panels.forEach(function(panel){
+            var isMatch = panel.id === targetId;
+            panel.classList.toggle('is-active', isMatch);
+            panel.hidden = !isMatch;
+          });
+        });
+      });
+    });
+  })();
+</script>
 {% endblock %}
