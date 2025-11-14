@@ -81,6 +81,7 @@ body {
 .clarify-text {
   display: inline-flex;
   gap: .4rem;
+  justify-content: center;
   white-space: nowrap;
 }
 
