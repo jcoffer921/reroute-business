@@ -36,7 +36,7 @@ class ModuleAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
     fieldsets = (
         (None, {"fields": ("title", "description", "category", "key_takeaways")}),
-        ("Media", {"fields": ("video_url", "embed_html")}),
+        ("Media", {"fields": ("video_url", "embed_html", "poster_image")}),
         ("Content", {"fields": ("internal_content",)}),
     )
     inlines = [QuizQuestionInline]

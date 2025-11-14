@@ -136,6 +136,11 @@ def _build_svg_poster(text: str) -> str:
 
 
 def _module_poster_url(module, yt_id: str) -> str:
+    if module.poster_image:
+        try:
+            return module.poster_image.url
+        except Exception:
+            pass
     if yt_id:
         return f"https://i.ytimg.com/vi/{yt_id}/hqdefault.jpg"
     if module.video_url and str(module.video_url).lower().endswith('.mp4'):
@@ -263,7 +268,8 @@ def module_quiz_submit(request, pk: int):
 
     if has_relational_questions:
         questions = list(module.questions.all().order_by('order', 'id'))
-        total_questions = len(questions)
+        graded_questions = [q for q in questions if q.qtype != QuizQuestion.QTYPE_OPEN]
+        total_questions = len(graded_questions)
     else:
         questions = _inline_quiz_questions(module)
         total_questions = len(questions)
@@ -283,7 +289,6 @@ def module_quiz_submit(request, pk: int):
         if qtype == QuizQuestion.QTYPE_OPEN:
             text_answer = (record.get('text_answer') or '').strip()
             if text_answer:
-                attempted += 1
                 ModuleQuizOpenResponse.objects.update_or_create(
                     module=module,
                     question=question,

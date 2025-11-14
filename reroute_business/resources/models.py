@@ -49,6 +49,7 @@ class Module(models.Model):
     internal_content = models.TextField(blank=True, null=True)
     quiz_data = models.JSONField(blank=True, null=True)
     key_takeaways = models.JSONField(blank=True, default=list)
+    poster_image = models.ImageField(upload_to="modules/posters/", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
