@@ -94,3 +94,18 @@ def youtube_embed_url(value: str) -> str:
 
     # Fallback to original
     return val
+
+
+@register.filter(name="endswith")
+def endswith(value, suffix):
+    """
+    Safe string ``endswith`` check usable inside templates.
+
+    Usage: ``{{ some_string|endswith:".mp4" }}``
+    """
+    if value is None or suffix is None:
+        return False
+    try:
+        return str(value).lower().endswith(str(suffix).lower())
+    except Exception:
+        return False

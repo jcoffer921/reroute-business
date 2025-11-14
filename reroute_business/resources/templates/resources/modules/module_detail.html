@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static resources_extras %}
 
 {% block title %}ReRoute | {{ module.title }}{% endblock %}
 
@@ -32,7 +32,7 @@
           <iframe src="https://www.youtube-nocookie.com/embed/{{ yt_id }}?rel=0&modestbranding=1&playsinline=1"
                   title="Module video" referrerpolicy="strict-origin-when-cross-origin"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-        {% elif module.video_url and module.video_url|lower|endswith:'.mp4' %}
+        {% elif module.video_url and module.video_url|endswith:'.mp4' %}
           <video controls playsinline preload="metadata">
             <source src="{{ module.video_url }}" type="video/mp4">
           </video>
