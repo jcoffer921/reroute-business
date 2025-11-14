@@ -1,6 +1,10 @@
-// CSP-safe module quiz renderer: fetch schema and build DOM
+// Modern guided quiz flow (CSP-safe, no inline scripts)
 (function(){
-  function ready(fn){ if(document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+  function ready(fn){
+    if (document.readyState !== 'loading'){ fn(); }
+    else { document.addEventListener('DOMContentLoaded', fn); }
+  }
+
   function getCookie(name){
     var value = '; ' + document.cookie;
     var parts = value.split('; ' + name + '=');
@@ -10,211 +14,371 @@
 
   function formatTimestamp(value){
     if (!value) return '';
-    try {
-      var date = new Date(value);
-      if (!isNaN(date.getTime())){
-        return date.toLocaleString();
-      }
-    } catch (err){
-      return '';
-    }
-    return '';
+    var date = new Date(value);
+    if (isNaN(date.getTime())) return '';
+    return date.toLocaleString();
   }
 
-  function showMessage(el, text){
-    if (!el) return;
-    el.textContent = text;
-  }
-
-  function updateStatusDisplay(score, total, updatedAt){
-    var status = document.querySelector('.quiz-status');
-    if (!status) return;
-    var label = status.querySelector('.quiz-status__label');
-    if (!label){
-      label = document.createElement('div');
-      label.className = 'quiz-status__label';
-      status.insertBefore(label, status.firstChild);
-    }
-    label.textContent = 'Latest Score';
-
-    var value = status.querySelector('.quiz-status__value');
-    if (!value){
-      value = document.createElement('div');
-      value.className = 'quiz-status__value';
-      status.insertBefore(value, label.nextSibling);
-    }
-    value.textContent = score + ' / ' + total;
-
-    var meta = status.querySelector('.quiz-status__meta');
-    if (!meta){
-      meta = document.createElement('div');
-      meta.className = 'quiz-status__meta';
-      status.appendChild(meta);
-    }
-    meta.textContent = updatedAt ? ('Updated ' + updatedAt) : '';
+  function clamp(value, min, max){
+    return Math.min(Math.max(value, min), max);
   }
 
   ready(function(){
-    var root = document.getElementById('quizPanel');
-    var submit = document.getElementById('quizSubmit');
-    var resultEl = document.getElementById('quizResult');
-    if (!root || !submit) return;
+    var quizRoot = document.getElementById('quizFlow');
+    if (!quizRoot) return;
 
-    var schemaUrl = root.getAttribute('data-quiz-url');
-    var submitUrl = root.getAttribute('data-submit-url') || submit.getAttribute('data-submit-url');
-    var canSubmit = root.getAttribute('data-can-submit') === 'true';
+    var questionStage = document.getElementById('quizQuestionStage');
+    var progressLabel = document.getElementById('quizProgressLabel');
+    var progressFill = document.getElementById('quizProgressFill');
+    var prevBtn = document.getElementById('quizPrevBtn');
+    var nextBtn = document.getElementById('quizNextBtn');
+    var submitBtn = document.getElementById('quizSubmitBtn');
+    var completeBtn = document.getElementById('quizCompleteBtn');
+    var resultCard = document.getElementById('quizResultCard');
+    var startBtn = document.getElementById('quizStartBtn');
+    var quizSection = document.getElementById('quizSection');
+
+    var schemaUrl = quizRoot.getAttribute('data-quiz-url');
+    var submitUrl = quizRoot.getAttribute('data-submit-url');
+    var canSubmit = quizRoot.getAttribute('data-can-submit') === 'true';
+    var moduleId = quizRoot.getAttribute('data-module-id');
+
     if (!schemaUrl){
-      root.textContent = 'No quiz found for this module.';
+      if (questionStage) questionStage.textContent = 'No quiz available for this module.';
       return;
     }
 
-    var schema = null;
+    var state = {
+      questions: [],
+      current: 0,
+      answers: {},
+      evaluation: {},
+      hasSubmitted: false,
+      latestScore: null,
+    };
+
+    if (startBtn && quizSection){
+      startBtn.addEventListener('click', function(){
+        quizSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+
+    if (completeBtn && moduleId){
+      var key = 'module_complete_' + moduleId;
+      try {
+        if (localStorage.getItem(key) === 'done'){
+          markCompleteUI(true);
+        }
+      } catch (err){}
+      completeBtn.addEventListener('click', function(){
+        if (completeBtn.getAttribute('data-complete') === 'true') return;
+        completeBtn.setAttribute('data-complete', 'true');
+        completeBtn.textContent = 'Module marked complete ✓';
+        completeBtn.classList.add('is-complete');
+        try { localStorage.setItem(key, 'done'); } catch (err){}
+        showResult('Module marked complete — great work!', true);
+      });
+    }
+
+    function markCompleteUI(initial){
+      if (!completeBtn) return;
+      completeBtn.setAttribute('data-complete', 'true');
+      completeBtn.textContent = initial ? 'Completed on this device' : 'Module marked complete ✓';
+      completeBtn.classList.add('is-complete');
+    }
 
     fetch(schemaUrl, { credentials: 'same-origin' })
       .then(function(response){
-        if (!response.ok) throw new Error('Failed to load quiz schema.');
+        if (!response.ok) throw new Error('Failed to load quiz.');
         return response.json();
       })
-      .then(function(data){
-        schema = data || {};
-        render(schema);
-        if (schema.user_score){
-          var stamp = formatTimestamp(schema.user_score.updated_at);
-          updateStatusDisplay(schema.user_score.score, schema.user_score.total_questions, stamp);
+      .then(function(payload){
+        state.questions = Array.isArray(payload.questions) ? payload.questions : [];
+        if (!state.questions.length && questionStage){
+          questionStage.textContent = 'Quiz questions are coming soon.';
+          disableControls(true);
+          return;
+        }
+        renderQuestion();
+        if (payload.user_score){
+          updateSidebar(payload.user_score.score, payload.user_score.total_questions, payload.user_score.updated_at);
         }
       })
       .catch(function(){
-        root.textContent = 'Unable to load quiz.';
+        if (questionStage) questionStage.textContent = 'Unable to load quiz at the moment.';
+        disableControls(true);
       });
 
-    function render(sc){
-      var qs = Array.isArray(sc.questions) ? sc.questions : [];
-      root.innerHTML = '';
-      if (!qs.length){
-        var empty = document.createElement('div');
-        empty.className = 'quiz-q';
-        empty.textContent = 'No quiz available for this module.';
-        root.appendChild(empty);
+    function disableControls(force){
+      if (prevBtn) prevBtn.disabled = true;
+      if (nextBtn) nextBtn.disabled = true;
+      if (submitBtn) submitBtn.disabled = submitBtn ? true : false;
+      if (force && progressLabel) progressLabel.textContent = 'Quiz unavailable';
+      if (force && progressFill) progressFill.style.setProperty('--progress-value', '0%');
+    }
+
+    function renderQuestion(){
+      if (!questionStage || !state.questions.length){
         return;
       }
+      var total = state.questions.length;
+      state.current = clamp(state.current, 0, total - 1);
+      var question = state.questions[state.current];
+      var answered = state.answers[question.id];
 
-      qs.forEach(function(q){
-        var box = document.createElement('div');
-        box.className = 'quiz-q';
+      if (progressLabel){
+        progressLabel.textContent = 'Question ' + (state.current + 1) + ' of ' + total;
+      }
+      var stagePercent = total ? Math.round(((state.current + 1) / total) * 100) : 0;
+      if (progressFill){
+        progressFill.style.setProperty('--progress-value', stagePercent + '%');
+      }
 
-        var h = document.createElement('h4');
-        h.textContent = q.prompt || '';
-        box.appendChild(h);
+      questionStage.innerHTML = '';
 
-        var list = document.createElement('div');
-        list.className = 'quiz-choices';
+      var title = document.createElement('h3');
+      title.textContent = question.prompt || 'Untitled question';
+      questionStage.appendChild(title);
 
-        (q.choices || []).forEach(function(choice){
-          var id = 'q' + q.id + '_' + choice.id;
-          var label = document.createElement('label');
-          label.setAttribute('for', id);
+      var list = document.createElement('ul');
+      (question.choices || []).forEach(function(choice){
+        var choiceId = String(choice.id);
+        var label = document.createElement('label');
+        label.className = 'quiz-choice';
 
-          var input = document.createElement('input');
-          input.type = 'radio';
-          input.name = 'q_' + q.id;
-          input.value = choice.id;
-          input.id = id;
+        var input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'active_question';
+        input.value = choiceId;
 
-          var span = document.createElement('span');
-          span.textContent = choice.text || '';
+        if (String(answered) === choiceId){
+          input.checked = true;
+          label.classList.add('is-selected');
+        }
 
-          label.appendChild(input);
-          label.appendChild(span);
-          list.appendChild(label);
+        input.addEventListener('change', function(){
+          state.answers[question.id] = choiceId;
+          state.hasSubmitted = false;
+          state.evaluation = {};
+          renderQuestion();
+          updateNavState();
         });
 
-        box.appendChild(list);
-        root.appendChild(box);
-      });
+        label.appendChild(input);
+        var span = document.createElement('span');
+        span.textContent = choice.text || '';
+        label.appendChild(span);
+        list.appendChild(label);
 
-      if (canSubmit){
-        submit.addEventListener('click', function(){
-          handleSubmit(qs);
-        }, { once: false });
+        applySubmissionStyles(label, choice, question.id);
+      });
+      questionStage.appendChild(list);
+
+      if (state.hasSubmitted){
+        appendFeedback(question.id);
+      }
+
+      updateNavState();
+      updateSubmitState();
+    }
+
+    function applySubmissionStyles(label, choice, questionId){
+      if (!state.hasSubmitted) return;
+      var evaluation = state.evaluation[questionId];
+      if (!evaluation) return;
+      var choiceId = String(choice.id);
+      if (choiceId === evaluation.correctChoiceId){
+        label.classList.add('is-correct');
+      }
+      if (String(state.answers[questionId]) === choiceId && !evaluation.isUserCorrect){
+        label.classList.add('is-incorrect');
+      }
+      if (String(state.answers[questionId]) === choiceId){
+        label.classList.add('is-selected');
       }
     }
 
-    function handleSubmit(questions){
-      if (!Array.isArray(questions) || !questions.length){
-        showMessage(resultEl, 'Quiz is still loading.');
+    function appendFeedback(questionId){
+      var evaluation = state.evaluation[questionId];
+      if (!evaluation) return;
+      var note = document.createElement('p');
+      note.className = 'quiz-feedback-line';
+      note.textContent = evaluation.isUserCorrect ? 'Nice! You nailed this one.' : ('Correct answer: ' + (evaluation.correctText || ''));
+      if (evaluation.isUserCorrect){
+        note.classList.add('is-correct');
+      } else {
+        note.classList.add('is-incorrect');
+      }
+      questionStage.appendChild(note);
+    }
+
+    function updateNavState(){
+      var total = state.questions.length;
+      if (!prevBtn || !nextBtn) return;
+      prevBtn.disabled = state.current === 0;
+      var answeredCurrent = !!state.answers[state.questions[state.current].id];
+      var atEnd = state.current >= total - 1;
+      nextBtn.disabled = atEnd || !answeredCurrent;
+      nextBtn.textContent = atEnd ? 'End of Quiz' : 'Next Question';
+    }
+
+    function updateSubmitState(){
+      if (!submitBtn) return;
+      if (!state.questions.length){
+        submitBtn.disabled = true;
+        return;
+      }
+      var answeredCount = Object.keys(state.answers).length;
+      var total = state.questions.length;
+      var ready = answeredCount >= total;
+      submitBtn.disabled = !ready;
+      submitBtn.setAttribute('aria-disabled', ready ? 'false' : 'true');
+    }
+
+    if (prevBtn){
+      prevBtn.addEventListener('click', function(){
+        if (state.current === 0) return;
+        state.current -= 1;
+        renderQuestion();
+      });
+    }
+
+    if (nextBtn){
+      nextBtn.addEventListener('click', function(){
+        var total = state.questions.length;
+        if (state.current >= total - 1) return;
+        if (!state.answers[state.questions[state.current].id]) return;
+        state.current += 1;
+        renderQuestion();
+      });
+    }
+
+    if (submitBtn){
+      submitBtn.addEventListener('click', function(){
+        handleSubmit();
+      });
+    }
+
+    function handleSubmit(){
+      if (!state.questions.length){
+        showResult('Quiz is still loading.', false);
+        return;
+      }
+      var answeredCount = Object.keys(state.answers).length;
+      var total = state.questions.length;
+      if (answeredCount < total){
+        showResult('Answer every question before submitting.', false);
         return;
       }
 
-      var answers = [];
-      var total = questions.length;
-      var correct = 0;
-      var attempted = 0;
+      var answersPayload = [];
+      var score = 0;
+      var evaluation = {};
 
-      questions.forEach(function(q){
-        var selected = document.querySelector('input[name="q_' + q.id + '"]:checked');
-        if (!selected) return;
-        attempted += 1;
-        var value = selected.value;
-        var choice = (q.choices || []).find(function(c){ return String(c.id) === String(value); });
-        if (choice && (choice.is_correct === true || choice.correct === true)){
-          correct += 1;
-        }
-        answers.push({
-          question_id: q.id,
-          answer_id: value
+      state.questions.forEach(function(question){
+        var selected = state.answers[question.id];
+        var choices = Array.isArray(question.choices) ? question.choices : [];
+        var correctChoice = choices.find(function(choice){
+          return choice.is_correct === true || choice.correct === true;
+        });
+        var isCorrect = correctChoice && String(selected) === String(correctChoice.id);
+        if (isCorrect) score += 1;
+        evaluation[question.id] = {
+          correctChoiceId: correctChoice ? String(correctChoice.id) : '',
+          correctText: correctChoice ? correctChoice.text : '',
+          isUserCorrect: !!isCorrect,
+        };
+        answersPayload.push({
+          question_id: question.id,
+          answer_id: selected,
         });
       });
 
-      showMessage(resultEl, 'You answered ' + correct + ' of ' + attempted + ' attempted questions correctly.');
+      state.hasSubmitted = true;
+      state.evaluation = evaluation;
+      state.latestScore = { score: score, total: total };
+      renderQuestion();
+      var intro = canSubmit ? 'Saving your score…' : 'Log in to save this attempt. Review your results below.';
+      showResultCard(score, total, intro);
 
-      if (!submitUrl){
-        return;
+      if (canSubmit && submitUrl){
+        submitResults(answersPayload, score, total);
       }
+    }
 
+    function submitResults(answersPayload, score, total){
       var csrf = getCookie('csrftoken');
       var headers = { 'Content-Type': 'application/json' };
       if (csrf){
         headers['X-CSRFToken'] = csrf;
       }
-
       fetch(submitUrl, {
         method: 'POST',
         headers: headers,
         credentials: 'same-origin',
         body: JSON.stringify({
-          answers: answers,
+          answers: answersPayload,
           total: total,
-          score: correct
+          score: score,
         }),
       })
         .then(function(response){
           if (!response.ok){
             return response.json().catch(function(){ return {}; }).then(function(body){
-              var message = body.error || 'Unable to save score.';
-              throw new Error(message);
+              var err = body.error || 'Unable to save score.';
+              throw new Error(err);
             });
           }
           return response.json();
         })
         .then(function(payload){
-          var serverScore = typeof payload.score === 'number' ? payload.score : correct;
+          var serverScore = typeof payload.score === 'number' ? payload.score : score;
           var serverTotal = typeof payload.total_questions === 'number' ? payload.total_questions : total;
-          var percent;
-          if (typeof payload.percent === 'number'){
-            percent = payload.percent;
-          } else if (serverTotal) {
-            percent = Math.round((serverScore / serverTotal) * 100);
-          } else {
-            percent = 0;
-          }
-          var updatedText = payload.updated_at ? formatTimestamp(payload.updated_at) : 'just now';
-          var msg = (payload.message || 'Score saved.') + ' (' + serverScore + '/' + serverTotal + ', ' + percent + '%)';
-          showMessage(resultEl, msg);
-          updateStatusDisplay(serverScore, serverTotal, updatedText);
+          var message = payload.message || 'Score saved!';
+          showResult(message + ' (' + serverScore + '/' + serverTotal + ')', true);
+          updateSidebar(serverScore, serverTotal, payload.updated_at);
         })
         .catch(function(err){
-          showMessage(resultEl, err.message || 'Unable to save score.');
+          showResult(err.message || 'Unable to save score right now.', false);
         });
+    }
+
+    function showResult(message, success){
+      if (!resultCard) return;
+      resultCard.classList.add('is-visible');
+      resultCard.innerHTML = '<strong>' + (success ? 'Nice progress!' : 'Heads up') + '</strong><p>' + message + '</p>';
+    }
+
+    function showResultCard(score, total, intro){
+      if (!resultCard) return;
+      var percent = total ? Math.round((score / total) * 100) : 0;
+      var body = '<strong>' + percent + '% · ' + score + '/' + total + ' correct</strong>';
+      if (intro){
+        body += '<p>' + intro + '</p>';
+      }
+      resultCard.classList.add('is-visible');
+      resultCard.innerHTML = body;
+    }
+
+    function updateSidebar(score, total, updatedAt){
+      var percent = 0;
+      if (typeof score === 'number' && typeof total === 'number' && total){
+        percent = Math.round((score / total) * 100);
+      }
+      var valueEl = document.getElementById('sidebarProgressValue');
+      var metaEl = document.getElementById('sidebarProgressMeta');
+      var fillEl = document.getElementById('sidebarProgressFill');
+      var pillText = document.getElementById('quizStartBtn');
+
+      if (valueEl) valueEl.textContent = percent + '%';
+      if (fillEl) fillEl.style.setProperty('--progress-value', percent + '%');
+      if (metaEl){
+        var timeText = updatedAt ? 'Updated ' + formatTimestamp(updatedAt) : 'Latest attempt just now';
+        metaEl.textContent = score + ' of ' + total + ' correct · ' + timeText;
+      }
+      if (pillText){
+        pillText.textContent = 'Continue Quiz';
+      }
     }
   });
 })();

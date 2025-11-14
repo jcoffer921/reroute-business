@@ -120,12 +120,20 @@ def module_detail(request, pk: int):
     question_count = module.questions.count()
     if not question_count:
         question_count = len(_inline_quiz_questions(module))
+    progress_percent = 0
+    if user_score and user_score.total_questions:
+        try:
+            ratio = user_score.score / max(user_score.total_questions, 1)
+            progress_percent = max(0, min(100, round(ratio * 100)))
+        except Exception:
+            progress_percent = 0
     return render(request, 'resources/modules/module_detail.html', {
         'module': module,
         'yt_id': yt_id,
         'user_score': user_score,
         'can_submit_quiz': request.user.is_authenticated,
         'question_count': question_count,
+        'progress_percent': progress_percent,
     })
 
 
