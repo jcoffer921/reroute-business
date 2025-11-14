@@ -11,9 +11,7 @@
   <div class="auth-grid">
     <div class="auth-visual" aria-hidden="true">
       <div class="auth-visual-layer">
-        <span class="auth-pill">Welcome back</span>
         <h2 class="auth-slogan clarify-text">ReBuild. ReClaim. ReRoute.</h2>
-        <p class="auth-slogan-sub">Your next chapter starts each time you sign in.</p>
       </div>
     </div>
 
@@ -27,6 +25,7 @@
           <div id="form-error" class="auth-error" role="alert" aria-live="polite"></div>
         {% endif %}
 
+        <span class="auth-pill pill-inline">Welcome back</span>
         <form id="login-form" method="post" action="{% url 'login' %}">
           {% csrf_token %}
           <input type="hidden" name="next" value="{{ request.GET.next }}">
@@ -89,5 +88,6 @@
 </div>
 
 <script src="{% static 'js/base.js' %}"></script>
+<script src="{% static 'js/auth_clarify.js' %}" defer></script>
 <script src="{% static 'js/login.js' %}"></script>
 {% endblock %}
