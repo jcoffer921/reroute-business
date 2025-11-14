@@ -260,7 +260,7 @@ class AddCSPHeaderMiddleware(MiddlewareMixin):
             # Scripts from self, YouTube helpers, and Google reCAPTCHA
             "script-src 'self' https://www.youtube.com https://www.gstatic.com https://www.google.com https://www.gstatic.com/recaptcha; "
             # Explicit style policy (no inline styles)
-            "style-src 'self'; "
+            "style-src 'self' https://www.gstatic.com; "
             # Images from self, data URIs, YouTube thumbnails, and gstatic
             "img-src 'self' data: https://i.ytimg.com https://www.gstatic.com; "
             # XHR/fetch to self and Google (reCAPTCHA)

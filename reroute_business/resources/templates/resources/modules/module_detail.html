@@ -9,15 +9,25 @@
 
 {% block content %}
 <div class="module-shell">
+  <nav class="module-crumbs" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">Home</a>
+    <span aria-hidden="true">›</span>
+    <a href="{% url 'resource_list' %}">Resources</a>
+    <span aria-hidden="true">›</span>
+    <span>{{ module.title }}</span>
+  </nav>
+
   <section class="module-hero-card">
     <div class="module-hero-card__eyebrow">{{ module.get_category_display|default:"Learning Module" }}</div>
     <h1 class="module-hero-card__title">{{ module.title }}</h1>
-    <p class="module-hero-card__subtitle">Build a confident resume in minutes with expert guidance.</p>
+    <p class="module-hero-card__subtitle">
+      Build confidence with bite-sized lessons, then put it into practice right away.
+    </p>
     <div class="module-hero-card__meta">
       <span>{{ module.get_category_display|default:"Workforce Readiness" }}</span>
       <span>{{ question_count|default:0 }} question{% if question_count|default:0 != 1 %}s{% endif %}</span>
-      <span>On-demand video</span>
-      <span>Beginner friendly</span>
+      <span>{{ video_duration_label }}</span>
+      <span>{{ estimated_minutes }} min • Beginner friendly</span>
     </div>
   </section>
 
@@ -72,13 +82,13 @@
 
     <main class="module-main">
       <article class="module-card module-card--video">
-        <div class="module-video-wrap">
+        <div class="module-video-wrap" {% if video_poster %}style="background-image: url('{{ video_poster }}');"{% endif %}>
           {% if yt_id %}
             <iframe src="https://www.youtube-nocookie.com/embed/{{ yt_id }}?rel=0&modestbranding=1&playsinline=1"
                     title="Module video" referrerpolicy="strict-origin-when-cross-origin"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-          {% elif module.video_url and module.video_url|endswith:'.mp4' %}
-            <video controls playsinline preload="metadata">
+        {% elif module.video_url and module.video_url|endswith:'.mp4' %}
+            <video controls playsinline preload="metadata" {% if video_poster %}poster="{{ video_poster }}"{% endif %}>
               <source src="{{ module.video_url }}" type="video/mp4">
             </video>
           {% elif module.embed_html %}
@@ -136,6 +146,36 @@
         </section>
       {% endif %}
 
+      <section class="module-card module-card--resources">
+        <div class="resources-header">
+          <p class="resources-pill">Resources</p>
+          <h3>Keep learning after the lesson</h3>
+        </div>
+        <ul class="resources-list">
+          <li>
+            <div>
+              <strong>Resume Templates</strong>
+              <p>Use proven layouts to highlight your experience.</p>
+            </div>
+            <a href="{% url 'resource_list' %}#resumes" class="resource-link">Open</a>
+          </li>
+          <li>
+            <div>
+              <strong>Interview Practice</strong>
+              <p>Prep with mock questions and employer insights.</p>
+            </div>
+            <a href="{% url 'resource_list' %}#interview" class="resource-link">Explore</a>
+          </li>
+          <li>
+            <div>
+              <strong>Career Coaching</strong>
+              <p>Connect with experts for personalized feedback.</p>
+            </div>
+            <a href="{% url 'contact' %}" class="resource-link">Contact</a>
+          </li>
+        </ul>
+      </section>
+
       <section id="quizSection" class="module-card module-card--quiz">
         <header class="quiz-header">
           <div>
@@ -147,12 +187,18 @@
 
         <div
           id="quizFlow"
-          class="quiz-flow"
+          class="quiz-flow quiz-flow--locked"
           data-quiz-url="{% url 'module_quiz_schema' module.id %}"
           data-submit-url="{% url 'module_quiz_submit' module.id %}"
           data-can-submit="{{ can_submit_quiz|yesno:'true,false' }}"
           data-module-id="{{ module.id }}"
+          data-state="locked"
         >
+          <div class="quiz-lock-screen" id="quizLockScreen">
+            <p>Start the guided quiz when you're ready.</p>
+            <button id="quizInlineStartBtn" type="button" class="module-btn module-btn--primary">Start Quiz</button>
+          </div>
+
           <div class="quiz-flow__status">
             <div class="quiz-progress-label" id="quizProgressLabel">Loading quiz…</div>
             <div class="module-progress module-progress--inline">
@@ -178,10 +224,12 @@
             >
               Submit Quiz{% if not can_submit_quiz %} (Preview Only){% endif %}
             </button>
+            <button id="quizRetakeBtn" type="button" class="module-btn module-btn--ghost" disabled>Retake Quiz</button>
             <button id="quizCompleteBtn" type="button" class="module-btn module-btn--ghost">Mark Module Complete</button>
           </div>
 
           <div id="quizResultCard" class="quiz-result-card" role="status" aria-live="polite"></div>
+          <div id="quizConfetti" class="quiz-confetti" aria-hidden="true"></div>
         </div>
       </section>
     </main>

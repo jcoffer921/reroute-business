@@ -36,6 +36,10 @@
     var completeBtn = document.getElementById('quizCompleteBtn');
     var resultCard = document.getElementById('quizResultCard');
     var startBtn = document.getElementById('quizStartBtn');
+    var inlineStartBtn = document.getElementById('quizInlineStartBtn');
+    var lockScreen = document.getElementById('quizLockScreen');
+    var retakeBtn = document.getElementById('quizRetakeBtn');
+    var confettiHost = document.getElementById('quizConfetti');
     var quizSection = document.getElementById('quizSection');
 
     var schemaUrl = quizRoot.getAttribute('data-quiz-url');
@@ -56,11 +60,31 @@
       hasSubmitted: false,
       latestScore: null,
     };
+    var isUnlocked = false;
 
-    if (startBtn && quizSection){
-      startBtn.addEventListener('click', function(){
+    function unlockQuiz(){
+      if (isUnlocked) return;
+      isUnlocked = true;
+      quizRoot.classList.remove('quiz-flow--locked');
+      quizRoot.setAttribute('data-state', 'active');
+      if (lockScreen){
+        lockScreen.style.display = 'none';
+      }
+      renderQuestion();
+    }
+
+    function handleStartClick(){
+      unlockQuiz();
+      if (quizSection){
         quizSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
+      }
+    }
+
+    if (startBtn){
+      startBtn.addEventListener('click', handleStartClick);
+    }
+    if (inlineStartBtn){
+      inlineStartBtn.addEventListener('click', handleStartClick);
     }
 
     if (completeBtn && moduleId){
@@ -119,6 +143,16 @@
 
     function renderQuestion(){
       if (!questionStage || !state.questions.length){
+        return;
+      }
+      if (!isUnlocked){
+        questionStage.innerHTML = '<p class="quiz-hint-line">Hit “Start Quiz” to load your first question.</p>';
+        if (prevBtn) prevBtn.disabled = true;
+        if (nextBtn) nextBtn.disabled = true;
+        if (submitBtn){
+          submitBtn.disabled = true;
+          submitBtn.setAttribute('aria-disabled', 'true');
+        }
         return;
       }
       var total = state.questions.length;
@@ -259,6 +293,23 @@
       });
     }
 
+    if (retakeBtn){
+      retakeBtn.addEventListener('click', function(){
+        if (retakeBtn.disabled) return;
+        state.current = 0;
+        state.answers = {};
+        state.evaluation = {};
+        state.hasSubmitted = false;
+        state.latestScore = null;
+        retakeBtn.disabled = true;
+        if (resultCard){
+          resultCard.classList.remove('is-visible');
+          resultCard.textContent = '';
+        }
+        renderQuestion();
+      });
+    }
+
     function handleSubmit(){
       if (!state.questions.length){
         showResult('Quiz is still loading.', false);
@@ -300,10 +351,14 @@
       renderQuestion();
       var intro = canSubmit ? 'Saving your score…' : 'Log in to save this attempt. Review your results below.';
       showResultCard(score, total, intro);
+      if (retakeBtn){
+        retakeBtn.disabled = false;
+      }
 
       if (canSubmit && submitUrl){
         submitResults(answersPayload, score, total);
       }
+      launchConfetti();
     }
 
     function submitResults(answersPayload, score, total){
@@ -337,6 +392,7 @@
           var message = payload.message || 'Score saved!';
           showResult(message + ' (' + serverScore + '/' + serverTotal + ')', true);
           updateSidebar(serverScore, serverTotal, payload.updated_at);
+          launchConfetti();
         })
         .catch(function(err){
           showResult(err.message || 'Unable to save score right now.', false);
@@ -378,6 +434,25 @@
       }
       if (pillText){
         pillText.textContent = 'Continue Quiz';
+      }
+    }
+
+    function launchConfetti(){
+      if (!confettiHost) return;
+      confettiHost.innerHTML = '';
+      var colors = ['#4a6cff', '#7f93ff', '#1db954', '#facc15'];
+      for (var i = 0; i < 16; i++){
+        var piece = document.createElement('span');
+        piece.className = 'confetti-piece';
+        var color = colors[i % colors.length];
+        piece.style.background = color;
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.top = '0';
+        piece.style.animationDelay = (Math.random() * 0.2) + 's';
+        confettiHost.appendChild(piece);
+        (function(p){
+          setTimeout(function(){ if (p && p.parentNode){ p.parentNode.removeChild(p); } }, 1500);
+        })(piece);
       }
     }
   });

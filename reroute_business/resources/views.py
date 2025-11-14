@@ -1,6 +1,8 @@
 # resources/views.py
 import json
 from datetime import datetime
+from urllib.parse import quote
+
 from django.conf import settings
 from django.http import JsonResponse, Http404
 from django.shortcuts import render, get_object_or_404
@@ -110,16 +112,47 @@ def _extract_youtube_id_simple(url: str) -> str:
     return ''
 
 
+def _build_svg_poster(text: str) -> str:
+    title = (text or 'Learning Module').strip()[:48] or 'Learning Module'
+    svg = (
+        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 675'>"
+        "<defs>"
+        "<linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>"
+        "<stop offset='0%' stop-color='%23f5f7fb'/>"
+        "<stop offset='100%' stop-color='%23dbeafe'/>"
+        "</linearGradient>"
+        "</defs>"
+        "<rect width='1200' height='675' fill='url(%23g)'/>"
+        "<text x='50%' y='50%' font-family='Helvetica,Arial,sans-serif' font-size='56' "
+        "fill='%234a6cff' text-anchor='middle' dominant-baseline='middle'>"
+        f"{title}"
+        "</text>"
+        "</svg>"
+    )
+    return "data:image/svg+xml;utf8," + quote(svg)
+
+
+def _module_poster_url(module, yt_id: str) -> str:
+    if yt_id:
+        return f"https://i.ytimg.com/vi/{yt_id}/hqdefault.jpg"
+    if module.video_url and str(module.video_url).lower().endswith('.mp4'):
+        return _build_svg_poster(module.title)
+    return _build_svg_poster(module.title)
+
+
 @ensure_csrf_cookie
 def module_detail(request, pk: int):
     module = get_object_or_404(Module, pk=pk)
     yt_id = _extract_youtube_id_simple(module.video_url or '') if module.video_url else ''
+    poster_url = _module_poster_url(module, yt_id)
+    duration_label = getattr(module, 'duration_label', None) or 'Self-paced video'
     user_score = None
     if request.user.is_authenticated:
         user_score = ModuleQuizScore.objects.filter(module=module, user=request.user).first()
     question_count = module.questions.count()
     if not question_count:
         question_count = len(_inline_quiz_questions(module))
+    estimated_minutes = max(3, int(question_count or 3))
     progress_percent = 0
     if user_score and user_score.total_questions:
         try:
@@ -130,6 +163,9 @@ def module_detail(request, pk: int):
     return render(request, 'resources/modules/module_detail.html', {
         'module': module,
         'yt_id': yt_id,
+        'video_poster': poster_url,
+        'video_duration_label': duration_label,
+        'estimated_minutes': estimated_minutes,
         'user_score': user_score,
         'can_submit_quiz': request.user.is_authenticated,
         'question_count': question_count,
