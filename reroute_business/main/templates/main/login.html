@@ -17,71 +17,85 @@
 
     <div class="auth-panel">
       <div class="auth-panel-card">
-        <h1 class="auth-title">Login to your account</h1>
+        <div
+          id="login-react-root"
+          data-action="{% url 'login' %}"
+          data-next="{{ request.GET.next|default:'' }}"
+          data-prefill="{{ prefill_identifier|default:'' }}"
+          data-error="{{ error|default:'' }}"
+          data-forgot-url="{% url 'password_reset' %}"
+          data-signup-url="{% url 'signup' %}"
+          data-employer-url="{% url 'employer_login' %}"
+          data-resend-url="{% url 'resend_verification' %}"
+        ></div>
 
-        {% if error %}
-          <div id="form-error" class="auth-error" role="alert" aria-live="polite">{{ error }}</div>
-        {% else %}
-          <div id="form-error" class="auth-error" role="alert" aria-live="polite"></div>
-        {% endif %}
+        <div id="login-fallback">
+          <h1 class="auth-title">Login to your account</h1>
 
-        <span class="auth-pill pill-inline">Welcome back</span>
-        <form id="login-form" method="post" action="{% url 'login' %}">
-          {% csrf_token %}
-          <input type="hidden" name="next" value="{{ request.GET.next }}">
+          {% if error %}
+            <div id="form-error" class="auth-error" role="alert" aria-live="polite">{{ error }}</div>
+          {% else %}
+            <div id="form-error" class="auth-error" role="alert" aria-live="polite"></div>
+          {% endif %}
 
-          <div class="form-group">
-            <label for="login-username">Email or username</label>
-            <input
-              id="login-username"
-              name="username"
-              type="text"
-              inputmode="email"
-              autocomplete="username"
-              placeholder="Email or username"
-              required
-              value="{{ prefill_identifier|default:'' }}"
-            >
-          </div>
+          <span class="auth-pill pill-inline">Welcome back</span>
+          <form id="login-form" method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
 
-          <div class="form-group">
-            <div class="label-row">
-              <label for="login-password">Password</label>
-              <a class="micro-link" href="{% url 'password_reset' %}">Forgot your password?</a>
-            </div>
-            <div class="pwd-wrap">
+            <div class="form-group">
+              <label for="login-username">Email or username</label>
               <input
-                id="login-password"
-                name="password"
-                type="password"
-                autocomplete="current-password"
-                placeholder="Password"
+                id="login-username"
+                name="username"
+                type="text"
+                inputmode="email"
+                autocomplete="username"
+                placeholder="Email or username"
                 required
+                value="{{ prefill_identifier|default:'' }}"
               >
-              <span class="pwd-toggle-text" tabindex="0" role="button" aria-controls="login-password">Show Password</span>
             </div>
-          </div>
 
-          <div class="remember-row">
-            <label class="checkbox">
-              <input type="checkbox" name="remember" value="1">
-              <span>Remember this device</span>
-              <span class="help" tabindex="0" title="Keeps you signed in on this device longer. Don't use on shared computers.">?</span>
-            </label>
-          </div>
+            <div class="form-group">
+              <div class="label-row">
+                <label for="login-password">Password</label>
+                <a class="micro-link" href="{% url 'password_reset' %}">Forgot your password?</a>
+              </div>
+              <div class="pwd-wrap">
+                <input
+                  id="login-password"
+                  name="password"
+                  type="password"
+                  autocomplete="current-password"
+                  placeholder="Password"
+                  required
+                >
+                <span class="pwd-toggle-text" tabindex="0" role="button" aria-controls="login-password">Show Password</span>
+              </div>
+            </div>
 
-          <button id="signin-btn" type="submit" class="btn-pill">Sign in</button>
+            <div class="remember-row">
+              <label class="checkbox">
+                <input type="checkbox" name="remember" value="1">
+                <span>Remember this device</span>
+                <span class="help" tabindex="0" title="Keeps you signed in on this device longer. Don't use on shared computers.">?</span>
+              </label>
+            </div>
 
-          <div class="secondary-actions">
-            <span>Don't have an account? <a class="link" href="{% url 'signup' %}">Register</a>.</span>
-            <span class="sep" aria-hidden="true">·</span>
-            <a class="link" href="{% url 'employer_login' %}">Employer Login</a>
-            <span class="sep" aria-hidden="true">·</span>
-            <a class="link" href="{% url 'resend_verification' %}">Resend verification</a>
-          </div>
+            <button id="signin-btn" type="submit" class="btn-pill">Sign in</button>
 
-          <p id="login-error" class="error-text" aria-live="polite"></p>
-        </form>
+            <div class="secondary-actions">
+              <span>Don't have an account? <a class="link" href="{% url 'signup' %}">Register</a>.</span>
+              <span class="sep" aria-hidden="true">·</span>
+              <a class="link" href="{% url 'employer_login' %}">Employer Login</a>
+              <span class="sep" aria-hidden="true">·</span>
+              <a class="link" href="{% url 'resend_verification' %}">Resend verification</a>
+            </div>
+
+            <p id="login-error" class="error-text" aria-live="polite"></p>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -89,5 +103,8 @@
 
 <script src="{% static 'js/base.js' %}"></script>
 <script src="{% static 'js/auth_clarify.js' %}" defer></script>
-<script src="{% static 'js/login.js' %}"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js" defer></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" defer></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/framer-motion@10.16.4/dist/framer-motion.umd.min.js" defer></script>
+<script src="{% static 'js/login-react.js' %}" defer></script>
 {% endblock %}
