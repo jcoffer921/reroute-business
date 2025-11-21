@@ -43,6 +43,8 @@ body {
     linear-gradient(135deg, rgba(3, 20, 60, 0.92), rgba(26, 77, 217, 0.88)),
     url('../images/login-img.png') center/cover;
   display: flex;
+  justify-content: center;
+  align-items: flex-start;
   min-height: inherit;
   color: #fff;
 }
@@ -56,14 +58,11 @@ body {
 }
 
 .auth-visual-layer {
-  position: absolute;
-  top: 8%;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
   text-align: center;
-  padding: 0 2rem;
+  padding: 1.5rem 2rem 0;
 }
 
 .auth-pill {
