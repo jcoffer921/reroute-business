@@ -7,85 +7,107 @@
 <link rel="stylesheet" href="{% static 'css/employer_login.css' %}">
 
 <section class="auth-card">
-  <h1 class="auth-title">Employer Login</h1>
-  <p class="subtitle">Access your dashboard to post jobs and manage applications</p>
+  <div
+    id="login-react-root"
+    data-action="{% url 'employer_login' %}"
+    data-next="{{ request.GET.next|default:'' }}"
+    data-prefill="{{ prefill_identifier|default:'' }}"
+    data-error="{{ error|default:'' }}"
+    data-forgot-url="{% url 'password_reset' %}"
+    data-signup-url="{% url 'employer_signup' %}"
+    data-resend-url="{% url 'resend_verification' %}"
+    data-switch-url="{% url 'login' %}"
+    data-switch-label="User login"
+    data-title="Employer login"
+    data-subtitle="Access your dashboard to post jobs and manage applications"
+    data-signup-label="Create employer account"
+    data-mode="employer"
+  ></div>
 
-  {# Inline error area (server-rendered or JS can write here) #}
-  {% if error %}
-    <div id="form-error" class="auth-error" role="alert" aria-live="polite">{{ error }}</div>
-  {% else %}
-    <div id="form-error" class="auth-error" role="alert" aria-live="polite"></div>
-  {% endif %}
+  <div id="employer-fallback">
+    <h1 class="auth-title">Employer Login</h1>
+    <p class="subtitle">Access your dashboard to post jobs and manage applications</p>
 
-  <!--
-    Unified form:
-    - Works without JS (normal POST)
-    - If employer_login.js is loaded, it will send JSON to this same action
-  -->
-  <form id="login-form" method="post" action="{% url 'employer_login' %}">
-    {% csrf_token %}
-    <input type="hidden" name="next" value="{{ request.GET.next }}">
+    {# Inline error area (server-rendered or JS can write here) #}
+    {% if error %}
+      <div id="form-error" class="auth-error" role="alert" aria-live="polite">{{ error }}</div>
+    {% else %}
+      <div id="form-error" class="auth-error" role="alert" aria-live="polite"></div>
+    {% endif %}
 
-    <!-- Username / Email -->
-    <div class="form-group">
-      <label for="employer-username">Email or username</label>
-      <input
-        id="employer-username"
-        name="username"            {# server accepts email OR username #}
-        type="text"
-        inputmode="email"
-        autocomplete="username"
-        placeholder="Email or username"
-        required
-        value="{{ prefill_identifier|default:'' }}"
-      >
-    </div>
+    <!--
+      Unified form:
+      - Works without JS (normal POST)
+      - If employer_login.js is loaded, it will send JSON to this same action
+    -->
+    <form id="login-form" method="post" action="{% url 'employer_login' %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.GET.next }}">
 
-    <!-- Password + right-aligned 'Forgot?' -->
-    <div class="form-group">
-      <div class="label-row">
-        <label for="employer-password">Password</label>
-        <a class="micro-link" href="{% url 'password_reset' %}">Forgot your password?</a>
-      </div>
-      <div class="pwd-wrap">
+      <!-- Username / Email -->
+      <div class="form-group">
+        <label for="employer-username">Email or username</label>
         <input
-          id="employer-password"
-          name="password"
-          type="password"
-          autocomplete="current-password"
-          placeholder="Password"
+          id="employer-username"
+          name="username"            {# server accepts email OR username #}
+          type="text"
+          inputmode="email"
+          autocomplete="username"
+          placeholder="Email or username"
           required
+          value="{{ prefill_identifier|default:'' }}"
         >
-        <span class="pwd-toggle-text" tabindex="0" role="button" aria-controls="employer-password">Show Password</span>
       </div>
-    </div>
 
-    <!-- Remember device (note: cosmetic until we wire it in the view) -->
-    <div class="remember-row">
-      <label class="checkbox">
-        <input type="checkbox" name="remember" value="1">
-        <span>Remember this device</span>
-        <span class="help" tabindex="0"
-              title="Keeps you signed in on this device longer. Don’t use on shared computers.">?</span>
-      </label>
-    </div>
+      <!-- Password + right-aligned 'Forgot?' -->
+      <div class="form-group">
+        <div class="label-row">
+          <label for="employer-password">Password</label>
+          <a class="micro-link" href="{% url 'password_reset' %}">Forgot your password?</a>
+        </div>
+        <div class="pwd-wrap">
+          <input
+            id="employer-password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Password"
+            required
+          >
+          <span class="pwd-toggle-text" tabindex="0" role="button" aria-controls="employer-password">Show Password</span>
+        </div>
+      </div>
 
-    <!-- Primary pill CTA -->
-    <button id="employer-login-btn" type="submit" class="btn-pill">Sign in</button>
+      <!-- Remember device (note: cosmetic until we wire it in the view) -->
+      <div class="remember-row">
+        <label class="checkbox">
+          <input type="checkbox" name="remember" value="1">
+          <span>Remember this device</span>
+          <span class="help" tabindex="0"
+                title="Keeps you signed in on this device longer. Don’t use on shared computers.">?</span>
+        </label>
+      </div>
 
-    <!-- Secondary actions (best home for Employer/User switch) -->
-    <div class="secondary-actions">
-      <span>Not an employer? <a class="link" href="{% url 'login' %}">User login</a>.</span>
-      <span class="sep" aria-hidden="true">·</span>
-      <a class="link" href="{% url 'resend_verification' %}">Resend verification</a>
-      <span class="sep" aria-hidden="true">·</span>
-      <a class="link" href="{% url 'employer_signup' %}">Create employer account</a>
-    </div>
+      <!-- Primary pill CTA -->
+      <button id="employer-login-btn" type="submit" class="btn-pill">Sign in</button>
 
-    <!-- Optional: AJAX error slot if JS posts JSON -->
-    <p id="login-error" class="error-text" aria-live="polite"></p>
-  </form>
+      <!-- Secondary actions (best home for Employer/User switch) -->
+      <div class="secondary-actions">
+        <span>Not an employer? <a class="link" href="{% url 'login' %}">User login</a>.</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <a class="link" href="{% url 'resend_verification' %}">Resend verification</a>
+        <span class="sep" aria-hidden="true">·</span>
+        <a class="link" href="{% url 'employer_signup' %}">Create employer account</a>
+      </div>
+
+      <!-- Optional: AJAX error slot if JS posts JSON -->
+      <p id="login-error" class="error-text" aria-live="polite"></p>
+    </form>
+  </div>
 </section>
 
-<script src="{% static 'js/employer_login.js' %}"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js" defer></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" defer></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/framer-motion@10.16.4/dist/framer-motion.umd.min.js" defer></script>
+<script src="{% static 'js/login-react.js' %}" defer></script>
 {% endblock %}

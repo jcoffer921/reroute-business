@@ -44,8 +44,8 @@
             <a class="video-thumb-container" href="{{ item_href }}">
               {% if vid %}
                 <img src="https://i.ytimg.com/vi/{{ vid }}/hqdefault.jpg" alt="{{ video.title }} thumbnail">
-              {% else %}
-                <img src="{{ video.poster|default:'/static/images/dont_say_interview.png' }}" alt="{{ video.title }} thumbnail">
+              {% elif video.thumbnail_static_path %}
+                <img src="{{ video.thumbnail_static_path }}" alt="{{ video.title }} thumbnail">
               {% endif %}
               <span class="video-play-btn" aria-hidden="true">
                 <span>▶</span>

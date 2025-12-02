@@ -63,6 +63,11 @@
       forgotUrl,
       signupUrl,
       employerUrl,
+      switchUrl,
+      switchLabel,
+      signupLabel,
+      title,
+      subtitle,
       resendUrl,
       isEmployer,
     } = props;
@@ -185,8 +190,8 @@
           [
             e('div', { className: 'spark', 'aria-hidden': 'true' }, '✺'),
             e('div', { className: 'header-copy' }, [
-              e('h1', { className: 'auth-title' }, 'Login to your account'),
-              e('p', { className: 'react-subtitle' }, 'Smooth, animated, and still powered by Django.'),
+              e('h1', { className: 'auth-title' }, title || (isEmployer ? 'Employer login' : 'Login to your account')),
+              e('p', { className: 'react-subtitle' }, subtitle || (isEmployer ? 'Access your dashboard to post jobs.' : 'Smooth, animated, and still powered by Django.')),
             ]),
           ]
         ),
@@ -267,7 +272,7 @@
                   }),
                   e('span', null, 'Remember this device'),
                 ]),
-                e('a', { className: 'micro-link', href: employerUrl }, 'Employer login'),
+                e('a', { className: 'micro-link', href: switchUrl || employerUrl }, switchLabel || (isEmployer ? 'User login' : 'Employer login')),
               ]
             ),
             e(
@@ -311,8 +316,8 @@
           { variants: variants.item, initial: 'hidden', animate: 'show', custom: 5, className: 'secondary-actions' },
           [
             e('span', null, [
-              "Don't have an account? ",
-              e('a', { className: 'link', href: signupUrl }, 'Register'),
+              isEmployer ? 'Need an employer account? ' : "Don't have an account? ",
+              e('a', { className: 'link', href: signupUrl }, signupLabel || (isEmployer ? 'Create employer account' : 'Register')),
               '.',
             ]),
             e('span', { className: 'sep', 'aria-hidden': 'true' }, '·'),
@@ -331,6 +336,11 @@
     forgotUrl: clean(rootEl.dataset.forgotUrl) || '#',
     signupUrl: clean(rootEl.dataset.signupUrl) || '#',
     employerUrl: clean(rootEl.dataset.employerUrl) || '#',
+    switchUrl: clean(rootEl.dataset.switchUrl),
+    switchLabel: clean(rootEl.dataset.switchLabel),
+    signupLabel: clean(rootEl.dataset.signupLabel),
+    title: clean(rootEl.dataset.title),
+    subtitle: clean(rootEl.dataset.subtitle),
     resendUrl: clean(rootEl.dataset.resendUrl) || '#',
     isEmployer: (clean(rootEl.dataset.action) || '').includes('/employer/'),
   };

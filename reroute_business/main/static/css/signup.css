@@ -12,6 +12,18 @@ body {
   background: var(--auth-bg);
 }
 
+.signup-react-active #signup-fallback {
+  display: none;
+}
+
+#signup-react-root {
+  display: none;
+}
+
+.signup-react-active #signup-react-root {
+  display: block;
+}
+
 .auth-shell {
   min-height: calc(100vh - 80px);
   padding: 0;
@@ -70,6 +82,7 @@ body {
   font-weight: 800;
   margin: 0;
   line-height: 1.1;
+  text-align: center;
 }
 
 .auth-slogan-sub {
@@ -110,6 +123,112 @@ body {
   display: flex;
   flex-direction: column;
   animation: slideFade .7s ease .1s both;
+}
+
+.react-login-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.react-login-shell .pill-inline {
+  margin: 0;
+}
+
+.react-header {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+.react-header .spark {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: radial-gradient(circle at 20% 20%, rgba(255,255,255,.9), rgba(26,77,217,.25)), linear-gradient(135deg, rgba(26,77,217,.2), rgba(26,77,217,.05));
+  display: grid;
+  place-items: center;
+  color: var(--auth-blue);
+  box-shadow: 0 12px 22px rgba(26, 77, 217, 0.18);
+}
+
+.react-subtitle {
+  color: var(--auth-muted);
+  margin: .25rem 0 0;
+}
+
+.react-stack {
+  display: flex;
+  flex-direction: column;
+  gap: .85rem;
+}
+
+.react-field {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #f8fbff;
+  padding: .9rem 1rem;
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.react-field:focus-within {
+  border-color: rgba(26, 77, 217, 0.7);
+  box-shadow: 0 0 0 3px rgba(26, 77, 217, 0.14);
+  background: #fff;
+}
+
+.react-field .label-row {
+  margin-bottom: .3rem;
+}
+
+.react-field input[type="text"],
+.react-field input[type="password"],
+.react-field input[type="email"] {
+  border: none;
+  padding: .25rem 0 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.react-field input:focus {
+  border: none;
+  box-shadow: none;
+}
+
+.pwd-toggle-chip {
+  font-size: .9rem;
+  color: var(--auth-blue);
+  cursor: pointer;
+  user-select: none;
+  padding: .35rem .7rem;
+  background: rgba(26, 77, 217, 0.08);
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+.pwd-toggle-chip:hover,
+.pwd-toggle-chip:focus {
+  background: rgba(26, 77, 217, 0.12);
+}
+
+.caps-hint {
+  margin-top: .35rem;
+  color: #b91c1c;
+  font-size: .9rem;
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+.react-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  color: var(--auth-muted);
 }
 
 .auth-panel-card form {
@@ -259,6 +378,22 @@ input:focus {
   transform: translateY(0);
 }
 
+.submit-btn .btn-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+}
+
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.6);
+  border-top-color: #fff;
+  animation: spin .8s linear infinite;
+}
+
 .secondary-actions {
   margin-top: 1.25rem;
   text-align: left;
@@ -282,6 +417,25 @@ input:focus {
 
 .g-recaptcha {
   margin-bottom: 1rem;
+}
+
+.react-error {
+  margin: .35rem 0 0;
+  color: #b91c1c;
+  min-height: 1rem;
+}
+
+.react-error-banner {
+  background: #fef2f2;
+  border: 1px solid #fecdd3;
+  color: #b91c1c;
+  padding: .75rem 1rem;
+  border-radius: 12px;
+  margin: .25rem 0;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-weight: 600;
 }
 
 @keyframes clarify {
@@ -327,6 +481,10 @@ input:focus {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 @media (max-width: 960px) {
