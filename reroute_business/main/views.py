@@ -681,6 +681,50 @@ def video_gallery(request):
         setattr(v, 'effective_category', eff)
         setattr(v, 'effective_tags', (v.tags or '').lower())
 
+    def _auto_thumbnail(video_obj):
+        """
+        Return a thumbnail URL for the video. Prefer YouTube's official thumb, then any
+        provided static thumbnail/poster, and finally generate a lightweight SVG data URL.
+        """
+        import hashlib
+        import html
+        from urllib.parse import quote
+
+        vid = getattr(video_obj, 'youtube_id2', None) or extract_vid(video_obj.embed_url())
+        if vid:
+            setattr(video_obj, 'youtube_id2', vid)
+            return f"https://i.ytimg.com/vi/{vid}/hqdefault.jpg"
+
+        # Static image fallback if provided
+        static_thumb = getattr(video_obj, 'thumbnail_static_path', '') or getattr(video_obj, 'poster', '')
+        if static_thumb:
+            return static_thumb
+
+        # Generate a deterministic placeholder SVG so every non-YouTube video still has a cover image
+        palette = ['#0ea5e9', '#6366f1', '#14b8a6', '#22c55e', '#f59e0b', '#ec4899']
+        title = (getattr(video_obj, 'title', '') or 'Learning Video').strip() or 'Learning Video'
+        seed = f"{getattr(video_obj, 'id', '')}{title}"
+        digest = hashlib.md5(seed.encode('utf-8', 'ignore')).hexdigest()
+        color = palette[int(digest[:2], 16) % len(palette)]
+        short_title = html.escape(title[:36])
+        svg = (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270">'
+            '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
+            f'<stop offset="0%" stop-color="{color}"/><stop offset="100%" stop-color="#0b1120"/>'
+            '</linearGradient></defs>'
+            '<rect width="480" height="270" rx="20" fill="url(#g)"/>'
+            '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" '
+            'fill="#e5e7eb" font-family="Arial, sans-serif" font-size="30" font-weight="700">'
+            f'{short_title}'
+            '</text>'
+            '</svg>'
+        )
+        return f"data:image/svg+xml;utf8,{quote(svg)}"
+
+    # Attach computed thumbnails
+    for v in videos:
+        setattr(v, 'thumbnail_url', _auto_thumbnail(v))
+
     # Optional server-side filter
     if req_cat in {'module','quick','lecture','webinar','other'}:
         videos = [v for v in videos if getattr(v, 'effective_category', '') == req_cat]
