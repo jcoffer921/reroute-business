@@ -159,7 +159,7 @@
         </div>
         <div class="progress-grid">
           {% with resume_percent=resume|yesno:"92,40" %}
-          <div class="progress-tile" style="--value: {{ resume_percent }};">
+          <div class="progress-tile" data-value="{{ resume_percent }}">
             <div class="progress-ring" aria-hidden="true"></div>
             <div class="progress-meta">
               <p class="label">Resume completeness</p>
@@ -168,7 +168,7 @@
             </div>
           </div>
           {% endwith %}
-          <div class="progress-tile" style="--value: {{ modules_completed_percent|default:0 }};">
+          <div class="progress-tile" data-value="{{ modules_completed_percent|default:0 }}">
             <div class="progress-ring" aria-hidden="true"></div>
             <div class="progress-meta">
               <p class="label">Modules completed</p>
@@ -176,7 +176,7 @@
               <p class="hint"><a href="{% url 'resource_list' %}#modules">Continue learning</a></p>
             </div>
           </div>
-          <div class="progress-tile" style="--value: {{ completion_percentage|default:0 }};">
+          <div class="progress-tile" data-value="{{ completion_percentage|default:0 }}">
             <div class="progress-ring" aria-hidden="true"></div>
             <div class="progress-meta">
               <p class="label">Profile completion</p>
@@ -184,7 +184,7 @@
               <p class="hint">Finish your profile for better matches.</p>
             </div>
           </div>
-          <div class="progress-tile" style="--value: {{ organizations_saved_count|default:0 }};">
+          <div class="progress-tile" data-value="{{ organizations_saved_count|default:0 }}">
             <div class="progress-ring" aria-hidden="true"></div>
             <div class="progress-meta">
               <p class="label">Organizations saved</p>
