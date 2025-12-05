@@ -23,6 +23,8 @@ from reroute_business.job_list.matching import match_jobs_for_user
 # Profiles & resumes
 from reroute_business.profiles.models import UserProfile
 from reroute_business.resumes.models import Education, Experience, Resume  # your resumes app owns these
+from reroute_business.resources.models import Module
+from reroute_business.reentry_org.models import ReentryOrganization, SavedOrganization
 
 
 # =========================
@@ -203,6 +205,38 @@ def user_dashboard(request):
     except Exception:
         upcoming_interviews = []
 
+    # Learning modules (lightweight surface for dashboard cards)
+    try:
+        recommended_modules = list(Module.objects.order_by('-created_at')[:4])
+        recent_module = recommended_modules[0] if recommended_modules else None
+    except Exception:
+        recommended_modules = []
+        recent_module = None
+
+    # Reentry organizations catalog picks (verified only)
+    try:
+        recommended_orgs = list(
+            ReentryOrganization.objects.filter(is_verified=True).order_by('name')[:6]
+        )
+    except Exception:
+        recommended_orgs = []
+
+    modules_completed = 0
+    try:
+        from reroute_business.resources.models import ModuleQuizScore
+        modules_completed = ModuleQuizScore.objects.filter(user=request.user).count()
+    except Exception:
+        modules_completed = 0
+    modules_completed_percent = min(modules_completed * 20, 100) if modules_completed else 0
+
+    try:
+        saved_orgs_qs = SavedOrganization.objects.filter(user=request.user).select_related('organization')
+        organizations_saved_count = saved_orgs_qs.count()
+        saved_org_ids = [o.organization_id for o in saved_orgs_qs]
+    except Exception:
+        organizations_saved_count = 0
+        saved_org_ids = []
+
     # Charts for seeker dashboard were removed per request.
 
     return render(request, 'dashboard/user_dashboard.html', {
@@ -226,6 +260,14 @@ def user_dashboard(request):
             'matches_found': matches_found,
         },
         'upcoming_interviews': upcoming_interviews,
+        'recommended_modules': recommended_modules,
+        'recent_module': recent_module,
+        'recommended_orgs': recommended_orgs,
+        'modules_completed': modules_completed,
+        'modules_completed_percent': modules_completed_percent,
+        'saved_jobs_count': saved_jobs_count,
+        'organizations_saved_count': organizations_saved_count,
+        'saved_org_ids': saved_org_ids,
     })
 
 

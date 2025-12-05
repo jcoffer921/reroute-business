@@ -38,6 +38,8 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.contrib.auth.password_validation import validate_password
+from django.core.cache import cache
+from django.core.paginator import Paginator
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.views.decorators.http import require_GET, require_POST
@@ -590,8 +592,23 @@ def logout_view(request):
 # ===============================
 @ensure_csrf_cookie
 def video_gallery(request):
+    allowed_cats = {'module', 'quick', 'lecture', 'webinar', 'other'}
     req_cat = (request.GET.get('cat') or '').strip().lower()
-    videos = list(YouTubeVideo.objects.all().order_by('-created_at'))
+    if req_cat and req_cat not in allowed_cats:
+        req_cat = ''
+
+    try:
+        page_number = int(request.GET.get('page') or 1)
+    except Exception:
+        page_number = 1
+    if page_number < 1:
+        page_number = 1
+
+    per_page = 12
+
+    videos = list(YouTubeVideo.objects.all().only(
+        'id', 'title', 'video_url', 'category', 'tags', 'mp4_static_path', 'poster', 'created_at'
+    ).order_by('-created_at'))
 
     # Helper to extract YouTube ID from various URL formats
     def extract_vid(url: str) -> str:
@@ -618,118 +635,159 @@ def video_gallery(request):
                 return ''
         return ''
 
-    # Attach a related interactive lesson slug when available by matching YouTube IDs
-    if Lesson:
-        ids = {}
-        for v in videos:
-            vid = extract_vid(v.embed_url())
-            if vid:
-                ids[v.id] = vid
-                setattr(v, 'youtube_id2', vid)
-        if ids:
-            lessons = Lesson.objects.filter(youtube_video_id__in=list(ids.values())).only('slug', 'youtube_video_id')
-            by_id = {ls.youtube_video_id: ls.slug for ls in lessons}
-            for v in videos:
-                vid = ids.get(v.id)
-                if vid and vid in by_id:
-                    setattr(v, 'lesson_slug', by_id[vid])
+    # Collect YouTube IDs once to avoid repeated parsing (cached briefly)
+    youtube_ids = {}
+    for v in videos:
+        yid_cache_key = f"video_yid:{v.id}:{getattr(v, 'video_url', '')}"
+        vid = cache.get(yid_cache_key)
+        if vid is None:
+            try:
+                embed = v.embed_url()
+            except Exception:
+                embed = ''
+            vid = extract_vid(embed)
+            cache.set(yid_cache_key, vid, 600)
+        if vid:
+            youtube_ids[v.id] = vid
+            setattr(v, 'youtube_id2', vid)
 
-    # Attach a Module id when a module has the same YouTube ID
+    # Attach a related interactive lesson slug when available by matching YouTube IDs
+    lesson_map = {}
+    if Lesson and youtube_ids:
+        lessons = Lesson.objects.filter(youtube_video_id__in=list(youtube_ids.values())).only('slug', 'youtube_video_id')
+        lesson_map = {ls.youtube_video_id: ls.slug for ls in lessons}
+        for v in videos:
+            vid = youtube_ids.get(v.id)
+            if vid and vid in lesson_map:
+                setattr(v, 'lesson_slug', lesson_map[vid])
+
+    # Attach a Module id when a module has the same YouTube ID or a unique slugified title
+    mod_map = {}
+    title_map = {}
     if Module:
         try:
-            mod_map = {}
-            # Build map of yt_id -> module_id
-            for m in Module.objects.all().only('id', 'video_url'):
+            modules = list(Module.objects.all().only('id', 'video_url', 'title'))
+            for m in modules:
                 vid = extract_vid(getattr(m, 'video_url', '') or '')
                 if vid:
                     mod_map[vid] = m.id
-            # Assign mapping to video items
-            for v in videos:
-                vid = getattr(v, 'youtube_id2', None) or extract_vid(v.embed_url())
-                if vid and vid in mod_map:
-                    setattr(v, 'module_id', mod_map[vid])
-            # Fallback: title-slug match when video_url is missing or IDs don't match
+
+            # Build a unique title slug map (skip collisions to avoid mis-attachments)
             from django.utils.text import slugify
             title_map = {}
-            for m in Module.objects.all().only('id', 'title'):
-                try:
-                    title_map[slugify(m.title or '')] = m.id
-                except Exception:
+            collisions = set()
+            for m in modules:
+                slug = slugify(getattr(m, 'title', '') or '')
+                if not slug:
                     continue
-            for v in videos:
-                if getattr(v, 'module_id', None):
+                if slug in title_map:
+                    collisions.add(slug)
                     continue
-                try:
-                    vt = slugify(getattr(v, 'title', '') or '')
-                    if vt and vt in title_map:
-                        setattr(v, 'module_id', title_map[vt])
-                except Exception:
-                    continue
+                title_map[slug] = m.id
+            for slug in collisions:
+                title_map.pop(slug, None)
+
         except Exception:
             pass
-    # Compute an effective category for filtering and rendering
-    for v in videos:
-        eff = (v.category or '').strip().lower()
-        if not eff:
-            # Treat either a mapped Module or a mapped Lesson as a Module category
-            if getattr(v, 'module_id', None) or getattr(v, 'lesson_slug', None):
+
+    def _hydrate_video(video_obj):
+        """
+        Attach derived metadata to the video and use a short-lived cache to avoid
+        recomputing on every request.
+        """
+        cache_version = f"{video_obj.id}:{getattr(video_obj, 'video_url', '')}:{getattr(video_obj, 'category', '')}:{getattr(video_obj, 'tags', '')}:{getattr(video_obj, 'mp4_static_path', '')}:{getattr(video_obj, 'poster', '')}"
+        cache_key = f"video_meta:{cache_version}"
+        cached = cache.get(cache_key)
+        if cached:
+            for key, val in cached.items():
+                setattr(video_obj, key, val)
+            return cached
+
+        # Module/Lesson mapping
+        vid = getattr(video_obj, 'youtube_id2', None) or youtube_ids.get(getattr(video_obj, 'id', None))
+        module_id = mod_map.get(vid) if vid else None
+        lesson_slug = lesson_map.get(vid) if vid else None
+
+        if not module_id:
+            try:
+                vt = slugify(getattr(video_obj, 'title', '') or '')
+                module_id = title_map.get(vt)
+            except Exception:
+                module_id = None
+
+        eff = (getattr(video_obj, 'category', '') or '').strip().lower()
+        if eff not in allowed_cats:
+            if module_id or lesson_slug:
                 eff = 'module'
-            elif getattr(v, 'mp4_static_path', ''):
+            elif getattr(video_obj, 'mp4_static_path', ''):
                 eff = 'quick'
             else:
                 eff = 'other'
-        setattr(v, 'effective_category', eff)
-        setattr(v, 'effective_tags', (v.tags or '').lower())
 
-    def _auto_thumbnail(video_obj):
-        """
-        Return a thumbnail URL for the video. Prefer YouTube's official thumb, then any
-        provided static thumbnail/poster, and finally generate a lightweight SVG data URL.
-        """
-        import hashlib
-        import html
-        from urllib.parse import quote
+        def _auto_thumbnail(video_inner):
+            import hashlib
+            import html
+            from urllib.parse import quote
 
-        vid = getattr(video_obj, 'youtube_id2', None) or extract_vid(video_obj.embed_url())
-        if vid:
-            setattr(video_obj, 'youtube_id2', vid)
-            return f"https://i.ytimg.com/vi/{vid}/hqdefault.jpg"
+            v_id = getattr(video_inner, 'youtube_id2', None) or youtube_ids.get(getattr(video_inner, 'id', None))
+            if v_id:
+                setattr(video_inner, 'youtube_id2', v_id)
+                return f"https://i.ytimg.com/vi/{v_id}/hqdefault.jpg"
 
-        # Static image fallback if provided
-        static_thumb = getattr(video_obj, 'thumbnail_static_path', '') or getattr(video_obj, 'poster', '')
-        if static_thumb:
-            return static_thumb
+            static_thumb = getattr(video_inner, 'thumbnail_static_path', '') or getattr(video_inner, 'poster', '')
+            if static_thumb:
+                return static_thumb
 
-        # Generate a deterministic placeholder SVG so every non-YouTube video still has a cover image
-        palette = ['#0ea5e9', '#6366f1', '#14b8a6', '#22c55e', '#f59e0b', '#ec4899']
-        title = (getattr(video_obj, 'title', '') or 'Learning Video').strip() or 'Learning Video'
-        seed = f"{getattr(video_obj, 'id', '')}{title}"
-        digest = hashlib.md5(seed.encode('utf-8', 'ignore')).hexdigest()
-        color = palette[int(digest[:2], 16) % len(palette)]
-        short_title = html.escape(title[:36])
-        svg = (
-            '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270">'
-            '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
-            f'<stop offset="0%" stop-color="{color}"/><stop offset="100%" stop-color="#0b1120"/>'
-            '</linearGradient></defs>'
-            '<rect width="480" height="270" rx="20" fill="url(#g)"/>'
-            '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" '
-            'fill="#e5e7eb" font-family="Arial, sans-serif" font-size="30" font-weight="700">'
-            f'{short_title}'
-            '</text>'
-            '</svg>'
-        )
-        return f"data:image/svg+xml;utf8,{quote(svg)}"
+            palette = ['#0ea5e9', '#6366f1', '#14b8a6', '#22c55e', '#f59e0b', '#ec4899']
+            title = (getattr(video_inner, 'title', '') or 'Learning Video').strip() or 'Learning Video'
+            seed = f"{getattr(video_inner, 'id', '')}{title}"
+            digest = hashlib.md5(seed.encode('utf-8', 'ignore')).hexdigest()
+            color = palette[int(digest[:2], 16) % len(palette)]
+            short_title = html.escape(title[:36])
+            svg = (
+                '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270">'
+                '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
+                f'<stop offset="0%" stop-color="{color}"/><stop offset="100%" stop-color="#0b1120"/>'
+                '</linearGradient></defs>'
+                '<rect width="480" height="270" rx="20" fill="url(#g)"/>'
+                '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" '
+                'fill="#e5e7eb" font-family="Arial, sans-serif" font-size="30" font-weight="700">'
+                f'{short_title}'
+                '</text>'
+                '</svg>'
+            )
+            return f"data:image/svg+xml;utf8,{quote(svg)}"
 
-    # Attach computed thumbnails
+        thumbnail_url = _auto_thumbnail(video_obj)
+
+        payload = {
+            'youtube_id2': vid,
+            'module_id': module_id,
+            'lesson_slug': lesson_slug,
+            'effective_category': eff,
+            'effective_tags': (getattr(video_obj, 'tags', '') or '').lower(),
+            'thumbnail_url': thumbnail_url,
+        }
+        for key, val in payload.items():
+            setattr(video_obj, key, val)
+        cache.set(cache_key, payload, 600)
+        return payload
+
+    # Attach computed metadata and optional server-side filter
     for v in videos:
-        setattr(v, 'thumbnail_url', _auto_thumbnail(v))
+        _hydrate_video(v)
 
-    # Optional server-side filter
-    if req_cat in {'module','quick','lecture','webinar','other'}:
+    if req_cat:
         videos = [v for v in videos if getattr(v, 'effective_category', '') == req_cat]
 
-    return render(request, 'main/video_gallery.html', {'videos': videos, 'active_cat': req_cat})
+    paginator = Paginator(videos, per_page)
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'main/video_gallery.html', {
+        'videos': list(page_obj.object_list),
+        'page_obj': page_obj,
+        'active_cat': req_cat,
+    })
 
 
 # ===============================

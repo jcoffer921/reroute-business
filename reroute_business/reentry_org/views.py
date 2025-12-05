@@ -1,9 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.db.utils import ProgrammingError, OperationalError
 from django.db.models import Q
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 
-from .models import ReentryOrganization
+from .models import ReentryOrganization, SavedOrganization
 
 
 def organization_catalog(request):
@@ -31,3 +34,23 @@ def organization_catalog(request):
         'categories': ReentryOrganization.CATEGORIES,
     }
     return render(request, 'reentry_org/catalog.html', context)
+
+
+@login_required
+@require_POST
+def toggle_saved_org(request):
+    org_id = request.POST.get("organization_id")
+    redirect_to = request.POST.get("next") or request.META.get("HTTP_REFERER") or reverse('dashboard:user')
+
+    if not org_id:
+        return redirect(redirect_to)
+
+    org = get_object_or_404(ReentryOrganization, pk=org_id)
+
+    existing = SavedOrganization.objects.filter(user=request.user, organization=org)
+    if existing.exists():
+        existing.delete()
+    else:
+        SavedOrganization.objects.create(user=request.user, organization=org)
+
+    return redirect(redirect_to)

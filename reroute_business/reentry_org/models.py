@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 class ReentryOrganization(models.Model):
@@ -38,3 +39,16 @@ class ReentryOrganization(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+class SavedOrganization(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="saved_organizations")
+    organization = models.ForeignKey(ReentryOrganization, on_delete=models.CASCADE, related_name="saves")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "organization")
+        ordering = ("-created_at", "-id")
+
+    def __str__(self):
+        return f"{self.user} saved {self.organization}"

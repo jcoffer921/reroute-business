@@ -19,6 +19,10 @@
       <a class="filter-btn {% if active_cat == 'lecture' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=lecture">Lectures</a>
       <a class="filter-btn {% if active_cat == 'webinar' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=webinar">Webinars</a>
       <a class="filter-btn {% if active_cat == 'other' %}active{% endif %}" href="{% url 'video_gallery' %}?cat=other">Other</a>
+      <div class="video-search">
+        <label class="sr-only" for="video-search">Search videos</label>
+        <input id="video-search" type="search" placeholder="Search by title or tags" aria-label="Search videos by title or tags">
+      </div>
     </div>
     {% if videos %}
       <div class="video-gallery-grid">
@@ -27,6 +31,7 @@
           <article class="learning-video-card"
             data-category="{{ video.effective_category|default:video.category|default:'other' }}"
             data-tags="{{ video.effective_tags }}"
+            data-title="{{ video.title|default:''|lower }}"
           >
             {% comment %} Determine the click-through URL per item (stay on-site) {% endcomment %}
             {% if video.module_id %}
@@ -41,9 +46,9 @@
               {% url 'video_watch' video.id as item_href %}
             {% endif %}
 
-            <a class="video-thumb-container" href="{{ item_href }}">
+            <a class="video-thumb-container" href="{{ item_href }}" aria-label="Watch {{ video.title }}">
               {% if video.thumbnail_url %}
-                <img src="{{ video.thumbnail_url }}" alt="{{ video.title }} thumbnail">
+                <img src="{{ video.thumbnail_url }}" alt="{{ video.title }} thumbnail" loading="lazy" decoding="async">
               {% endif %}
               <span class="video-play-btn" aria-hidden="true">
                 <span>▶</span>
@@ -80,6 +85,25 @@
           </article>
         {% endfor %}
       </div>
+      {% if page_obj and page_obj.paginator.num_pages > 1 %}
+        <nav class="video-pagination" aria-label="Video pages">
+          <div class="pagination">
+            {% if page_obj.has_previous %}
+              <a class="page-link" href="?{% if active_cat %}cat={{ active_cat }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+            {% else %}
+              <span class="page-link disabled" aria-disabled="true">Previous</span>
+            {% endif %}
+
+            <span class="page-status">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+            {% if page_obj.has_next %}
+              <a class="page-link" href="?{% if active_cat %}cat={{ active_cat }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+            {% else %}
+              <span class="page-link disabled" aria-disabled="true">Next</span>
+            {% endif %}
+          </div>
+        </nav>
+      {% endif %}
     {% else %}
       <p class="empty-state">No videos yet. Add some in the admin.</p>
     {% endif %}
