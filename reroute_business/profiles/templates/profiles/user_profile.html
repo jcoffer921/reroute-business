@@ -4,33 +4,29 @@
 
 {% block title %}ReRoute | Profile{% endblock %}
 
-{% block content %}
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/employer_public_profile.css' %}">
 <link rel="stylesheet" href="{% static 'css/public_profile.css' %}">
+<link rel="stylesheet" href="{% static 'css/profile_page.css' %}">
+{% endblock %}
+
+{% block content %}
 
 <!-- Hero (owner view) -->
 <div class="employer-public" data-user="{{ user.username }}">
-  <section class="hero">
-    {% if profile.background_image %}
-      <div class="hero-bg" style="background-image: url('{{ profile.background_image.url }}?v={{ profile.background_image|file_version }}');"></div>
-    {% elif profile.profile_picture %}
-      <div class="hero-bg" style="background-image: url('{{ profile.profile_picture.url }}?v={{ profile.profile_picture|file_version }}');"></div>
-    {% else %}
-      <div class="hero-bg hero-bg--color"></div>
-      <div class="hero-watermark" style="background-image: url('{% static 'images/reroute-trans-logo.png' %}');"></div>
-    {% endif %}
-    <div class="hero-gradient"></div>
+  <section class="hero hero-clickable">
+    <div class="profile-cover" data-role="cover-trigger">
+      <img id="coverPreview" src="{% if profile.background_image %}{{ profile.background_image.url }}?v={{ profile.background_image|file_version }}{% elif profile.profile_picture %}{{ profile.profile_picture.url }}?v={{ profile.profile_picture|file_version }}{% else %}{% static 'images/default-cover.jpg' %}{% endif %}" alt="Cover image">
+      <div class="overlay">Change Cover</div>
+    </div>
     <div class="hero-content">
-      <div class="hero-logo-wrap">
+      <div class="profile-avatar-wrapper" data-role="avatar-trigger">
         {% if profile.profile_picture %}
-          <img class="hero-logo" style="border-radius:50%" src="{{ profile.profile_picture.url }}?v={{ profile.profile_picture|file_version }}" alt="{{ user.username }} avatar">
+          <img id="avatarPreview" src="{{ profile.profile_picture.url }}?v={{ profile.profile_picture|file_version }}" alt="{{ user.username }} avatar">
         {% else %}
-          <div class="hero-logo hero-logo--initials" style="border-radius:50%" aria-hidden="true">{{ user|initials }}</div>
+          <img id="avatarPreview" src="{% static 'images/default-avatar.png' %}" alt="{{ user.username }} avatar">
         {% endif %}
-        <button type="button" class="logo-edit-hint" data-open-avatar>
-          <svg viewBox="0 0 24 24" fill="none"><path d="M12 20h9" stroke="#111827" stroke-width="1.5"/><path d="M16.5 3.5l4 4-9 9H7.5v-4l9-9z" stroke="#111827" stroke-width="1.5"/></svg>
-          Edit Photo
-        </button>
+        <div class="overlay">Change Photo</div>
       </div>
       <div class="hero-text">
         <h1 class="hero-name" data-profile-full-name>
@@ -45,11 +41,17 @@
         <div><span class="label">Date Joined</span> {{ user.date_joined|date:"M j, Y" }}</div>
         <div><span class="label">Status</span> {{ profile.account_status|capfirst }}</div>
       </div>
-      <button type="button" class="hero-edit-hint" data-open-bg>
-        <svg viewBox="0 0 24 24" fill="none"><path d="M12 20h9" stroke="#111827" stroke-width="1.5"/><path d="M16.5 3.5l4 4-9 9H7.5v-4l9-9z" stroke="#111827" stroke-width="1.5"/></svg>
-        Change Background
-      </button>
     </div>
+    <form id="coverForm" method="post" action="{% url 'update_profile_background' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="file" id="coverInput" name="background_image" accept="image/*" hidden>
+      <button type="submit" class="btn btn-primary hidden" id="saveCoverBtn">Save cover</button>
+    </form>
+    <form id="avatarForm" method="post" action="{% url 'update_profile_picture' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="file" id="avatarInput" name="profile_picture" accept="image/*" hidden>
+      <button type="submit" class="btn btn-primary hidden" id="saveAvatarBtn">Save photo</button>
+    </form>
   </section>
 </div>
 
@@ -87,26 +89,6 @@
 <div class="mini-nav-container">
 
   <hr class="section-sep">
-
-  <!-- Profile Picture Modal (moved outside; used by click-to-edit) -->
-  <div id="profilePicModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000;">
-    <div style="background: #fff; margin: 6% auto; padding: 20px; width: min(420px, 92vw); text-align: center; border-radius: 12px;">
-      <h3>Update Profile Picture</h3>
-      <img id="previewImage" src="" style="width: 100%; height: auto; margin-bottom: 10px; display:none;" alt="Avatar preview" />
-      <form id="profilePicForm" method="POST" enctype="multipart/form-data" action="{% url 'update_profile_picture' %}">
-        {% csrf_token %}
-        <input type="file" id="modalPicInput" name="profile_picture" accept="image/*" />
-        <div class="form-actions" style="margin-top:12px;">
-          <button type="submit" class="btn btn-primary">Save</button>
-          <button type="button" class="btn btn-secondary" data-close-avatar>Cancel</button>
-        </div>
-      </form>
-      <form method="post" action="{% url 'remove_profile_picture' %}" style="margin-top:8px;">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-secondary">Remove Photo</button>
-      </form>
-    </div>
-  </div>
 
   <!-- Personal Info -->
   <section class="section">
@@ -617,4 +599,8 @@
   window.__profilePanelsLoaded = true;
 })();
 </script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/profile_page.js' %}" defer></script>
 {% endblock %}

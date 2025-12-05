@@ -15,34 +15,21 @@
     {% with active=request.resolver_match.url_name %}
     <div class="sidebar-section">
       <p class="sidebar-label">Main</p>
-      <a class="sidebar-link {% if active == 'user' %}active{% endif %}" href="{% url 'dashboard:user' %}">Dashboard Home</a>
+      <a class="sidebar-link {% if active == 'user' %}active{% endif %}" href="{% url 'dashboard:user' %}">Dashboard</a>
       <a class="sidebar-link" href="{% url 'dashboard:notifications' %}">Notifications</a>
     </div>
     <div class="sidebar-section">
-      <p class="sidebar-label">Jobs</p>
-      <a class="sidebar-link" href="{% url 'opportunities' %}">Board</a>
-      <a class="sidebar-link" href="{% url 'dashboard:saved_jobs' %}">Saved</a>
-      <a class="sidebar-link" href="{% url 'dashboard:matched_jobs' %}">Matches</a>
+      <p class="sidebar-label">Career</p>
+      <a class="sidebar-link" href="{% url 'opportunities' %}">Jobs</a>
+      <a class="sidebar-link" href="{% url 'dashboard:saved_jobs' %}">Resume</a>
     </div>
     <div class="sidebar-section">
-      <p class="sidebar-label">Resume</p>
-      {% if resume %}
-        <a class="sidebar-link" href="{% url 'resumes:created_resume_view' resume.id %}">View</a>
-      {% else %}
-        <a class="sidebar-link" href="{% url 'resumes:resume_welcome' %}">Create</a>
-      {% endif %}
-      <a class="sidebar-link" href="{% url 'resumes:resume_welcome' %}">Upload / Edit</a>
+      <p class="sidebar-label">Learning</p>
+      <a class="sidebar-link" href="{% url 'resource_list' %}#modules">Modules</a>
+      <a class="sidebar-link" href="{% url 'reentry_org:organization_catalog' %}">Reentry Orgs</a>
     </div>
     <div class="sidebar-section">
-      <p class="sidebar-label">Modules</p>
-      <a class="sidebar-link" href="{% url 'resource_list' %}#modules">All Modules</a>
-    </div>
-    <div class="sidebar-section">
-      <p class="sidebar-label">Reentry Organizations</p>
-      <a class="sidebar-link" href="{% url 'reentry_org:organization_catalog' %}">Browse</a>
-    </div>
-    <div class="sidebar-section">
-      <p class="sidebar-label">Settings</p>
+      <p class="sidebar-label">Account</p>
       <a class="sidebar-link" href="{% url 'profiles:my_profile' %}">Profile</a>
       <a class="sidebar-link" href="{% url 'contact' %}">Support</a>
     </div>
@@ -50,16 +37,25 @@
   </aside>
 
   <main class="dash-main">
-    <header class="dash-header">
-      <div>
-        <p class="eyebrow">Dashboard Home</p>
+    <header class="dash-hero">
+      <div class="dash-hero-content">
+        <p class="eyebrow">Dashboard</p>
         <h1>Welcome, {{ request.user.first_name|default:request.user.username }}!</h1>
-        <p class="muted">A compact hub for jobs, organizations, modules, and your progress.</p>
-      </div>
-      <div class="header-pills">
-        <div class="pill">Matches <span>{{ stats.matches_found|default:0 }}</span></div>
-        <div class="pill">Applications <span>{{ stats.applications_sent|default:0 }}</span></div>
-        <div class="pill">Profile views <span>{{ stats.profile_views|default:0 }}</span></div>
+        <p class="muted">Keep momentum with jobs, modules, and organizations tailored to you.</p>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <p class="stat-label">Matches</p>
+            <p class="stat-number">{{ stats.matches_found|default:0 }}</p>
+          </div>
+          <div class="hero-stat">
+            <p class="stat-label">Applications</p>
+            <p class="stat-number">{{ stats.applications_sent|default:0 }}</p>
+          </div>
+          <div class="hero-stat">
+            <p class="stat-label">Profile views</p>
+            <p class="stat-number">{{ stats.profile_views|default:0 }}</p>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -148,93 +144,51 @@
       </section>
     </div>
 
-    <div class="grid two-col">
-      <section class="card progress-card">
-        <div class="section-heading">
-          <div>
-            <h2>Your Progress</h2>
-            <p>Track readiness across resume, profile, and learning</p>
-          </div>
-          <a href="{{ PROFILE_URL }}" class="link-sm">View details</a>
+    <section class="card progress-card">
+      <div class="section-heading">
+        <div>
+          <h2>Your Progress</h2>
+          <p>Track readiness across resume, profile, and learning</p>
         </div>
-        <div class="progress-grid">
-          {% with resume_percent=resume|yesno:"92,40" %}
-          <div class="progress-tile" data-value="{{ resume_percent }}">
-            <div class="progress-ring" aria-hidden="true"></div>
-            <div class="progress-meta">
-              <p class="label">Resume completeness</p>
-              <p class="value">{{ resume_percent }}%</p>
-              <p class="hint">{% if resume %}Great work—keep it updated.{% else %}Upload to unlock matches.{% endif %}</p>
-            </div>
-          </div>
-          {% endwith %}
-          <div class="progress-tile" data-value="{{ modules_completed_percent|default:0 }}">
-            <div class="progress-ring" aria-hidden="true"></div>
-            <div class="progress-meta">
-              <p class="label">Modules completed</p>
-              <p class="value">{{ modules_completed|default:0 }}</p>
-              <p class="hint"><a href="{% url 'resource_list' %}#modules">Continue learning</a></p>
-            </div>
-          </div>
-          <div class="progress-tile" data-value="{{ completion_percentage|default:0 }}">
-            <div class="progress-ring" aria-hidden="true"></div>
-            <div class="progress-meta">
-              <p class="label">Profile completion</p>
-              <p class="value">{{ completion_percentage|default:0 }}%</p>
-              <p class="hint">Finish your profile for better matches.</p>
-            </div>
-          </div>
-          <div class="progress-tile" data-value="{{ organizations_saved_count|default:0 }}">
-            <div class="progress-ring" aria-hidden="true"></div>
-            <div class="progress-meta">
-              <p class="label">Organizations saved</p>
-              <p class="value">{{ organizations_saved_count|default:0 }}</p>
-              <p class="hint"><a href="{% url 'reentry_org:organization_catalog' %}">Browse support near you</a></p>
-            </div>
+        <a href="{{ PROFILE_URL }}" class="link-sm">View details</a>
+      </div>
+      <div class="progress-grid">
+        {% with resume_percent=resume|yesno:"92,40" %}
+        <div class="progress-tile" data-value="{{ resume_percent }}">
+          <div class="progress-ring" aria-hidden="true"></div>
+          <div class="progress-meta">
+            <p class="label">Resume completeness</p>
+            <p class="value">{{ resume_percent }}%</p>
+            <p class="hint">{% if resume %}Great work—keep it updated.{% else %}Upload to unlock matches.{% endif %}</p>
           </div>
         </div>
-      </section>
-
-      <section class="card module-card">
-        <div class="section-heading">
-          <div>
-            <h2>Modules</h2>
-            <p>Stay on track with your training</p>
+        {% endwith %}
+        <div class="progress-tile" data-value="{{ modules_completed_percent|default:0 }}">
+          <div class="progress-ring" aria-hidden="true"></div>
+          <div class="progress-meta">
+            <p class="label">Modules completed</p>
+            <p class="value">{{ modules_completed|default:0 }}</p>
+            <p class="hint"><a href="{% url 'resource_list' %}#modules">Continue learning</a></p>
           </div>
-          <a href="{% url 'resource_list' %}#modules" class="link-sm">All modules</a>
         </div>
-        {% if recent_module %}
-          <article class="module-feature">
-            <div>
-              <p class="badge subtle">{{ recent_module.get_category_display|default:"Module" }}</p>
-              <h3>{{ recent_module.title }}</h3>
-              <p class="muted">{{ recent_module.description|default:"Keep growing with ReRoute modules."|truncatechars:140 }}</p>
-            </div>
-            <a class="btn btn-primary btn-sm" href="{% url 'module_detail' recent_module.id %}">Continue</a>
-          </article>
-        {% else %}
-          <div class="empty-state minimal">
-            <h4>No modules started</h4>
-            <p>Pick a track to begin your training.</p>
-            <a class="btn btn-outline btn-sm" href="{% url 'resource_list' %}#modules">Browse modules</a>
+        <div class="progress-tile" data-value="{{ completion_percentage|default:0 }}">
+          <div class="progress-ring" aria-hidden="true"></div>
+          <div class="progress-meta">
+            <p class="label">Profile completion</p>
+            <p class="value">{{ completion_percentage|default:0 }}%</p>
+            <p class="hint">Finish your profile for better matches.</p>
           </div>
-        {% endif %}
-        {% if recommended_modules %}
-          <div class="module-mini-grid">
-            {% for mod in recommended_modules|slice:"1:4" %}
-              <article class="mini-card">
-                <div>
-                  <p class="badge subtle">{{ mod.get_category_display|default:"Module" }}</p>
-                  <h4>{{ mod.title }}</h4>
-                  <p class="muted">{{ mod.description|default:"" |truncatechars:80 }}</p>
-                </div>
-                <a class="link-sm" href="{% url 'module_detail' mod.id %}">Open</a>
-              </article>
-            {% endfor %}
+        </div>
+        <div class="progress-tile" data-value="{{ organizations_saved_count|default:0 }}">
+          <div class="progress-ring" aria-hidden="true"></div>
+          <div class="progress-meta">
+            <p class="label">Organizations saved</p>
+            <p class="value">{{ organizations_saved_count|default:0 }}</p>
+            <p class="hint"><a href="{% url 'reentry_org:organization_catalog' %}">Browse support near you</a></p>
           </div>
-        {% endif %}
-      </section>
-    </div>
+        </div>
+      </div>
+    </section>
 
     <section class="card recs-card" data-tab-group="recs">
       <div class="section-heading">
@@ -357,178 +311,6 @@
         </div>
       </div>
     </section>
-
-    <div class="grid two-col">
-      <section class="card orgs-card">
-        <div class="section-heading">
-          <div>
-            <h2>Reentry Organizations</h2>
-            <p>Verified providers by category and location</p>
-          </div>
-          <a class="btn btn-outline btn-sm" href="{% url 'reentry_org:organization_catalog' %}">Browse All Orgs</a>
-        </div>
-        {% if recommended_orgs %}
-          <div class="card-grid two-col">
-            {% for org in recommended_orgs|slice:":4" %}
-              <article class="org-card">
-                <div class="org-header">
-                  <p class="badge subtle">{{ org.get_category_display|default:"Support" }}</p>
-                  <span class="pill pill-ghost">{% if org.city or org.state %}{{ org.city }}{% if org.city and org.state %}, {% endif %}{{ org.state }}{% else %}Distance{% endif %}</span>
-                </div>
-                <h3>{{ org.name }}</h3>
-                <p class="muted">{{ org.description|default:"Support services tailored to reentry needs."|truncatechars:120 }}</p>
-                <div class="org-actions">
-                  <form method="post" action="{% url 'reentry_org:toggle_saved_org' %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="organization_id" value="{{ org.id }}">
-                    <input type="hidden" name="next" value="{{ request.path }}">
-                    {% if org.id in saved_org_ids %}
-                      <button class="btn btn-outline btn-sm" type="submit">Unsave</button>
-                    {% else %}
-                      <button class="btn btn-primary btn-sm" type="submit">Save</button>
-                    {% endif %}
-                  </form>
-                  <a class="btn btn-outline btn-sm" href="{% url 'reentry_org:organization_catalog' %}?q={{ org.name|urlencode }}">View</a>
-                  <a class="btn btn-outline btn-sm" href="{{ org.website|default:'#' }}" target="_blank" rel="noopener">Website</a>
-                </div>
-              </article>
-            {% endfor %}
-          </div>
-        {% else %}
-          <div class="empty-state minimal">
-            <h4>Search the catalog</h4>
-            <p>Filter by housing, training, legal, or career support.</p>
-            <a class="btn btn-outline btn-sm" href="{% url 'reentry_org:organization_catalog' %}">Browse organizations</a>
-          </div>
-        {% endif %}
-      </section>
-
-      <section class="card notifications-panel" aria-label="Notifications">
-        <div class="section-heading">
-          <div>
-            <h2>Notifications</h2>
-            <p>Recent updates across your account</p>
-          </div>
-          <a href="{% url 'dashboard:notifications' %}" class="link-sm">View All</a>
-        </div>
-        <div class="notifications-scroll">
-          {% if notifications %}
-            <div class="notifications-list">
-              {% for n in notifications|slice:":6" %}
-                {% if n.url %}
-                  <a class="notification-item-link" href="{{ n.url }}">
-                    <article class="notification-card {% if not n.is_read %}unread{% endif %}">
-                      <div class="avatar {% if not n.actor %}admin{% endif %}">
-                        {% if n.actor and n.actor|profile_picture_url %}
-                          <img src="{{ n.actor|profile_picture_url }}" alt="Avatar">
-                        {% elif n.actor %}
-                          {{ n.actor|initials }}
-                        {% else %}
-                          R
-                        {% endif %}
-                      </div>
-                      <div class="content">
-                        <div class="text-row">
-                          <div class="title">{{ n.title|default:n.verb|default:"Update" }}</div>
-                          <time class="timestamp" datetime="{{ n.created_at|date:'c' }}">{{ n.created_at|timesince }} ago</time>
-                        </div>
-                        {% if n.message %}
-                        <div class="message">{{ n.message|striptags|truncatechars:100 }}</div>
-                        {% endif %}
-                      </div>
-                    </article>
-                  </a>
-                {% else %}
-                  <article class="notification-card {% if not n.is_read %}unread{% endif %}">
-                    <div class="avatar {% if not n.actor %}admin{% endif %}">
-                      {% if n.actor and n.actor|profile_picture_url %}
-                        <img src="{{ n.actor|profile_picture_url }}" alt="Avatar">
-                      {% elif n.actor %}
-                        {{ n.actor|initials }}
-                      {% else %}
-                        R
-                      {% endif %}
-                    </div>
-                    <div class="content">
-                      <div class="text-row">
-                        <div class="title">{{ n.title|default:n.verb|default:"Update" }}</div>
-                        <time class="timestamp" datetime="{{ n.created_at|date:'c' }}">{{ n.created_at|timesince }} ago</time>
-                      </div>
-                      {% if n.message %}
-                      <div class="message">{{ n.message|striptags|truncatechars:100 }}</div>
-                      {% endif %}
-                    </div>
-                  </article>
-                {% endif %}
-              {% endfor %}
-            </div>
-          {% else %}
-            <div class="empty-state minimal">
-              <h4>You're all caught up</h4>
-              <p>No new notifications right now.</p>
-            </div>
-          {% endif %}
-        </div>
-      </section>
-    </div>
-
-    <div class="grid two-col">
-      <section class="card stats-card">
-        <div class="section-heading">
-          <div>
-            <h2>Stats</h2>
-            <p>At a glance</p>
-          </div>
-          <a class="link-sm" href="{% url 'dashboard:matched_jobs' %}">View matches</a>
-        </div>
-        <div class="stats-grid compact">
-          <div class="stat">
-            <p class="stat-label">Applications sent</p>
-            <p class="stat-number">{{ stats.applications_sent|default:0 }}</p>
-          </div>
-          <div class="stat">
-            <p class="stat-label">Profile views</p>
-            <p class="stat-number">{{ stats.profile_views|default:0 }}</p>
-          </div>
-          <div class="stat">
-            <p class="stat-label">Matches found</p>
-            <p class="stat-number">{{ stats.matches_found|default:0 }}</p>
-          </div>
-          <div class="stat">
-            <p class="stat-label">Saved jobs</p>
-            <p class="stat-number">{{ saved_jobs_count|default:0 }}</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="card resume-card">
-        <div class="section-heading">
-          <div>
-            <h2>Resume Hub</h2>
-            <p>Keep a polished resume on file</p>
-          </div>
-          <a class="btn btn-outline btn-sm" href="{% url 'resumes:resume_welcome' %}">Manage</a>
-        </div>
-        <div class="resume-actions">
-          <div class="resume-block">
-            <p class="label">Created Resume</p>
-            {% if resume %}
-              <a class="btn btn-primary btn-sm" href="{% url 'resumes:created_resume_view' resume.id %}">View</a>
-            {% else %}
-              <a class="btn btn-outline btn-sm" href="{% url 'resumes:resume_welcome' %}">Create</a>
-            {% endif %}
-          </div>
-          <div class="resume-block">
-            <p class="label">Imported Resume</p>
-            {% if imported_resume %}
-              <a class="btn btn-primary btn-sm" href="{% url 'resumes:imported_resume' imported_resume.id %}">View</a>
-            {% else %}
-              <a class="btn btn-outline btn-sm" href="{% url 'resumes:resume_welcome' %}">Import</a>
-            {% endif %}
-          </div>
-        </div>
-      </section>
-    </div>
 
     <!-- User Interviews Modal -->
     <div id="userInterviewsBackdrop" class="modal-backdrop hidden"></div>

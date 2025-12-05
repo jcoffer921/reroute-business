@@ -1,0 +1,78 @@
+.hero.hero-clickable {
+  position: relative;
+  padding: 0;
+  overflow: visible;
+}
+
+.profile-cover {
+  position: relative;
+  height: 240px;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.profile-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.profile-avatar-wrapper {
+  position: absolute;
+  left: 50%;
+  bottom: -50px;
+  transform: translateX(-50%);
+  width: 124px;
+  height: 124px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  overflow: hidden;
+  background: #e2e8f0;
+  cursor: pointer;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
+.profile-avatar-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.profile-cover .overlay,
+.profile-avatar-wrapper .overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  color: #f8fafc;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity 160ms ease;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 12px;
+}
+
+.profile-cover:hover .overlay,
+.profile-avatar-wrapper:hover .overlay {
+  opacity: 1;
+}
+
+#saveCoverBtn,
+#saveAvatarBtn {
+  margin-top: 12px;
+}
+
+#saveCoverBtn.hidden,
+#saveAvatarBtn.hidden {
+  display: none;
+}
+
+.hero-content {
+  position: relative;
+  padding: 16px 20px 32px;
+}
