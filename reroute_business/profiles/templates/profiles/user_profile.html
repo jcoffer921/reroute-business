@@ -42,12 +42,12 @@
         <div><span class="label">Status</span> {{ profile.account_status|capfirst }}</div>
       </div>
     </div>
-    <form id="coverForm" method="post" action="{% url 'update_profile_background' %}" enctype="multipart/form-data">
+    <form id="coverForm" method="post" action="{% url 'profiles:update_profile_background' %}" enctype="multipart/form-data">
       {% csrf_token %}
       <input type="file" id="coverInput" name="background_image" accept="image/*" hidden>
       <button type="submit" class="btn btn-primary hidden" id="saveCoverBtn">Save cover</button>
     </form>
-    <form id="avatarForm" method="post" action="{% url 'update_profile_picture' %}" enctype="multipart/form-data">
+    <form id="avatarForm" method="post" action="{% url 'profiles:update_profile_picture' %}" enctype="multipart/form-data">
       {% csrf_token %}
       <input type="file" id="avatarInput" name="profile_picture" accept="image/*" hidden>
       <button type="submit" class="btn btn-primary hidden" id="saveAvatarBtn">Save photo</button>

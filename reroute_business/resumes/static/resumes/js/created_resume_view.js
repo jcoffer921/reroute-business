@@ -42,82 +42,98 @@ async function safeJson(res) {
 document.addEventListener("DOMContentLoaded", () => {
   const saveBtn  = document.getElementById("saveResumeBtn");
   const statusEl = document.getElementById("saveStatus");
-  if (!saveBtn || !statusEl) return;
+  if (saveBtn && statusEl) {
+    // Make status updates accessible to screen readers
+    statusEl.setAttribute("role", "status");
+    statusEl.setAttribute("aria-live", "polite");
 
-  // Make status updates accessible to screen readers
-  statusEl.setAttribute("role", "status");
-  statusEl.setAttribute("aria-live", "polite");
+    const url = saveBtn.dataset.saveUrl;
+    const resumeId = saveBtn.dataset.resumeId;
+    const spinner = saveBtn.querySelector(".spinner");
+    const csrftoken = getCookie("csrftoken");
 
-  const url = saveBtn.dataset.saveUrl;
-  const resumeId = saveBtn.dataset.resumeId;
-  const spinner = saveBtn.querySelector(".spinner");
-  const csrftoken = getCookie("csrftoken");
-
-  if (!csrftoken) {
-    // Helpful console note if CSRF not present (misconfigured middleware)
-    console.warn("CSRF cookie not found. Is CsrfViewMiddleware enabled?");
-  }
-
-  // Track if a save is in-flight to prevent double submits
-  let saving = false;
-
-  function setSavingState(isSaving, msg) {
-    saving = isSaving;
-    if (spinner) {
-      if (isSaving) spinner.removeAttribute('hidden'); else spinner.setAttribute('hidden','');
-    }
-    saveBtn.disabled = isSaving;
-    statusEl.textContent = msg || "";
-  }
-
-  async function doSave(signal) {
-    return fetch(url, {
-      method: "POST",
-      headers: {
-        "X-CSRFToken": csrftoken || "",
-        "X-Requested-With": "XMLHttpRequest",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ resume_id: resumeId }),
-      signal
-    });
-  }
-
-  saveBtn.addEventListener("click", async () => {
-    // 1) Prevent duplicate clicks & catch obvious offline state
-    if (saving) return;
-    if (!navigator.onLine) {
-      statusEl.textContent = "⚠️ You appear to be offline. Please reconnect and try again.";
-      return;
+    if (!csrftoken) {
+      console.warn("CSRF cookie not found. Is CsrfViewMiddleware enabled?");
     }
 
-    try {
-      setSavingState(true, "Saving…");
+    let saving = false;
 
-      // 2) Perform fetch with a timeout
-      const res = await withTimeout(doSave, SAVE_TIMEOUT_MS);
-      const data = await safeJson(res);
+    function setSavingState(isSaving, msg) {
+      saving = isSaving;
+      if (spinner) {
+        if (isSaving) spinner.removeAttribute("hidden"); else spinner.setAttribute("hidden","");
+      }
+      saveBtn.disabled = isSaving;
+      statusEl.textContent = msg || "";
+    }
 
-      // 3) Handle common auth errors explicitly
-      if (res.status === 401 || res.status === 403) {
-        setSavingState(false, "🔒 Session expired. Please sign in again and retry.");
+    async function doSave(signal) {
+      return fetch(url, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrftoken || "",
+          "X-Requested-With": "XMLHttpRequest",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ resume_id: resumeId }),
+        signal
+      });
+    }
+
+    saveBtn.addEventListener("click", async () => {
+      if (saving) return;
+      if (!navigator.onLine) {
+        statusEl.textContent = "⚠️ You appear to be offline. Please reconnect and try again.";
         return;
       }
 
-      // 4) Success / failure messaging
-      if (res.ok && data.status === "success") {
-        setSavingState(false, "✅ Saved!");
-        // Optional: clear the message after a short delay
-        setTimeout(() => { if (!saving) statusEl.textContent = ""; }, 2000);
-      } else {
-        const errText = (data && data.error) ? `: ${data.error}` : "";
-        setSavingState(false, `❌ Save failed${errText}.`);
+      try {
+        setSavingState(true, "Saving…");
+        const res = await withTimeout(doSave, SAVE_TIMEOUT_MS);
+        const data = await safeJson(res);
+        if (res.status === 401 || res.status === 403) {
+          setSavingState(false, "🔒 Session expired. Please sign in again and retry.");
+          return;
+        }
+        if (res.ok && data.status === "success") {
+          setSavingState(false, "✅ Saved!");
+          setTimeout(() => { if (!saving) statusEl.textContent = ""; }, 2000);
+        } else {
+          const errText = (data && data.error) ? `: ${data.error}` : "";
+          setSavingState(false, `❌ Save failed${errText}.`);
+        }
+      } catch (err) {
+        const timedOut = (err && err.name === "AbortError");
+        console.error(err);
+        setSavingState(false, timedOut ? "⏳ Save timed out. Please try again." : "❌ Save error. Please try again.");
       }
-    } catch (err) {
-      // AbortError => network timeout or manual abort
-      const timedOut = (err && err.name === "AbortError");
-      console.error(err);
-      setSavingState(false, timedOut ? "⏳ Save timed out. Please try again." : "❌ Save error. Please try again.");
-    }
-  });
+    });
+  }
+
+  initStylePreview();
 });
+
+function initStylePreview() {
+  const wrap = document.getElementById("stylePreview");
+  const select = document.getElementById("tpl");
+  const frame = document.getElementById("stylePreviewFrame");
+  if (!wrap || !select || !frame) return;
+
+  const previewUrl = wrap.dataset.previewUrl;
+  const setUrl = wrap.dataset.setUrl;
+  const csrftoken = getCookie("csrftoken") || "";
+
+  select.addEventListener("change", () => {
+    const choice = select.value;
+    frame.src = `${previewUrl}?template=${encodeURIComponent(choice)}`;
+    fetch(setUrl, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": csrftoken,
+        "X-Requested-With": "XMLHttpRequest",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: `template=${encodeURIComponent(choice)}`
+    }).catch(() => {});
+  });
+}
