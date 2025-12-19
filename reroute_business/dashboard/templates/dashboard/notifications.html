@@ -6,7 +6,10 @@
 
 <div class="notifications-page">
   <header class="notifications-header">
-    <h1>Notifications</h1>
+    <div>
+      <h1>Notifications</h1>
+      <p class="notifications-subhead">Stay on top of matches, updates, and announcements.</p>
+    </div>
     <form id="markAllForm" method="post">
       {% csrf_token %}
       <input type="hidden" name="action" value="mark_all_read">
@@ -65,6 +68,7 @@
             <div class="message">{{ n.message }}</div>
             <div class="meta">
               {% if not n.is_read %}<span class="unread-dot" aria-label="Unread"></span>{% endif %}
+              <span class="pill pill-ghost tiny">{% if not n.is_read %}New{% else %}Update{% endif %}</span>
               <time datetime="{{ n.created_at|date:'c' }}">{{ n.created_at|timesince }} ago</time>
             </div>
           </div>
@@ -73,7 +77,7 @@
               <a href="{{ n.url }}" class="btn-action">View</a>
             {% endif %}
             {% if not n.is_read and n.user_id %}
-              <form method="post" class="mark-read-form" data-id="{{ n.id }}" style="display:inline-block; margin-left:8px;">
+              <form method="post" class="mark-read-form inline-form" data-id="{{ n.id }}">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="mark_read">
                 <input type="hidden" name="id" value="{{ n.id }}">
@@ -89,24 +93,24 @@
   </section>
 
   <!-- Dynamic empty state for filters -->
-  <div id="notificationsEmptyState" class="empty" style="display:none;">
+  <div id="notificationsEmptyState" class="empty empty-box" hidden>
     <div class="empty-illustration" aria-hidden="true">🔔</div>
     <div class="empty-text">You're all caught up.</div>
   </div>
 
   <!-- Drawer for notification details -->
-  <div id="notifDrawerOverlay" class="notif-drawer-overlay" role="presentation"></div>
+  <div id="notifDrawerOverlay" class="notif-drawer-overlay" role="presentation" hidden></div>
   <aside id="notifDrawer" class="notif-drawer" aria-hidden="true" aria-label="Notification details">
     <header>
-      <h2 id="notifDrawerTitle" style="margin:0; font-size:1rem;">Notification</h2>
+      <h2 id="notifDrawerTitle" class="drawer-title">Notification</h2>
       <button id="notifDrawerClose" class="btn-secondary" type="button">Close</button>
     </header>
-    <div class="content">
-      <p id="notifDrawerMessage" style="margin-top:8px;"></p>
-      <p id="notifDrawerTime" style="color:#6b7280; font-size:0.85rem;"></p>
+    <div class="content drawer-content">
+      <p id="notifDrawerMessage" class="drawer-message"></p>
+      <p id="notifDrawerTime" class="drawer-time"></p>
     </div>
     <div class="actions">
-      <a id="notifDrawerLink" class="btn-action" href="#" target="_self" style="display:none;">Open Link</a>
+      <a id="notifDrawerLink" class="btn-action" href="#" target="_self" hidden>Open Link</a>
       <button id="notifDrawerClose2" class="btn-secondary" type="button">Done</button>
     </div>
   </aside>

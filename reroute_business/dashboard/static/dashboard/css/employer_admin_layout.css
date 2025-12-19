@@ -1,0 +1,36 @@
+/* Shared employer/admin dashboard layout leveraging the user dashboard shell */
+
+.dash-shell-wrap { max-width: 1360px; margin: 0 auto; padding: 16px 24px 40px; }
+
+.card table { width: 100%; border-collapse: collapse; }
+.card table th, .card table td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+.card table th { font-weight: 700; color: #111827; font-size: 0.95rem; }
+.card table td { font-size: 0.9rem; color: #374151; }
+.card table tr:last-child td { border-bottom: none; }
+
+.badge { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 999px; font-weight: 700; font-size: 0.78rem; }
+.badge-success { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+.badge-secondary { background: #e5e7eb; color: #374151; border: 1px solid #e5e7eb; }
+
+.section-heading .muted { margin: 2px 0 0; }
+
+.list-plain { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.list-plain li { padding: 10px; border: 1px solid #e5e7eb; border-radius: 12px; background: #f8fafc; }
+
+.analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.analytics-tile { border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; background: #fff; box-shadow: 0 4px 12px rgba(15,23,42,0.04); }
+.analytics-tile h3 { margin: 0 0 4px; font-size: 0.95rem; color: #111827; }
+.analytics-tile .value { font-weight: 800; font-size: 1.4rem; color: #0f172a; }
+
+.pill.light { background: #eef2ff; color: #4338ca; padding: 3px 8px; border-radius: 999px; font-weight: 700; font-size: 0.78rem; border: 1px solid #e0e7ff; }
+
+.hero-stats.tall { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+
+.inline-actions { display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+.grid-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+
+.modal .edit-form { display: grid; gap: 10px; }
+.modal .edit-form label { font-weight: 700; }
+
+.table-responsive { overflow-x: auto; }

@@ -4,224 +4,265 @@
 {% block title %}Employer Dashboard{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'dashboard/css/employer_dashboard.css' %}">
-<link rel="stylesheet" href="{% static 'employers/css/dashboard.css' %}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="{% static 'dashboard/css/user_dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'dashboard/css/employer_admin_layout.css' %}">
 
+<div class="dashboard-shell">
+  <aside class="dash-sidebar">
+    {% with active=request.resolver_match.url_name %}
+    <div class="sidebar-section">
+      <p class="sidebar-label">Main</p>
+      <a class="sidebar-link {% if active == 'employer' %}active{% endif %}" href="{% url 'dashboard:employer' %}">Dashboard</a>
+      <a class="sidebar-link" href="{% url 'dashboard:notifications' %}">Notifications</a>
+    </div>
+    <div class="sidebar-section">
+      <p class="sidebar-label">Jobs</p>
+      <a class="sidebar-link" href="{% url 'create_job' %}">Create Job</a>
+      <a class="sidebar-link" href="{% url 'dashboard:employer' %}">Job Listings</a>
+      <a class="sidebar-link" href="{% url 'dashboard:employer_matcher' %}">Matcher</a>
+    </div>
+    <div class="sidebar-section">
+      <p class="sidebar-label">Talent</p>
+      <a class="sidebar-link" href="{{ PROFILE_URL }}">Employer Profile</a>
+      <a class="sidebar-link" href="{% url 'dashboard:employer_analytics' %}">Analytics</a>
+    </div>
+    <div class="sidebar-section">
+      <p class="sidebar-label">Account</p>
+      <a class="sidebar-link" href="{% url 'profiles:my_profile' %}">Profile</a>
+      <a class="sidebar-link" href="{% url 'contact' %}">Support</a>
+    </div>
+    {% endwith %}
+  </aside>
 
-<section class="employer-hero">
-  <div class="employer-hero-content">
-    <h1>Dashboard</h1>
-    <p>Take the leap of faith</p>
-    <p class="mt-6" style="font-size:.9rem;"><a href="{% url 'contact' %}" class="link">Give Feedback</a></p>
-  </div>
-</section>
-
-<div class="employer-dashboard container">
-  {% if not employer_verified %}
-  <div class="alert warning mb-12 mx-0" role="status">
-    <strong>Pending verification:</strong> Your employer account must be verified by ReRoute before you can post jobs. Complete your profile and we’ll review shortly.
-  </div>
-  {% endif %}
-
-  <!-- 📋 Job Listings -->
-  <section class="job-listings">
-    <div class="section-header">
-      <h2>Job Listings</h2>
-      <div class="sort-control">
-        {% if employer_verified %}
-          <a href="{% url 'create_job' %}" class="btn btn-secondary">
-            <i class="fas fa-plus"></i> Create Job
-          </a>
-        {% else %}
-          <a class="btn btn-secondary" aria-disabled="true" title="Pending verification">
-            <i class="fas fa-plus"></i> Create Job
-          </a>
-        {% endif %}
-        <a href="{{ PROFILE_URL }}" class="btn btn-secondary" title="Edit Employer Profile">
-          <i class="fas fa-building"></i> Profile
-        </a>
-        <form method="get" class="sort-form d-inline-flex ai-center gap-8">
-          <label for="sort_by">Sort by:</label>
-          <select id="sort_by" name="sort_by">
-            <option value="newest" {% if sort_by == 'newest' or not sort_by %}selected{% endif %}>Newest</option>
-            <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Oldest</option>
-          </select>
-        </form>
+  <main class="dash-main">
+    <header class="dash-hero">
+      <div class="dash-hero-content">
+        <p class="eyebrow">Employer Dashboard</p>
+        <h1>Welcome back{{ request.user.first_name|yesno:", " }}{{ request.user.first_name|default:request.user.username }}!</h1>
+        <p class="muted">Manage jobs, review applicants, and track performance.</p>
+        <div class="hero-stats tall">
+          <div class="hero-stat">
+            <p class="stat-label">Jobs posted</p>
+            <p class="stat-number">{{ total_jobs|default:0 }}</p>
+          </div>
+          <div class="hero-stat">
+            <p class="stat-label">Active listings</p>
+            <p class="stat-number">{{ active_jobs|default:0 }}</p>
+          </div>
+          <div class="hero-stat">
+            <p class="stat-label">Applicants</p>
+            <p class="stat-number">{{ total_applications|default:0 }}</p>
+          </div>
+          <div class="hero-stat">
+            <p class="stat-label">Jobs filled</p>
+            <p class="stat-number">{{ jobs_filled|default:0 }}</p>
+          </div>
+        </div>
       </div>
+    </header>
+
+    {% if not employer_verified %}
+    <div class="card" role="status">
+      <strong>Pending verification:</strong> Your employer account must be verified by ReRoute before you can post jobs. Complete your profile and we’ll review shortly.
     </div>
-
-    <table class="job-table">
-      <thead>
-        <tr>
-          <th>Job Title</th>
-          <th>Candidates</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for job in jobs %}
-        <tr>
-          <td>{{ job.title }}</td>
-          <td>{{ job.applications.count }} active</td>
-          <td>
-            <span class="badge {% if job.is_active %}badge-success{% else %}badge-secondary{% endif %}">
-              {{ job.is_active|yesno:"Open,Closed" }}
-            </span>
-          </td>
-          <td>
-            <form method="post" action="{% url 'dashboard:employer_job_toggle' job.id %}" class="d-inline">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-sm {% if job.is_active %}btn-outline{% else %}btn-primary{% endif %}" title="Toggle active/inactive">
-                {% if job.is_active %}Close{% else %}Open{% endif %}
-              </button>
-            </form>
-            <button type="button" class="btn btn-sm btn-outline view-applicants"
-                    data-url="{% url 'dashboard:job_applicants' job.id %}" title="View Applicants">
-              Applicants
-            </button>
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="4">No job listings yet.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </section>
-
-  <!-- 📈 Analytics Summary -->
-  <section class="analytics-section">
-    <div class="section-header d-flex jc-between ai-center mb-8">
-      <h2 class="section-title m-0">Analytics</h2>
-      <a href="{% url 'dashboard:employer_analytics' %}" class="btn btn-secondary btn-sm" title="Open full Analytics">Open Analytics</a>
-    </div>
-    <div class="analytics-cards">
-      <a class="analytics-card" href="{% url 'dashboard:employer' %}" title="View applicants">
-        <div class="icon-circle icon-green"><i class="fas fa-user"></i></div>
-        <div class="analytics-value">{{ total_applications }}</div>
-        <div class="analytics-label">Total Applicants</div>
-      </a>
-
-      <a class="analytics-card" href="{% url 'dashboard:employer' %}" title="View jobs">
-        <div class="icon-circle icon-blue"><i class="fas fa-file-alt"></i></div>
-        <div class="analytics-value">{{ total_jobs }}</div>
-        <div class="analytics-label">Jobs Posted</div>
-      </a>
-
-      <a class="analytics-card" href="{% url 'dashboard:employer' %}" title="Active listings">
-        <div class="icon-circle icon-amber"><i class="fas fa-briefcase"></i></div>
-        <div class="analytics-value">{{ active_jobs }}</div>
-        <div class="analytics-label">Active Listings</div>
-      </a>
-
-      <a class="analytics-card" href="{% url 'dashboard:employer' %}" title="Filled jobs">
-        <div class="icon-circle icon-purple"><i class="fas fa-check-circle"></i></div>
-        <div class="analytics-value">{{ jobs_filled }}</div>
-        <div class="analytics-label">Jobs Filled via ReRoute</div>
-      </a>
-    </div>
-  </section>
-
-  <!-- 🧑‍🤝‍🧑 Matcher (Full-width card) -->
-  <section class="card mb-12">
-    <div class="section-header mb-8 d-flex jc-between ai-center">
-      <h2>Matcher</h2>
-      <a href="{% url 'dashboard:employer_matcher' %}" class="btn btn-secondary btn-sm" title="Open full Matcher">Open Matcher</a>
-    </div>
-    {% if matched_seekers %}
-      <ul class="list-group">
-        {% for item in matched_seekers %}
-          <li>
-            <div class="d-flex jc-between ai-center gap-8">
-              <div>
-                <strong>
-                  <a href="{% url 'profiles:public_profile' item.user.username %}">
-                    {{ item.user.first_name|default:item.user.username }}
-                  </a>
-                </strong>
-                <span class="time"> · Best fit for {{ item.job.title }} · {{ item.score }}%</span>
-              </div>
-              <a href="{% url 'dashboard:employer_job_matches' item.job.id %}" class="btn btn-sm btn-outline" title="View all matches for this job">View all</a>
-            </div>
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <div class="empty-state"><i class="fas fa-user-friends"></i> No matches yet.</div>
     {% endif %}
-  </section>
 
-  <!-- 🔔 Notifications + Interviews (2-column grid) -->
-  <section class="grid-2col">
-    <!-- Notifications -->
-    <div class="card">
-      <div class="section-header d-flex jc-between ai-center">
-        <h3 class="m-0">Notifications</h3>
-        <form method="post" action="{% url 'dashboard:notifications' %}" style="margin:0;">
-          {% csrf_token %}
-          <input type="hidden" name="action" value="mark_all_read">
-          <button type="submit" class="btn btn-secondary btn-sm">Mark all read</button>
-        </form>
+    <section class="card">
+      <div class="section-heading">
+        <div>
+          <h2>Job Listings</h2>
+          <p class="muted">Manage your postings and applicants</p>
+        </div>
+        <div class="inline-actions">
+          {% if employer_verified %}
+            <a href="{% url 'create_job' %}" class="btn btn-primary btn-sm">Create Job</a>
+          {% else %}
+            <button class="btn btn-outline btn-sm" aria-disabled="true" title="Pending verification">Create Job</button>
+          {% endif %}
+          <a href="{{ PROFILE_URL }}" class="btn btn-outline btn-sm" title="Edit Employer Profile">Profile</a>
+          <form method="get" class="inline-actions">
+            <label for="sort_by" class="toolbar-label">Sort by:</label>
+            <select id="sort_by" name="sort_by">
+              <option value="newest" {% if sort_by == 'newest' or not sort_by %}selected{% endif %}>Newest</option>
+              <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Oldest</option>
+            </select>
+          </form>
+        </div>
       </div>
-      {% if notifications %}
-        <ul class="list-group">
-          {% for note in notifications %}
+
+      <div class="table-responsive">
+        <table class="job-table">
+          <thead>
+            <tr>
+              <th>Job Title</th>
+              <th>Candidates</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for job in jobs %}
+            <tr>
+              <td>{{ job.title }}</td>
+              <td>{{ job.applications.count }} active</td>
+              <td>
+                <span class="badge {% if job.is_active %}badge-success{% else %}badge-secondary{% endif %}">
+                  {{ job.is_active|yesno:"Open,Closed" }}
+                </span>
+              </td>
+              <td>
+                <form method="post" action="{% url 'dashboard:employer_job_toggle' job.id %}" class="inline-form">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm {% if job.is_active %}btn-outline{% else %}btn-primary{% endif %}" title="Toggle active/inactive">
+                    {% if job.is_active %}Close{% else %}Open{% endif %}
+                  </button>
+                </form>
+                <button type="button" class="btn btn-sm btn-outline view-applicants"
+                        data-url="{% url 'dashboard:job_applicants' job.id %}" title="View Applicants">
+                  Applicants
+                </button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">No job listings yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-heading">
+        <div>
+          <h2>Analytics</h2>
+          <p class="muted">Quick snapshot</p>
+        </div>
+        <a href="{% url 'dashboard:employer_analytics' %}" class="btn btn-outline btn-sm" title="Open full Analytics">Open Analytics</a>
+      </div>
+      <div class="analytics-grid">
+        <div class="analytics-tile">
+          <h3>Total Applicants</h3>
+          <div class="value">{{ total_applications|default:0 }}</div>
+        </div>
+        <div class="analytics-tile">
+          <h3>Jobs Posted</h3>
+          <div class="value">{{ total_jobs|default:0 }}</div>
+        </div>
+        <div class="analytics-tile">
+          <h3>Active Listings</h3>
+          <div class="value">{{ active_jobs|default:0 }}</div>
+        </div>
+        <div class="analytics-tile">
+          <h3>Jobs Filled</h3>
+          <div class="value">{{ jobs_filled|default:0 }}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-heading">
+        <div>
+          <h2>Matcher</h2>
+          <p class="muted">Best-fit candidates for your roles</p>
+        </div>
+        <a href="{% url 'dashboard:employer_matcher' %}" class="btn btn-outline btn-sm" title="Open full Matcher">Open Matcher</a>
+      </div>
+      {% if matched_seekers %}
+        <ul class="list-plain">
+          {% for item in matched_seekers %}
             <li>
-              <div>{{ note.message }}</div>
-              <div class="time">{{ note.created_at|timesince }} ago</div>
+              <div class="inline-actions" style="justify-content: space-between; width: 100%;">
+                <div>
+                  <strong>
+                    <a href="{% url 'profiles:public_profile' item.user.username %}">
+                      {{ item.user.first_name|default:item.user.username }}
+                    </a>
+                  </strong>
+                  <span class="muted"> · Best fit for {{ item.job.title }} · {{ item.score }}%</span>
+                </div>
+                <a href="{% url 'dashboard:employer_job_matches' item.job.id %}" class="btn btn-outline btn-sm" title="View all matches for this job">View all</a>
+              </div>
             </li>
           {% endfor %}
         </ul>
       {% else %}
-        <div class="empty-state">No notifications.</div>
+        <div class="empty-state">No matches yet.</div>
       {% endif %}
-    </div>
+    </section>
 
-    <!-- Interviews Scheduled -->
-    <div class="card">
-      <div class="section-header" style="justify-content: space-between; align-items:center;">
-        <h3 style="margin:0;">Interviews Scheduled</h3>
-        <button type="button" class="btn btn-primary btn-sm" id="openScheduleInterview">Add Interview</button>
-      </div>
-      {% if interviews %}
-        <ul class="list-group">
-          {% for interview in interviews %}
-            <li>
-              <div style="display:flex; justify-content:space-between; align-items:center; gap:.5rem; flex-wrap:wrap;">
-                <div>
-                  <div><strong>{{ interview.job.title }}</strong></div>
-                  <div class="time">{{ interview.scheduled_at|date:"M d, Y g:ia" }} · {{ interview.candidate.get_full_name|default:interview.candidate.username }}</div>
-                </div>
-                <div class="actions-dropdown">
-                  <button type="button"
-                          class="btn btn-outline btn-sm dropdown-toggle"
-                          data-menu-id="dd-{{ interview.id }}">
-                    Actions ▾
-                  </button>
-                  <div class="dropdown-menu" id="dd-{{ interview.id }}">
-                    <button type="button" class="dropdown-item openReschedule"
-                            data-interview="{{ interview.id }}"
-                            data-datetime="{{ interview.scheduled_at|date:'Y-m-d\\TH:i' }}">
-                      Reschedule
+    <div class="grid-two">
+      <section class="card">
+        <div class="section-heading">
+          <div>
+            <h3 class="m-0">Notifications</h3>
+            <p class="muted">Recent updates</p>
+          </div>
+          <form method="post" action="{% url 'dashboard:notifications' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="mark_all_read">
+            <button type="submit" class="btn btn-outline btn-sm">Mark all read</button>
+          </form>
+        </div>
+        {% if notifications %}
+          <ul class="list-plain">
+            {% for note in notifications %}
+              <li>
+                <div>{{ note.message }}</div>
+                <div class="time muted">{{ note.created_at|timesince }} ago</div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="empty-state">No notifications.</div>
+        {% endif %}
+      </section>
+
+      <section class="card">
+        <div class="section-heading">
+          <div>
+            <h3 class="m-0">Interviews Scheduled</h3>
+            <p class="muted">Keep candidates moving</p>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" id="openScheduleInterview">Add Interview</button>
+        </div>
+        {% if interviews %}
+          <ul class="list-plain">
+            {% for interview in interviews %}
+              <li>
+                <div class="inline-actions" style="justify-content: space-between; width: 100%;">
+                  <div>
+                    <div><strong>{{ interview.job.title }}</strong></div>
+                    <div class="time muted">{{ interview.scheduled_at|date:"M d, Y g:ia" }} · {{ interview.candidate.get_full_name|default:interview.candidate.username }}</div>
+                  </div>
+                  <div class="actions-dropdown">
+                    <button type="button"
+                            class="btn btn-outline btn-sm dropdown-toggle"
+                            data-menu-id="dd-{{ interview.id }}">
+                      Actions ▾
                     </button>
-                    <form method="post" action="{% url 'dashboard:cancel_interview' %}">
-                      {% csrf_token %}
-                      <input type="hidden" name="interview_id" value="{{ interview.id }}">
-                      <button type="submit" class="dropdown-item" onclick="return confirm('Cancel this interview?');">Cancel</button>
-                    </form>
+                    <div class="dropdown-menu" id="dd-{{ interview.id }}">
+                      <button type="button" class="dropdown-item openReschedule"
+                              data-interview="{{ interview.id }}"
+                              data-datetime="{{ interview.scheduled_at|date:'Y-m-d\\TH:i' }}">
+                        Reschedule
+                      </button>
+                      <form method="post" action="{% url 'dashboard:cancel_interview' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="interview_id" value="{{ interview.id }}">
+                        <button type="submit" class="dropdown-item" onclick="return confirm('Cancel this interview?');">Cancel</button>
+                      </form>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <div class="empty-state"><i class="far fa-calendar"></i> No interviews scheduled.</div>
-      {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="empty-state">No interviews scheduled.</div>
+        {% endif %}
+      </section>
     </div>
-  </section>
-
+  </main>
 </div>
 
 <!-- ====== Schedule Interview Modal ====== -->
@@ -291,8 +332,6 @@
   
 </div>
 
-<script src="{% static 'dashboard/js/employer_dashboard.js' %}" defer></script>
-<script src="{% static 'dashboard/js/employer_dashboard_modals.js' %}" defer></script>
 {% endblock %}
 {% block extra_js %}
   <script src="{% static 'dashboard/js/employer_dashboard.js' %}" defer></script>
