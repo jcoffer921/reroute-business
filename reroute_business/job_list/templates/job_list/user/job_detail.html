@@ -93,7 +93,7 @@
 
   <!-- CTA -->
   <div class="apply-now-wrapper">
-    <form method="post" action="{% url 'apply_to_job' job.id %}" onsubmit="return confirmApply();">
+    <form method="post" action="{% url 'apply_to_job' job.id %}" class="js-apply-form">
       {% csrf_token %}
       <button class="apply-button" type="submit">Apply Now</button>
     </form>

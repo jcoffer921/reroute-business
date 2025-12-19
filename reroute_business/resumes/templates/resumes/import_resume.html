@@ -8,7 +8,9 @@
 <div class="resume-upload-wrapper">
   <h2 class="page-title">Import Your Resume</h2>
 
-  <form id="resumeUploadForm" enctype="multipart/form-data" class="upload-form">
+  <form id="resumeUploadForm" enctype="multipart/form-data" class="upload-form"
+        data-upload-url="{% url 'resumes:parse_resume_upload' %}"
+        data-upload-only-url="{% url 'resumes:upload_resume_only' %}">
     {% csrf_token %}
     <label for="resume_file" class="upload-box">
       <img src="{% static 'resumes/img/document-icon.svg' %}" alt="Upload Icon" class="upload-icon">
@@ -35,9 +37,5 @@
   </div>
 </div>
 
-<script>
-  const uploadUrl = "{% url 'resumes:parse_resume_upload' %}";
-  const uploadOnlyUrl = "{% url 'resumes:upload_resume_only' %}";
-</script>
 <script src="{% static 'resumes/js/import_resume.js' %}"></script>
 {% endblock %}

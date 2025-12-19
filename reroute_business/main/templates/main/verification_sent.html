@@ -11,6 +11,14 @@
   <p class="target-email">{{ email }}</p>
   <p>Please click the link in that email to verify your address and finish setting up your account.</p>
 
+  <div class="verify-actions">
+    {% if is_employer %}
+      <a class="btn btn-primary" href="{% url 'employer_login' %}">Continue to Employer Login</a>
+    {% else %}
+      <a class="btn btn-primary" href="{% url 'login' %}">Continue to Login</a>
+    {% endif %}
+  </div>
+
   <div class="helper-links">
     <a href="{% url 'resend_verification' %}">Resend verification</a>
     <span class="sep">·</span>

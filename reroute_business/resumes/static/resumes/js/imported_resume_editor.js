@@ -9,7 +9,13 @@
   const toolbar = $('.editor-toolbar');
   const updateUrl = toolbar?.dataset.updateUrl || '';
   const discardUrl = toolbar?.dataset.discardUrl || '';
-  const csrf = decodeURIComponent(window.RR_CSRF || '');
+
+  function getCookie(name) {
+    const m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]+)'));
+    return m ? decodeURIComponent(m[1]) : '';
+  }
+
+  const csrf = getCookie('csrftoken');
 
   // History stack for undo/redo
   const history = [];

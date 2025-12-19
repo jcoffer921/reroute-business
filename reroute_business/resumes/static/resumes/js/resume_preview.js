@@ -188,8 +188,33 @@ function syncLivePreview() {
   }
 }
 
+function initStylePreview() {
+  const wrap = document.getElementById('stylePreview');
+  const select = document.getElementById('tpl');
+  const frame = document.getElementById('stylePreviewFrame');
+  if (!wrap || !select || !frame) return;
+  const previewUrl = wrap.dataset.previewUrl;
+  const setUrl = wrap.dataset.setUrl;
+  const csrftoken = getCookie('csrftoken') || '';
+
+  select.addEventListener('change', () => {
+    const choice = select.value;
+    frame.src = `${previewUrl}?template=${encodeURIComponent(choice)}`;
+    fetch(setUrl, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrftoken,
+        'X-Requested-With': 'XMLHttpRequest',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: `template=${encodeURIComponent(choice)}`
+    }).catch(() => {});
+  });
+}
+
 // ========== INIT ==========
 
 document.addEventListener('DOMContentLoaded', () => {
   syncLivePreview();
+  initStylePreview();
 });

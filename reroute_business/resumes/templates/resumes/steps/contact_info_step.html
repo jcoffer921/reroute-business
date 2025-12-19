@@ -56,14 +56,14 @@
 
       {# === City + State side-by-side (mobile friendly) === #}
       <div class="form-row d-flex justify-between gap-2">
-        <div class="form-group" style="flex: 1;">
+        <div class="form-group flex-1">
           <label for="{{ contact_form.city.id_for_label }}">City</label>
           {{ contact_form.city|add_class:"form-control"|attr:"autocomplete=address-level2" }}
           {% if contact_form.city.errors %}
             <div class="invalid-feedback d-block">{{ contact_form.city.errors|striptags }}</div>
           {% endif %}
         </div>
-        <div class="form-group" style="flex: 1;">
+        <div class="form-group flex-1">
           <label for="{{ contact_form.state.id_for_label }}">State</label>
           {{ contact_form.state|add_class:"form-control"|attr:"autocomplete=address-level1" }}
           {% if contact_form.state.errors %}

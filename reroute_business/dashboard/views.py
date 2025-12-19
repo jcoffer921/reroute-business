@@ -1168,6 +1168,13 @@ def admin_dashboard(request):
     new_jobs = Job.objects.filter(created_at__gte=seven_days_ago).count()
     new_applications = Application.objects.filter(submitted_at__gte=seven_days_ago).count()
 
+    trend_totals = {
+        "users_30": sum(users_by_day),
+        "jobs_30": sum(jobs_by_day),
+        "applications_30": sum(applications_by_day),
+        "employers_30": sum(employers_by_day),
+    }
+
     # Flagged jobs queue (tolerate missing column prior to migration)
     try:
         # Force evaluation so we can catch DB errors when column is missing
@@ -1217,6 +1224,7 @@ def admin_dashboard(request):
         "new_users": new_users,
         "new_jobs": new_jobs,
         "new_applications": new_applications,
+        "trend_totals": trend_totals,
         "analytics_summary": analytics_summary,
     }
     return render(request, 'dashboard/admin_dashboard.html', context)

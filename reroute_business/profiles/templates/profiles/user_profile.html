@@ -60,7 +60,7 @@
   <div class="info-header">
     <h2 class="section-title">Who You Are</h2>
     {% if user == request.user %}
-      <button class="edit-btn" type="button" onclick="toggleBioEdit()">Edit Bio</button>
+      <button class="edit-btn" type="button" data-bio-toggle="edit">Edit Bio</button>
     {% endif %}
   </div>
 
@@ -75,11 +75,11 @@
 
   {% if user == request.user %}
     <!-- Hidden form for editing bio -->
-    <form id="editBioForm" method="POST" action="{% url 'update_bio' %}" style="display: none;">
+    <form id="editBioForm" method="POST" action="{% url 'update_bio' %}" hidden>
       {% csrf_token %}
       <textarea name="bio" rows="4" cols="50">{{ profile.bio }}</textarea><br>
-      <div class="form-actions" style="margin-top: .5rem;">
-        <button type="button" class="cancel-btn" onclick="toggleBioEdit()">Cancel</button>
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" data-bio-toggle="edit">Cancel</button>
         <button type="submit" class="save-btn">Save</button>
       </div>
     </form>
@@ -249,19 +249,19 @@
 
   <!-- Slide-In Editor -->
   <!-- Background Image Modal -->
-  <div id="bgModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:1000;">
-    <div style="background:#fff; margin:6% auto; padding:20px; width:min(560px,92vw); border-radius:12px;">
+  <div id="bgModal" class="profile-modal" hidden>
+    <div class="profile-modal__dialog">
       <h3>Update Background Image</h3>
-      <img id="bgPreview" src="" style="width:100%; height:auto; margin:10px 0; display:none;" alt="Background preview">
+      <img id="bgPreview" src="" class="profile-modal__preview" alt="Background preview" hidden>
       <form id="bgForm" method="post" enctype="multipart/form-data" action="{% url 'profiles:update_profile_background' %}">
         {% csrf_token %}
         <input type="file" id="bgFileInput" name="background_image" accept="image/*">
-        <div class="form-actions" style="margin-top:12px;">
+        <div class="form-actions">
           <button type="submit" class="btn btn-primary">Save</button>
           <button type="button" class="btn btn-secondary" data-close-bg>Cancel</button>
         </div>
       </form>
-      <form method="post" action="{% url 'profiles:remove_profile_background' %}" style="margin-top:8px;">
+      <form method="post" action="{% url 'profiles:remove_profile_background' %}" class="profile-modal__remove">
         {% csrf_token %}
         <button type="submit" class="btn btn-secondary">Remove Background</button>
       </form>
@@ -304,7 +304,7 @@
         <button type="button" class="cancel-btn" data-panel-close>Cancel</button>
         <button type="submit" class="save-btn">
           <span class="btn-text">Save</span>
-          <span class="spinner" style="display:none;"></span>
+          <span class="spinner" hidden></span>
         </button>
       </div>
     </form>
@@ -400,7 +400,7 @@
         <button type="button" class="btn-secondary" data-panel-close>Cancel</button>
         <button type="submit" class="btn-primary">
           <span class="btn-text">Save</span>
-          <span class="spinner" style="display:none;"></span>
+          <span class="spinner" hidden></span>
         </button>
       </div>
     </form>
@@ -529,75 +529,6 @@
 <script src="{% static 'js/profile_media_modals.js' %}" defer></script>
 <script type="application/json" id="skillData">
   {{ skills_json|safe }}
-</script>
-<script>
-/* Fallback: only runs if the external profile_panels.js did NOT load.
-   It wires slide-panel open/close using data attributes or aria-controls. */
-(function () {
-  if (window.__profilePanelsLoaded) return; // external JS already active
-
-  // --- helpers ---
-  function openPanel(sel) {
-    const p = document.querySelector(sel);
-    if (!p) { console.warn('Panel not found:', sel); return; }
-    p.classList.add('open');              // your CSS can respond to .open
-    p.classList.add('visible');           // or .visible (covers both)
-    p.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('no-scroll');
-    const first = p.querySelector('input,select,textarea,button,[tabindex]:not([tabindex="-1"])');
-    if (first) first.focus({ preventScroll: true });
-  }
-  function closePanel(el) {
-    const p = el.closest('.slide-panel') || el;
-    if (!p) return;
-    p.classList.remove('open', 'visible');
-    p.setAttribute('aria-hidden', 'true');
-    document.body.classList.remove('no-scroll');
-  }
-
-  // Map legacy IDs → panel IDs if data attributes are missing
-  const idMap = {
-    '#editSlideTrigger':        '#slideEditor',
-    '#editEmploymentTrigger':   '#employmentSlideEditor',
-    '#editEmergencyTrigger':    '#emergencySlidePanel',
-    '#editDemographicsTrigger': '#demographicsSlidePanel',
-    '#editSkillsTrigger':       '#skillsSlidePanel',
-  };
-  Object.entries(idMap).forEach(([btnSel, panelSel]) => {
-    const btn = document.querySelector(btnSel);
-    if (btn && !btn.hasAttribute('data-panel-open') && !btn.hasAttribute('aria-controls')) {
-      btn.setAttribute('data-panel-open', panelSel); // add hook if missing
-      btn.type = btn.type || 'button';               // avoid accidental form submits
-    }
-  });
-
-  // Openers: [data-panel-open] OR [aria-controls]
-  document.addEventListener('click', function (e) {
-    const opener = e.target.closest('[data-panel-open],[aria-controls]');
-    if (opener) {
-      e.preventDefault();
-      const targetSel = opener.getAttribute('data-panel-open') || ('#' + opener.getAttribute('aria-controls'));
-      if (targetSel) openPanel(targetSel);
-      return;
-    }
-    // Closers: any element with [data-panel-close]
-    const closer = e.target.closest('[data-panel-close]');
-    if (closer) {
-      e.preventDefault();
-      closePanel(closer);
-    }
-  });
-
-  // Esc closes any open panel
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') {
-      document.querySelectorAll('.slide-panel.open, .slide-panel.visible').forEach(closePanel);
-    }
-  });
-
-  // Mark fallback as active
-  window.__profilePanelsLoaded = true;
-})();
 </script>
 {% endblock %}
 

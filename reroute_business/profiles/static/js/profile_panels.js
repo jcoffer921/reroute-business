@@ -91,6 +91,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btn) btn.addEventListener('click', (e) => { e.preventDefault(); openPanel(panelSel); });
   });
 
+  document.addEventListener('click', (e) => {
+    const opener = e.target.closest('[data-panel-open]');
+    if (opener) {
+      e.preventDefault();
+      const targetSel = opener.getAttribute('data-panel-open');
+      if (targetSel) openPanel(targetSel);
+      return;
+    }
+    const closer = e.target.closest('[data-panel-close]');
+    if (closer) {
+      e.preventDefault();
+      const panel = closer.closest('.slide-panel') || closer;
+      closePanel(panel);
+    }
+  });
+
   /* ---------- Toggle groups in Employment (buttons set hidden input values) ---------- */
   // HTML pattern:
   // <div class="btn-toggle-group" data-name="authorized_us">
@@ -161,6 +177,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  if (typeof window.showToast !== 'function') {
+    window.showToast = function showToast(message) {
+      const t = document.createElement('div');
+      t.className = 'toast toast-success';
+      t.textContent = message || 'Saved';
+      document.body.appendChild(t);
+      setTimeout(() => t.classList.add('show'), 10);
+      setTimeout(() => {
+        t.classList.remove('show');
+        t.addEventListener('transitionend', () => t.remove(), { once: true });
+      }, 2200);
+    };
+  }
   /* ---------- Wire each form (matches your current HTML) ---------- */
 
   // PERSONAL (#personalSlideForm)
@@ -507,4 +536,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (showing) { form.setAttribute('hidden',''); if (short) short.removeAttribute('hidden'); }
     else { form.removeAttribute('hidden'); if (short) short.setAttribute('hidden',''); if (full) full.setAttribute('hidden',''); }
   };
+
+  qsa('[data-bio-toggle="edit"]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.toggleBioEdit();
+    });
+  });
 });

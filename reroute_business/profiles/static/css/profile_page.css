@@ -76,3 +76,51 @@
   position: relative;
   padding: 16px 20px 32px;
 }
+
+.form-actions { margin-top: 12px; }
+
+.profile-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.profile-modal__dialog {
+  background: #fff;
+  width: min(560px, 92vw);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+}
+
+.profile-modal__preview {
+  width: 100%;
+  height: auto;
+  margin: 10px 0;
+}
+
+.profile-modal__remove { margin-top: 8px; }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 24px;
+  background: #111827;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.18);
+  opacity: 0;
+  transition: opacity .2s ease, transform .2s ease;
+  z-index: 2000;
+}
+.toast-success { background: #059669; }
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}

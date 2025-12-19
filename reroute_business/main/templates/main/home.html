@@ -9,16 +9,6 @@
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
 
 
-<!-- Login Status Message -->
-<div class="rr-center rr-mt-4">
-    {% if user.is_authenticated %}
-        <p>You are logged in as <strong>{{ user.username }}</strong>.</p>
-    {% else %}
-        <p>You are not logged in.</p>
-    {% endif %}
-</div>
-
-
 <section class="hero home-hero">
     <div class="hero-content">
         <h1>Rebuild. Reclaim. ReRoute.</h1>
@@ -83,7 +73,7 @@
         <a href="{% url 'about_us' %}" class="vision-btn" aria-label="Learn more about ReRoute">Learn More</a>
       </div>
     </div>
-    <div class="vision-right" style="--vision-image: url('{% static 'images/jaycoffer.jpg' %}'); --vision-image-pos-y: 78%; --vision-image-pos-x: 52%;"></div>
+    <div class="vision-right vision-right--jay"></div>
   </div>
   
  </section>
@@ -136,7 +126,7 @@
       </article>
     </div>
 
-    <div class="audiences-inner" style="margin-top:1.25rem;">
+    <div class="audiences-inner audiences-inner--spaced">
       <article class="audience-card">
         <h3>For Job Seekers</h3>
         <ul>
@@ -177,7 +167,9 @@
       <div class="slides-wrapper" id="slidesWrapper">
         <!-- Intro slide doubles as section header -->
         <article class="slide hero-slide intro-slide">
-          <div class="hero-media" style="background-image:url('{% static 'images/your_voice.jpg' %}');"></div>
+          <div class="hero-media">
+            <img src="{% static 'images/your_voice.jpg' %}" alt="" loading="lazy">
+          </div>
           <div class="hero-overlay"></div>
           <div class="hero-content">
             <div class="hero-tagline">Your Voice Matters</div>
@@ -189,10 +181,12 @@
         {% if featured_posts %}
           {% for post in featured_posts %}
             <article class="slide hero-slide">
-              <div class="hero-media" style="background-image:url('{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/your_voice.jpg' %}{% endif %}');"></div>
+              <div class="hero-media">
+                <img src="{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/your_voice.jpg' %}{% endif %}" alt="{{ post.title }}" loading="lazy">
+              </div>
               <div class="hero-overlay"></div>
               <div class="hero-content">
-                <h3 class="hero-title">{{ post.title }} <span class="badge-soon">Coming Soon</span></h3>
+                <h3 class="hero-title">{{ post.title }}</h3>
                 <p class="hero-excerpt">{{ post.content|truncatechars:140 }}</p>
                 
               </div>
@@ -201,10 +195,12 @@
         {% else %}
           {% for post in recent_posts|slice:':1' %}
             <article class="slide hero-slide">
-              <div class="hero-media" style="background-image:url('{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/your_voice.jpg' %}{% endif %}');"></div>
+              <div class="hero-media">
+                <img src="{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/your_voice.jpg' %}{% endif %}" alt="{{ post.title }}" loading="lazy">
+              </div>
               <div class="hero-overlay"></div>
               <div class="hero-content">
-                <h3 class="hero-title">{{ post.title }} <span class="badge-soon">Coming Soon</span></h3>
+                <h3 class="hero-title">{{ post.title }}</h3>
                 <p class="hero-excerpt">{{ post.content|truncatechars:140 }}</p>
                 
               </div>
@@ -228,12 +224,14 @@
         {% for post in recent_posts %}
           <article class="post-card">
             {% if post.image %}
-              <a href="{% url 'blog_detail' slug=post.slug %}" class="post-media" style="background-image:url('{{ post.image.url }}');" aria-label="{{ post.title }}"></a>
+              <a href="{% url 'blog_detail' slug=post.slug %}" class="post-media" aria-label="{{ post.title }}">
+                <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
+              </a>
             {% else %}
               <a href="{% url 'blog_detail' slug=post.slug %}" class="post-media post-media--logo" aria-label="{{ post.title }}"></a>
             {% endif %}
             <div class="post-body">
-              <h4 class="post-title"><a href="{% url 'blog_detail' slug=post.slug %}">{{ post.title }}</a> <span class="badge-soon">Coming Soon</span></h4>
+              <h4 class="post-title"><a href="{% url 'blog_detail' slug=post.slug %}">{{ post.title }}</a></h4>
               <p class="post-excerpt">{{ post.content|truncatechars:110 }}</p>
             </div>
           </article>
@@ -241,7 +239,7 @@
       </div>
     {% endif %}
 
-    <div class="blog-header" style="margin-top:1rem;">
+    <div class="blog-header blog-header--spaced">
       <a href="{% url 'blog_list' %}" class="view-all-link">View all blog posts</a>
     </div>
 
@@ -251,7 +249,9 @@
       <div class="slides-wrapper" id="slidesWrapper">
         <!-- Intro slide doubles as section header in empty state -->
         <article class="slide hero-slide intro-slide">
-          <div class="hero-media" style="background-image:url('{% static 'images/your_voice.jpg' %}');"></div>
+          <div class="hero-media">
+            <img src="{% static 'images/your_voice.jpg' %}" alt="" loading="lazy">
+          </div>
           <div class="hero-overlay"></div>
           <div class="hero-content">
             <div class="hero-tagline">Your Voice Matters</div>

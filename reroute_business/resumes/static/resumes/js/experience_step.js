@@ -141,6 +141,12 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       const first = document.querySelector('#experience-form .is-invalid');
       if (first) first.focus();
+      return;
+    }
+    const btn = document.getElementById('experience-next-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
     }
   });
 });

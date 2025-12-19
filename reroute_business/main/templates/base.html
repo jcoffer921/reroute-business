@@ -38,22 +38,6 @@
                     {% if user.is_authenticated %}
                         {# ✅ Role-aware: always points to the correct dashboard #}
                         <a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a>
-
-                        {# Left (optional) menu block, kept for parity with original layout #}
-                        <div class="user-menu-container">
-                            <div class="user-dropdown" id="userDropdownLeft">
-                                <a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a>
-                                <a href="{% url 'dashboard:notifications' %}">Notifications{% if UNREAD_NOTIFICATIONS %}<span class="nav-badge">{{ UNREAD_NOTIFICATIONS }}</span>{% endif %}</a>
-                                {# Route to the correct profile page by role #}
-                                <a href="{{ PROFILE_URL }}">Profile</a>
-                                <a href="{% url 'contact' %}">Report Issues</a>
-                                <a href="{% url 'settings' %}">Settings</a>
-                                <form method="POST" action="{% url 'logout' %}" class="m-0">
-                                    {% csrf_token %}
-                                    <button type="submit" class="logout-btn">Sign out</button>
-                                </form>
-                            </div>
-                        </div>
                     {% else %}
                         {% if request.path != '/login/' %}
                             <a href="{% url 'login' %}">Login</a>

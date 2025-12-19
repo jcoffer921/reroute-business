@@ -21,7 +21,7 @@
       <a class="rr-btn rr-btn-secondary" href="{{ resume.file.url }}" target="_blank" rel="noopener">Download Original</a>
       {% endif %}
       <button type="button" class="rr-btn rr-btn-secondary" id="saveDraftBtn">Save Changes</button>
-      <form method="post" action="{% url 'resumes:imported_resume' resume.id %}" style="display:inline-block;">
+      <form method="post" action="{% url 'resumes:imported_resume' resume.id %}" class="inline-form">
         {% csrf_token %}
         <button type="submit" class="rr-btn rr-btn-primary">Save to Profile</button>
       </form>
@@ -132,9 +132,5 @@
   </div>
 </div>
 
-<script>
-  window.RR_RESUME = { id: {{ resume.id }} };
-  window.RR_CSRF = (document.cookie.match(/(?:^|; )csrftoken=([^;]+)/)||[])[1] || '';
-</script>
 <script src="{% static 'resumes/js/imported_resume_editor.js' %}"></script>
 {% endblock %}

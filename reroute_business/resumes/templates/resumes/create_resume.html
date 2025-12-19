@@ -38,29 +38,5 @@
   </div>
 </section>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const fields = ["education", "experience", "skills", "certifications"];
-
-  fields.forEach(field => {
-    const input = document.getElementById("id_" + field);
-    const preview = document.getElementById("preview-" + field);
-
-    const updatePreview = () => {
-      const lines = input.value.split('\n').filter(line => line.trim() !== "");
-      preview.innerHTML = "";
-      lines.forEach(line => {
-        const li = document.createElement("li");
-        li.textContent = line;
-        preview.appendChild(li);
-      });
-    };
-
-    if (input && preview) {
-      input.addEventListener("input", updatePreview);
-      updatePreview(); // Initial call
-    }
-  });
-});
-</script>
+<script src="{% static 'resumes/js/create_resume.js' %}"></script>
 {% endblock %}

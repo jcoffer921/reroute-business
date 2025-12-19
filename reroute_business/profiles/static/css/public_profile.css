@@ -307,6 +307,10 @@ hr.section-sep { border: none; height: 1px; background: #e5e7eb; margin: 36px au
 .employer-public[data-user] .info-grid .info-item { display: grid; grid-template-columns: minmax(160px, 1fr) 2fr; column-gap: 16px; row-gap: 6px; align-items: baseline; }
 .employer-public[data-user] .info-grid .info-item strong { margin: 0; font-weight: 600; color: #64748b; text-align: right; }
 .employer-public[data-user] .info-grid .info-item span { margin: 0; }
+.employer-public[data-user] .profile-display { line-height: 1.6; }
+.employer-public[data-user] .profile-bio { max-width: 700px; margin-left: auto; margin-right: auto; }
+.employer-public[data-user] .info-grid { gap: 18px 28px; }
+.employer-public[data-user] .info-grid .info-item { line-height: 1.55; }
 
 @media (max-width: 640px) {
   /* Mobile spacing rhythm + header/button fit */

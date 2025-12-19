@@ -120,6 +120,17 @@
   border-radius: 5px;
 }
 
+.preview-section--spaced { margin-top: 16px; }
+.style-preview-label { font-weight: 600; }
+.style-preview-select { max-width: 220px; display: inline-block; margin-left: 0.5rem; }
+.style-preview-frame-wrap {
+  margin-top: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.style-preview-frame { width: 100%; height: 520px; border: 0; }
+
 /* Action buttons */
 .actions {
   margin-top: 2rem;

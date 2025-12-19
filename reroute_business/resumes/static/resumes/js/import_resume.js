@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const fileNameDisplay = document.getElementById('selected-file');
   const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
   const uploadOnlyToggle = document.getElementById('upload_only');
+  const uploadUrl = form?.dataset.uploadUrl || '';
+  const uploadOnlyUrl = form?.dataset.uploadOnlyUrl || '';
 
   const messages = [
     "🔍 Reviewing your resume…",
@@ -42,6 +44,11 @@ document.addEventListener('DOMContentLoaded', function () {
     formData.append('file', file);
 
     const endpoint = (uploadOnlyToggle && uploadOnlyToggle.checked) ? uploadOnlyUrl : uploadUrl;
+    if (!endpoint) {
+      modal.classList.remove('active');
+      alert("❌ Upload failed: missing upload endpoint.");
+      return;
+    }
     fetch(endpoint, {
       method: "POST",
       headers: { 'X-CSRFToken': csrfToken },

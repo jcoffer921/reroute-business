@@ -368,12 +368,25 @@ a:hover {
 .rr-modal {
   position: fixed;
   inset: 0;
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 160ms ease, visibility 160ms ease;
 }
-.rr-modal.open { display: flex; }
+.rr-modal.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.rr-modal[aria-hidden="true"] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
 .rr-modal__dialog {
   position: relative;
   z-index: 1001;

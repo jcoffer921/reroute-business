@@ -40,14 +40,14 @@
         </div>
 
         <div class="form-row d-flex gap-2">
-          <div class="form-group" style="flex:1;">
+          <div class="form-group flex-1">
             <label for="{{ form.start_date.id_for_label }}">Start Date</label>
             {# Your ModelForm already uses DateInput(type=date) — adding class for styling #}
             {{ form.start_date|add_class:"form-control"|attr:"autocomplete=bday-month" }}
             {% if form.start_date.errors %}<div class="invalid-feedback d-block">{{ form.start_date.errors|striptags }}</div>{% endif %}
           </div>
 
-          <div class="form-group" style="flex:1;">
+          <div class="form-group flex-1">
             <label for="{{ form.end_date.id_for_label }}">End Date</label>
             {{ form.end_date|add_class:"form-control"|attr:"autocomplete=bday-month" }}
             {% if form.end_date.errors %}<div class="invalid-feedback d-block">{{ form.end_date.errors|striptags }}</div>{% endif %}
@@ -72,11 +72,11 @@
     {% endfor %}
 
     {# Empty form template for JS to clone (keeps Django’s naming) #}
-    <div id="empty-form-template" style="display:none;">
+    <div id="empty-form-template" hidden>
       {{ formset.empty_form.as_p }}
     </div>
 
-    <div style="text-align: right; margin-top: 1.25rem;">
+    <div class="form-actions-right">
       <button type="button" id="add-education-btn" class="add-row">➕ Add Education</button>
     </div>
 
@@ -89,11 +89,4 @@
 
 <script src="{% static 'resumes/js/steps.js' %}"></script>
 <script src="{% static 'resumes/js/education_step.js' %}"></script>
-<script>
-  // Prevent accidental double‑submit on slow connections
-  document.getElementById('education-form')?.addEventListener('submit', function () {
-    const btn = document.getElementById('education-next-btn');
-    if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
-  });
-</script>
 {% endblock %}

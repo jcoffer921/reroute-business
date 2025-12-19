@@ -132,6 +132,12 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       const first = document.querySelector('#education-form .is-invalid');
       if (first) first.focus();
+      return;
+    }
+    const btn = document.getElementById('education-next-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
     }
   });
 });

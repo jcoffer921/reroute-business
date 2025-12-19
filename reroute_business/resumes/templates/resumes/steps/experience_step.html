@@ -40,13 +40,13 @@
         </div>
 
         <div class="form-row d-flex gap-2">
-          <div class="form-group" style="flex:1;">
+          <div class="form-group flex-1">
             <label for="{{ form.start_date.id_for_label }}">Start Date</label>
             {{ form.start_date|add_class:"form-control"|attr:"autocomplete=bday-month" }}
             {% if form.start_date.errors %}<div class="invalid-feedback d-block">{{ form.start_date.errors|striptags }}</div>{% endif %}
           </div>
 
-          <div class="form-group" style="flex:1;">
+          <div class="form-group flex-1">
             <label for="{{ form.end_date.id_for_label }}">End Date</label>
             {# JS will disable this when "currently_work_here" is checked #}
             {{ form.end_date|add_class:"form-control"|attr:"autocomplete=bday-month" }}
@@ -76,12 +76,12 @@
     {% endfor %}
 
     {# 🔧 Template the JS clones for new rows (keeps Django's naming/indexing) #}
-    <div id="empty-form-template" style="display: none;">
+    <div id="empty-form-template" hidden>
       {{ formset.empty_form.as_p }}
     </div>
 
     <!-- Add Button -->
-    <div style="text-align: right; margin-top: 1.25rem;">
+    <div class="form-actions-right">
       <button type="button" id="add-experience-btn" class="add-row">➕ Add Experience</button>
     </div>
 
@@ -94,11 +94,4 @@
 
 <script src="{% static 'resumes/js/steps.js' %}"></script>
 <script src="{% static 'resumes/js/experience_step.js' %}"></script>
-<script>
-  // Prevent double-submit on slow networks
-  document.getElementById('experience-form')?.addEventListener('submit', function () {
-    const btn = document.getElementById('experience-next-btn');
-    if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
-  });
-</script>
 {% endblock %}

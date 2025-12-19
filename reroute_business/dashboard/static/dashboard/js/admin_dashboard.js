@@ -126,6 +126,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const backdrop = document.querySelector('.rr-modal__backdrop');
   let pendingForm = null;
 
+  if (modal) {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+
   function openModal(message, form) {
     pendingForm = form;
     if (msgEl) msgEl.textContent = message || 'Are you sure?';

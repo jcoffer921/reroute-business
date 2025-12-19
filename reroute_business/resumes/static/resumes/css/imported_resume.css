@@ -139,6 +139,8 @@
   text-decoration: none;
 }
 
+.inline-form { display: inline-block; }
+
 /* Section headers and text */
 .imported-resume-wrapper h2 { font-size: 1.6rem; margin-bottom: 0.5rem; }
 .imported-resume-wrapper h3 {

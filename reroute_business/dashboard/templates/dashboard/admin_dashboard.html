@@ -48,6 +48,12 @@
           <p class="muted">Key trends across the platform</p>
         </div>
       </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><p class="stat-label">New Users</p><p class="stat-number">{{ trend_totals.users_30|default:0 }}</p></div>
+        <div class="hero-stat"><p class="stat-label">New Jobs</p><p class="stat-number">{{ trend_totals.jobs_30|default:0 }}</p></div>
+        <div class="hero-stat"><p class="stat-label">New Applications</p><p class="stat-number">{{ trend_totals.applications_30|default:0 }}</p></div>
+        <div class="hero-stat"><p class="stat-label">New Employers</p><p class="stat-number">{{ trend_totals.employers_30|default:0 }}</p></div>
+      </div>
       <div class="analytics-grid">
         <div class="analytics-tile"><h3>Users</h3><div id="usersChart" class="plotly-chart"></div></div>
         <div class="analytics-tile"><h3>Jobs</h3><div id="jobsChart" class="plotly-chart"></div></div>
@@ -190,7 +196,7 @@
   </div>
   <button type="button" class="rr-modal__backdrop" aria-label="Close"></button>
 </div>
-<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<script src="{% static 'dashboard/js/vendor/plotly-2.27.0.min.js' %}"></script>
 <script id="admin-dashboard-data" type="application/json">
   {
     "dates": {{ dates|safe }},

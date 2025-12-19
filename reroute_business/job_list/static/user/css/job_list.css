@@ -267,7 +267,7 @@
   pointer-events: none;
   user-select: none;
 }
-.jobs-overlay-card .subtle { font-size: .95rem; color: #6b7280; }
+.jobs-overlay-card .subtle { font-size: .95rem; color: #6b7280; margin-top: 8px; }
 
 /* Filters subtitle helper */
 .filters-subtitle { font-weight: 600; font-size: .95rem; }

@@ -44,6 +44,9 @@ body,
   background-color: #fafafa;
 }
 
+.form-group.flex-1 { flex: 1; }
+.form-actions-right { text-align: right; margin-top: 1.25rem; }
+
 /* === CLIENT-SIDE VALIDATION === */
 .is-invalid {
   border-color: #dc3545 !important; /* red */

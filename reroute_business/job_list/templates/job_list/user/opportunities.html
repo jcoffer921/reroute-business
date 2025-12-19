@@ -7,16 +7,18 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'user/css/job_list.css' %}">
 
-<div class="opportunities-page overlay-active">
+<div class="opportunities-page{% if not jobs %} overlay-active{% endif %}">
+  {% if not jobs %}
   <!-- Cover the entire page content area (not navbar/footer) -->
   <div class="jobs-overlay" role="status" aria-live="polite">
     <div class="jobs-overlay-card">
       <h2>Jobs Coming Soon</h2>
       <p>In the meantime check out our resources to be best prepared when they arrive.</p>
       <a href="{% url 'resource_list' %}" class="btn btn-primary">Explore Resources</a>
-      <div class="subtle" style="margin-top:8px;">We’ll notify users as postings go live.</div>
+      <div class="subtle">We’ll notify users as postings go live.</div>
     </div>
   </div>
+  {% endif %}
 
   <!-- Full-width hero (outside the form) with primary search inside -->
   <section class="opportunities-hero">
