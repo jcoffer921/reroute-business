@@ -57,7 +57,6 @@
                     -->
                     <button class="user-initials-btn" id="userMenuButton" aria-expanded="false" aria-controls="userDropdown">
                         {{ user.first_name|default:user.username|slice:":1" }}{{ user.last_name|default:""|slice:":1" }}
-                        <span id="arrow-icon">▼</span>
                     </button>
                     <div class="user-dropdown" id="userDropdown" role="menu" aria-labelledby="userMenuButton">
                         <a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a>

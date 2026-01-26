@@ -26,36 +26,6 @@
         <h2>Our Mission</h2>
         <p class="mission-lead">We help justice-impacted people rebuild confidence, grow skills, and connect with employers who believe in second chances.</p>
         <p class="mission-bridge">Here’s how ReRoute supports you — starting now.</p>
-        <div class="mission-grid">
-          <article class="mission-pill">
-            <div class="pill-icon" aria-hidden="true">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l8 4v5c0 5-3.5 9-8 9s-8-4-8-9V7l8-4z" stroke="#006da0" stroke-width="1.5"/><path d="M9 12l2 2 4-4" stroke="#00beb8" stroke-width="1.5" stroke-linecap="round"/></svg>
-            </div>
-            <h3>Trust</h3>
-            <p>Respect, dignity, and privacy at every step.</p>
-          </article>
-          <article class="mission-pill">
-            <div class="pill-icon" aria-hidden="true">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 18h16M6 16V6h6v10" stroke="#006da0" stroke-width="1.5"/><path d="M14 9h4v7" stroke="#00beb8" stroke-width="1.5"/></svg>
-            </div>
-            <h3>Skills</h3>
-            <p>Resume tools and training to grow faster.</p>
-          </article>
-          <article class="mission-pill">
-            <div class="pill-icon" aria-hidden="true">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 7l9 5 9-5" stroke="#006da0" stroke-width="1.5"/><path d="M3 12l9 5 9-5" stroke="#00beb8" stroke-width="1.5"/></svg>
-            </div>
-            <h3>Opportunities</h3>
-            <p>Match with employers open to second-chance hiring.</p>
-          </article>
-          <article class="mission-pill">
-            <div class="pill-icon" aria-hidden="true">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 21a9 9 0 1 1 0-18" stroke="#006da0" stroke-width="1.5"/><path d="M7 12h10M12 7v10" stroke="#00beb8" stroke-width="1.5"/></svg>
-            </div>
-            <h3>Community</h3>
-            <p>Support that strengthens people and workplaces.</p>
-          </article>
-        </div>
     </div>
 </section>
 
@@ -79,6 +49,7 @@
         <p>Employers are onboarding. Completed profiles get priority access when jobs launch.</p>
       </article>
     </div>
+    <p class="prep-note">We’re in conversations with reentry organizations to expand access to support, training, and employer connections as the platform grows.</p>
     <div class="prep-cta">
       <a href="{% url 'resumes:resume_welcome' %}" class="cta-button cta-seekers">Build Your Resume (Free)</a>
       <p class="prep-microcopy">Early users get priority access when employers launch.</p>
@@ -101,144 +72,6 @@
   </div>
   
  </section>
-
-<!-- What Employers Are Saying -->
-<section id="trust" class="testimonial-section">
-  <div class="testimonial-inner">
-    <blockquote class="pullquote">
-      <div class="pullquote-top reveal-up">“...people with records tend to do better and last longer.”</div>
-      <p class="pullquote-full reveal-up">I work in staffing for light industrial work and people with records tend to do better and last longer. In my experience, they call off less and are usually looking to stay with the company longer term because they know how hard the job market can be. Some of our best performing hires come from this group.</p>
-      <footer class="pullquote-attrib reveal-up">— Staffing Professional, TikTok</footer>
-    </blockquote>
-  </div>
-</section>
-
-<!-- =========================
-     Blog Section — Featured + Recent or Teaser Empty State
-     ========================= -->
-<section class="blog-section">
-  {% if featured_posts or recent_posts %}
-    <!-- Hero Carousel (intro slide + featured; fallback to first recent) -->
-    <div class="slider-container blog-hero">
-      <div class="slides-wrapper" id="slidesWrapper">
-        <!-- Intro slide doubles as section header -->
-        <article class="slide hero-slide intro-slide">
-          <div class="hero-media">
-            <img src="{% static 'images/your_voice.jpg' %}" alt="" loading="lazy">
-          </div>
-          <div class="hero-overlay"></div>
-          <div class="hero-content">
-            <div class="hero-tagline">Your Voice Matters</div>
-            <h2 class="hero-kicker">Our Blog</h2>
-            <p class="hero-excerpt">Insights, stories, and resources from the ReRoute team.</p>
-            
-          </div>
-        </article>
-        {% if featured_posts %}
-          {% for post in featured_posts %}
-            <article class="slide hero-slide">
-              <div class="hero-media">
-                <img src="{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/your_voice.jpg' %}{% endif %}" alt="{{ post.title }}" loading="lazy">
-              </div>
-              <div class="hero-overlay"></div>
-              <div class="hero-content">
-                <h3 class="hero-title">{{ post.title }}</h3>
-                <p class="hero-excerpt">{{ post.content|truncatechars:140 }}</p>
-                
-              </div>
-            </article>
-          {% endfor %}
-        {% else %}
-          {% for post in recent_posts|slice:':1' %}
-            <article class="slide hero-slide">
-              <div class="hero-media">
-                <img src="{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/your_voice.jpg' %}{% endif %}" alt="{{ post.title }}" loading="lazy">
-              </div>
-              <div class="hero-overlay"></div>
-              <div class="hero-content">
-                <h3 class="hero-title">{{ post.title }}</h3>
-                <p class="hero-excerpt">{{ post.content|truncatechars:140 }}</p>
-                
-              </div>
-            </article>
-          {% endfor %}
-        {% endif %}
-      </div>
-
-      <button type="button" class="slider-btn prev" aria-label="Previous slide">
-        <span class="arrow-triangle left"></span>
-      </button>
-      <button type="button" class="slider-btn next" aria-label="Next slide">
-        <span class="arrow-triangle right"></span>
-      </button>
-    </div>
-    <div class="slider-dots" id="sliderDots"></div>
-
-    <!-- Recent posts row -->
-    {% if recent_posts %}
-      <div class="recent-row">
-        {% for post in recent_posts %}
-          <article class="post-card">
-            {% if post.image %}
-              <a href="{% url 'blog_detail' slug=post.slug %}" class="post-media" aria-label="{{ post.title }}">
-                <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
-              </a>
-            {% else %}
-              <a href="{% url 'blog_detail' slug=post.slug %}" class="post-media post-media--logo" aria-label="{{ post.title }}"></a>
-            {% endif %}
-            <div class="post-body">
-              <h4 class="post-title"><a href="{% url 'blog_detail' slug=post.slug %}">{{ post.title }}</a></h4>
-              <p class="post-excerpt">{{ post.content|truncatechars:110 }}</p>
-            </div>
-          </article>
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    <div class="blog-header blog-header--spaced">
-      <a href="{% url 'blog_list' %}" class="view-all-link">View all blog posts</a>
-    </div>
-
-  {% else %}
-    <!-- Teaser Carousel with immersive images -->
-    <div class="slider-container blog-hero">
-      <div class="slides-wrapper" id="slidesWrapper">
-        <!-- Intro slide doubles as section header in empty state -->
-        <article class="slide hero-slide intro-slide">
-          <div class="hero-media">
-            <img src="{% static 'images/your_voice.jpg' %}" alt="" loading="lazy">
-          </div>
-          <div class="hero-overlay"></div>
-          <div class="hero-content">
-            <div class="hero-tagline">Your Voice Matters</div>
-            <h2 class="hero-kicker">Our Blog</h2>
-            <p class="hero-excerpt">We're working on insightful stories and resources. Coming Soon.</p>
-            
-          </div>
-        </article>
-        <article class="slide hero-slide">
-      <div class="hero-media hero-media--logo"></div>
-          <div class="hero-overlay"></div>
-          <div class="hero-content">
-            <h3 class="hero-title">Resources that make a difference</h3>
-            <p class="hero-excerpt">We're crafting practical guides you can use right away. Coming Soon.</p>
-            
-          </div>
-        </article>
-      </div>
-      <button type="button" class="slider-btn prev" aria-label="Previous slide">
-        <span class="arrow-triangle left"></span>
-      </button>
-      <button type="button" class="slider-btn next" aria-label="Next slide">
-        <span class="arrow-triangle right"></span>
-      </button>
-    </div>
-    <div class="slider-dots" id="sliderDots"></div>
-
-    <!-- Removed duplicate Notify Me CTA under the carousel per request -->
-  {% endif %}
-</section>
-
 
 <section id="features" class="services-section">
   <div class="services-inner">
@@ -300,5 +133,4 @@
   </div>
 </section>
 
-<script src="{% static 'js/home.js' %}"></script>
 {% endblock %}
