@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load profile_extras %}
 
 {% block title %}Employer — {{ employer_profile.company_name|default:viewed_user.username }}{% endblock %}
 
