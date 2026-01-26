@@ -59,7 +59,7 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
 }
 
 .navbar-logo { display: flex; align-items: center; flex-shrink: 0; }
-.navbar-logo img, .brand-logo { height: 50px; max-height: 50px; width: auto; object-fit: contain; }
+.navbar-logo img, .brand-logo { height: 54px; max-height: 54px; width: auto; object-fit: contain; }
 
 .navbar-links-container {
   display: grid;
@@ -72,7 +72,7 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1.6rem;
   list-style: none;
   justify-self: center;
   grid-column: 2;
@@ -278,7 +278,7 @@ iframe { max-width: 100%; border: 0; }
 @media (max-width: 768px) {
   /* Navbar compresses on mobile */
   .navbar { height: var(--nav-h-sm); padding: 0 .75rem; }
-  .navbar-logo img { height: 44px; }
+  .navbar-logo img { height: 48px; }
 
   /* Hide desktop nav + desktop profile controls */
   .nav-links, .user-menu-container, .user-profile-right { display: none !important; }
@@ -359,7 +359,7 @@ iframe { max-width: 100%; border: 0; }
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.22);
+    background: rgba(0, 0, 0, 0.3);
     z-index: -1;
 }
 
