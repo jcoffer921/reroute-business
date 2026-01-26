@@ -15,7 +15,7 @@
 <!-- Hero (owner view) -->
 <div class="employer-public" data-user="{{ user.username }}">
   <section class="hero hero-clickable">
-    <div class="profile-cover" data-role="cover-trigger">
+    <div class="profile-cover" data-role="cover-trigger" data-open-bg role="button" tabindex="0" aria-controls="bgModal" aria-haspopup="dialog">
       <img id="coverPreview" src="{% if profile.background_image %}{{ profile.background_image.url }}?v={{ profile.background_image|file_version }}{% elif profile.profile_picture %}{{ profile.profile_picture.url }}?v={{ profile.profile_picture|file_version }}{% else %}{% static 'images/default-cover.jpg' %}{% endif %}" alt="Cover image">
       <div class="overlay">Change Cover</div>
     </div>
@@ -249,9 +249,10 @@
 
   <!-- Slide-In Editor -->
   <!-- Background Image Modal -->
-  <div id="bgModal" class="profile-modal" hidden>
-    <div class="profile-modal__dialog">
-      <h3>Update Background Image</h3>
+  <div id="bgModal" class="profile-modal" role="dialog" aria-modal="true" aria-labelledby="bgModalTitle" aria-hidden="true" tabindex="-1" hidden>
+    <div class="profile-modal__dialog" role="document">
+      <button type="button" class="profile-modal__close" aria-label="Close" data-close-bg>×</button>
+      <h3 id="bgModalTitle">Update Background Image</h3>
       <img id="bgPreview" src="" class="profile-modal__preview" alt="Background preview" hidden>
       <form id="bgForm" method="post" enctype="multipart/form-data" action="{% url 'profiles:update_profile_background' %}">
         {% csrf_token %}
@@ -527,9 +528,7 @@
 <script src="{% static 'js/employer_public_profile.js' %}"></script>
 <script src="{% static 'js/profile_panels.js' %}" defer></script>
 <script src="{% static 'js/profile_media_modals.js' %}" defer></script>
-<script type="application/json" id="skillData">
-  {{ skills_json|safe }}
-</script>
+<div id="skillData" data-skill-json="{{ skills_json|escapejs }}" hidden></div>
 {% endblock %}
 
 {% block extra_js %}

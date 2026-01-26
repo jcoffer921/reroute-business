@@ -38,7 +38,7 @@
     <header class="dash-hero">
       <div class="dash-hero-content">
         <p class="eyebrow">Employer Dashboard</p>
-        <h1>Welcome back{{ request.user.first_name|yesno:", " }}{{ request.user.first_name|default:request.user.username }}!</h1>
+        <h1>Welcome back {{ request.user.first_name|yesno:", " }}{{ request.user.first_name|default:request.user.username }}!</h1>
         <p class="muted">Manage jobs, review applicants, and track performance.</p>
         <div class="hero-stats tall">
           <div class="hero-stat">

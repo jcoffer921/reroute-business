@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------- SKILLS (#skillsSlideForm) — render + submit ---------- */
   (function wireSkills() {
     const form         = qs('#skillsSlideForm');
-    const dataNode     = qs('#skillData'); // <script type="application/json" id="skillData">…</script>
+    const dataNode     = qs('#skillData'); // <div id="skillData" data-skill-json="..."></div>
     const selectedWrap = qs('#selectedSkills');
     const suggestedWrap= qs('#suggestedSkillsContainer');
     const input        = qs('#skillInput');
@@ -315,7 +315,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!form || !dataNode || !selectedWrap || !input || !addHidden || !removeHidden) return;
 
     /* ---------------- State ---------------- */
-    const parsed = safeParseJSON(dataNode.textContent);
+    const rawSkills = dataNode.getAttribute('data-skill-json') || dataNode.textContent;
+    const parsed = safeParseJSON(rawSkills);
     // Accept either: {"selected":[...], "suggested":[...]} OR ["a","b",...]
     const initialSelected  = Array.isArray(parsed) ? parsed : (parsed?.selected || []);
     const initialSuggested = Array.isArray(parsed) ? []     : (parsed?.suggested || []);

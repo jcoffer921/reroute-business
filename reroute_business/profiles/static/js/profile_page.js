@@ -14,13 +14,14 @@
     const coverPreview = document.getElementById('coverPreview');
     const saveAvatarBtn = document.getElementById('saveAvatarBtn');
     const saveCoverBtn = document.getElementById('saveCoverBtn');
+    const bgModal = document.getElementById('bgModal');
 
     if (avatarWrap && avatarInput) {
       avatarWrap.addEventListener('click', () => avatarInput.click());
       avatarInput.addEventListener('change', () => handleFile(avatarInput, avatarPreview, saveAvatarBtn));
     }
 
-    if (coverWrap && coverInput) {
+    if (coverWrap && coverInput && !bgModal) {
       coverWrap.addEventListener('click', () => coverInput.click());
       coverInput.addEventListener('change', () => handleFile(coverInput, coverPreview, saveCoverBtn));
     }

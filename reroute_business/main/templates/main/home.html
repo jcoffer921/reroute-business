@@ -12,15 +12,11 @@
 <section class="hero home-hero">
     <div class="hero-content">
         <h1>Rebuild. Reclaim. ReRoute.</h1>
-        <div class="sub-hero">
-            <p><span class="highlight">Rebuild</span> people's views of formerly incarcerated individuals as we help them,</p>
-            <p><span class="highlight">Reclaim</span> their place in society in order to</p>
-            <p><span class="highlight">ReRoute</span> their future.</p>
-        </div>
-        <p class="hero-subheadline">Connecting justice-impacted job seekers with supportive employers, resume tools, training, and job matching to make second chances work.</p>
+        <p class="hero-subheadline">Build your resume, prepare your profile, and get early access to fair-chance employers.</p>
+        <p class="hero-microcopy">Employers are onboarding now. Early profiles get priority access when jobs launch.</p>
         <div class="hero-ctas">
-            <a href="{% url 'signup' %}" class="cta-button cta-seekers">Get Started (Job Seekers)</a>
-            <a href="{% url 'employer_signup' %}" class="cta-button cta-employers">Post a Job (Employers)</a>
+            <a href="{% url 'resumes:resume_welcome' %}" class="cta-button cta-seekers">Build Your Resume (Free)</a>
+            <a href="{% url 'employer_signup' %}" class="cta-button cta-employers">Join the Pilot</a>
         </div>
     </div>
 </section>
@@ -29,6 +25,7 @@
     <div class="mission-content">
         <h2>Our Mission</h2>
         <p class="mission-lead">We help justice-impacted people rebuild confidence, grow skills, and connect with employers who believe in second chances.</p>
+        <p class="mission-bridge">Here’s how ReRoute supports you — starting now.</p>
         <div class="mission-grid">
           <article class="mission-pill">
             <div class="pill-icon" aria-hidden="true">
@@ -62,6 +59,33 @@
     </div>
 </section>
 
+<section id="getting-started" class="prep-section">
+  <div class="prep-inner">
+    <div class="prep-header">
+      <h2>Getting Started with ReRoute</h2>
+      <p class="prep-sub">Prepare your profile, build your resume, and get early access to fair-chance employers.</p>
+    </div>
+    <div class="prep-steps">
+      <article class="prep-step">
+        <h3>Create Your Profile</h3>
+        <p>Tell us about your skills, experience, and goals.</p>
+      </article>
+      <article class="prep-step">
+        <h3>Build Your Resume</h3>
+        <p>Create or upload a resume you can use anywhere.</p>
+      </article>
+      <article class="prep-step">
+        <h3>Get Early Access</h3>
+        <p>Employers are onboarding. Completed profiles get priority access when jobs launch.</p>
+      </article>
+    </div>
+    <div class="prep-cta">
+      <a href="{% url 'resumes:resume_welcome' %}" class="cta-button cta-seekers">Build Your Resume (Free)</a>
+      <p class="prep-microcopy">Early users get priority access when employers launch.</p>
+    </div>
+  </div>
+</section>
+
 <section id="vision" class="vision-split">
   <div class="vision-inner vision-theme-primary">
     <div class="vision-left">
@@ -89,74 +113,6 @@
   </div>
 </section>
 
-<!-- How It Works + Benefits (Unified) -->
-<section id="how-it-works" class="hiw-section">
-  <div class="hiw-inner">
-    <h2>How It Works</h2>
-    <p class="hiw-sub">Simple steps for seekers and employers to connect and succeed.</p>
-    <div class="hiw-steps">
-      <article class="hiw-step">
-        <div class="hiw-icon" aria-hidden="true">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="12" cy="12" r="10" stroke="#006da0" stroke-width="1.5"/>
-            <path d="M8 12h8M12 8v8" stroke="#00beb8" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <h3>Sign Up</h3>
-        <p>Create a free account as a job seeker or employer.</p>
-      </article>
-      <article class="hiw-step">
-        <div class="hiw-icon" aria-hidden="true">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 7l9 5 9-5-9-4-9 4z" fill="#6495ED" opacity=".2"/>
-            <path d="M3 7l9 5 9-5M5 10l7 4 7-4" stroke="#0F172A" stroke-width="1.5"/>
-          </svg>
-        </div>
-        <h3>Connect</h3>
-        <p>Use resume tools, training, and matching to find the right fit.</p>
-      </article>
-      <article class="hiw-step">
-        <div class="hiw-icon" aria-hidden="true">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5 13l4 4L19 7" stroke="#00beb8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <h3>Succeed</h3>
-        <p>Get hired, grow skills, and build long-term success.</p>
-      </article>
-    </div>
-
-    <div class="audiences-inner audiences-inner--spaced">
-      <article class="audience-card">
-        <h3>For Job Seekers</h3>
-        <ul>
-          <li>AI-assisted resume builder</li>
-          <li>Interview prep & email guidance</li>
-          <li>Job matching with supportive employers</li>
-          <li>Training and upskilling pathways</li>
-        </ul>
-        <div class="audience-actions">
-          <a href="{% url 'resumes:resume_welcome' %}" class="btn-pill">Build Your Resume</a>
-          <a href="{% url 'opportunities' %}" class="btn-link">Browse Jobs</a>
-        </div>
-      </article>
-      <article class="audience-card">
-        <h3>For Employers</h3>
-        <ul>
-          <li>Streamlined job posting</li>
-          <li>Access to motivated talent</li>
-          <li>Metrics and insights</li>
-          <li>Second-chance hiring support</li>
-        </ul>
-        <div class="audience-actions">
-          <a href="{% url 'employer_signup' %}" class="btn-pill">Create Employer Account</a>
-          <a href="{% url 'create_job' %}" class="btn-link">Post a Job</a>
-        </div>
-      </article>
-    </div>
-
-  </div>
-</section>
 <!-- =========================
      Blog Section — Featured + Recent or Teaser Empty State
      ========================= -->

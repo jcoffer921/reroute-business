@@ -343,6 +343,7 @@
 
 /* ===== Hero Enhancements (subheadline + dual CTAs) ===== */
 .hero-subheadline { color: #e8eef7; max-width: 860px; margin: .75rem auto 1.25rem; font-size: 1.05rem; }
+.hero-microcopy { color: rgba(232, 238, 247, 0.82); max-width: 760px; margin: -0.5rem auto 1.5rem; font-size: .95rem; }
 .hero-ctas { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
 
 .hero-media img,
@@ -358,34 +359,6 @@
 .hero-ctas .cta-seekers:hover { filter: brightness(0.95); }
 .hero-ctas .cta-employers { background: transparent; color: #fff; border: 2px solid #ffffff; }
 .hero-ctas .cta-employers:hover { background: rgba(255,255,255,0.12); }
-
-/* ===== How It Works ===== */
-.hiw-section { background: linear-gradient(180deg, #E6F2FF 0%, #FFFFFF 100%); padding: 4rem 1.25rem; }
-.hiw-inner { max-width: 1100px; margin: 0 auto; text-align: center; }
-.hiw-inner h2 { margin: 0 0 .35rem; font-size: clamp(1.9rem, 3.4vw, 2.4rem); font-weight: 900; color: #0F172A; }
-.hiw-sub { color: #64748b; margin: 0 0 1.5rem; font-weight: 400; }
-.hiw-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-.hiw-step { background: #ffffff; border: 1px solid #e6ecfb; border-radius: 14px; padding: 1.25rem; text-align: left; box-shadow: 0 8px 22px rgba(10, 34, 80, 0.06); }
-.hiw-step h3 { margin: .35rem 0 .25rem; font-size: 1.2rem; font-weight: 800; color: #0F172A; }
-.hiw-step p { margin: 0; color: #475569; font-size: .95rem; }
-.hiw-icon { width: 48px; height: 48px; display: grid; place-items: center; background: #E6F2FF; border: 1px solid #d8e9ff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,.06); }
-@media (max-width: 900px){ .hiw-steps { grid-template-columns: 1fr; } .hiw-step { text-align: left; } }
-
-/* ===== Audience Split ===== */
-.audiences-split { background: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%); padding: 2.5rem 1.25rem; }
-.audiences-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.audience-card { background: #fff; border: 1px solid #e6ecfb; border-radius: 16px; padding: 1.25rem; box-shadow: 0 8px 22px rgba(10,34,80,0.06); }
-.audience-card h3 { margin: 0 0 .35rem; font-size: 1.35rem; font-weight: 900; color: #0F172A; }
-.audience-card ul { margin: 0 0 .75rem .95rem; padding: 0; color: #475569; line-height: 1.7; }
-.audience-actions { display: flex; gap: .6rem; flex-wrap: wrap; }
-.btn-link { color: #2563eb; font-weight: 700; text-decoration: none; align-self: center; }
-.btn-link:hover { text-decoration: underline; }
-@media (max-width: 900px){ .audiences-inner { grid-template-columns: 1fr; } }
-
-/* HIW CTA */
-.hiw-cta { margin-top: 1.5rem; display: flex; justify-content: center; }
-.hiw-btn { background: var(--primary-blue, #006da0); box-shadow: 0 8px 22px rgba(0,109,160,0.35); }
-.hiw-btn:hover { filter: brightness(0.95); }
 
 /* ===== Testimonial (Pull-Quote on Dark Gradient) ===== */
 .testimonial-section {
@@ -422,12 +395,26 @@
 
 /* ===== Mission Pillars ===== */
 .mission-lead { text-align: center; color: #475569; max-width: 900px; margin: 0 auto 1rem; }
+.mission-bridge { text-align: center; color: #64748b; max-width: 900px; margin: -0.25rem auto 1.25rem; font-weight: 600; }
 .mission-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: .5rem; }
 .mission-pill { background: #fff; border: 1px solid #e6ecfb; border-radius: 14px; padding: 1rem; text-align: center; box-shadow: 0 6px 16px rgba(10,34,80,0.06); }
 .mission-pill h3 { margin: .35rem 0 .25rem; font-size: 1.05rem; color: #0F172A; }
 .mission-pill p { margin: 0; color: #475569; }
 .pill-icon { width: 48px; height: 48px; border-radius: 12px; background: #f0f6ff; display: grid; place-items: center; margin: 0 auto; }
 @media (max-width: 900px){ .mission-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* ===== Getting Started ===== */
+.prep-section { background: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%); padding: 3.5rem 1.25rem; }
+.prep-inner { max-width: 1100px; margin: 0 auto; text-align: center; }
+.prep-header h2 { margin: 0 0 .4rem; font-size: clamp(1.9rem, 3.4vw, 2.4rem); font-weight: 900; color: #0F172A; }
+.prep-sub { color: #64748b; margin: 0 auto 1.5rem; max-width: 780px; }
+.prep-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: left; }
+.prep-step { background: #fff; border: 1px solid #e6ecfb; border-radius: 14px; padding: 1.25rem; box-shadow: 0 8px 22px rgba(10, 34, 80, 0.06); }
+.prep-step h3 { margin: 0 0 .35rem; font-size: 1.2rem; font-weight: 800; color: #0F172A; }
+.prep-step p { margin: 0; color: #475569; font-size: .95rem; }
+.prep-cta { margin-top: 1.5rem; display: grid; gap: .5rem; justify-items: center; }
+.prep-microcopy { color: #64748b; margin: 0; font-size: .95rem; }
+@media (max-width: 900px){ .prep-steps { grid-template-columns: 1fr; } }
 
 /* ===== Final CTA ===== */
 .final-cta { background: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%); padding: 2rem 1.25rem; }
