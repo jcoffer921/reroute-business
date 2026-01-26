@@ -15,7 +15,7 @@
         <p class="hero-subheadline">Build your resume, prepare your profile, and get early access to fair-chance employers.</p>
         <p class="hero-microcopy">Employers are onboarding now. Early profiles get priority access when jobs launch.</p>
         <div class="hero-ctas">
-            <a href="{% url 'resumes:resume_welcome' %}" class="cta-button cta-seekers">Build Your Resume (Free)</a>
+            <a href="{% url 'early_access_cta' %}" class="cta-button cta-seekers">Build Your Resume (Free)</a>
             <a href="{% url 'employer_signup' %}" class="cta-button cta-employers">Join the Pilot</a>
         </div>
     </div>
@@ -51,7 +51,7 @@
     </div>
     <p class="prep-note">We’re in conversations with reentry organizations to expand access to support, training, and employer connections as the platform grows.</p>
     <div class="prep-cta">
-      <a href="{% url 'resumes:resume_welcome' %}" class="cta-button cta-seekers">Build Your Resume (Free)</a>
+      <a href="{% url 'early_access_cta' %}" class="cta-button cta-seekers">Build Your Resume (Free)</a>
       <p class="prep-microcopy">Early users get priority access when employers launch.</p>
     </div>
   </div>
@@ -124,9 +124,9 @@
           </svg>
         </div>
         <h3>Job Matching</h3>
-        <p>Connect with employers open to second-chance hiring.</p>
+        <p>Employers are onboarding now. Matches will launch with early access.</p>
         <div class="card-actions">
-          <a href="{% url 'opportunities' %}" class="btn-pill">Explore Jobs</a>
+          <button class="btn-pill" disabled>Launching Soon</button>
         </div>
       </article>
     </div>

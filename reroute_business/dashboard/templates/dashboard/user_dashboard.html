@@ -41,10 +41,16 @@
       <div class="dash-hero-content">
         <p class="eyebrow">Dashboard</p>
         <h1>Welcome, {{ request.user.first_name|default:request.user.username }}!</h1>
-        <p class="muted">Keep momentum with jobs, modules, and organizations tailored to you.</p>
+        <p class="muted">Keep momentum with your profile and resume while employers onboard.</p>
+        {% if early_access_mode %}
+          <div class="early-access-banner">{{ early_access_message }}</div>
+        {% endif %}
+        {% if profile.early_access_priority %}
+          <span class="pill">Early Access — Priority Profile</span>
+        {% endif %}
         <div class="hero-stats">
           <div class="hero-stat">
-            <p class="stat-label">Matches</p>
+            <p class="stat-label">Matches{% if not jobs_live %} (soon){% endif %}</p>
             <p class="stat-number">{{ stats.matches_found|default:0 }}</p>
           </div>
           <div class="hero-stat">
@@ -59,43 +65,13 @@
       </div>
     </header>
 
-    <section class="quick-actions" aria-label="Quick actions">
-      <a class="quick-action" href="{% url 'resource_list' %}#modules">
-        <span class="qa-icon" aria-hidden="true">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </span>
-        <div>
-          <span class="qa-label">Continue Module</span>
-          <span class="qa-sub">Pick up where you left off</span>
-        </div>
-      </a>
-      <a class="quick-action" href="{% url 'reentry_org:organization_catalog' %}">
-        <span class="qa-icon" aria-hidden="true">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        </span>
-        <div>
-          <span class="qa-label">Explore Reentry Orgs</span>
-          <span class="qa-sub">Find nearby support</span>
-        </div>
-      </a>
-      <a class="quick-action" href="{% url 'resumes:resume_welcome' %}">
-        <span class="qa-icon" aria-hidden="true">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16l4-4h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/></svg>
-        </span>
-        <div>
-          <span class="qa-label">Finish Resume</span>
-          <span class="qa-sub">Improve completeness</span>
-        </div>
-      </a>
-      <a class="quick-action" href="{% url 'opportunities' %}">
-        <span class="qa-icon" aria-hidden="true">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13l-2-2 2-2"/><path d="M14 13l2-2-2-2"/><path d="M11 17l1 4"/><path d="M6 17l-4 1"/><path d="M18 17l4 1"/><path d="M12 3a2 2 0 0 1 2 2v1H10V5a2 2 0 0 1 2-2z"/></svg>
-        </span>
-        <div>
-          <span class="qa-label">Find Jobs</span>
-          <span class="qa-sub">Search matches and new roles</span>
-        </div>
-      </a>
+    <section class="card next-step-card" aria-label="Next step">
+      <div class="next-step-content">
+        <p class="eyebrow">Next step</p>
+        <h2>{{ next_step.title }}</h2>
+        <p class="muted">{{ next_step.desc }}</p>
+      </div>
+      <a class="btn btn-primary" href="{{ next_step.url }}">{{ next_step.cta }}</a>
     </section>
 
     <div class="grid two-col">
@@ -127,7 +103,7 @@
         {% else %}
           <div class="empty-state minimal">
             <h4>No interviews scheduled</h4>
-            <p>Keep applying and we’ll place interviews here.</p>
+            <p>{% if jobs_live %}Keep applying and we’ll place interviews here.{% else %}We’ll place interviews here once jobs launch.{% endif %}</p>
           </div>
         {% endif %}
       </section>
@@ -159,7 +135,13 @@
           <div class="progress-meta">
             <p class="label">Resume completeness</p>
             <p class="value">{{ resume_percent }}%</p>
-            <p class="hint">{% if resume %}Great work—keep it updated.{% else %}Upload to unlock matches.{% endif %}</p>
+            <p class="hint">
+              {% if resume %}
+                Great work—keep it updated.
+              {% else %}
+                {% if jobs_live %}Upload to unlock matches.{% else %}Upload to unlock early access.{% endif %}
+              {% endif %}
+            </p>
           </div>
         </div>
         {% endwith %}
@@ -194,10 +176,10 @@
       <div class="section-heading">
         <div>
           <h2>Recommendations</h2>
-          <p>Jobs, organizations, and modules tailored for you</p>
+          <p>{% if jobs_live %}Jobs, organizations, and modules tailored for you{% else %}Organizations and modules tailored for you. Jobs launch soon.{% endif %}</p>
         </div>
         <div class="tabs">
-          <button class="tab-btn active" data-tab="jobs">Jobs for You</button>
+          <button class="tab-btn active" data-tab="jobs">{% if jobs_live %}Jobs for You{% else %}Jobs (Launching Soon){% endif %}</button>
           <button class="tab-btn" data-tab="orgs">Reentry Organizations</button>
           <button class="tab-btn" data-tab="modules">Recommended Modules</button>
         </div>
@@ -205,7 +187,12 @@
 
       <div class="tab-panels">
         <div class="tab-panel active" data-tab-panel="jobs">
-          {% if suggested_cards %}
+          {% if not jobs_live %}
+            <div class="empty-state minimal">
+              <h4>Jobs are launching soon</h4>
+              <p>{{ early_access_message }}</p>
+            </div>
+          {% elif suggested_cards %}
             <div class="card-grid three-col">
               {% for item in suggested_cards|slice:":6" %}
                 {% with job=item.job %}

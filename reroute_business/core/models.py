@@ -55,3 +55,19 @@ class AnalyticsEvent(models.Model):
     def __str__(self) -> str:
         who = self.user.username if self.user else "anon"
         return f"{self.event_type} by {who} @ {self.created_at:%Y-%m-%d %H:%M:%S}"
+
+
+class OnboardingEvent(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="onboarding_events")
+    event = models.CharField(max_length=64, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["event", "created_at"]),
+        ]
+        ordering = ["-created_at", "-id"]
+
+    def __str__(self) -> str:
+        who = self.user.username if self.user else "anon"
+        return f"{self.event} by {who} @ {self.created_at:%Y-%m-%d %H:%M:%S}"

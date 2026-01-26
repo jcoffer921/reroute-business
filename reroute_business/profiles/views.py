@@ -19,9 +19,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils.safestring import mark_safe
 
- 
 
 from .models import UserProfile, EmployerProfile, Subscription
+from reroute_business.core.utils.onboarding import log_onboarding_event
 
 # Optional integrations — guarded to avoid hard crashes if app not installed
 try:
@@ -80,6 +80,18 @@ def is_employer(user) -> bool:
         return user.groups.filter(name__in=["Employer", "Employers"]).exists()
     except Exception:
         return False
+
+
+def _mark_profile_progress(profile: UserProfile) -> None:
+    try:
+        if profile.onboarding_step in {"start", ""}:
+            profile.onboarding_step = "profile_started"
+        profile.update_onboarding_flags()
+        profile.save(update_fields=["onboarding_step", "onboarding_completed", "early_access_priority"])
+        if profile.profile_is_complete():
+            log_onboarding_event(profile.user, "first_step_completed", once=True)
+    except Exception:
+        pass
 
 
 # ----------------------------- Public profile ---------------------------
@@ -224,6 +236,7 @@ def update_personal_info(request):
     if hasattr(profile, "zip_code"):
         profile.zip_code = zip_code
     profile.save()
+    _mark_profile_progress(profile)
 
     updated = {
         "firstname": first,
@@ -269,6 +282,7 @@ def update_emergency_contact(request):
     for k, v in data.items():
       setattr(profile, k, v)
     profile.save()
+    _mark_profile_progress(profile)
 
     updated = {**data, "emergency_contact_fullname": f"{data['emergency_contact_firstname']} {data['emergency_contact_lastname']}".strip()}
     return json_ok(updated) if is_ajax(request) else redirect("my_profile")
@@ -295,6 +309,7 @@ def update_employment_info(request):
         if post_key in request.POST and hasattr(profile, model_field):
             setattr(profile, model_field, request.POST.get(post_key))
     profile.save()
+    _mark_profile_progress(profile)
 
     # Return keys the frontend expects (see profile_panels.js mapping)
     updated = {
@@ -327,6 +342,7 @@ def update_demographics(request):
         if hasattr(profile, k):
             setattr(profile, k, v)
     profile.save()
+    _mark_profile_progress(profile)
 
     updated = {
         **payload,
@@ -345,6 +361,7 @@ def update_bio(request):
     bio = (request.POST.get("bio") or "").strip()
     profile.bio = bio
     profile.save()
+    _mark_profile_progress(profile)
     return json_ok({"bio": bio}) if is_ajax(request) else redirect("my_profile")
 
 
@@ -422,6 +439,7 @@ def update_profile_picture(request):
         profile = get_object_or_404(UserProfile, user=request.user)
         profile.profile_picture = image_file
         profile.save()
+        _mark_profile_progress(profile)
         messages.success(request, "Profile picture updated successfully.")
     return redirect("my_profile")
 
@@ -461,6 +479,7 @@ def update_profile_background(request):
         profile = get_object_or_404(UserProfile, user=request.user)
         profile.background_image = image_file
         profile.save(update_fields=["background_image"])
+        _mark_profile_progress(profile)
         messages.success(request, "Background image updated.")
     return redirect("my_profile")
 

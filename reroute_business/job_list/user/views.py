@@ -1,6 +1,7 @@
 # job_list/user/views.py
 
 from django.db.models import Q
+from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse, NoReverseMatch
@@ -29,6 +30,20 @@ def opportunities_view(request):
       - type=full_time|part_time|... (repeats allowed)
       - zip=19104 (optional) + radius=25 (miles, optional; default 25)
     """
+    jobs_live = bool(getattr(settings, "JOBS_LIVE", False))
+    if not jobs_live:
+        return render(request, 'job_list/user/opportunities.html', {
+            'jobs_live': False,
+            'jobs': [],
+            'saved_job_ids': set(),
+            'q': '',
+            'user_zip': '',
+            'radius': 25,
+            'selected_job_types': [],
+            'selected_preset_zip': '',
+            'selected_employer': '',
+        })
+
     jobs_qs = Job.objects.filter(is_active=True).select_related('employer').prefetch_related('skills_required')
 
     # --- Keyword search across key fields ---
@@ -91,6 +106,7 @@ def opportunities_view(request):
         )
 
     context = {
+        'jobs_live': True,
         'jobs': jobs,
         'saved_job_ids': saved_job_ids,
         # expose current filters for template state
@@ -134,6 +150,9 @@ def toggle_saved_job(request):
 
 # View details for a specific job
 def job_detail_view(request, job_id):
+    if not getattr(settings, "JOBS_LIVE", False):
+        messages.info(request, "Jobs are launching soon. We’ll notify you when postings go live.")
+        return redirect('opportunities')
     job = get_object_or_404(Job, id=job_id)
     return render(request, 'job_list/user/job_detail.html', {'job': job})
 
@@ -141,6 +160,9 @@ def job_detail_view(request, job_id):
 @require_POST
 @login_required
 def apply_to_job(request, job_id):
+    if not getattr(settings, "JOBS_LIVE", False):
+        messages.info(request, "Jobs are launching soon. We’ll notify you when postings go live.")
+        return redirect('opportunities')
     job = get_object_or_404(Job, pk=job_id)
     # Build a link to the applicant's public profile for the employer email/notifications.
     # Prefer namespaced route; fall back to global alias if project URLconf isn't namespaced.
@@ -203,6 +225,9 @@ def apply_to_job(request, job_id):
 
 # ---------- Scored matching ----------
 def match_jobs(request, seeker_id):
+    if not getattr(settings, "JOBS_LIVE", False):
+        messages.info(request, "Jobs are launching soon. We’ll notify you when postings go live.")
+        return redirect('opportunities')
     """Delegate to the shared matching module and render the matches page."""
     from reroute_business.job_list.matching import match_jobs_for_user
 

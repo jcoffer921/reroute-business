@@ -5,6 +5,7 @@ import os
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import HttpResponse, JsonResponse
@@ -21,6 +22,7 @@ inside the view that needs it to prevent 500s when opening other pages.
 """
 
 from reroute_business.profiles.models import UserProfile
+from reroute_business.core.utils.onboarding import log_onboarding_event
 from reroute_business.core.constants import RELATABLE_SKILLS
 from reroute_business.core.models import Skill
 
@@ -80,7 +82,25 @@ def _get_skill_categories():
 
 @login_required
 def resume_welcome(request):
-    return render(request, 'resumes/welcome.html')
+    try:
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        if profile.onboarding_step in {"start", "profile_started", "profile_completed"}:
+            profile.onboarding_step = "resume_started"
+            profile.save(update_fields=["onboarding_step"])
+    except Exception:
+        pass
+
+    try:
+        log_onboarding_event(request.user, "resume_started", once=True)
+    except Exception:
+        pass
+
+    return render(request, 'resumes/welcome.html', {
+        "early_access_message": (
+            "ReRoute is in early access. Employers and reentry organizations are onboarding now. "
+            "Completed profiles get priority access when jobs launch."
+        ),
+    })
 
 
 @login_required
@@ -98,6 +118,17 @@ def resume_import(request, resume_id):
     resume = get_object_or_404(Resume, id=resume_id, user=request.user)
 
     if request.method == "POST":
+        try:
+            profile, _ = UserProfile.objects.get_or_create(user=request.user)
+            profile.onboarding_step = "resume_completed"
+            profile.update_onboarding_flags(resume=resume)
+            profile.save(update_fields=["onboarding_step", "onboarding_completed", "early_access_priority"])
+        except Exception:
+            pass
+        try:
+            log_onboarding_event(request.user, "resume_completed", once=True)
+        except Exception:
+            pass
         messages.success(request, "✅ Resume saved to your profile successfully!")
         # Send users back to the dashboard's user view
         return redirect("dashboard:user")
@@ -193,6 +224,10 @@ def resume_import(request, resume_id):
 
 @login_required
 def resume_upload_page(request):
+    try:
+        log_onboarding_event(request.user, "resume_started", once=True)
+    except Exception:
+        pass
     return render(request, 'resumes/import_resume.html')
 
 
@@ -273,6 +308,17 @@ def parse_resume_upload(request):
             track_event(event_type='resume_imported', user=request.user, metadata={'resume_id': resume.id, 'ext': ext})
         except Exception:
             pass
+        try:
+            profile, _ = UserProfile.objects.get_or_create(user=request.user)
+            profile.onboarding_step = "resume_completed"
+            profile.update_onboarding_flags(resume=resume)
+            profile.save(update_fields=["onboarding_step", "onboarding_completed", "early_access_priority"])
+        except Exception:
+            pass
+        try:
+            log_onboarding_event(request.user, "resume_completed", once=True)
+        except Exception:
+            pass
 
         # Provide a redirect URL so the front-end doesn't hardcode paths
         from django.urls import reverse
@@ -315,6 +361,17 @@ def upload_resume_only(request):
         # Analytics: resume uploaded (file-only)
         try:
             track_event(event_type='resume_uploaded', user=request.user, metadata={'resume_id': resume.id, 'ext': ext})
+        except Exception:
+            pass
+        try:
+            profile, _ = UserProfile.objects.get_or_create(user=request.user)
+            profile.onboarding_step = "resume_completed"
+            profile.update_onboarding_flags(resume=resume)
+            profile.save(update_fields=["onboarding_step", "onboarding_completed", "early_access_priority"])
+        except Exception:
+            pass
+        try:
+            log_onboarding_event(request.user, "resume_completed", once=True)
         except Exception:
             pass
         # Send user to the dashboard router (chooses user/employer/admin)
@@ -478,6 +535,14 @@ def contact_info_step(request):
     Step 1: user-provided contact info (builder).
     """
     resume = _get_or_create_resume(request.user)
+    try:
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        if profile.onboarding_step in {"start", "profile_started", "profile_completed"}:
+            profile.onboarding_step = "resume_started"
+            profile.save(update_fields=["onboarding_step"])
+        log_onboarding_event(request.user, "resume_started", once=True)
+    except Exception:
+        pass
     # Do NOT create ContactInfo until we have valid POSTed data.
     try:
         contact_info = resume.contact_info
@@ -652,12 +717,28 @@ def created_resume_view(request, resume_id):
     # If you need profile data:
     profile = UserProfile.objects.filter(user=request.user).first()
 
+    try:
+        if profile:
+            profile.onboarding_step = "resume_completed"
+            profile.update_onboarding_flags(resume=resume)
+            profile.save(update_fields=["onboarding_step", "onboarding_completed", "early_access_priority"])
+    except Exception:
+        pass
+    try:
+        log_onboarding_event(request.user, "resume_completed", once=True)
+    except Exception:
+        pass
+
     return render(request, 'resumes/created_resume_view.html', {
         'resume': resume,
         'profile': profile,
         'contact_info': contact_info,
         'education_entries': education_entries,
         'experience_entries': experience_entries,
+        "early_access_message": (
+            "ReRoute is in early access. Employers and reentry organizations are onboarding now. "
+            "Completed profiles get priority access when jobs launch."
+        ),
     })
 
 

@@ -76,6 +76,25 @@ class UserProfile(models.Model):
         help_text="User-defined status reflecting their current journey.",
     )
 
+    # --- Onboarding (early access) ---
+    ONBOARDING_STEP_CHOICES = [
+        ("start", "Start"),
+        ("profile_started", "Profile started"),
+        ("profile_completed", "Profile completed"),
+        ("resume_started", "Resume started"),
+        ("resume_completed", "Resume completed"),
+        ("completed", "Completed"),
+    ]
+    onboarding_step = models.CharField(
+        max_length=32,
+        choices=ONBOARDING_STEP_CHOICES,
+        default="start",
+        blank=True,
+        help_text="Current onboarding milestone for the seeker.",
+    )
+    onboarding_completed = models.BooleanField(default=False)
+    early_access_priority = models.BooleanField(default=False)
+
     # --- Platform account control (NOT A ROLE FIELD) ---
     account_status = models.CharField(
         max_length=20,
@@ -134,6 +153,43 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.get_full_name() or self.user.username
+
+    # =========================
+    # Onboarding helpers
+    # =========================
+    def profile_is_complete(self) -> bool:
+        first = (self.firstname or self.user.first_name or "").strip()
+        last = (self.lastname or self.user.last_name or "").strip()
+        return bool(first and last and (self.bio or self.profile_picture))
+
+    def resume_is_complete(self, resume=None) -> bool:
+        if resume is None:
+            try:
+                from reroute_business.resumes.models import Resume
+                resume = Resume.objects.filter(user=self.user).order_by("-created_at").first()
+            except Exception:
+                resume = None
+        return bool(resume)
+
+    def update_onboarding_flags(self, resume=None) -> None:
+        profile_done = self.profile_is_complete()
+        resume_done = self.resume_is_complete(resume=resume)
+        self.early_access_priority = bool(profile_done and resume_done)
+        self.onboarding_completed = self.early_access_priority
+        if self.onboarding_completed:
+            self.onboarding_step = "completed"
+        elif resume_done:
+            self.onboarding_step = "resume_completed"
+        elif profile_done:
+            self.onboarding_step = "profile_completed"
+
+    def get_next_step_url(self) -> str:
+        from django.urls import reverse
+        if not self.profile_is_complete():
+            return reverse("profiles:my_profile")
+        if not self.resume_is_complete():
+            return reverse("resumes:resume_welcome")
+        return reverse("dashboard:user")
 
     class Meta:
         ordering = ['user_uid']

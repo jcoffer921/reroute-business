@@ -238,6 +238,10 @@ LOGOUT_REDIRECT_URL = '/'
 # Allauth relaxed flags for dev/demo
 DISABLE_ALLAUTH_EMAIL_VERIFICATION = True
 
+# ---------- Early access flags ----------
+EARLY_ACCESS_MODE = True
+JOBS_LIVE = False
+
 # --- Allow YouTube video embedding (fix for CSP blocking) ---
 from django.middleware.security import SecurityMiddleware
 

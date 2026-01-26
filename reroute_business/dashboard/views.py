@@ -3,6 +3,7 @@
 from datetime import timedelta
 
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
@@ -22,6 +23,7 @@ from reroute_business.job_list.matching import match_jobs_for_user
 
 # Profiles & resumes
 from reroute_business.profiles.models import UserProfile
+from reroute_business.core.utils.onboarding import log_onboarding_event
 from reroute_business.resumes.models import Education, Experience, Resume  # your resumes app owns these
 from reroute_business.resources.models import Module
 from reroute_business.reentry_org.models import ReentryOrganization, SavedOrganization
@@ -92,6 +94,12 @@ def user_dashboard(request):
     """
     # Ensure a profile exists to avoid template conditionals blowing up
     user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    early_access_mode = bool(getattr(settings, "EARLY_ACCESS_MODE", False))
+    jobs_live = bool(getattr(settings, "JOBS_LIVE", False))
+    early_access_message = (
+        "ReRoute is in early access. Employers and reentry organizations are onboarding now. "
+        "Completed profiles get priority access when jobs launch."
+    )
 
     # Latest imported resume (guard in case 'is_imported' doesn't exist)
     try:
@@ -126,9 +134,9 @@ def user_dashboard(request):
     step_order = ["profile", "resume", "saved_jobs"]
     current_step = next((name for name in step_order if not steps.get(name)), None)
 
-    # Suggested jobs: only attempt if we detect skills
+    # Suggested jobs: only attempt if we detect skills and jobs are live
     skills_list = extract_resume_skills(resume)
-    suggested_jobs = match_jobs_for_user(request.user)[:10] if skills_list else []
+    suggested_jobs = match_jobs_for_user(request.user)[:10] if (jobs_live and skills_list) else []
 
     # Compute a lightweight match % for suggested jobs (if skills available)
     suggested_cards = []
@@ -239,6 +247,41 @@ def user_dashboard(request):
 
     # Charts for seeker dashboard were removed per request.
 
+    # Sync onboarding flags (early access priority)
+    try:
+        user_profile.update_onboarding_flags(resume=resume)
+        user_profile.save(update_fields=["onboarding_step", "onboarding_completed", "early_access_priority"])
+    except Exception:
+        pass
+
+    if not user_profile.profile_is_complete():
+        next_step = {
+            "title": "Complete your profile",
+            "desc": "Add the basics so employers can understand your goals.",
+            "cta": "Complete profile",
+            "url": user_profile.get_next_step_url(),
+        }
+    elif not user_profile.resume_is_complete(resume=resume):
+        next_step = {
+            "title": "Build your resume",
+            "desc": "Create or upload a resume to unlock early access priority.",
+            "cta": "Build your resume",
+            "url": user_profile.get_next_step_url(),
+        }
+    else:
+        next_step = {
+            "title": "You’re ready",
+            "desc": "You’re in line for early access when employers launch jobs.",
+            "cta": "View dashboard",
+            "url": user_profile.get_next_step_url(),
+        }
+
+    # Log first dashboard visit for onboarding
+    try:
+        log_onboarding_event(request.user, "onboarding_started", once=True)
+    except Exception:
+        pass
+
     return render(request, 'dashboard/user_dashboard.html', {
         'profile': user_profile,
         'resume': resume,
@@ -268,6 +311,10 @@ def user_dashboard(request):
         'saved_jobs_count': saved_jobs_count,
         'organizations_saved_count': organizations_saved_count,
         'saved_org_ids': saved_org_ids,
+        'early_access_mode': early_access_mode,
+        'jobs_live': jobs_live,
+        'early_access_message': early_access_message,
+        'next_step': next_step,
     })
 
 

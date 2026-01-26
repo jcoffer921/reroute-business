@@ -49,6 +49,7 @@ from reroute_business.job_list.models import Application
 from reroute_business.main.forms import UserSignupForm
 from reroute_business.resumes.models import Resume
 from reroute_business.profiles.views import is_employer
+from reroute_business.core.utils.onboarding import log_onboarding_event
 
 
 # Optional dependency for contact form reCAPTCHA
@@ -147,6 +148,17 @@ def home(request):
         'FEATURED_LIMIT': FEATURED_LIMIT,
         'RECENT_LIMIT': RECENT_LIMIT,
     })
+
+
+@require_GET
+def early_access_cta(request):
+    try:
+        log_onboarding_event(request.user, "cta_clicked")
+    except Exception:
+        pass
+    if getattr(request.user, "is_authenticated", False):
+        return redirect("resumes:resume_welcome")
+    return redirect("signup")
 
 
 def about_us(request):
@@ -397,6 +409,11 @@ def signup_view(request):
                 # Create the user account
                 user = user_form.save()
 
+                try:
+                    log_onboarding_event(user, "signup_completed")
+                except Exception:
+                    pass
+
                 # Send verification email via allauth and show confirmation screen
                 if send_email_confirmation is not None:
                     try:
@@ -415,6 +432,10 @@ def signup_view(request):
             # Log full traceback to server logs and fall through to re-render
             logger.exception("Signup exception: %s", e)
 
+    try:
+        log_onboarding_event(request.user, "signup_started")
+    except Exception:
+        pass
     return render(request, 'main/signup.html', {
         'user_form': user_form,
         'recaptcha_site_key': getattr(settings, 'RECAPTCHA_SITE_KEY', None),

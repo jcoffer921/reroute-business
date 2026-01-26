@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import AnalyticsEvent, Skill, SuggestedSkill
+from .models import AnalyticsEvent, OnboardingEvent, Skill, SuggestedSkill
 
 
 @admin.register(AnalyticsEvent)
@@ -9,6 +9,15 @@ class AnalyticsEventAdmin(admin.ModelAdmin):
     list_display = ("event_type", "path", "user", "created_at")
     list_filter = ("event_type", "created_at")
     search_fields = ("path", "user__username", "user__email")
+    date_hierarchy = "created_at"
+    ordering = ("-created_at",)
+
+
+@admin.register(OnboardingEvent)
+class OnboardingEventAdmin(admin.ModelAdmin):
+    list_display = ("event", "user", "created_at")
+    list_filter = ("event", "created_at")
+    search_fields = ("event", "user__username", "user__email")
     date_hierarchy = "created_at"
     ordering = ("-created_at",)
 

@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{% static 'resumes/css/created_resume_view.css' %}">
 <link href="https://fonts.googleapis.com/css?family=Rokkitt:400,700|Lato:400,300" rel="stylesheet">
 
+{% if early_access_message %}
+  <div class="early-access-banner">{{ early_access_message }}</div>
+{% endif %}
+
 <!-- Toolbar: actions + style selector -->
 <div class="resume-toolbar">
   <div class="btns">
