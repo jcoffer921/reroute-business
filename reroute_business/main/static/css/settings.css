@@ -626,10 +626,14 @@ body.modal-open { overflow: hidden; }
   position: fixed;
   inset: 0;
   background: rgba(15, 23, 42, 0.55);
-  display: grid;
+  display: none;
   place-items: center;
   padding: 1.5rem;
   z-index: 3000;
+}
+
+.settings-modal.is-open {
+  display: grid;
 }
 
 .settings-modal__dialog {

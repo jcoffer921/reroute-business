@@ -55,6 +55,7 @@
   const openModal = (modal, trigger) => {
     if (!modal) return;
     lastFocused = trigger || document.activeElement;
+    modal.classList.add('is-open');
     modal.removeAttribute('hidden');
     modal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('modal-open');
@@ -64,6 +65,7 @@
 
   const closeModal = (modal) => {
     if (!modal) return;
+    modal.classList.remove('is-open');
     modal.setAttribute('hidden', '');
     modal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('modal-open');
@@ -90,7 +92,7 @@
 
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    const openModalEl = qs('.settings-modal:not([hidden])');
+    const openModalEl = qs('.settings-modal.is-open');
     if (openModalEl) closeModal(openModalEl);
   });
 

@@ -78,10 +78,20 @@ def role_flags(request):
     else:
         profile_url = reverse("login")
 
+    # Canonical public profile URL (read-only)
+    if is_auth:
+        try:
+            public_profile_url = reverse("profiles:public_profile", kwargs={"username": user.username})
+        except Exception:
+            public_profile_url = f"/profile/view/{user.username}/"
+    else:
+        public_profile_url = reverse("login")
+
     return {
         "IS_EMPLOYER": is_employer,
         "DASHBOARD_URL": dashboard_url,
         "PROFILE_URL": profile_url,
+        "PUBLIC_PROFILE_URL": public_profile_url,
         "COMPANY_LEGAL_NAME": getattr(settings, 'COMPANY_LEGAL_NAME', 'ReRoute Jobs, LLC'),
     }
 

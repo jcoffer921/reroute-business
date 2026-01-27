@@ -61,6 +61,7 @@
                     <div class="user-dropdown" id="userDropdown" role="menu" aria-labelledby="userMenuButton">
                         <a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a>
                         <a href="{% url 'dashboard:notifications' %}">Notifications{% if UNREAD_NOTIFICATIONS %}<span class="nav-badge">{{ UNREAD_NOTIFICATIONS }}</span>{% endif %}</a>
+                        <a href="{{ PUBLIC_PROFILE_URL }}">View Profile</a>
                         <a href="{{ PROFILE_URL }}">Profile Settings</a>
                         <a href="{% url 'contact' %}">Report Issues</a>
                         <a href="{% url 'settings' %}">Settings</a>
@@ -181,12 +182,12 @@
     {% if user.is_authenticated %}
     <div class="mobile-user-footer">
         {# ✅ Make the profile circle clickable to the profile page #}
-        <a href="{{ PROFILE_URL }}" class="user-initials-circle" aria-label="Go to your profile">
+        <a href="{{ PUBLIC_PROFILE_URL }}" class="user-initials-circle" aria-label="Go to your public profile">
         {{ user.first_name|default:user.username|slice:":1" }}{{ user.last_name|default:""|slice:":1" }}
         </a>
 
         {# (Optional) Make the name clickable too #}
-        <a href="{{ PROFILE_URL }}" class="mobile-user-name">
+        <a href="{{ PUBLIC_PROFILE_URL }}" class="mobile-user-name">
         {{ user.first_name|default:user.username }}
         </a>
 
