@@ -3,7 +3,7 @@
  * Purpose:
  *   - Accessible tab switching for public profile sections
  *   - Small UI niceties: copy-to-clipboard, simple POST actions (e.g., shortlist)
- *   - Zero overlap with owner slide-in edit logic (handled by profile_panels.js)
+ *   - Read-only public profile behavior only
  *
  * Assumptions:
  *   - Tabs use ARIA roles: [role="tablist"] > [role="tab"] with aria-controls -> [role="tabpanel"]

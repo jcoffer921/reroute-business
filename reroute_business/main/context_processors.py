@@ -69,22 +69,14 @@ def role_flags(request):
     else:
         dashboard_url = reverse("login")
 
-    # Canonical profile URL, role-aware, with safe fallbacks
-    if is_auth and is_employer:
-        # Try global name, then namespaced, then static path
+    # Canonical profile settings URL (private editor)
+    if is_auth:
         try:
-            profile_url = reverse("employer_profile")
+            profile_url = reverse("settings") + "?panel=profile"
         except Exception:
-            try:
-                profile_url = reverse("profiles:employer_profile")
-            except Exception:
-                profile_url = "/profile/employer/profile/"
+            profile_url = "/settings/?panel=profile"
     else:
-        # Default seeker profile
-        try:
-            profile_url = reverse("my_profile")
-        except Exception:
-            profile_url = "/profile/"
+        profile_url = reverse("login")
 
     return {
         "IS_EMPLOYER": is_employer,

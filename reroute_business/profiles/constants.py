@@ -38,6 +38,7 @@ GENDER_CHOICES = [
     ('male', 'Male'),
     ('non_binary', 'Non-Binary'),
     ('other', 'Other'),
+    ('prefer_not_to_say', 'Prefer not to say'),
 ]
 
 
@@ -80,4 +81,14 @@ USER_STATUS_CHOICES = [
     ('in_training', 'In Training or Education'),
     ('not_ready', 'Not Currently Seeking'),
     ('need_support', 'Needs Additional Support'),
+]
+
+PROFILE_GRADIENT_CHOICES = [
+    ("aurora", "Aurora"),
+    ("harbor", "Harbor"),
+    ("sunrise", "Sunrise"),
+    ("mint", "Mint"),
+    ("ember", "Ember"),
+    ("slate", "Slate"),
+    ("violet", "Violet"),
 ]

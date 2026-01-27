@@ -2,16 +2,31 @@
   document.addEventListener('DOMContentLoaded', function(){
     const navCards = document.querySelectorAll('.nav-card');
     const panels = document.querySelectorAll('.panel');
+
+    const setActivePanel = (id, updateUrl) => {
+      if (!id) return;
+      navCards.forEach(b => b.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      const btn = Array.from(navCards).find(b => b.getAttribute('data-panel') === id);
+      const panel = document.getElementById('panel-' + id);
+      if (btn) btn.classList.add('active');
+      if (panel) panel.classList.add('active');
+      if (updateUrl && window.history && window.history.replaceState) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('panel', id);
+        window.history.replaceState({}, '', url.toString());
+      }
+    };
+
     navCards.forEach(btn => {
       btn.addEventListener('click', () => {
         const id = btn.getAttribute('data-panel');
-        navCards.forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        panels.forEach(p=>p.classList.remove('active'));
-        const panel = document.getElementById('panel-' + id);
-        if (panel) panel.classList.add('active');
+        setActivePanel(id, true);
       });
     });
+
+    const panelParam = new URLSearchParams(window.location.search).get('panel');
+    if (panelParam) setActivePanel(panelParam, false);
 
     const form = document.getElementById('recoveryForm');
     if (!form) return;
@@ -54,4 +69,3 @@
     });
   });
 })();
-

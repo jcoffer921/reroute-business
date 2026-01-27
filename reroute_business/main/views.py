@@ -63,6 +63,7 @@ except Exception:
 # Local Imports
 # -----------------------------
 from reroute_business.profiles.models import EmployerProfile, UserProfile, Subscription
+from reroute_business.profiles.constants import GENDER_CHOICES, PROFILE_GRADIENT_CHOICES
 from reroute_business.main.models import YouTubeVideo
 try:
     # Optional: map gallery videos to interactive lessons when IDs match
@@ -1196,6 +1197,18 @@ def settings_view(request):
     # Ensure profile exists for preferences section
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
+    # Profile settings data (private profile editor)
+    try:
+        from reroute_business.resumes.models import Resume, Experience
+    except Exception:
+        Resume = None
+        Experience = None
+    resume = Resume.objects.filter(user=request.user).order_by("-created_at").first() if Resume else None
+    experiences = list(resume.experiences.all()) if resume else []
+    skills = list(profile.skills.all())
+    languages = list(profile.languages.all()) if hasattr(profile, "languages") else []
+    email_change_allowed = True
+
     # Account preferences form (username, display name, status)
     from .forms import AccountPreferencesForm, RecoveryOptionsForm
     initial_prefs = {
@@ -1322,6 +1335,21 @@ def settings_view(request):
         'is_employer': employer,
         'is_verified': is_verified,
         'subscription_pricing_url': subscription_pricing_url,
+        'profile_details': profile,
+        'profile_first_name': profile.firstname or request.user.first_name,
+        'profile_last_name': profile.lastname or request.user.last_name,
+        'profile_phone': profile.phone_number or '',
+        'profile_email': request.user.email or '',
+        'profile_gender': profile.gender or '',
+        'profile_user_uid': str(profile.user_uid),
+        'profile_bio': profile.bio or '',
+        'profile_skills': skills,
+        'profile_languages': languages,
+        'profile_experiences': experiences,
+        'profile_background_gradient': getattr(profile, "background_gradient", "") or "",
+        'profile_gradients': PROFILE_GRADIENT_CHOICES,
+        'gender_choices': GENDER_CHOICES,
+        'email_change_allowed': email_change_allowed,
     })
 
 # =========================================================================

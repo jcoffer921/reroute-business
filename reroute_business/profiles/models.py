@@ -14,6 +14,13 @@ from reroute_business.profiles.constants import USER_STATUS_CHOICES, YES_NO
 from reroute_business.core.models import Skill
 
 
+class Language(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class UserProfile(models.Model):
     """
     User-owned profile for job seekers.
@@ -28,6 +35,8 @@ class UserProfile(models.Model):
 
     # --- Skills owned by the user (kept) ---
     skills = models.ManyToManyField(Skill, blank=True)
+    # --- Languages owned by the user (kept) ---
+    languages = models.ManyToManyField(Language, blank=True)
 
     # --- Step 1: Basic Profile Details ---
     firstname = models.CharField(max_length=50, blank=True)
@@ -44,6 +53,7 @@ class UserProfile(models.Model):
     # --- Step 2: Additional Info ---
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     background_image = models.ImageField(upload_to='users/backgrounds/', blank=True, null=True)
+    background_gradient = models.CharField(max_length=50, blank=True)
     birthdate = models.DateField(blank=True, null=True)
     pronouns = models.CharField(max_length=50, blank=True)
     native_language = models.CharField(max_length=100, blank=True)
@@ -186,7 +196,7 @@ class UserProfile(models.Model):
     def get_next_step_url(self) -> str:
         from django.urls import reverse
         if not self.profile_is_complete():
-            return reverse("profiles:my_profile")
+            return f"{reverse('settings')}?panel=profile"
         if not self.resume_is_complete():
             return reverse("resumes:resume_welcome")
         return reverse("dashboard:user")

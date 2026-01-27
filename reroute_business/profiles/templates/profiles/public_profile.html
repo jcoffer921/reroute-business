@@ -4,95 +4,113 @@
 {% block title %}ReRoute | Public Profile{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/employer_public_profile.css' %}">
 <link rel="stylesheet" href="{% static 'css/public_profile.css' %}">
 
-<div class="employer-public" data-user="{{ viewed_user.username }}">
-  <!-- Hero / Header -->
-  <section class="hero">
-    {% if profile.background_image %}
-      <div class="hero-bg" style="background-image: url('{{ profile.background_image.url }}');"></div>
-    {% elif profile.profile_picture %}
-      <div class="hero-bg" style="background-image: url('{{ profile.profile_picture.url }}');"></div>
-    {% else %}
-      <div class="hero-bg hero-bg--color"></div>
-      <div class="hero-watermark" style="background-image: url('{% static 'images/reroute-trans-logo.png' %}');"></div>
-    {% endif %}
-    <div class="hero-gradient"></div>
-    <div class="hero-content">
-      {% if profile.profile_picture %}
-        <img class="hero-logo" style="border-radius:50%" src="{{ profile.profile_picture.url }}" alt="{{ viewed_user.username }} avatar">
-      {% else %}
-        <div class="hero-logo hero-logo--initials" style="border-radius:50%" aria-hidden="true">
-          {% with fn=viewed_user.first_name ln=viewed_user.last_name %}
-            {% if fn or ln %}{{ fn|slice:':1' }}{{ ln|slice:':1' }}{% else %}{{ viewed_user.username|slice:':2' }}{% endif %}
-          {% endwith %}
+<div class="public-profile" data-user="{{ viewed_user.username }}">
+  <section class="profile-hero gradient-{{ gradient_key }}"></section>
+
+  <section class="profile-content">
+    <div class="profile-card">
+      <div class="profile-grid">
+        <aside class="profile-col profile-col--left">
+          <div class="profile-identity">
+            <div class="profile-avatar">
+              {% if profile.profile_picture %}
+                <img src="{{ profile.profile_picture.url }}" alt="{{ display_name }} avatar">
+              {% else %}
+                <div class="profile-avatar__initials" aria-hidden="true">
+                  {% if display_first or display_last %}
+                    {{ display_first|slice:':1' }}{{ display_last|slice:':1' }}
+                  {% else %}
+                    {{ viewed_user.username|slice:':2' }}
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+            <h1 class="profile-name">{{ display_name }}</h1>
+            {% if profile.verified %}
+              <span class="hero-verified hero-verified--sm" title="Verified">Verified</span>
+            {% endif %}
+          </div>
+
+          <div class="profile-section">
+            <h2 class="profile-section-title">General</h2>
+            <div class="profile-info">
+              <div class="info-row">
+                <span class="label">Phone</span>
+                <span class="value">{{ profile.phone_number|default:"—" }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Email</span>
+                <span class="value">{{ profile.personal_email|default:"—" }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Gender</span>
+                <span class="value">{{ profile.gender|default:"—" }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-section">
+            <h2 class="profile-section-title">Languages</h2>
+            <div class="pill-row">
+              {% for language in languages %}
+                <span class="pill-chip">{{ language.name }}</span>
+              {% empty %}
+                <span class="muted">—</span>
+              {% endfor %}
+            </div>
+          </div>
+        </aside>
+
+        <div class="profile-col profile-col--right">
+          <div class="profile-section">
+            <h2 class="profile-section-title">Who Am I?</h2>
+            <div class="profile-body-text">
+              {% if profile.bio %}
+                {{ profile.bio|linebreaksbr }}
+              {% else %}
+                <span class="muted">This user hasn't added a bio yet.</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="profile-section">
+            <h2 class="profile-section-title">Experience</h2>
+            <div class="experience-list">
+              {% for exp in experiences %}
+                <div class="experience-item">
+                  <div class="experience-header">
+                    <div class="experience-title">{{ exp.job_title }}</div>
+                    <div class="experience-company">{{ exp.company }}</div>
+                    <div class="experience-dates">
+                      {{ exp.start_date|date:"M Y" }}
+                      {% if exp.end_date %}— {{ exp.end_date|date:"M Y" }}{% elif exp.currently_work_here %}— Present{% endif %}
+                    </div>
+                  </div>
+                  {% if exp.description %}
+                    <p class="experience-desc">{{ exp.description }}</p>
+                  {% endif %}
+                </div>
+              {% empty %}
+                <div class="muted">No experience added yet.</div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="profile-section">
+            <h2 class="profile-section-title">Skills</h2>
+            <div class="pill-row">
+              {% for skill in skills %}
+                <span class="pill-chip">{{ skill.name }}</span>
+              {% empty %}
+                <span class="muted">—</span>
+              {% endfor %}
+            </div>
+          </div>
         </div>
-      {% endif %}
-
-      <div class="hero-text">
-        <h1 class="hero-name">{% with full=viewed_user.get_full_name %}{% if full %}{{ full }}{% else %}@{{ viewed_user.username }}{% endif %}{% endwith %}</h1>
-        {% if profile.verified %}
-          <span class="hero-verified hero-verified--sm" title="Verified">Verified</span>
-        {% endif %}
-        <div class="hero-sub">User ID: {{ profile.user_uid|stringformat:"s" }}</div>
-      </div>
-
-      <div class="hero-meta-right">
-        <div><span class="label">Date Joined</span> {{ viewed_user.date_joined|date:"M j, Y" }}</div>
-        <div><span class="label">Status</span> {{ profile.account_status|capfirst }}</div>
       </div>
     </div>
-  </section>
-
-  <hr class="section-sep">
-
-  <!-- Who You Are (clean, matches private profile) -->
-  <div class="section-divider"></div>
-  <section class="section">
-    <div class="info-header">
-      <h2 class="section-title">Who You Are</h2>
-    </div>
-    <div class="about-text">
-      {% if profile.bio %}
-        {{ profile.bio|linebreaksbr }}
-      {% else %}
-        <em class="muted">No bio yet.</em>
-      {% endif %}
-    </div>
-  </section>
-
-  <!-- General Info (clean) -->
-  <section class="section section-info">
-    <div class="info-header">
-      <h2 class="section-title">General Info</h2>
-    </div>
-    <div class="info-grid">
-      <div class="info-item"><div class="label">Phone</div><div class="value">{{ profile.phone_number|default:'—' }}</div></div>
-      <div class="info-item"><div class="label">Email</div><div class="value">{{ profile.personal_email|default:'—' }}</div></div>
-      <div class="info-item"><div class="label">DOB</div><div class="value">{{ profile.birthdate|date:'M j, Y'|default:'—' }}</div></div>
-      <div class="info-item"><div class="label">Gender</div><div class="value">{{ profile.gender|default:'—' }}</div></div>
-    </div>
-  </section>
-
-  <hr class="section-sep">
-
-  <!-- Resume -->
-  <section class="section">
-    <div class="info-header">
-      <h2 class="section-title">Resume</h2>
-      {% if resume %}
-        <div style="display:flex; gap:.6rem; align-items:center;">
-          <a class="btn-view-all" href="{% url 'resumes:employer_view_resume' viewed_user.username %}">View Resume</a>
-          <a class="btn-view-all" href="{% url 'resumes:employer_download_resume' viewed_user.username %}">Download</a>
-        </div>
-      {% endif %}
-    </div>
-    {% if not resume %}
-      <p class="muted">No resume available.</p>
-    {% endif %}
   </section>
 </div>
-
-<script src="{% static 'js/employer_public_profile.js' %}"></script>
 {% endblock %}

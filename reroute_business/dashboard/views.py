@@ -4,13 +4,14 @@ from datetime import timedelta
 
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.timezone import now
 from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.db.models import Q
+from django.http import JsonResponse
 
 
 
@@ -22,9 +23,12 @@ from django.db.utils import ProgrammingError
 from reroute_business.job_list.matching import match_jobs_for_user
 
 # Profiles & resumes
-from reroute_business.profiles.models import UserProfile
+from reroute_business.profiles.models import UserProfile, Language
+from reroute_business.profiles.constants import PROFILE_GRADIENT_CHOICES, GENDER_CHOICES
+from reroute_business.core.models import Skill
 from reroute_business.core.utils.onboarding import log_onboarding_event
 from reroute_business.resumes.models import Education, Experience, Resume  # your resumes app owns these
+from PIL import Image, UnidentifiedImageError
 from reroute_business.resources.models import Module
 from reroute_business.reentry_org.models import ReentryOrganization, SavedOrganization
 
@@ -65,6 +69,17 @@ def extract_resume_skills(resume):
     # Case B: Text field
     raw = getattr(resume, "skills", "") or ""
     return [s.strip() for s in raw.split(",") if s.strip()]
+
+
+def _json_ok(payload=None, status=200):
+    data = {"ok": True}
+    if payload:
+        data.update(payload)
+    return JsonResponse(data, status=status)
+
+
+def _json_err(errors, status=400):
+    return JsonResponse({"ok": False, "errors": errors}, status=status)
 
 
 # =========================
@@ -1537,3 +1552,274 @@ def remove_flagged_job(request, job_id: int):
 
     messages.success(request, f"Removed (deactivated): {job.title}")
     return redirect('dashboard:admin')
+
+
+# =========================
+# Profile Settings (Private)
+# =========================
+def _allowed_profile_gradients():
+    return {key for key, _label in PROFILE_GRADIENT_CHOICES}
+
+
+def _validate_image_upload(image_file, max_bytes):
+    if max_bytes and image_file.size > max_bytes:
+        return "Image exceeds the maximum upload size."
+    try:
+        img = Image.open(image_file)
+        img.verify()
+        if img.format and img.format.lower() not in {"jpeg", "jpg", "png", "gif", "webp"}:
+            return "Unsupported image format. Use JPEG, PNG, GIF, or WebP."
+    except UnidentifiedImageError:
+        return "Invalid image file. Please upload a real image."
+    return None
+
+
+def _touch_profile_progress(profile):
+    try:
+        profile.update_onboarding_flags()
+        profile.save(update_fields=["onboarding_step", "onboarding_completed", "early_access_priority"])
+    except Exception:
+        pass
+
+
+@login_required
+@require_POST
+def profile_details_update(request):
+    profile = get_object_or_404(UserProfile, user=request.user)
+    first = (request.POST.get("first_name") or "").strip()
+    last = (request.POST.get("last_name") or "").strip()
+    email = (request.POST.get("email") or "").strip()
+    phone = (request.POST.get("phone") or "").strip()
+    gender = (request.POST.get("gender") or "").strip()
+
+    errors = {}
+    if not first:
+        errors["first_name"] = "First name is required."
+    if not last:
+        errors["last_name"] = "Last name is required."
+
+    allowed_genders = {value for value, _label in GENDER_CHOICES}
+    if gender and gender not in allowed_genders:
+        errors["gender"] = "Please choose a valid option."
+
+    allow_email_change = bool(getattr(settings, "ALLOW_PROFILE_EMAIL_CHANGE", True))
+    if email and allow_email_change:
+        from django.contrib.auth.models import User
+        if User.objects.filter(email__iexact=email).exclude(pk=request.user.pk).exists():
+            errors["email"] = "That email is already in use."
+    elif email and not allow_email_change:
+        errors["email"] = "Email changes are not allowed right now."
+
+    if errors:
+        return _json_err(errors, status=400)
+
+    if first != request.user.first_name or last != request.user.last_name:
+        request.user.first_name = first
+        request.user.last_name = last
+        request.user.save(update_fields=["first_name", "last_name"])
+
+    if allow_email_change and email and email != request.user.email:
+        request.user.email = email
+        request.user.save(update_fields=["email"])
+
+    profile.firstname = first
+    profile.lastname = last
+    profile.phone_number = phone
+    profile.gender = gender
+    profile.save(update_fields=["firstname", "lastname", "phone_number", "gender"])
+    _touch_profile_progress(profile)
+
+    return _json_ok({
+        "first_name": first,
+        "last_name": last,
+        "email": request.user.email,
+        "phone": phone,
+        "gender": gender,
+    })
+
+
+@login_required
+@require_POST
+def profile_avatar_upload(request):
+    profile = get_object_or_404(UserProfile, user=request.user)
+    image_file = request.FILES.get("avatar")
+    if not image_file:
+        return _json_err({"avatar": "Please choose an image to upload."}, status=400)
+
+    max_bytes = getattr(settings, "PROFILE_IMAGE_MAX_BYTES", None)
+    if not max_bytes:
+        max_bytes = getattr(settings, "FILE_UPLOAD_MAX_MEMORY_SIZE", 5 * 1024 * 1024)
+    error = _validate_image_upload(image_file, max_bytes)
+    if error:
+        return _json_err({"avatar": error}, status=400)
+
+    profile.profile_picture = image_file
+    profile.save(update_fields=["profile_picture"])
+    _touch_profile_progress(profile)
+    return _json_ok({"avatar_url": profile.profile_picture.url})
+
+
+@login_required
+@require_POST
+def profile_avatar_delete(request):
+    profile = get_object_or_404(UserProfile, user=request.user)
+    if profile.profile_picture:
+        profile.profile_picture.delete(save=False)
+        profile.profile_picture = None
+        profile.save(update_fields=["profile_picture"])
+    _touch_profile_progress(profile)
+    return _json_ok({"avatar_url": ""})
+
+
+@login_required
+@require_POST
+def profile_background_set(request):
+    profile = get_object_or_404(UserProfile, user=request.user)
+    gradient = (request.POST.get("gradient") or "").strip()
+    allowed = _allowed_profile_gradients()
+    if gradient not in allowed:
+        return _json_err({"gradient": "Please select a valid background."}, status=400)
+    profile.background_gradient = gradient
+    profile.save(update_fields=["background_gradient"])
+    return _json_ok({"gradient": gradient})
+
+
+@login_required
+@require_POST
+def profile_bio_update(request):
+    profile = get_object_or_404(UserProfile, user=request.user)
+    bio = (request.POST.get("bio") or "").strip()
+    max_len = int(getattr(settings, "PROFILE_BIO_MAX_CHARS", 600))
+    if len(bio) > max_len:
+        return _json_err({"bio": f"Bio must be {max_len} characters or fewer."}, status=400)
+    profile.bio = bio
+    profile.save(update_fields=["bio"])
+    _touch_profile_progress(profile)
+    return _json_ok({"bio": bio})
+
+
+@login_required
+@require_POST
+def profile_experience_add(request):
+    resume = Resume.objects.filter(user=request.user).order_by("-created_at").first()
+    if not resume:
+        resume = Resume.objects.create(user=request.user)
+
+    job_title = (request.POST.get("job_title") or "").strip()
+    company = (request.POST.get("company") or "").strip()
+    start_date = (request.POST.get("start_date") or "").strip()
+    end_date = (request.POST.get("end_date") or "").strip()
+    currently_work_here = (request.POST.get("currently_work_here") or "") == "on"
+    description = (request.POST.get("description") or "").strip()
+
+    errors = {}
+    if not job_title:
+        errors["job_title"] = "Job title is required."
+    if not company:
+        errors["company"] = "Company is required."
+    if not start_date:
+        errors["start_date"] = "Start date is required."
+
+    if errors:
+        return _json_err(errors, status=400)
+
+    from django.utils.dateparse import parse_date
+    start_dt = parse_date(start_date)
+    end_dt = parse_date(end_date) if end_date else None
+    if not start_dt:
+        return _json_err({"start_date": "Start date is invalid."}, status=400)
+    if end_date and not end_dt:
+        return _json_err({"end_date": "End date is invalid."}, status=400)
+    if currently_work_here:
+        end_dt = None
+
+    experience = Experience.objects.create(
+        resume=resume,
+        job_title=job_title,
+        company=company,
+        start_date=start_dt,
+        end_date=end_dt,
+        currently_work_here=currently_work_here,
+        description=description,
+    )
+    return _json_ok({
+        "experience": {
+            "id": experience.id,
+            "job_title": experience.job_title,
+            "company": experience.company,
+            "start_date": experience.start_date.isoformat(),
+            "end_date": experience.end_date.isoformat() if experience.end_date else "",
+            "currently_work_here": experience.currently_work_here,
+            "description": experience.description or "",
+        }
+    })
+
+
+@login_required
+@require_POST
+def profile_experience_delete(request, experience_id):
+    experience = get_object_or_404(Experience, id=experience_id, resume__user=request.user)
+    experience.delete()
+    return _json_ok({"deleted": experience_id})
+
+
+@login_required
+@require_POST
+def profile_skill_add(request):
+    profile = get_object_or_404(UserProfile, user=request.user)
+    name = (request.POST.get("skill") or "").strip()
+    if not name:
+        return _json_err({"skill": "Enter a skill to add."}, status=400)
+    if len(name) > 40:
+        return _json_err({"skill": "Skill must be 40 characters or fewer."}, status=400)
+    if profile.skills.filter(name__iexact=name).exists():
+        skills = [{"id": s.id, "name": s.name} for s in profile.skills.all().order_by("name")]
+        return _json_ok({"skills": skills})
+
+    existing = Skill.objects.filter(name__iexact=name).first()
+    if not existing:
+        existing = Skill.objects.create(name=name)
+    profile.skills.add(existing)
+    skills = [{"id": s.id, "name": s.name} for s in profile.skills.all().order_by("name")]
+    return _json_ok({"skills": skills})
+
+
+@login_required
+@require_POST
+def profile_skill_delete(request, skill_id):
+    profile = get_object_or_404(UserProfile, user=request.user)
+    skill = get_object_or_404(Skill, id=skill_id)
+    profile.skills.remove(skill)
+    skills = [{"id": s.id, "name": s.name} for s in profile.skills.all().order_by("name")]
+    return _json_ok({"skills": skills})
+
+
+@login_required
+@require_POST
+def profile_language_add(request):
+    profile = get_object_or_404(UserProfile, user=request.user)
+    name = (request.POST.get("language") or "").strip()
+    if not name:
+        return _json_err({"language": "Enter a language to add."}, status=400)
+    if len(name) > 40:
+        return _json_err({"language": "Language must be 40 characters or fewer."}, status=400)
+    if profile.languages.filter(name__iexact=name).exists():
+        languages = [{"id": l.id, "name": l.name} for l in profile.languages.all().order_by("name")]
+        return _json_ok({"languages": languages})
+
+    existing = Language.objects.filter(name__iexact=name).first()
+    if not existing:
+        existing = Language.objects.create(name=name)
+    profile.languages.add(existing)
+    languages = [{"id": l.id, "name": l.name} for l in profile.languages.all().order_by("name")]
+    return _json_ok({"languages": languages})
+
+
+@login_required
+@require_POST
+def profile_language_delete(request, language_id):
+    profile = get_object_or_404(UserProfile, user=request.user)
+    language = get_object_or_404(Language, id=language_id)
+    profile.languages.remove(language)
+    languages = [{"id": l.id, "name": l.name} for l in profile.languages.all().order_by("name")]
+    return _json_ok({"languages": languages})

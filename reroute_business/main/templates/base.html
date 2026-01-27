@@ -61,7 +61,7 @@
                     <div class="user-dropdown" id="userDropdown" role="menu" aria-labelledby="userMenuButton">
                         <a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a>
                         <a href="{% url 'dashboard:notifications' %}">Notifications{% if UNREAD_NOTIFICATIONS %}<span class="nav-badge">{{ UNREAD_NOTIFICATIONS }}</span>{% endif %}</a>
-                        <a href="{{ PROFILE_URL }}">Profile</a>
+                        <a href="{{ PROFILE_URL }}">Profile Settings</a>
                         <a href="{% url 'contact' %}">Report Issues</a>
                         <a href="{% url 'settings' %}">Settings</a>
                         <form method="POST" action="{% url 'logout' %}" class="m-0">

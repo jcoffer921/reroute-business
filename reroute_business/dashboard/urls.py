@@ -45,4 +45,17 @@ urlpatterns = [
     path('employer/interviews/cancel/', views.cancel_interview, name='cancel_interview'),
     path('employer/job/<int:job_id>/matches/', views.employer_job_matches, name='employer_job_matches'),
     path('employer/matcher/', views.employer_matcher, name='employer_matcher'),
+
+    # ===== Profile Settings (private) =====
+    path('settings/profile/details/update/', views.profile_details_update, name='profile_details_update'),
+    path('settings/profile/avatar/upload/', views.profile_avatar_upload, name='profile_avatar_upload'),
+    path('settings/profile/avatar/delete/', views.profile_avatar_delete, name='profile_avatar_delete'),
+    path('settings/profile/background/set/', views.profile_background_set, name='profile_background_set'),
+    path('settings/profile/bio/update/', views.profile_bio_update, name='profile_bio_update'),
+    path('settings/profile/experience/add/', views.profile_experience_add, name='profile_experience_add'),
+    path('settings/profile/experience/<int:experience_id>/delete/', views.profile_experience_delete, name='profile_experience_delete'),
+    path('settings/profile/skill/add/', views.profile_skill_add, name='profile_skill_add'),
+    path('settings/profile/skill/<int:skill_id>/delete/', views.profile_skill_delete, name='profile_skill_delete'),
+    path('settings/profile/language/add/', views.profile_language_add, name='profile_language_add'),
+    path('settings/profile/language/<int:language_id>/delete/', views.profile_language_delete, name='profile_language_delete'),
 ]

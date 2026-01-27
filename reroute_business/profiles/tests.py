@@ -34,11 +34,13 @@ class ProfileRoutingTests(TestCase):
         req.user = self.user
         ctx = role_flags(req)
         self.assertIn('PROFILE_URL', ctx)
-        self.assertTrue(ctx['PROFILE_URL'].endswith('/profile/'))
+        self.assertIn('/settings/', ctx['PROFILE_URL'])
+        self.assertIn('panel=profile', ctx['PROFILE_URL'])
 
     def test_context_processor_profile_url_employer(self):
         req = self.factory.get('/')
         req.user = self.employer
         ctx = role_flags(req)
         self.assertIn('PROFILE_URL', ctx)
-        self.assertIn('/profile/employer/profile/', ctx['PROFILE_URL'])
+        self.assertIn('/settings/', ctx['PROFILE_URL'])
+        self.assertIn('panel=profile', ctx['PROFILE_URL'])
