@@ -102,13 +102,25 @@
         <p class="help-text mt--4 text-gray-500">Update your profile photo, background, and private info.</p>
         <div class="profile-settings-grid">
           <div class="profile-avatar-block">
-            <div class="avatar-shell">
+            <div class="avatar-shell {% if not profile_details.profile_picture %}avatar-shell--empty{% endif %}">
               <img
                 id="profileAvatarPreview"
                 class="avatar-image"
-                src="{% if profile_details.profile_picture %}{{ profile_details.profile_picture.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}"
+                src="{% if profile_details.profile_picture %}{{ profile_details.profile_picture.url }}{% else %}#{% endif %}"
                 alt="Profile photo"
+                {% if not profile_details.profile_picture %}aria-hidden="true"{% endif %}
               >
+              <div id="profileAvatarInitials" class="avatar-initials" aria-hidden="{% if profile_details.profile_picture %}true{% else %}false{% endif %}">
+                {% with fn=profile_first_name|default:'' ln=profile_last_name|default:'' %}
+                  {% if fn and ln %}
+                    {{ fn|slice:":1" }}{{ ln|slice:":1" }}
+                  {% elif fn %}
+                    {{ fn|slice:":1" }}
+                  {% else %}
+                    U
+                  {% endif %}
+                {% endwith %}
+              </div>
               <button type="button" class="avatar-camera-btn" id="avatarUploadTrigger" aria-label="Change profile photo">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
                   <path d="M4 7h3l2-2h6l2 2h3v12H4V7z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
@@ -152,12 +164,12 @@
           {% csrf_token %}
           <div class="form-row-2">
             <div class="form-group">
-              <label for="profile_first_name">First Name <span class="hint">(required)</span></label>
-              <input type="text" id="profile_first_name" name="first_name" value="{{ profile_first_name }}" required>
+              <label for="profile_first_name">First Name<span class="required-asterisk" aria-hidden="true">*</span></label>
+              <input type="text" id="profile_first_name" name="first_name" value="{{ profile_first_name }}" required aria-required="true">
             </div>
             <div class="form-group">
-              <label for="profile_last_name">Last Name <span class="hint">(required)</span></label>
-              <input type="text" id="profile_last_name" name="last_name" value="{{ profile_last_name }}" required>
+              <label for="profile_last_name">Last Name<span class="required-asterisk" aria-hidden="true">*</span></label>
+              <input type="text" id="profile_last_name" name="last_name" value="{{ profile_last_name }}" required aria-required="true">
             </div>
           </div>
           <div class="form-row-2">

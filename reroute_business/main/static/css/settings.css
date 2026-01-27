@@ -111,6 +111,12 @@ label {
   color: #1f2937;
 }
 
+.required-asterisk {
+  color: #dc2626;
+  font-weight: 700;
+  margin-left: 2px;
+}
+
 input[type="text"],
 input[type="email"],
 input[type="password"] {
@@ -444,6 +450,14 @@ button.danger {
   height: 140px;
 }
 
+.avatar-shell--empty .avatar-image {
+  display: none;
+}
+
+.avatar-shell--empty .avatar-initials {
+  display: grid;
+}
+
 .avatar-image {
   width: 140px;
   height: 140px;
@@ -451,6 +465,22 @@ button.danger {
   object-fit: cover;
   border: 3px solid #e2e8f0;
   box-shadow: 0 6px 16px rgba(15, 23, 42, 0.15);
+}
+
+.avatar-initials {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  display: none;
+  place-items: center;
+  border: 3px solid #e2e8f0;
+  background: linear-gradient(135deg, #0f172a, #2563eb);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 2.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
 }
 
 .avatar-camera-btn {
@@ -645,6 +675,8 @@ body.modal-open { overflow: hidden; }
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
   display: grid;
   gap: 1rem;
+  max-height: min(85vh, 900px);
+  overflow-y: auto;
 }
 
 .settings-modal__dialog--wide {

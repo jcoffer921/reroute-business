@@ -101,6 +101,8 @@
   const avatarInput = qs('#profileAvatarInput');
   const avatarPreview = qs('#profileAvatarPreview');
   const avatarDeleteBtn = qs('#avatarDeleteBtn');
+  const avatarShell = qs('.avatar-shell');
+  const avatarInitials = qs('#profileAvatarInitials');
 
   if (avatarTrigger && avatarInput) {
     avatarTrigger.addEventListener('click', () => avatarInput.click());
@@ -116,7 +118,10 @@
       }
       if (avatarPreview && data.avatar_url) {
         avatarPreview.src = `${data.avatar_url}?v=${Date.now()}`;
+        avatarPreview.removeAttribute('aria-hidden');
       }
+      if (avatarShell) avatarShell.classList.remove('avatar-shell--empty');
+      if (avatarInitials) avatarInitials.setAttribute('aria-hidden', 'true');
       showToast('Profile photo updated.');
     });
   }
@@ -129,7 +134,12 @@
         showToast('Unable to remove photo.', true);
         return;
       }
-      if (avatarPreview) avatarPreview.src = urls.avatarDefault;
+      if (avatarPreview) {
+        avatarPreview.src = '#';
+        avatarPreview.setAttribute('aria-hidden', 'true');
+      }
+      if (avatarShell) avatarShell.classList.add('avatar-shell--empty');
+      if (avatarInitials) avatarInitials.setAttribute('aria-hidden', 'false');
       showToast('Profile photo removed.');
     });
   }
