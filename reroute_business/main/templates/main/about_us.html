@@ -35,67 +35,55 @@
   <div class="founders-header reveal">
     <h2>Meet the Founders</h2>
   </div>
-  <div class="founders-carousel reveal-group" data-carousel>
-    <button class="carousel-btn prev" type="button" aria-label="Previous founder" data-carousel-prev>
-      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </button>
-    <div class="founders-viewport">
-      <div class="founders-track" data-carousel-track>
-        <article class="founder-card reveal-item">
-          <div class="founder-content">
-            <h3 class="founder-name">Jason Coffer</h3>
-            <p class="founder-role">CTO</p>
-            <p class="founder-bio">
-              Technical co-founder. Leads software development and product architecture at ReRoute. Jason attends
-              Pennsylvania State University, where he is studying Software Engineering and Computer Science. Born and raised
-              in Philadelphia, he is passionate about using technology to create social impact to help improve the lives of those
-              in underrepresented communities.
-            </p>
-          </div>
-          <div class="founder-image">
-            <img src="{% static 'images/team/jason.jpg' %}" alt="Jason">
-          </div>
-        </article>
-        <article class="founder-card reveal-item">
-          <div class="founder-content">
-            <h3 class="founder-name">Jackson Miller</h3>
-            <p class="founder-role">CMO</p>
-            <p class="founder-bio">
-              Marketing strategist. A gifted storyteller and content creator, he leads our branding efforts and works
-              to dismantle stigma around reentry through powerful media campaigns. Jackson attended the Hampton University
-              and is now a freelance Social Media and Brand Strategist Consultant. He is also in the process of starting his
-              own affordable clothing line geared towards helping people express themselves through fashion.
-            </p>
-          </div>
-          <div class="founder-image">
-            <img src="{% static 'images/team/jackson.jpg' %}" alt="Jackson">
-          </div>
-        </article>
-        <article class="founder-card reveal-item">
-          <div class="founder-content">
-            <h3 class="founder-name">Derrick Melvin</h3>
-            <p class="founder-role">COO</p>
-            <p class="founder-bio">
-              Business strategist. With a sharp eye for sustainability and scalability, he makes sure ReRoute grows
-              responsibly while staying aligned with its mission to serve justice-impacted individuals. Derrick is also a
-              full-time student at Howard University, studying Economics and Sports Administration. He also looks forward
-              to practicing law and is passionate about community development.
-            </p>
-          </div>
-          <div class="founder-image">
-            <img src="{% static 'images/team/derrick.jpg' %}" alt="Derrick">
-          </div>
-        </article>
+  <div class="founders-grid reveal-group">
+    <article class="founder-block reveal-item">
+      <div class="founder-image">
+        <div class="founder-image-backdrop" aria-hidden="true"></div>
+        <img src="{% static 'images/team/jason.jpg' %}" alt="Jason">
       </div>
-    </div>
-    <button class="carousel-btn next" type="button" aria-label="Next founder" data-carousel-next>
-      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </button>
-    <div class="founders-dots" data-carousel-dots></div>
+      <div class="founder-content">
+        <h3 class="founder-name">Jason Coffer</h3>
+        <p class="founder-role">CTO</p>
+        <p class="founder-bio">
+          Technical co-founder. Leads software development and product architecture at ReRoute. Jason attends
+          Pennsylvania State University, where he is studying Software Engineering and Computer Science. Born and raised
+          in Philadelphia, he is passionate about using technology to create social impact to help improve the lives of those
+          in underrepresented communities.
+        </p>
+      </div>
+    </article>
+    <article class="founder-block reveal-item is-flipped">
+      <div class="founder-image">
+        <div class="founder-image-backdrop" aria-hidden="true"></div>
+        <img src="{% static 'images/team/jackson.jpg' %}" alt="Jackson">
+      </div>
+      <div class="founder-content">
+        <h3 class="founder-name">Jackson Miller</h3>
+        <p class="founder-role">CMO</p>
+        <p class="founder-bio">
+          Marketing strategist. A gifted storyteller and content creator, he leads our branding efforts and works
+          to dismantle stigma around reentry through powerful media campaigns. Jackson attended the Hampton University
+          and is now a freelance Social Media and Brand Strategist Consultant. He is also in the process of starting his
+          own affordable clothing line geared towards helping people express themselves through fashion.
+        </p>
+      </div>
+    </article>
+    <article class="founder-block reveal-item">
+      <div class="founder-image">
+        <div class="founder-image-backdrop" aria-hidden="true"></div>
+        <img src="{% static 'images/team/derrick.jpg' %}" alt="Derrick">
+      </div>
+      <div class="founder-content">
+        <h3 class="founder-name">Derrick Melvin</h3>
+        <p class="founder-role">COO</p>
+        <p class="founder-bio">
+          Business strategist. With a sharp eye for sustainability and scalability, he makes sure ReRoute grows
+          responsibly while staying aligned with its mission to serve justice-impacted individuals. Derrick is also a
+          full-time student at Howard University, studying Economics and Sports Administration. He also looks forward
+          to practicing law and is passionate about community development.
+        </p>
+      </div>
+    </article>
   </div>
 </section>
 
