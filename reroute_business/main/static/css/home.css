@@ -154,7 +154,7 @@
 .home-hero .hero-content .hero-logo {
   width: clamp(220px, 30vw, 360px);
   height: auto;
-  margin: 0 auto .6rem;
+  margin: 0 auto .3rem;
   opacity: 0;
   animation: heroFadeIn .9s ease forwards;
   animation-delay: .15s;
@@ -210,8 +210,8 @@
   letter-spacing: .02em;
   color: rgba(148, 163, 184, 0.38);
   opacity: 0;
-  animation: ambientFade 1.2s ease forwards, ambientFloat 26s ease-in-out infinite;
-  animation-delay: 2.1s, 2.1s;
+  animation: ambientFade 1.1s ease forwards, ambientFloat 26s ease-in-out infinite;
+  animation-delay: 1.7s, 1.7s;
 }
 .hero-ambient .word-1 { top: 9%; left: 11%; font-size: clamp(0.7rem, 1.5vw, 0.9rem); animation-duration: 27s; }
 .hero-ambient .word-2 { top: 26%; right: 7%; font-size: clamp(0.65rem, 1.4vw, 0.85rem); animation-duration: 33s; }
@@ -219,7 +219,7 @@
 .hero-ambient .word-4 { top: 58%; right: 14%; font-size: clamp(0.65rem, 1.5vw, 0.9rem); animation-duration: 31s; }
 .hero-ambient .word-5 { bottom: 28%; left: 18%; font-size: clamp(0.7rem, 1.7vw, 0.95rem); animation-duration: 30s; }
 .hero-ambient .word-6 { bottom: 14%; right: 21%; font-size: clamp(0.65rem, 1.4vw, 0.85rem); animation-duration: 28s; }
-.hero-ambient .word-7 { bottom: 38%; right: 2%; font-size: clamp(0.6rem, 1.35vw, 0.8rem); animation-duration: 34s; }
+.hero-ambient .word-7 { top: 26%; left: 58%; font-size: clamp(0.6rem, 1.35vw, 0.8rem); animation-duration: 34s; }
 
 @keyframes heroFadeIn {
   from { opacity: 0; transform: translateY(6px); }
@@ -231,7 +231,7 @@
 }
 @keyframes ambientFloat {
   0% { transform: translate(0, 0); }
-  50% { transform: translate(8px, -10px); }
+  50% { transform: translate(12px, -14px); }
   100% { transform: translate(0, 0); }
 }
 
@@ -253,6 +253,31 @@
     animation: none;
     opacity: 1;
     transform: none;
+  }
+}
+
+/* ===== Scroll Reveal ===== */
+.reveal,
+.reveal-item {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .5s ease-out, transform .5s ease-out;
+  will-change: opacity, transform;
+}
+.reveal.is-visible,
+.reveal-item.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-item {
+  transition-delay: var(--reveal-delay, 0ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-item {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
 
