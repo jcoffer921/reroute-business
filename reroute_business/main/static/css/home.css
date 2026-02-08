@@ -339,3 +339,37 @@
 .resource-card p { margin: 0; color: #475569; }
 .resource-icon { width: 44px; height: 44px; display: grid; place-items: center; background: #f0f6ff; border-radius: 12px; font-size: 1.25rem; }
 @media (max-width: 900px){ .resources-grid { grid-template-columns: 1fr; } }
+
+@media (max-width: 720px) {
+  .home-hero {
+    height: auto;
+    min-height: 88vh;
+    padding: 5.5rem 1.25rem 3.25rem;
+  }
+  .home-hero .hero-content { max-width: 100%; }
+  .home-hero .hero-content .hero-logo { width: clamp(180px, 60vw, 260px); }
+  .home-hero .hero-content .hero-tagline { margin-bottom: .5rem; }
+  .home-hero .hero-content .hero-subheadline { font-size: 1rem; }
+  .home-hero .hero-content .hero-microcopy { font-size: .9rem; }
+  .home-hero .hero-content .hero-ctas { gap: .6rem; }
+  .home-hero .hero-content .hero-ctas a { width: 100%; max-width: 320px; }
+
+  .services-section { padding: 2.75rem 1.25rem; }
+  .services-header { margin-bottom: 1rem; }
+  .service-card { padding: 1.25rem; }
+
+  .vision-left { padding: 2rem 1.5rem; }
+  .vision-left h2 { font-size: clamp(1.9rem, 6vw, 2.4rem); }
+  .vision-left p { font-size: 1rem; }
+
+  .prep-section { padding: 2.25rem 1.25rem; }
+  .prep-header h2 { font-size: clamp(1.7rem, 5.5vw, 2.1rem); }
+  .prep-step { padding: 1.1rem; }
+  .prep-note { margin-top: .75rem; }
+
+  .resources-preview { padding: 2.5rem 1.25rem; }
+  .resources-inner h2 { font-size: clamp(1.7rem, 5vw, 2.1rem); }
+
+  .final-cta { padding: 1.75rem 1.25rem; }
+  .final-cta-actions { gap: .5rem; }
+}
