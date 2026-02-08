@@ -15,17 +15,13 @@
         <aside class="profile-col profile-col--left">
           <div class="profile-identity">
             <div class="profile-avatar">
-              {% if profile.profile_picture %}
-                <img src="{{ profile.profile_picture.url }}" alt="{{ display_name }} avatar">
-              {% else %}
-                <div class="profile-avatar__initials" aria-hidden="true">
-                  {% if display_first or display_last %}
-                    {{ display_first|slice:':1' }}{{ display_last|slice:':1' }}
-                  {% else %}
-                    {{ viewed_user.username|slice:':2' }}
-                  {% endif %}
-                </div>
-              {% endif %}
+              <div class="profile-avatar__initials" aria-hidden="true">
+                {% if display_first or display_last %}
+                  {{ display_first|slice:':1' }}{{ display_last|slice:':1' }}
+                {% else %}
+                  {{ viewed_user.username|slice:':2' }}
+                {% endif %}
+              </div>
             </div>
             <h1 class="profile-name">{{ display_name }}</h1>
             {% if profile.verified %}
