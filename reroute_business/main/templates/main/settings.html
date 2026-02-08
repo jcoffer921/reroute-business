@@ -102,15 +102,8 @@
         <p class="help-text mt--4 text-gray-500">Update your profile photo, background, and private info.</p>
         <div class="profile-settings-grid">
           <div class="profile-avatar-block">
-            <div class="avatar-shell {% if not profile_details.profile_picture %}avatar-shell--empty{% endif %}">
-              <img
-                id="profileAvatarPreview"
-                class="avatar-image"
-                src="{% if profile_details.profile_picture %}{{ profile_details.profile_picture.url }}{% else %}#{% endif %}"
-                alt="Profile photo"
-                {% if not profile_details.profile_picture %}aria-hidden="true"{% endif %}
-              >
-              <div id="profileAvatarInitials" class="avatar-initials" aria-hidden="{% if profile_details.profile_picture %}true{% else %}false{% endif %}">
+            <div class="avatar-shell avatar-shell--empty">
+              <div id="profileAvatarInitials" class="avatar-initials" aria-hidden="false">
                 {% with fn=profile_first_name|default:'' ln=profile_last_name|default:'' %}
                   {% if fn and ln %}
                     {{ fn|slice:":1" }}{{ ln|slice:":1" }}
@@ -121,16 +114,8 @@
                   {% endif %}
                 {% endwith %}
               </div>
-              <button type="button" class="avatar-camera-btn" id="avatarUploadTrigger" aria-label="Change profile photo">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 7h3l2-2h6l2 2h3v12H4V7z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
-                  <circle cx="12" cy="13" r="3.5" stroke="#fff" stroke-width="1.6"/>
-                </svg>
-              </button>
-              <input type="file" id="profileAvatarInput" name="avatar" accept="image/*" hidden>
             </div>
-            <button type="button" class="btn btn-secondary btn-pill btn-sm" id="avatarDeleteBtn">Delete Profile Picture</button>
-            <p class="input-help">Upload a clear headshot (JPG, PNG, or GIF).</p>
+            <p class="input-help">Profile photo uploads are temporarily disabled.</p>
           </div>
 
           <div class="profile-background-block">
