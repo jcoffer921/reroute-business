@@ -3,91 +3,215 @@
 
 /* ============= HERO ============= */
 .about-hero{
-  background-color:#0F172A;
-  color:#F3F4F6;
-  padding: clamp(3rem, 7vw, 6rem) 1.25rem clamp(2rem, 4vw, 3rem);
   position:relative;
+  color:#f8fafc;
+  background: url('/static/css/salonagility-com-daniel-ZCbBBaFL-Ek-unsplash.jpg') center/cover no-repeat;
+  min-height: 70vh;
+  display:flex;
   overflow:hidden;
 }
-.about-hero-content{max-width:1200px;margin:0 auto;}
-.about-hero h1{
-  font-size: clamp(2rem, 5.2vw, 3.25rem);
-  font-weight:900;
-  margin:0 0 .75rem;
+.about-hero-overlay{
+  position:absolute;
+  inset:0;
+  background: linear-gradient(120deg, rgba(2,6,23,0.82), rgba(2,6,23,0.55));
+  z-index:0;
 }
-.about-hero p{
-  font-size:.95rem;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  font-weight:600;
-}
-/* Pattern on the right — hidden on small screens */
-.about-hero::after{
-  content:"";
-  background-size:100px;
-  background-repeat:repeat;
-  opacity:.18;
-  position:absolute; right:0; top:0; bottom:0; width:50%; z-index:0;
-}
-@media (max-width: 640px){
-  .about-hero::after{display:none;}
-}
-
-/* ============= TEAM BUBBLES ============= */
-.bubble-team-section{
-  background: linear-gradient(135deg, var(--primary-blue), var(--accent-cyan));
-  color:#fff;
-  text-align:center;
-  padding: clamp(2.5rem, 6vw, 5rem) 1.25rem;
+.about-hero-inner{
   position:relative;
-  overflow:visible;
-}
-.team-heading{
-  font-size: clamp(1.75rem, 4.5vw, 2.5rem);
-  font-weight:800;
-  margin:0 0 1.5rem;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Inter, Arial, sans-serif; /* swap Comic Sans */
-}
-
-/* Wrapper and bubble defaults (mobile-first) */
-.bubble-wrapper{
-  max-width:1200px; margin:0 auto;
-  display:flex; flex-direction:column; gap:2rem;
-}
-.bubble-with-caption{ width:min(72vw, 360px); margin:0 auto; }
-.bubble{
-  --bubble-size: min(72vw, 320px);
-  width: var(--bubble-size);
-  height: var(--bubble-size);
-  border-radius: 40%;
-  overflow:hidden;
-  border:6px solid #fff;
-  box-shadow:0 12px 24px rgba(0,0,0,.15);
-  transition: transform .25s ease;
-}
-.bubble:hover{ transform: scale(1.04); }
-.bubble img{
+  z-index:1;
   width:100%;
-  height:100%;
-  /* Fill the bubble while keeping faces visible */
+  max-width:1200px;
+  margin:0 auto;
+  padding: clamp(3rem, 7vw, 6rem) 1.5rem;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  min-height: 70vh;
+}
+.about-hero-content{ max-width: 640px; }
+.about-hero h1{
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight:900;
+  margin:0 0 .85rem;
+}
+.about-hero-text{
+  font-size: clamp(1rem, 2.1vw, 1.15rem);
+  line-height:1.75;
+  color: rgba(226,232,240,0.92);
+  margin:0;
+}
+.founders-cta{
+  align-self:center;
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  gap:.35rem;
+  margin-top:2rem;
+  color: rgba(226,232,240,0.92);
+  text-decoration:none;
+  font-weight:600;
+  letter-spacing:.02em;
+  transition: transform .2s ease, opacity .2s ease;
+}
+.founders-cta:hover{
+  transform: translateY(2px) scale(1.03);
+  opacity:.9;
+}
+.founders-cta-icon{ display:block; }
+
+/* ============= FOUNDERS CAROUSEL ============= */
+.founders-section{
+  background:#f8fafc;
+  color:#0f172a;
+  padding: clamp(2.75rem, 6vw, 5rem) 1.25rem;
+}
+.founders-header{
+  max-width:1100px;
+  margin:0 auto 1.5rem;
+  text-align:center;
+}
+.founders-header h2{
+  font-size: clamp(1.8rem, 4.2vw, 2.6rem);
+  margin:0;
+  font-weight:800;
+}
+.founders-carousel{
+  max-width:1100px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns: auto 1fr auto;
+  gap:1rem;
+  align-items:center;
+}
+.founders-viewport{
+  overflow:hidden;
+  width:100%;
+}
+.founders-track{
+  display:flex;
+  transition: transform .6s ease;
+  will-change: transform;
+}
+.founder-card{
+  min-width:100%;
+  background:#fff;
+  border:1px solid #e2e8f0;
+  border-radius:18px;
+  padding: clamp(1.25rem, 2.6vw, 2rem);
+  display:flex;
+  gap: clamp(1rem, 3vw, 2.25rem);
+  align-items:center;
+  box-shadow:0 10px 26px rgba(15,23,42,0.08);
+}
+.founder-content{ flex:1; }
+.founder-name{
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  margin:0 0 .25rem;
+  font-weight:800;
+}
+.founder-role{
+  margin:0 0 .75rem;
+  font-size: clamp(1.05rem, 2.3vw, 1.25rem);
+  font-weight:600;
+  color:#334155;
+}
+.founder-bio{
+  margin:0;
+  color:#475569;
+  line-height:1.6;
+}
+.founder-image{
+  flex:0 0 clamp(160px, 22vw, 240px);
+}
+.founder-image img{
+  width:100%;
+  height:auto;
+  aspect-ratio: 4 / 5;
   object-fit: cover;
-  /* Bias crop towards the top so heads stay in-frame */
-  object-position: 50% 20%;
+  border-radius:14px;
+  box-shadow:0 8px 18px rgba(15,23,42,0.12);
+}
+.carousel-btn{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid #e2e8f0;
+  background:#fff;
+  color:#0f172a;
+  display:grid;
+  place-items:center;
+  box-shadow:0 8px 18px rgba(15,23,42,0.08);
+  cursor:pointer;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.carousel-btn:hover{
+  transform: translateY(-1px);
+  box-shadow:0 10px 22px rgba(15,23,42,0.12);
+}
+.founders-dots{
+  grid-column:1 / -1;
+  display:flex;
+  justify-content:center;
+  gap:.5rem;
+  margin-top:1rem;
+}
+.founders-dots button{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  border:none;
+  background:#cbd5e1;
+  cursor:pointer;
+}
+.founders-dots button.active{ background:#0f172a; }
+
+@media (max-width: 900px){
+  .founders-carousel{ grid-template-columns: 1fr; }
+  .carousel-btn{ justify-self:center; }
+  .founder-card{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .founder-image{
+    order:-1;
+    width:100%;
+    max-width: 320px;
+  }
 }
 
-.bubble-caption{ margin-top:.75rem; max-width: 34ch; margin-inline:auto; color:#f5f5f5; margin-bottom:3px; }
-.bubble-caption h4{ font-size:1.05rem; margin:.25rem 0 .35rem; font-weight:700; }
-.bubble-caption p{ font-size:.95rem; line-height:1.45; padding-bottom:1.5rem; }
+@media (prefers-reduced-motion: reduce){
+  .founders-cta,
+  .carousel-btn{
+    transition: none;
+  }
+  .founders-track{
+    transition: none;
+  }
+}
 
-/* Larger screens: position the three bubbles in a “triangle” */
-@media (min-width: 900px){
-  /* Increase canvas height so bios aren't clipped behind next section */
-  .bubble-wrapper{ position:relative; min-height: clamp(620px, 68vw, 780px); }
-  .bubble-with-caption{ position:absolute; width:auto; }
-  #bubble1{ left:6%; top:66px; }
-  #bubble2{ right:6%; top:66px; }
-  #bubble3{ left:37%; top:70px; }
-  .bubble{ --bubble-size: clamp(260px, 26vw, 320px); border-width:8px; }
+/* ===== Scroll Reveal ===== */
+.reveal-enabled .reveal,
+.reveal-enabled .reveal-item {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .5s ease-out, transform .5s ease-out;
+  will-change: opacity, transform;
+}
+.reveal-enabled .reveal.is-visible,
+.reveal-enabled .reveal-item.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-enabled .reveal-item {
+  transition-delay: var(--reveal-delay, 0ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 /* ============= OUR STORY ============= */

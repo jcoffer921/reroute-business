@@ -1,124 +1,59 @@
-/**
- * Mission section scroll polish
- * - Parallax-y lift + gentle overlay fade
- * - Mobile-friendly (IO + rAF), reduced-motion aware
- */
+// About Us page interactions: founders carousel + smooth anchor scroll
 (function () {
-  // ------- DOM targets -------
-  const section = document.querySelector('.about-mission');
-  if (!section) return;  // page guard
+  const carousel = document.querySelector('[data-carousel]');
+  if (!carousel) return;
 
-  const overlay = section.querySelector('.mission-overlay');
-  const content = section.querySelector('.mission-content');
-  const quote   = section.querySelector('.mission-quote');
+  const track = carousel.querySelector('[data-carousel-track]');
+  const slides = track ? Array.from(track.children) : [];
+  const prevBtn = carousel.querySelector('[data-carousel-prev]');
+  const nextBtn = carousel.querySelector('[data-carousel-next]');
+  const dotsWrap = carousel.querySelector('[data-carousel-dots]');
 
-  // ------- A11y: respect reduced motion -------
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduceMotion) {
-    // Keep everything static and reveal quote immediately
-    section.classList.add('static');
-    if (quote) requestAnimationFrame(() => quote.classList.add('visible'));
-    return;
-  }
+  if (!track || !slides.length) return;
 
-  // ------- rAF loop control -------
-  let ticking = false;
-  let active  = false;
+  let index = 0;
 
-  function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
-
-  function updateFrame() {
-    ticking = false;
-    if (!active || !section) return;
-
-    // Use viewport relative metrics to avoid layout thrash
-    const rect = section.getBoundingClientRect();
-    const h    = rect.height || 1;
-
-    // Visible if intersects viewport at all
-    const inView = rect.bottom > 0 && rect.top < window.innerHeight;
-    if (!inView) return;
-
-    // Compute progress: 0 when top is at element top, ~1 as we move through its height
-    // Derived from original formula: progress = 1 - rect.top / height
-    const rawProgress = 1 - (rect.top / h);
-    const progress    = clamp(rawProgress, 0, 1);  // 0..1
-    // Discretize into 0..10 and toggle a class for CSS-driven transitions
-    const step = Math.min(10, Math.max(0, Math.round(progress * 10)));
-    // Remove any previous step classes
-    for (let i=0;i<=10;i++){ section.classList.remove('mission-step-'+i); }
-    section.classList.add('mission-step-'+step);
-  }
-
-  function onScrollOrResize() {
-    if (!ticking) {
-      ticking = true;
-      requestAnimationFrame(updateFrame);
+  const update = (nextIndex) => {
+    index = (nextIndex + slides.length) % slides.length;
+    track.style.transform = `translateX(${index * -100}%)`;
+    slides.forEach((slide, i) => slide.setAttribute('aria-hidden', i !== index));
+    if (dotsWrap) {
+      Array.from(dotsWrap.children).forEach((dot, i) => {
+        dot.classList.toggle('active', i === index);
+        dot.setAttribute('aria-current', i === index ? 'true' : 'false');
+      });
     }
+  };
+
+  if (dotsWrap) {
+    dotsWrap.innerHTML = '';
+    slides.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.setAttribute('aria-label', `Go to founder ${i + 1}`);
+      dot.addEventListener('click', () => update(i));
+      dotsWrap.appendChild(dot);
+    });
   }
 
-  // ------- Reveal quote when section is meaningfully visible -------
-  let quoteShown = false;
-  function revealQuoteSoon() {
-    if (quoteShown || !quote) return;
-    quoteShown = true;
-    setTimeout(() => quote.classList.add('visible'), 350); // gentle delay
-  }
+  if (prevBtn) prevBtn.addEventListener('click', () => update(index - 1));
+  if (nextBtn) nextBtn.addEventListener('click', () => update(index + 1));
 
-  // ------- IntersectionObserver to toggle active state -------
-  const io = ('IntersectionObserver' in window) ? new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (entry.target !== section) continue;
-        active = entry.isIntersecting;
-        if (active) {
-          revealQuoteSoon();
-          onScrollOrResize(); // refresh immediately
-          window.addEventListener('scroll', onScrollOrResize, { passive: true });
-          window.addEventListener('resize', onScrollOrResize);
-        } else {
-          window.removeEventListener('scroll', onScrollOrResize);
-          window.removeEventListener('resize', onScrollOrResize);
-        }
-      }
-    },
-    { root: null, threshold: [0, 0.2, 0.5, 1] }   // wake early, update through
-  ) : null;
-
-  if (io) {
-    io.observe(section);
-  } else {
-    // Fallback for very old browsers: always-on listeners
-    active = true;
-    window.addEventListener('scroll', onScrollOrResize, { passive: true });
-    window.addEventListener('resize', onScrollOrResize);
-  }
-
-  // Initial paint once the page is ready
-  window.addEventListener('load', () => {
-    onScrollOrResize();
-    // If the section is already in view on load, show the quote
-    const r = section.getBoundingClientRect();
-    if (r.bottom > 0 && r.top < window.innerHeight) revealQuoteSoon();
-  });
-
-  // Optional: clean up on page hide (single-page apps)
-  window.addEventListener('pagehide', () => {
-    window.removeEventListener('scroll', onScrollOrResize);
-    window.removeEventListener('resize', onScrollOrResize);
-    if (io) io.disconnect();
-  });
+  update(0);
 })();
 
-// Smooth scroll for bio links (CSP-safe)
-(function(){
-  document.addEventListener('DOMContentLoaded', function(){
-    document.querySelectorAll('a.bio-link').forEach(function(anchor){
-      anchor.addEventListener('click', function(e){
-        e.preventDefault();
-        var target = document.querySelector(anchor.getAttribute('href'));
-        if (target && target.scrollIntoView) target.scrollIntoView({ behavior: 'smooth' });
-      });
-    });
+(function () {
+  const cta = document.querySelector('.founders-cta');
+  if (!cta) return;
+
+  cta.addEventListener('click', (event) => {
+    const targetId = cta.getAttribute('href');
+    if (!targetId || targetId.charAt(0) !== '#') return;
+    const target = document.querySelector(targetId);
+    if (!target) return;
+
+    event.preventDefault();
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
   });
 })();
