@@ -131,6 +131,8 @@
   const revealItems = document.querySelectorAll('.reveal, .reveal-item');
   if (!revealItems.length) return;
 
+  document.documentElement.classList.add('reveal-enabled');
+
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const showAll = () => revealItems.forEach(el => el.classList.add('is-visible'));
   if (reducedMotion.matches || !('IntersectionObserver' in window)) {

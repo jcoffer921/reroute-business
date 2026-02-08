@@ -257,19 +257,19 @@
 }
 
 /* ===== Scroll Reveal ===== */
-.reveal,
-.reveal-item {
+.reveal-enabled .reveal,
+.reveal-enabled .reveal-item {
   opacity: 0;
   transform: translateY(12px);
   transition: opacity .5s ease-out, transform .5s ease-out;
   will-change: opacity, transform;
 }
-.reveal.is-visible,
-.reveal-item.is-visible {
+.reveal-enabled .reveal.is-visible,
+.reveal-enabled .reveal-item.is-visible {
   opacity: 1;
   transform: translateY(0);
 }
-.reveal-item {
+.reveal-enabled .reveal-item {
   transition-delay: var(--reveal-delay, 0ms);
 }
 @media (prefers-reduced-motion: reduce) {
