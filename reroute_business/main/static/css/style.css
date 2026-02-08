@@ -55,7 +55,17 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
   background: #111; color: #fff;
   padding: 0 1rem; /* tighter, consistent padding */
   border-bottom: 1px solid rgba(255,255,255,0.06);
-  transition: 0.3s ease;
+  transition: transform 0.28s ease, box-shadow 0.22s ease;
+  will-change: transform;
+  transform: translateY(0);
+}
+
+.navbar--auto-hide.navbar--hidden {
+  transform: translateY(-100%);
+}
+
+.navbar--auto-hide.navbar--shadow {
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
 }
 
 .navbar-logo { display: flex; align-items: center; flex-shrink: 0; }

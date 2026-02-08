@@ -167,6 +167,53 @@
     on(window, 'resize', () => { if (window.innerWidth < DESKTOP_MIN) closeProfile(); });
   }
 
+  /* ------------------------ NAV AUTO-HIDE ------------------------- */
+  const navbar = qs('[data-navbar]');
+  if (navbar) {
+    const HIDE_THRESHOLD = 12;
+    const SHADOW_THRESHOLD = 8;
+    const AUTOHIDE_MIN_WIDTH = 768;
+    let lastScrollY = window.scrollY || 0;
+    let ticking = false;
+
+    const setState = (currentY) => {
+      const isNearTop = currentY <= HIDE_THRESHOLD;
+      const isScrollingDown = currentY > lastScrollY;
+      const allowAutohide = window.innerWidth >= AUTOHIDE_MIN_WIDTH;
+
+      navbar.classList.toggle('navbar--shadow', currentY > SHADOW_THRESHOLD);
+
+      if (!allowAutohide) {
+        navbar.classList.remove('navbar--hidden');
+        lastScrollY = currentY;
+        return;
+      }
+
+      if (isNearTop) {
+        navbar.classList.remove('navbar--hidden');
+      } else if (isScrollingDown) {
+        navbar.classList.add('navbar--hidden');
+      } else {
+        navbar.classList.remove('navbar--hidden');
+      }
+
+      lastScrollY = currentY;
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        setState(window.scrollY || 0);
+        ticking = false;
+      });
+    };
+
+    setState(lastScrollY);
+    on(window, 'scroll', onScroll, { passive: true });
+    on(window, 'resize', () => setState(window.scrollY || 0), { passive: true });
+  }
+
   /* -------------------------- CSP helpers --------------------------- */
   // Prevent default navigation for menu items purely used to open dropdowns
   document.querySelectorAll('.nav-item.has-dropdown > a.no-nav').forEach(a => {

@@ -104,6 +104,28 @@
   const avatarShell = qs('.avatar-shell');
   const avatarInitials = qs('#profileAvatarInitials');
 
+  const setAvatarEmpty = (isEmpty) => {
+    if (avatarShell) avatarShell.classList.toggle('avatar-shell--empty', isEmpty);
+    if (avatarInitials) avatarInitials.setAttribute('aria-hidden', isEmpty ? 'false' : 'true');
+    if (!avatarPreview) return;
+    if (isEmpty) {
+      avatarPreview.setAttribute('aria-hidden', 'true');
+      if (avatarPreview.getAttribute('src') !== '#') avatarPreview.src = '#';
+      return;
+    }
+    avatarPreview.removeAttribute('aria-hidden');
+  };
+
+  if (avatarPreview) {
+    const src = avatarPreview.getAttribute('src');
+    if (!src || src === '#') setAvatarEmpty(true);
+    avatarPreview.addEventListener('error', () => setAvatarEmpty(true));
+    avatarPreview.addEventListener('load', () => {
+      const loadedSrc = avatarPreview.getAttribute('src');
+      if (loadedSrc && loadedSrc !== '#') setAvatarEmpty(false);
+    });
+  }
+
   if (avatarTrigger && avatarInput) {
     avatarTrigger.addEventListener('click', () => avatarInput.click());
     avatarInput.addEventListener('change', async () => {
@@ -118,10 +140,9 @@
       }
       if (avatarPreview && data.avatar_url) {
         avatarPreview.src = `${data.avatar_url}?v=${Date.now()}`;
-        avatarPreview.removeAttribute('aria-hidden');
+        setAvatarEmpty(false);
       }
-      if (avatarShell) avatarShell.classList.remove('avatar-shell--empty');
-      if (avatarInitials) avatarInitials.setAttribute('aria-hidden', 'true');
+      setAvatarEmpty(false);
       showToast('Profile photo updated.');
     });
   }
@@ -136,10 +157,8 @@
       }
       if (avatarPreview) {
         avatarPreview.src = '#';
-        avatarPreview.setAttribute('aria-hidden', 'true');
       }
-      if (avatarShell) avatarShell.classList.add('avatar-shell--empty');
-      if (avatarInitials) avatarInitials.setAttribute('aria-hidden', 'false');
+      setAvatarEmpty(true);
       showToast('Profile photo removed.');
     });
   }
