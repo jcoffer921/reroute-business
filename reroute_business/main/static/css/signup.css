@@ -39,31 +39,26 @@ body {
 
 .auth-visual {
   position: relative;
-  background:
-    linear-gradient(135deg, rgba(3, 20, 60, 0.92), rgba(26, 77, 217, 0.88)),
-    url('../images/login-img.png') center/cover;
+  background: #ffffff;
   display: flex;
+  align-items: center;
+  justify-content: center;
   min-height: inherit;
-  color: #fff;
-}
-
-.auth-visual::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.25), transparent 45%);
-  mix-blend-mode: screen;
+  color: #0f172a;
 }
 
 .auth-visual-layer {
-  position: absolute;
-  top: 8%;
-  left: 50%;
-  transform: translateX(-50%);
   width: 100%;
-  max-width: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
   text-align: center;
-  padding: 0 2rem;
+}
+
+.auth-logo {
+  width: min(240px, 60%);
+  height: auto;
 }
 
 .auth-pill {
