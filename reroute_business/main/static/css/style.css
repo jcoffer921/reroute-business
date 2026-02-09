@@ -356,6 +356,16 @@ iframe { max-width: 100%; border: 0; }
     overflow: hidden;
     background: linear-gradient(180deg, #0b0d10 0%, #0f1720 100%);
 }
+.home-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 50% 45%, rgba(0, 109, 160, 0.22) 0%, rgba(0, 109, 160, 0.12) 28%, rgba(0, 109, 160, 0) 62%),
+        radial-gradient(circle at 50% 48%, rgba(0, 109, 160, 0.14) 0%, rgba(0, 109, 160, 0.08) 35%, rgba(0, 109, 160, 0) 70%);
+    z-index: 0;
+    pointer-events: none;
+}
 
 .home-hero .hero-content h1 {
     font-size: 3rem;

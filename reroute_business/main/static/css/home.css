@@ -159,9 +159,6 @@
   animation: heroFadeIn .9s ease forwards;
   animation-delay: .15s;
   display: block;
-  filter:
-    drop-shadow(0 0 10px rgba(0, 109, 160, 0.22))
-    drop-shadow(0 0 24px rgba(0, 109, 160, 0.14));
 }
 .home-hero .hero-content .hero-tagline {
   margin: 0 auto .75rem;
