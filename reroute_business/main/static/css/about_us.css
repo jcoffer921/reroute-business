@@ -74,95 +74,138 @@
 }
 .founders-cta-icon{ display:block; }
 
-/* ============= FOUNDERS CAROUSEL ============= */
+/* ============= FOUNDERS SECTION ============= */
 .founders-section{
   background:#f8fafc;
   color:#0f172a;
   padding: clamp(2.75rem, 6vw, 5rem) 1.25rem;
 }
-.founders-header{
-  max-width:1100px;
-  margin:0 auto 1.5rem;
-  text-align:center;
-}
-.founders-header h2{
-  font-size: clamp(1.8rem, 4.2vw, 2.6rem);
-  margin:0;
-  font-weight:800;
-}
-.founders-grid{
-  max-width:1100px;
+.founders-wrap{
+  max-width:1200px;
   margin:0 auto;
-  display:flex;
-  flex-direction:column;
-  gap: clamp(2.25rem, 5vw, 4rem);
-}
-.founder-row{
   display:grid;
-  grid-template-columns: minmax(260px, 380px) 1fr;
-  gap: clamp(1.5rem, 4vw, 3rem);
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, .8fr);
+  gap: clamp(2rem, 4vw, 3.75rem);
   align-items:center;
 }
-.founder-row.is-flipped{
-  grid-template-columns: 1fr minmax(240px, 360px);
+.founders-media{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
 }
-.founder-row.is-flipped .founder-image{ order: 2; }
-.founder-row.is-flipped .founder-content{ order: 1; }
-.founder-content{ flex:1; }
-.founder-name{
-  font-size: clamp(1.4rem, 3vw, 2rem);
-  margin:0 0 .25rem;
-  font-weight:800;
-}
-.founder-role{
-  margin:0 0 .75rem;
-  font-size: clamp(1.05rem, 2.3vw, 1.25rem);
-  font-weight:600;
-  color:#334155;
-}
-.founder-bio{
+.founder-column{
   margin:0;
-  color:#475569;
-  line-height:1.6;
-}
-.founder-image{
   position:relative;
-  width:100%;
-  max-width:380px;
 }
-.founder-image-backdrop{
+.founder-column.is-outer{
+  transform: translateY(-14px);
+}
+.founder-column.is-center{
+  transform: translateY(10px);
+}
+.founder-portrait{
+  position:relative;
+  height: clamp(360px, 48vw, 520px);
+  background:#fff;
+  padding: 12px;
+}
+.founder-column.is-center .founder-portrait{
+  background: linear-gradient(180deg, var(--primary-blue, #006da0) 0 50%, #ffffff 50% 100%);
+}
+.founder-column.is-center::before{
+  content:'';
   position:absolute;
-  width:115%;
-  height:115%;
-  top:-7%;
-  left:-9%;
-  background: rgba(37,99,235,0.06);
-  border-radius:0;
+  inset:0 -4px;
+  background: linear-gradient(180deg, var(--primary-blue, #006da0) 0 50%, #ffffff 50% 100%);
   z-index:0;
 }
-.founder-row.is-flipped .founder-image-backdrop{
-  left:auto;
-  right:-9%;
-}
-.founder-image img{
+.founder-portrait img{
   width:100%;
-  height:auto;
-  aspect-ratio: 4 / 5;
+  height:88%;
   object-fit: cover;
-  border-radius:0;
-  box-shadow:none;
+  display:block;
   position:relative;
   z-index:1;
 }
+.founder-badge{
+  position:absolute;
+  left:50%;
+  transform: translateX(-50%);
+  padding:.7rem 1.2rem;
+  text-align:center;
+  min-width: 72%;
+  z-index:2;
+  clip-path: polygon(8% 0, 92% 0, 100% 20%, 100% 80%, 92% 100%, 8% 100%, 0 80%, 0 20%);
+}
+.badge-bottom{
+  bottom:8%;
+  background: var(--primary-blue, #006da0);
+  color:#fff;
+}
+.badge-top{
+  top:42%;
+  background:#fff;
+  color:#0f172a;
+}
+.badge-name{
+  display:block;
+  font-weight:700;
+  font-size:1rem;
+}
+.badge-role{
+  display:block;
+  font-size:.7rem;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  opacity:.8;
+}
+.founders-summary{
+  align-self:center;
+}
+.summary-eyebrow{
+  text-transform:uppercase;
+  letter-spacing:.2em;
+  font-size:.75rem;
+  color:#94a3b8;
+  margin:0 0 .75rem;
+}
+.founders-summary h2{
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  margin:0 0 1rem;
+  font-weight:800;
+  color:#0f172a;
+}
+.summary-text{
+  margin:0;
+  color:#475569;
+  line-height:1.7;
+  font-size:1rem;
+}
 
-@media (max-width: 900px){
-  .founder-row,
-  .founder-row.is-flipped{
+@media (max-width: 1024px){
+  .founders-wrap{
     grid-template-columns: 1fr;
   }
-  .founder-row .founder-image,
-  .founder-row.is-flipped .founder-image{
-    order:-1;
+  .founders-summary{ max-width: 640px; }
+}
+
+@media (max-width: 720px){
+  .founders-media{
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .founder-column.is-outer,
+  .founder-column.is-center{
+    transform: none;
+  }
+  .founder-portrait{
+    height: clamp(320px, 90vw, 420px);
+  }
+  .founder-badge{
+    min-width: 65%;
+  }
+  .founders-summary{
+    order:2;
   }
 }
 
@@ -173,8 +216,7 @@
     opacity: 1;
     transform: none;
   }
-  .founders-cta,
-  .founder-row{
+  .founders-cta{
     transition: none;
   }
 }

@@ -32,58 +32,45 @@
 </section>
 
 <section id="founders" class="founders-section">
-  <div class="founders-header reveal">
-    <h2>Meet the Founders</h2>
-  </div>
-  <div class="founders-grid reveal-group">
-    <article class="founder-row reveal-item">
-      <div class="founder-image">
-        <div class="founder-image-backdrop" aria-hidden="true"></div>
-        <img src="{% static 'images/team/jason.jpg' %}" alt="Jason">
-      </div>
-      <div class="founder-content">
-        <h3 class="founder-name">Jason Coffer</h3>
-        <p class="founder-role">CTO</p>
-        <p class="founder-bio">
-          Technical co-founder. Leads software development and product architecture at ReRoute. Jason attends
-          Pennsylvania State University, where he is studying Software Engineering and Computer Science. Born and raised
-          in Philadelphia, he is passionate about using technology to create social impact to help improve the lives of those
-          in underrepresented communities.
-        </p>
-      </div>
-    </article>
-    <article class="founder-row reveal-item is-flipped">
-      <div class="founder-image">
-        <div class="founder-image-backdrop" aria-hidden="true"></div>
-        <img src="{% static 'images/team/jackson.jpg' %}" alt="Jackson">
-      </div>
-      <div class="founder-content">
-        <h3 class="founder-name">Jackson Miller</h3>
-        <p class="founder-role">CMO</p>
-        <p class="founder-bio">
-          Marketing strategist. A gifted storyteller and content creator, he leads our branding efforts and works
-          to dismantle stigma around reentry through powerful media campaigns. Jackson attended the Hampton University
-          and is now a freelance Social Media and Brand Strategist Consultant. He is also in the process of starting his
-          own affordable clothing line geared towards helping people express themselves through fashion.
-        </p>
-      </div>
-    </article>
-    <article class="founder-row reveal-item">
-      <div class="founder-image">
-        <div class="founder-image-backdrop" aria-hidden="true"></div>
-        <img src="{% static 'images/team/derrick.jpg' %}" alt="Derrick">
-      </div>
-      <div class="founder-content">
-        <h3 class="founder-name">Derrick Melvin</h3>
-        <p class="founder-role">COO</p>
-        <p class="founder-bio">
-          Business strategist. With a sharp eye for sustainability and scalability, he makes sure ReRoute grows
-          responsibly while staying aligned with its mission to serve justice-impacted individuals. Derrick is also a
-          full-time student at Howard University, studying Economics and Sports Administration. He also looks forward
-          to practicing law and is passionate about community development.
-        </p>
-      </div>
-    </article>
+  <div class="founders-wrap">
+    <div class="founders-media reveal-group">
+      <figure class="founder-column is-outer reveal-item">
+        <div class="founder-portrait">
+          <img src="{% static 'images/team/jason.jpg' %}" alt="Jason">
+          <div class="founder-badge badge-bottom">
+            <span class="badge-role">CTO</span>
+            <span class="badge-name">Jason Coffer</span>
+          </div>
+        </div>
+      </figure>
+      <figure class="founder-column is-center reveal-item">
+        <div class="founder-portrait">
+          <img src="{% static 'images/team/jackson.jpg' %}" alt="Jackson">
+          <div class="founder-badge badge-top">
+            <span class="badge-role">CMO</span>
+            <span class="badge-name">Jackson Miller</span>
+          </div>
+        </div>
+      </figure>
+      <figure class="founder-column is-outer reveal-item">
+        <div class="founder-portrait">
+          <img src="{% static 'images/team/derrick.jpg' %}" alt="Derrick">
+          <div class="founder-badge badge-bottom">
+            <span class="badge-role">COO</span>
+            <span class="badge-name">Derrick Melvin</span>
+          </div>
+        </div>
+      </figure>
+    </div>
+    <div class="founders-summary reveal">
+      <p class="summary-eyebrow">Our Team</p>
+      <h2>Meet the Founders</h2>
+      <p class="summary-text">
+        ReRoute is led by a small, mission-locked founding team combining product, brand, and operational leadership. We work
+        side-by-side with community partners to build a platform that treats people with dignity, moves deliberately, and keeps
+        opportunity at the center of every decision.
+      </p>
+    </div>
   </div>
 </section>
 
