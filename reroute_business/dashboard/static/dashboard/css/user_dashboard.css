@@ -61,23 +61,15 @@
 
 .dashboard-hero {
   background: linear-gradient(180deg, #7db6ff 0%, #5b8fe2 100%);
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-  position: relative;
-  overflow: hidden;
+  width: 100%;
 }
 .dashboard-hero-inner {
   max-width: 1360px;
   margin: 0 auto;
   padding: 56px 24px 64px;
-  display: flex;
-  gap: 24px;
 }
-.dashboard-hero-spacer { width: 240px; flex: 0 0 240px; }
 .dash-hero {
   color: #f8fafc;
-  flex: 1;
 }
 .dash-hero-content { display: grid; gap: 12px; }
 .dash-hero h1 { margin: 0; font-size: 26px; color: #fff; }
@@ -391,8 +383,7 @@
   .sidebar-section { min-width: 180px; margin-bottom: 0; }
   .dash-header { flex-direction: column; }
   .header-pills { justify-content: flex-start; }
-  .dashboard-hero-inner { flex-direction: column; padding: 44px 20px 52px; }
-  .dashboard-hero-spacer { display: none; }
+  .dashboard-hero-inner { padding: 44px 20px 52px; }
 }
 
 @media (max-width: 640px) {
