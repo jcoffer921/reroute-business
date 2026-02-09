@@ -8,7 +8,9 @@
 <link rel="stylesheet" href="{% static 'css/login.css' %}">
 
 {% url 'oauth_role_redirect' as oauth_role_redirect_url %}
-{% provider_login_url "google" process="login" next=oauth_role_redirect_url|add:'?role=user' as google_login_url %}
+{% with google_next=oauth_role_redirect_url|add:'?role=user' %}
+  {% provider_login_url "google" process="login" next=google_next as google_login_url %}
+  {% with google_login_url=google_login_url|default:"/accounts/google/login/?next="|add:google_next %}
 
 <div class="auth-shell">
   <div class="auth-grid">
@@ -100,6 +102,8 @@
       </div>
     </div>
   </div>
+  {% endwith %}
+{% endwith %}
 </div>
 
 <script src="{% static 'js/base.js' %}"></script>

@@ -32,7 +32,8 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
 @media (max-width: 768px) { .content { padding-top: var(--nav-h-sm); } }
 
 /* Flash messages: keep clear of fixed navbar */
-.flash-messages { margin-top: 8px; }
+.flash-messages { margin-top: calc(var(--nav-h) + 8px); }
+@media (max-width: 768px) { .flash-messages { margin-top: calc(var(--nav-h-sm) + 8px); } }
 
 /* ========== BODY BASE STYLES ========== */
 .site-footer {
