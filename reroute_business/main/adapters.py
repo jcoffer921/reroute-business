@@ -27,5 +27,11 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             user = User.objects.get(email__iexact=email)
         except User.DoesNotExist:
             return
+        except User.MultipleObjectsReturned:
+            self.authentication_error(
+                request,
+                message="Multiple accounts use this email. Please sign in with password and connect Google from settings.",
+            )
+            return
 
         sociallogin.connect(request, user)
