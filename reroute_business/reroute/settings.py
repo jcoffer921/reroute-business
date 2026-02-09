@@ -253,6 +253,8 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
 # Allauth relaxed flags for dev/demo
 DISABLE_ALLAUTH_EMAIL_VERIFICATION = True
 

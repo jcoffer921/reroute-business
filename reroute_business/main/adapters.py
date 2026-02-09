@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+from allauth.exceptions import ImmediateHttpResponse
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 
 
@@ -28,10 +32,12 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         except User.DoesNotExist:
             return
         except User.MultipleObjectsReturned:
-            self.authentication_error(
+            messages.error(
                 request,
-                message="Multiple accounts use this email. Please sign in with password and connect Google from settings.",
+                "Multiple accounts use this email. Please sign in with password and connect Google from settings.",
             )
-            return
+            next_url = (request.GET.get("next") or "").lower()
+            target = "employer_login" if "role=employer" in next_url else "login"
+            raise ImmediateHttpResponse(redirect(reverse(target)))
 
         sociallogin.connect(request, user)
