@@ -9,7 +9,7 @@
 
 {% url 'socialaccount_login' 'google' as google_base %}
 {% url 'oauth_role_redirect' as oauth_role_redirect_url %}
-{% with google_next=oauth_role_redirect_url|add:'?role=user' google_login_url=google_base|add:'?next='|add:google_next %}
+{% with google_login_url=google_base|add:'?next='|add:oauth_role_redirect_url|add:'?role=user' %}
 
 <div class="auth-shell">
   <div class="auth-grid">
