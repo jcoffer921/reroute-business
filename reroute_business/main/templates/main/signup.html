@@ -7,10 +7,9 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/signup.css' %}">
 
+{% url 'socialaccount_login' 'google' as google_base %}
 {% url 'oauth_role_redirect' as oauth_role_redirect_url %}
-{% with google_next=oauth_role_redirect_url|add:'?role=user' %}
-  {% provider_login_url "google" process="login" next=google_next as google_login_url %}
-{% endwith %}
+{% with google_next=oauth_role_redirect_url|add:'?role=user' google_login_url=google_base|add:'?next='|add:google_next %}
 
 <div class="auth-shell">
   <div class="auth-grid">
@@ -119,9 +118,9 @@
               <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
             {% endif %}
             <button type="submit" class="submit-btn">Create account</button>
-
-            {% include "main/partials/google_auth.html" with divider_text="Or sign up with" google_url=google_login_url %}
           </form>
+
+          {% include "main/partials/google_auth.html" with divider_text="Or sign up with" google_url=google_login_url %}
 
           <div class="secondary-actions">
             <p class="muted">Already have an account? <a href="{% url 'login' %}">Log in</a>.</p>
@@ -139,4 +138,5 @@
   {% if recaptcha_site_key %}
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   {% endif %}
+{% endwith %}
 {% endblock %}
