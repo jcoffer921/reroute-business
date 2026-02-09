@@ -68,11 +68,17 @@
   transform: translateY(8px);
 }
 .founders-cta:hover{
-  transform: translateY(2px) scale(1.05);
-  opacity:.92;
+  transform: translateY(0) scale(1.03);
+  filter: brightness(1.08);
   text-decoration: none;
 }
-.founders-cta-icon{ display:block; }
+.founders-cta-icon{
+  display:block;
+  transition: transform .25s ease-out;
+}
+.founders-cta:hover .founders-cta-icon{
+  transform: translateY(8px);
+}
 
 /* ============= FOUNDERS SECTION ============= */
 .founders-section{
@@ -136,13 +142,12 @@
   z-index:2;
   clip-path: polygon(8% 0, 92% 0, 100% 20%, 100% 80%, 92% 100%, 8% 100%, 0 80%, 0 20%);
 }
-.badge-bottom{
-  bottom:8%;
+.badge-bottom{ bottom:-4%; }
+.badge-blue{
   background: var(--primary-blue, #006da0);
   color:#fff;
 }
-.badge-top{
-  top:38%;
+.badge-white{
   background:#fff;
   color:#0f172a;
 }
@@ -215,8 +220,16 @@
     opacity: 1;
     transform: none;
   }
-  .founders-cta{
+  .founders-cta,
+  .founders-cta-icon{
     transition: none;
+  }
+  .founders-cta:hover{
+    transform: none;
+    filter: none;
+  }
+  .founders-cta:hover .founders-cta-icon{
+    transform: none;
   }
 }
 
