@@ -70,6 +70,8 @@
       subtitle,
       resendUrl,
       isEmployer,
+      googleUrl,
+      googleDivider,
     } = props;
 
     const [username, setUsername] = useState(prefill);
@@ -292,6 +294,30 @@
                 loading ? 'Signing in…' : 'Sign in',
               ])
             ),
+            googleUrl ? e(
+              motion.div,
+              { variants: variants.item, initial: 'hidden', animate: 'show', custom: 5, className: 'oauth-block' },
+              [
+                e('div', { className: 'oauth-divider' }, [
+                  e('span', { className: 'oauth-divider-line', 'aria-hidden': 'true' }),
+                  e('span', { className: 'oauth-divider-text' }, googleDivider || 'Or log in with'),
+                  e('span', { className: 'oauth-divider-line', 'aria-hidden': 'true' }),
+                ]),
+                e('a', { className: 'oauth-google-btn', href: googleUrl }, [
+                  e('span', { className: 'oauth-google-icon', 'aria-hidden': 'true' }, e(
+                    'svg',
+                    { width: 18, height: 18, viewBox: '0 0 48 48', role: 'img', 'aria-hidden': 'true', focusable: 'false' },
+                    [
+                      e('path', { fill: '#EA4335', d: 'M24 9.5c3.54 0 6.7 1.23 9.19 3.25l6.86-6.86C35.96 2.36 30.3 0 24 0 14.64 0 6.53 5.39 2.56 13.22l7.98 6.19C12.41 13.06 17.74 9.5 24 9.5z' }),
+                      e('path', { fill: '#4285F4', d: 'M46.5 24.5c0-1.6-.14-3.15-.41-4.65H24v9h12.71c-.55 2.95-2.23 5.45-4.73 7.13l7.29 5.67C43.9 37.34 46.5 31.4 46.5 24.5z' }),
+                      e('path', { fill: '#FBBC05', d: 'M10.54 28.41a14.5 14.5 0 0 1 0-8.82l-7.98-6.19A23.99 23.99 0 0 0 0 24c0 3.95.95 7.68 2.56 11.02l7.98-6.61z' }),
+                      e('path', { fill: '#34A853', d: 'M24 48c6.48 0 11.93-2.14 15.9-5.85l-7.29-5.67c-2.03 1.36-4.64 2.17-8.61 2.17-6.26 0-11.59-3.56-13.46-8.91l-7.98 6.61C6.53 42.61 14.64 48 24 48z' }),
+                    ]
+                  )),
+                  e('span', null, 'Continue with Google'),
+                ]),
+              ]
+            ) : null,
             e(
               AnimatePresence,
               { key: 'error-presence' },
@@ -313,7 +339,7 @@
         ),
         e(
           motion.div,
-          { variants: variants.item, initial: 'hidden', animate: 'show', custom: 5, className: 'secondary-actions' },
+          { variants: variants.item, initial: 'hidden', animate: 'show', custom: 6, className: 'secondary-actions' },
           [
             e('span', null, [
               isEmployer ? 'Need an employer account? ' : "Don't have an account? ",
@@ -343,6 +369,8 @@
     subtitle: clean(rootEl.dataset.subtitle),
     resendUrl: clean(rootEl.dataset.resendUrl) || '#',
     isEmployer: (clean(rootEl.dataset.action) || '').includes('/employer/'),
+    googleUrl: clean(rootEl.dataset.googleUrl) || '',
+    googleDivider: clean(rootEl.dataset.googleDivider),
   };
 
   ReactDOM.createRoot(rootEl).render(e(LoginApp, props));

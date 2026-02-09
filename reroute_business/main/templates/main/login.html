@@ -7,14 +7,13 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/login.css' %}">
 
+{% url 'oauth_role_redirect' as oauth_role_redirect_url %}
+{% with google_next=oauth_role_redirect_url|add:'?role=user' %}
+  {% provider_login_url "google" process="login" next=google_next as google_login_url %}
+{% endwith %}
+
 <div class="auth-shell">
   <div class="auth-grid">
-    <div class="auth-visual" aria-hidden="true">
-      <div class="auth-visual-layer">
-        <img class="auth-logo" src="{% static 'images/reroute-trans-logo.png' %}" alt="ReRoute">
-      </div>
-    </div>
-
     <div class="auth-panel">
       <div class="auth-panel-card">
         <div
@@ -27,6 +26,8 @@
           data-signup-url="{% url 'signup' %}"
           data-employer-url="{% url 'employer_login' %}"
           data-resend-url="{% url 'resend_verification' %}"
+          data-google-url="{{ google_login_url }}"
+          data-google-divider="Or log in with"
         ></div>
 
         <div id="login-fallback">
@@ -84,6 +85,8 @@
             </div>
 
             <button id="signin-btn" type="submit" class="btn-pill">Sign in</button>
+
+            {% include "main/partials/google_auth.html" with divider_text="Or log in with" google_url=google_login_url %}
 
             <div class="secondary-actions">
               <span>Don't have an account? <a class="link" href="{% url 'signup' %}">Register</a>.</span>

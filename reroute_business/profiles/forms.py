@@ -277,3 +277,19 @@ class EmployerProfileForm(forms.ModelForm):
         if ctype and ctype.lower() not in allowed:
             raise forms.ValidationError("Unsupported image type. Use JPG, PNG, GIF, or WebP.")
         return bg
+
+
+class EmployerOnboardingForm(forms.ModelForm):
+    class Meta:
+        model = EmployerProfile
+        fields = ['company_name', 'website', 'description']
+        widgets = {
+            'company_name': forms.TextInput(attrs={'placeholder': 'Company name'}),
+            'website': forms.URLInput(attrs={'placeholder': 'https://example.com'}),
+            'description': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Tell candidates about your mission.'}),
+        }
+        labels = {
+            'company_name': 'Company name',
+            'website': 'Website (optional)',
+            'description': 'Company description (optional)',
+        }

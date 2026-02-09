@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 {% load static %}
+{% load socialaccount %}
 
 {% block title %}ReRoute | Sign Up{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/signup.css' %}">
 
+{% url 'oauth_role_redirect' as oauth_role_redirect_url %}
+{% with google_next=oauth_role_redirect_url|add:'?role=user' %}
+  {% provider_login_url "google" process="login" next=google_next as google_login_url %}
+{% endwith %}
+
 <div class="auth-shell">
   <div class="auth-grid">
-    <div class="auth-visual" aria-hidden="true">
-      <div class="auth-visual-layer">
-        <img class="auth-logo" src="{% static 'images/reroute-trans-logo.png' %}" alt="ReRoute">
-      </div>
-    </div>
-
     <div class="auth-panel">
       <div class="auth-panel-card signup-card">
         <div
@@ -29,6 +29,8 @@
           data-login-url="{% url 'login' %}"
           data-terms-url="{% url 'terms' %}"
           data-privacy-url="{% url 'privacy' %}"
+          data-google-url="{{ google_login_url }}"
+          data-google-divider="Or sign up with"
         ></div>
 
         <div id="signup-fallback">
@@ -117,6 +119,8 @@
               <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
             {% endif %}
             <button type="submit" class="submit-btn">Create account</button>
+
+            {% include "main/partials/google_auth.html" with divider_text="Or sign up with" google_url=google_login_url %}
           </form>
 
           <div class="secondary-actions">

@@ -63,6 +63,7 @@ except Exception:
 # Local Imports
 # -----------------------------
 from reroute_business.profiles.models import EmployerProfile, UserProfile, Subscription
+from reroute_business.profiles.forms import EmployerOnboardingForm
 from reroute_business.profiles.constants import GENDER_CHOICES, PROFILE_GRADIENT_CHOICES
 from reroute_business.main.models import YouTubeVideo
 try:
@@ -1015,6 +1016,67 @@ def employer_signup_view(request):
         'email': user.email,
         'is_employer': True,
     })
+
+
+def _is_employer_user(user) -> bool:
+    if not getattr(user, "is_authenticated", False):
+        return False
+    try:
+        if hasattr(user, "employerprofile") and user.employerprofile:
+            return True
+    except Exception:
+        pass
+    try:
+        return user.groups.filter(name__in=["Employer", "Employers"]).exists()
+    except Exception:
+        return False
+
+
+@login_required
+def employer_oauth_onboarding_view(request):
+    if _is_employer_user(request.user):
+        return redirect('dashboard:employer')
+
+    form = EmployerOnboardingForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        employer_profile = form.save(commit=False)
+        employer_profile.user = request.user
+        employer_profile.save()
+        try:
+            employer_group, _ = Group.objects.get_or_create(name="Employer")
+            request.user.groups.add(employer_group)
+        except Exception:
+            pass
+        return redirect('dashboard:employer')
+
+    return render(request, "main/employer_onboarding.html", {"form": form})
+
+
+@login_required
+def oauth_role_redirect(request):
+    user = request.user
+    role = (request.GET.get("role") or "").strip().lower()
+
+    try:
+        if user.is_staff or user.is_superuser:
+            return redirect("dashboard:admin")
+    except NoReverseMatch:
+        if user.is_staff or user.is_superuser:
+            return redirect("/dashboard/admin/")
+
+    is_employer_user = _is_employer_user(user)
+
+    if role == "employer":
+        if is_employer_user:
+            return redirect("dashboard:employer")
+        return redirect("employer_oauth_onboarding")
+
+    if role == "user":
+        if is_employer_user:
+            return redirect("dashboard:employer")
+        return redirect("dashboard:user")
+
+    return redirect("dashboard:employer" if is_employer_user else "dashboard:user")
 
 
 @csrf_protect

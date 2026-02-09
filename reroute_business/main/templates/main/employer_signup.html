@@ -1,11 +1,17 @@
 {# employers/employer_signup.html #}
 {% extends "base.html" %}
 {% load static %}
+{% load socialaccount %}
 {% block title %}Employer Signup{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/employer_login.css' %}"> {# reuse styles #}
 <link rel="stylesheet" href="{% static 'css/employer_signup.css' %}"> {# overrides below #}
+
+{% url 'oauth_role_redirect' as oauth_role_redirect_url %}
+{% with google_next=oauth_role_redirect_url|add:'?role=employer' %}
+  {% provider_login_url "google" process="login" next=google_next as google_login_url %}
+{% endwith %}
 
 <section class="auth-card auth-card--wide">
   <div
@@ -23,6 +29,8 @@
     data-user-signup-url="{% url 'signup' %}"
     data-terms-url="{% url 'terms' %}"
     data-privacy-url="{% url 'privacy' %}"
+    data-google-url="{{ google_login_url }}"
+    data-google-divider="Or sign up with"
   ></div>
 
   <div id="employer-signup-fallback">
@@ -115,6 +123,8 @@
         <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
       {% endif %}
       <button type="submit" class="btn-pill">Create employer account</button>
+
+      {% include "main/partials/google_auth.html" with divider_text="Or sign up with" google_url=google_login_url %}
 
       <div class="secondary-actions">
         <span>Already have an account? <a class="link" href="{% url 'employer_login' %}">Employer login</a>.</span>

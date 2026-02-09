@@ -230,6 +230,62 @@ input:focus{
   animation:spin .8s linear infinite;
 }
 
+.oauth-divider{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:18px 0 14px;
+  color:#6b7280;
+  font-size:14px;
+}
+
+.oauth-divider-line{
+  flex:1;
+  height:1px;
+  background:#e5e7eb;
+}
+
+.oauth-divider-text{
+  white-space:nowrap;
+}
+
+.oauth-google-btn{
+  width:100%;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:14px 20px;
+  border-radius:999px;
+  border:1px solid #e5e7eb;
+  background:#fff;
+  color:#111827;
+  font-weight:600;
+  text-decoration:none;
+  box-shadow:0 6px 14px rgba(15, 23, 42, 0.08);
+  transition:background .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.oauth-google-btn:hover{
+  background:#f9fafb;
+  box-shadow:0 8px 18px rgba(15, 23, 42, 0.12);
+  transform:translateY(-1px);
+}
+
+.oauth-google-btn:active{
+  transform:translateY(0);
+  box-shadow:0 5px 12px rgba(15, 23, 42, 0.1);
+}
+
+.oauth-google-btn:focus-visible{
+  outline:2px solid rgba(37, 99, 235, 0.4);
+  outline-offset:2px;
+}
+
+.oauth-google-icon{
+  display:inline-flex;
+}
+
 /* Secondary actions */
 .secondary-actions{
   margin-top:16px;

@@ -1,10 +1,16 @@
 {% extends "base.html" %}
 {% load static %}
+{% load socialaccount %}
 
 {% block title %}Employer Login{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/employer_login.css' %}">
+
+{% url 'oauth_role_redirect' as oauth_role_redirect_url %}
+{% with google_next=oauth_role_redirect_url|add:'?role=employer' %}
+  {% provider_login_url "google" process="login" next=google_next as google_login_url %}
+{% endwith %}
 
 <section class="auth-card">
   <div
@@ -22,6 +28,8 @@
     data-subtitle="Access your dashboard to post jobs and manage applications"
     data-signup-label="Create employer account"
     data-mode="employer"
+    data-google-url="{{ google_login_url }}"
+    data-google-divider="Or log in with"
   ></div>
 
   <div id="employer-fallback">
@@ -90,6 +98,8 @@
 
       <!-- Primary pill CTA -->
       <button id="employer-login-btn" type="submit" class="btn-pill">Sign in</button>
+
+      {% include "main/partials/google_auth.html" with divider_text="Or log in with" google_url=google_login_url %}
 
       <!-- Secondary actions (best home for Employer/User switch) -->
       <div class="secondary-actions">

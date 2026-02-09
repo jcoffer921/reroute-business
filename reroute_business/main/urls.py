@@ -33,8 +33,10 @@ urlpatterns = [
     # ================ Employer Auth & Dashboard ================
     path('employer/login/', views.employer_login_view, name='employer_login'),
     path('employer/signup/', views.employer_signup_view, name='employer_signup'),
+    path('employer/onboarding/', views.employer_oauth_onboarding_view, name='employer_oauth_onboarding'),
     # Legacy employer dashboard path → redirect to dashboard app
     path('employer/dashboard/', lambda request: redirect('dashboard:employer'), name='employer_dashboard'),
+    path('accounts/role-redirect/', views.oauth_role_redirect, name='oauth_role_redirect'),
 
     # ================ Apps ================
     path('blog/', include('reroute_business.blog.urls')),
