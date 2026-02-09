@@ -7,9 +7,8 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/employer_login.css' %}">
 
-{% url 'socialaccount_login' 'google' as google_base %}
 {% url 'oauth_role_redirect' as oauth_role_redirect_url %}
-{% with google_login_url=google_base|add:'?next='|add:oauth_role_redirect_url|add:'?role=employer' %}
+{% provider_login_url "google" process="login" next=oauth_role_redirect_url|add:'?role=employer' as google_login_url %}
 
 <section class="auth-card">
   <div
@@ -119,5 +118,4 @@
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" defer></script>
 <script crossorigin src="https://cdn.jsdelivr.net/npm/framer-motion@10.16.4/dist/framer-motion.umd.min.js" defer></script>
 <script src="{% static 'js/login-react.js' %}" defer></script>
-{% endwith %}
 {% endblock %}

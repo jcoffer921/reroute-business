@@ -7,9 +7,8 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/signup.css' %}">
 
-{% url 'socialaccount_login' 'google' as google_base %}
 {% url 'oauth_role_redirect' as oauth_role_redirect_url %}
-{% with google_login_url=google_base|add:'?next='|add:oauth_role_redirect_url|add:'?role=user' %}
+{% provider_login_url "google" process="login" next=oauth_role_redirect_url|add:'?role=user' as google_login_url %}
 
 <div class="auth-shell">
   <div class="auth-grid">
@@ -138,5 +137,4 @@
   {% if recaptcha_site_key %}
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   {% endif %}
-{% endwith %}
 {% endblock %}
