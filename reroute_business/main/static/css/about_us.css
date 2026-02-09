@@ -76,7 +76,7 @@
 
 /* ============= FOUNDERS SECTION ============= */
 .founders-section{
-  background:#f8fafc;
+  background:#fff;
   color:#0f172a;
   padding: clamp(2.75rem, 6vw, 5rem) 1.25rem;
 }
@@ -92,16 +92,14 @@
   display:grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
+  background:#fff;
 }
 .founder-column{
   margin:0;
   position:relative;
 }
-.founder-column.is-outer{
-  transform: translateY(-14px);
-}
 .founder-column.is-center{
-  transform: translateY(10px);
+  transform: translateY(32px);
 }
 .founder-portrait{
   position:relative;
@@ -121,8 +119,9 @@
 }
 .founder-portrait img{
   width:100%;
-  height:88%;
+  height:100%;
   object-fit: cover;
+  object-position: 50% 15%;
   display:block;
   position:relative;
   z-index:1;
@@ -143,7 +142,7 @@
   color:#fff;
 }
 .badge-top{
-  top:42%;
+  top:38%;
   background:#fff;
   color:#0f172a;
 }
