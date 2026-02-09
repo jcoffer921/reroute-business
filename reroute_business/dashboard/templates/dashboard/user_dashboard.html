@@ -37,33 +37,38 @@
   </aside>
 
   <main class="dash-main">
-    <header class="dash-hero">
-      <div class="dash-hero-content">
-        <p class="eyebrow">Dashboard</p>
-        <h1>Welcome, {{ request.user.first_name|default:request.user.username }}!</h1>
-        <p class="muted">Keep momentum with your profile and resume while employers onboard.</p>
-        {% if early_access_mode %}
-          <div class="early-access-banner">{{ early_access_message }}</div>
-        {% endif %}
-        {% if profile.early_access_priority %}
-          <span class="pill">Early Access — Priority Profile</span>
-        {% endif %}
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <p class="stat-label">Matches{% if not jobs_live %} (soon){% endif %}</p>
-            <p class="stat-number">{{ stats.matches_found|default:0 }}</p>
+    <section class="dashboard-hero">
+      <div class="dashboard-hero-inner">
+        <div class="dashboard-hero-spacer" aria-hidden="true"></div>
+        <header class="dash-hero">
+          <div class="dash-hero-content">
+            <p class="eyebrow">Dashboard</p>
+            <h1>Welcome, {{ request.user.first_name|default:request.user.username }}!</h1>
+            <p class="muted">Keep momentum with your profile and resume while employers onboard.</p>
+            {% if early_access_mode %}
+              <div class="early-access-banner">{{ early_access_message }}</div>
+            {% endif %}
+            {% if profile.early_access_priority %}
+              <span class="pill">Early Access — Priority Profile</span>
+            {% endif %}
+            <div class="hero-stats">
+              <div class="hero-stat">
+                <p class="stat-label">Matches{% if not jobs_live %} (soon){% endif %}</p>
+                <p class="stat-number">{{ stats.matches_found|default:0 }}</p>
+              </div>
+              <div class="hero-stat">
+                <p class="stat-label">Applications</p>
+                <p class="stat-number">{{ stats.applications_sent|default:0 }}</p>
+              </div>
+              <div class="hero-stat">
+                <p class="stat-label">Profile views</p>
+                <p class="stat-number">{{ stats.profile_views|default:0 }}</p>
+              </div>
+            </div>
           </div>
-          <div class="hero-stat">
-            <p class="stat-label">Applications</p>
-            <p class="stat-number">{{ stats.applications_sent|default:0 }}</p>
-          </div>
-          <div class="hero-stat">
-            <p class="stat-label">Profile views</p>
-            <p class="stat-number">{{ stats.profile_views|default:0 }}</p>
-          </div>
-        </div>
+        </header>
       </div>
-    </header>
+    </section>
 
     <section class="card next-step-card" aria-label="Next step">
       <div class="next-step-content">

@@ -59,27 +59,41 @@
 
 .dash-main { flex: 1; display: flex; flex-direction: column; gap: 16px; }
 
+.dashboard-hero {
+  background: linear-gradient(180deg, #7db6ff 0%, #5b8fe2 100%);
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  position: relative;
+  overflow: hidden;
+}
+.dashboard-hero-inner {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 56px 24px 64px;
+  display: flex;
+  gap: 24px;
+}
+.dashboard-hero-spacer { width: 240px; flex: 0 0 240px; }
 .dash-hero {
-  background: linear-gradient(135deg, #0f172a, #2563eb);
   color: #f8fafc;
-  border-radius: 16px;
-  padding: 28px 24px;
-  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.22);
+  flex: 1;
 }
 .dash-hero-content { display: grid; gap: 12px; }
-.dash-hero h1 { margin: 0; font-size: 26px; }
-.dash-hero .muted { margin: 0; color: #e2e8f0; }
+.dash-hero h1 { margin: 0; font-size: 26px; color: #fff; }
+.dash-hero .muted { margin: 0; color: #e8f1ff; }
+.dash-hero .eyebrow { color: #dbeafe; }
 .early-access-banner {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #f1f5f9;
   padding: 10px 12px;
   border-radius: 12px;
   font-size: 13px;
 }
 .hero-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 4px; }
-.hero-stat { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 10px; }
-.hero-stat .stat-label { margin: 0; font-size: 13px; color: #cbd5e1; }
+.hero-stat { background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.22); border-radius: 12px; padding: 10px; }
+.hero-stat .stat-label { margin: 0; font-size: 13px; color: #e2e8f0; }
 .hero-stat .stat-number { margin: 4px 0 0; font-size: 20px; font-weight: 800; color: #fff; }
 .eyebrow {
   font-size: 12px;
@@ -377,9 +391,13 @@
   .sidebar-section { min-width: 180px; margin-bottom: 0; }
   .dash-header { flex-direction: column; }
   .header-pills { justify-content: flex-start; }
+  .dashboard-hero-inner { flex-direction: column; padding: 44px 20px 52px; }
+  .dashboard-hero-spacer { display: none; }
 }
 
 @media (max-width: 640px) {
   .quick-action { min-width: 170px; }
   .section-heading { flex-direction: column; align-items: flex-start; }
+  .dashboard-hero-inner { padding: 36px 16px 44px; }
+  .dash-hero h1 { font-size: 22px; }
 }
