@@ -3,8 +3,6 @@
 
 {% block title %}User Dashboard{% endblock %}
 {% block body_class %}dashboard-page{% endblock %}
-{% block nav_center %}<span class="nav-center-label">Dashboard</span>{% endblock %}
-
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'dashboard/css/user_dashboard.css' %}">
 {% endblock %}
@@ -15,7 +13,7 @@
     <div class="hero-pill">EARLY ACCESS</div>
     <h1>Welcome back, {{ request.user.first_name|default:request.user.username }}</h1>
     <p class="hero-subhead">You're making real progress</p>
-    <p class="hero-support">Employers are onboarding now. Keep going — you're building something that matters.</p>
+    <p class="hero-support">Employers are onboarding now. Keep going, you're building something that matters.</p>
     <div class="hero-actions">
       <a class="btn-primary" href="{{ hero_cta_url }}">{{ hero_cta_label }} <span aria-hidden="true">→</span></a>
     </div>
@@ -38,9 +36,9 @@
         <span class="section-pill">Every step forward counts. You're building momentum.</span>
       </div>
       <div class="progress-body">
-        <div class="progress-ring" data-progress="{{ readiness_percent|default:0 }}">
+        <div class="progress-ring" data-progress="70">
           <div class="progress-ring-inner">
-            <span class="progress-value">{{ readiness_percent|default:0 }}%</span>
+            <span class="progress-value">70%</span>
             <span class="progress-label">Profile</span>
           </div>
         </div>

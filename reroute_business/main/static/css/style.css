@@ -69,14 +69,8 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
 }
 
-.navbar-logo { display: flex; align-items: center; flex-shrink: 0; gap: 0.5rem; }
+.navbar-logo { display: flex; align-items: center; flex-shrink: 0; }
 .navbar-logo img, .brand-logo { height: 54px; max-height: 54px; width: auto; object-fit: contain; }
-.brand-wordmark {
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  color: inherit;
-}
 
 .navbar-links-container {
   display: grid;
@@ -85,13 +79,6 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
   width: 100%;
   gap: 1rem;
 }
-.nav-center {
-  justify-self: center;
-  grid-column: 2;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-.nav-center:empty { display: none; }
 
 .nav-links {
   display: flex;

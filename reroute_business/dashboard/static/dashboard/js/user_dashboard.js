@@ -81,7 +81,25 @@ function initThoughts() {
   };
 
   render();
-  if (nextBtn) nextBtn.addEventListener('click', next);
+  let interval = setInterval(next, 9000);
+
+  const resetInterval = () => {
+    clearInterval(interval);
+    interval = setInterval(next, 9000);
+  };
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      next();
+      resetInterval();
+    });
+  }
+
+  card.addEventListener('click', () => {
+    next();
+    resetInterval();
+  });
 }
 
 function initCarousel() {
