@@ -10,7 +10,7 @@
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
     <div class="page-wrapper">
         <!-- =================== NAVBAR (fixed) =================== -->
         <nav class="navbar navbar--auto-hide" data-navbar>
@@ -18,9 +18,13 @@
                 <a href="{% url 'home' %}">
                     <img src="{% static 'images/reroute-trans-logo.png' %}" alt="ReRoute Logo" class="brand-logo">
                 </a>
+                <span class="brand-wordmark">ReRoute</span>
             </div>
 
             <div class="navbar-links-container">
+                <div class="nav-center">
+                    {% block nav_center %}{% endblock %}
+                </div>
                 <!-- ---------- Left-side navigation links ---------- -->
                 <div class="nav-links">
                     <a href="{% url 'about_us' %}">About Us</a>
@@ -55,8 +59,14 @@
                       Button shows user's initials; clicking toggles dropdown menu.
                       JS in base.js should control .show on #userDropdown and body.no-scroll for mobile.
                     -->
-                    <button class="user-initials-btn" id="userMenuButton" aria-expanded="false" aria-controls="userDropdown">
-                        {{ user.first_name|default:user.username|slice:":1" }}{{ user.last_name|default:""|slice:":1" }}
+                    <button class="user-initials-btn user-menu-trigger" id="userMenuButton" aria-expanded="false" aria-controls="userDropdown">
+                        <span class="user-menu-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false">
+                                <circle cx="12" cy="8" r="4"></circle>
+                                <path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>
+                            </svg>
+                        </span>
+                        <span class="user-menu-name">{{ user.first_name|default:user.username }}</span>
                     </button>
                     <div class="user-dropdown" id="userDropdown" role="menu" aria-labelledby="userMenuButton">
                         <a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a>

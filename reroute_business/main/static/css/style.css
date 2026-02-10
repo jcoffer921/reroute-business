@@ -69,8 +69,14 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
 }
 
-.navbar-logo { display: flex; align-items: center; flex-shrink: 0; }
+.navbar-logo { display: flex; align-items: center; flex-shrink: 0; gap: 0.5rem; }
 .navbar-logo img, .brand-logo { height: 54px; max-height: 54px; width: auto; object-fit: contain; }
+.brand-wordmark {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: inherit;
+}
 
 .navbar-links-container {
   display: grid;
@@ -79,6 +85,13 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
   width: 100%;
   gap: 1rem;
 }
+.nav-center {
+  justify-self: center;
+  grid-column: 2;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.nav-center:empty { display: none; }
 
 .nav-links {
   display: flex;
@@ -218,10 +231,30 @@ iframe { max-width: 100%; border: 0; }
 .user-menu-container { position: relative; display: flex; align-items: center; }
 .user-initials-btn {
   background: var(--accent-cyan); color: #fff;
-  border: none; border-radius: 999px; width: 42px; height: 42px;
-  font-weight: 700; font-size: 0.95rem; text-transform: uppercase; cursor: pointer;
-  display: inline-flex; align-items: center; justify-content: center;
+  border: none; border-radius: 999px; height: 42px;
+  font-weight: 700; font-size: 0.95rem; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0 0.85rem;
 }
+.user-menu-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.2);
+}
+.user-menu-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.user-menu-name { font-weight: 600; text-transform: capitalize; }
 .user-initials-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
 /* DROPDOWN — fixed: no more left:725px */
@@ -290,6 +323,7 @@ iframe { max-width: 100%; border: 0; }
   /* Navbar compresses on mobile */
   .navbar { height: var(--nav-h-sm); padding: 0 .75rem; }
   .navbar-logo img { height: 48px; }
+  .brand-wordmark { font-size: 1rem; }
 
   /* Hide desktop nav + desktop profile controls */
   .nav-links, .user-menu-container, .user-profile-right { display: none !important; }

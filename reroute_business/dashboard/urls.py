@@ -32,6 +32,7 @@ urlpatterns = [
     path('user/interviews/', views.user_interviews_modal, name='user_interviews_modal'),
     path('user/interviews/accept/', views.user_accept_interview, name='user_accept_interview'),
     path('user/interviews/request-reschedule/', views.user_request_reschedule, name='user_request_reschedule'),
+    path('user/notify/', views.toggle_job_notifications, name='toggle_job_notifications'),
 
     # ===== Employer analytics =====
     path('employer/analytics/', views.employer_analytics, name='employer_analytics'),

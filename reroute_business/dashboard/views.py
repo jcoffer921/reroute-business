@@ -12,6 +12,7 @@ from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.db.models import Q
 from django.http import JsonResponse
+from django.urls import reverse
 
 
 
@@ -269,27 +270,50 @@ def user_dashboard(request):
     except Exception:
         pass
 
-    if not user_profile.profile_is_complete():
-        next_step = {
-            "title": "Complete your profile",
-            "desc": "Add the basics so employers can understand your goals.",
-            "cta": "Complete profile",
-            "url": user_profile.get_next_step_url(),
-        }
-    elif not user_profile.resume_is_complete(resume=resume):
-        next_step = {
-            "title": "Build your resume",
-            "desc": "Create or upload a resume to unlock early access priority.",
-            "cta": "Build your resume",
-            "url": user_profile.get_next_step_url(),
-        }
+    profile_complete = user_profile.profile_is_complete()
+    resume_complete = user_profile.resume_is_complete(resume=resume)
+    modules_started = modules_completed > 0
+
+    readiness_score = 0
+    readiness_score += 35 if resume_complete else 0
+    readiness_score += 35 if profile_complete else (15 if (user_profile.bio or user_profile.profile_picture) else 0)
+    readiness_score += 15 if modules_started else 0
+    readiness_score += 15 if organizations_saved_count > 0 else 0
+    readiness_percent = min(100, readiness_score)
+
+    if readiness_percent < 100:
+        hero_cta_label = "Complete Your Profile"
+        hero_cta_url = f"{reverse('settings')}?panel=profile"
+    elif jobs_live:
+        hero_cta_label = "View opportunities"
+        hero_cta_url = reverse('opportunities')
     else:
-        next_step = {
-            "title": "You’re ready",
-            "desc": "You’re in line for early access when employers launch jobs.",
-            "cta": "View dashboard",
-            "url": user_profile.get_next_step_url(),
-        }
+        hero_cta_label = "View dashboard"
+        hero_cta_url = reverse('dashboard:user')
+
+    notify_jobs_live = bool(request.session.get("notify_jobs_live", False))
+    notify_job_matches = bool(request.session.get("notify_job_matches", False))
+
+    progress_items = [
+        {
+            "label": "Resume uploaded",
+            "subtext": "Looking great" if resume_complete else "Upload to unlock matches",
+            "url": reverse("resumes:resume_welcome"),
+            "done": resume_complete,
+        },
+        {
+            "label": "Learning module started",
+            "subtext": f"{modules_completed} of 3 completed" if modules_completed else "Start your first module",
+            "url": f"{reverse('resource_list')}#modules",
+            "done": modules_started,
+        },
+        {
+            "label": "Organizations saved",
+            "subtext": "Find support near you",
+            "url": reverse("reentry_org:organization_catalog"),
+            "done": organizations_saved_count > 0,
+        },
+    ]
 
     # Log first dashboard visit for onboarding
     try:
@@ -329,8 +353,29 @@ def user_dashboard(request):
         'early_access_mode': early_access_mode,
         'jobs_live': jobs_live,
         'early_access_message': early_access_message,
-        'next_step': next_step,
+        'hero_cta_label': hero_cta_label,
+        'hero_cta_url': hero_cta_url,
+        'readiness_percent': readiness_percent,
+        'progress_items': progress_items,
+        'profile_complete': profile_complete,
+        'resume_complete': resume_complete,
+        'notify_jobs_live': notify_jobs_live,
+        'notify_job_matches': notify_job_matches,
     })
+
+
+@login_required
+@require_POST
+def toggle_job_notifications(request):
+    pref = (request.POST.get("pref") or "jobs_live").strip().lower()
+    key = "notify_jobs_live" if pref == "jobs_live" else "notify_job_matches"
+    current = bool(request.session.get(key, False))
+    request.session[key] = not current
+    request.session.modified = True
+
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return _json_ok({"preference": key, "enabled": request.session[key]})
+    return redirect("dashboard:user")
 
 
 # =========================

@@ -2,316 +2,261 @@
 {% load static %}
 
 {% block title %}User Dashboard{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
+{% block nav_center %}<span class="nav-center-label">Dashboard</span>{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'dashboard/css/base.css' %}">
 <link rel="stylesheet" href="{% static 'dashboard/css/user_dashboard.css' %}">
 {% endblock %}
 
 {% block content %}
-{% load profile_extras %}
 <section class="dashboard-hero">
   <div class="dashboard-hero-inner">
-    <header class="dash-hero">
-      <div class="dash-hero-content">
-        <p class="eyebrow">Dashboard</p>
-        <h1>Welcome, {{ request.user.first_name|default:request.user.username }}!</h1>
-        <p class="muted">Keep momentum with your profile and resume while employers onboard.</p>
-        {% if early_access_mode %}
-          <div class="early-access-banner">{{ early_access_message }}</div>
-        {% endif %}
-        {% if profile.early_access_priority %}
-          <span class="pill">Early Access — Priority Profile</span>
-        {% endif %}
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <p class="stat-label">Matches{% if not jobs_live %} (soon){% endif %}</p>
-            <p class="stat-number">{{ stats.matches_found|default:0 }}</p>
-          </div>
-          <div class="hero-stat">
-            <p class="stat-label">Applications</p>
-            <p class="stat-number">{{ stats.applications_sent|default:0 }}</p>
-          </div>
-          <div class="hero-stat">
-            <p class="stat-label">Profile views</p>
-            <p class="stat-number">{{ stats.profile_views|default:0 }}</p>
-          </div>
-        </div>
-      </div>
-    </header>
+    <div class="hero-pill">EARLY ACCESS</div>
+    <h1>Welcome back, {{ request.user.first_name|default:request.user.username }}</h1>
+    <p class="hero-subhead">You're making real progress</p>
+    <p class="hero-support">Employers are onboarding now. Keep going — you're building something that matters.</p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="{{ hero_cta_url }}">{{ hero_cta_label }} <span aria-hidden="true">→</span></a>
+    </div>
   </div>
 </section>
 
-<div class="dashboard-shell">
-  <aside class="dash-sidebar">
-    {% with active=request.resolver_match.url_name %}
-    <div class="sidebar-section">
-      <p class="sidebar-label">Main</p>
-      <a class="sidebar-link {% if active == 'user' %}active{% endif %}" href="{% url 'dashboard:user' %}">Dashboard</a>
-      <a class="sidebar-link" href="{% url 'dashboard:notifications' %}">Notifications</a>
-    </div>
-    <div class="sidebar-section">
-      <p class="sidebar-label">Career</p>
-      <a class="sidebar-link" href="{% url 'opportunities' %}">Jobs</a>
-      <a class="sidebar-link" href="{% url 'dashboard:saved_jobs' %}">Saved Jobs</a>
-    </div>
-    <div class="sidebar-section">
-      <p class="sidebar-label">Learning</p>
-      <a class="sidebar-link" href="{% url 'resource_list' %}#modules">Modules</a>
-      <a class="sidebar-link" href="{% url 'reentry_org:organization_catalog' %}">Reentry Orgs</a>
-    </div>
-    <div class="sidebar-section">
-      <p class="sidebar-label">Account</p>
-      <a class="sidebar-link" href="{% url 'settings' %}?panel=profile">Profile Settings</a>
-      <a class="sidebar-link" href="{% url 'contact' %}">Support</a>
-    </div>
-    {% endwith %}
-  </aside>
-
-  <main class="dash-main">
-
-    <section class="card next-step-card" aria-label="Next step">
-      <div class="next-step-content">
-        <p class="eyebrow">Next step</p>
-        <h2>{{ next_step.title }}</h2>
-        <p class="muted">{{ next_step.desc }}</p>
-      </div>
-      <a class="btn btn-primary" href="{{ next_step.url }}">{{ next_step.cta }}</a>
-    </section>
-
-    <div class="grid two-col">
-      <section class="card interviews-card">
-        <div class="section-heading">
-          <div>
-            <h2>Scheduled Interviews</h2>
-            <p>Upcoming interviews you have lined up</p>
-          </div>
-          <button type="button" id="openUserInterviews" class="btn btn-primary btn-sm">View</button>
-        </div>
-        {% if upcoming_interviews %}
-          <div class="list-stack">
-            {% for iv in upcoming_interviews %}
-              <article class="stack-item">
-                <div class="stack-body">
-                  <div class="stack-title">
-                    <a href="{% url 'job_detail' iv.job.id %}">{{ iv.job.title }}</a>
-                    <span class="muted"> · {{ iv.employer.get_full_name|default:iv.employer.username }}</span>
-                  </div>
-                  <div class="stack-meta">
-                    <span class="badge subtle">Interview</span>
-                    <time datetime="{{ iv.scheduled_at|date:'c' }}">{{ iv.scheduled_at|date:"M d, Y g:ia" }}</time>
-                  </div>
-                </div>
-              </article>
-            {% endfor %}
-          </div>
-        {% else %}
-          <div class="empty-state minimal">
-            <h4>No interviews scheduled</h4>
-            <p>{% if jobs_live %}Keep applying and we’ll place interviews here.{% else %}We’ll place interviews here once jobs launch.{% endif %}</p>
-          </div>
-        {% endif %}
-      </section>
-
-      <section class="card tips-card">
-        <div class="section-heading">
-          <div>
-            <h2>Helpful Tips</h2>
-            <p>Personalized nudges and next steps</p>
-          </div>
-          <button id="nextTipBtn" class="btn btn-outline btn-sm">Next</button>
-        </div>
-        <div id="tipText" class="tip-item">Loading tips...</div>
-      </section>
-    </div>
-
+<div class="dashboard-container">
+  <div class="section-grid">
     <section class="card progress-card">
-      <div class="section-heading">
-        <div>
+      <div class="section-header">
+        <div class="section-title">
+          <span class="section-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 12a8 8 0 1 1 16 0" />
+              <path d="M12 4v8l6 3" />
+            </svg>
+          </span>
           <h2>Your Progress</h2>
-          <p>Track readiness across resume, profile, and learning</p>
         </div>
-        <a href="{{ PROFILE_URL }}" class="link-sm">View details</a>
+        <span class="section-pill">Every step forward counts. You're building momentum.</span>
       </div>
-      <div class="progress-grid">
-        {% with resume_percent=resume|yesno:"92,40" %}
-        <div class="progress-tile" data-value="{{ resume_percent }}">
-          <div class="progress-ring" aria-hidden="true"></div>
-          <div class="progress-meta">
-            <p class="label">Resume completeness</p>
-            <p class="value">{{ resume_percent }}%</p>
-            <p class="hint">
-              {% if resume %}
-                Great work—keep it updated.
+      <div class="progress-body">
+        <div class="progress-ring" data-progress="{{ readiness_percent|default:0 }}">
+          <div class="progress-ring-inner">
+            <span class="progress-value">{{ readiness_percent|default:0 }}%</span>
+            <span class="progress-label">Profile</span>
+          </div>
+        </div>
+        <div class="progress-list">
+          {% for item in progress_items %}
+          <a class="progress-item" href="{{ item.url }}">
+            <span class="progress-status {% if item.done %}is-done{% endif %}">
+              {% if item.done %}
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12l4 4L19 6" /></svg>
               {% else %}
-                {% if jobs_live %}Upload to unlock matches.{% else %}Upload to unlock early access.{% endif %}
+              <span class="status-dot"></span>
               {% endif %}
-            </p>
-          </div>
-        </div>
-        {% endwith %}
-        <div class="progress-tile" data-value="{{ modules_completed_percent|default:0 }}">
-          <div class="progress-ring" aria-hidden="true"></div>
-          <div class="progress-meta">
-            <p class="label">Modules completed</p>
-            <p class="value">{{ modules_completed|default:0 }}</p>
-            <p class="hint"><a href="{% url 'resource_list' %}#modules">Continue learning</a></p>
-          </div>
-        </div>
-        <div class="progress-tile" data-value="{{ completion_percentage|default:0 }}">
-          <div class="progress-ring" aria-hidden="true"></div>
-          <div class="progress-meta">
-            <p class="label">Profile completion</p>
-            <p class="value">{{ completion_percentage|default:0 }}%</p>
-            <p class="hint">Finish your profile for better matches.</p>
-          </div>
-        </div>
-        <div class="progress-tile" data-value="{{ organizations_saved_count|default:0 }}">
-          <div class="progress-ring" aria-hidden="true"></div>
-          <div class="progress-meta">
-            <p class="label">Organizations saved</p>
-            <p class="value">{{ organizations_saved_count|default:0 }}</p>
-            <p class="hint"><a href="{% url 'reentry_org:organization_catalog' %}">Browse support near you</a></p>
-          </div>
+            </span>
+            <div class="progress-copy">
+              <p class="progress-title">{{ item.label }}</p>
+              <p class="progress-sub">{{ item.subtext }}</p>
+            </div>
+            <span class="progress-arrow" aria-hidden="true">›</span>
+          </a>
+          {% endfor %}
         </div>
       </div>
     </section>
 
-    <section class="card recs-card" data-tab-group="recs">
-      <div class="section-heading">
-        <div>
-          <h2>Recommendations</h2>
-          <p>{% if jobs_live %}Jobs, organizations, and modules tailored for you{% else %}Organizations and modules tailored for you. Jobs launch soon.{% endif %}</p>
-        </div>
-        <div class="tabs">
-          <button class="tab-btn active" data-tab="jobs">{% if jobs_live %}Jobs for You{% else %}Jobs (Launching Soon){% endif %}</button>
-          <button class="tab-btn" data-tab="orgs">Reentry Organizations</button>
-          <button class="tab-btn" data-tab="modules">Recommended Modules</button>
+    <section class="card thought-card" data-thought-card>
+      <div class="thought-header">
+        <div class="thought-title">
+          <span class="section-icon amber">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M9 18h6" />
+              <path d="M10 22h4" />
+              <path d="M12 2a7 7 0 0 0-4 12c1 1 1 2 1 2h6s0-1 1-2a7 7 0 0 0-4-12z" />
+            </svg>
+          </span>
+          <div>
+            <p class="eyebrow">A THOUGHT FOR TODAY</p>
+            <p class="thought-pagination" data-thought-pagination>1/5</p>
+          </div>
         </div>
       </div>
-
-      <div class="tab-panels">
-        <div class="tab-panel active" data-tab-panel="jobs">
-          {% if not jobs_live %}
-            <div class="empty-state minimal">
-              <h4>Jobs are launching soon</h4>
-              <p>{{ early_access_message }}</p>
-            </div>
-          {% elif suggested_cards %}
-            <div class="card-grid three-col">
-              {% for item in suggested_cards|slice:":6" %}
-                {% with job=item.job %}
-                <article class="recommend-card">
-                  <div class="recommend-top">
-                    <div>
-                      <p class="badge subtle">{{ job.location|default:"Location flexible" }}</p>
-                      <h3 class="recommend-title">{{ job.title }}</h3>
-                      <p class="muted">{{ job.employer.username }}</p>
-                    </div>
-                    {% if item.match %}
-                      <span class="pill pill-ghost">{{ item.match }}% match</span>
-                    {% endif %}
-                  </div>
-                  <div class="recommend-actions">
-                    <a class="btn btn-primary btn-sm" href="{% url 'job_detail' job.id %}">Apply</a>
-                    <form method="post" action="{% url 'toggle_saved_job' %}">
-                      {% csrf_token %}
-                      <input type="hidden" name="job_id" value="{{ job.id }}">
-                      <button type="submit" class="btn btn-outline btn-sm">Save</button>
-                    </form>
-                  </div>
-                </article>
-                {% endwith %}
-              {% endfor %}
-            </div>
-          {% else %}
-            <div class="empty-state minimal">
-              <h4>No job recommendations yet</h4>
-              <p>Tell us more about your skills to improve matches.</p>
-              <a class="btn btn-outline btn-sm" href="{{ PROFILE_URL }}">Update preferences</a>
-            </div>
-          {% endif %}
-        </div>
-
-        <div class="tab-panel" data-tab-panel="orgs">
-          {% if recommended_orgs %}
-            <div class="card-grid three-col">
-              {% for org in recommended_orgs %}
-                <article class="recommend-card">
-                  <div class="recommend-top">
-                    <div>
-                      <p class="badge subtle">{{ org.get_category_display|default:"Support" }}</p>
-                      <h3 class="recommend-title">{{ org.name }}</h3>
-                      <p class="muted">{% if org.city or org.state %}{{ org.city }}{% if org.city and org.state %}, {% endif %}{{ org.state }}{% else %}Location TBD{% endif %}</p>
-                    </div>
-                    <span class="pill pill-ghost">Support</span>
-                  </div>
-                  <p class="muted">{{ org.description|default:"Verified organization ready to help."|truncatechars:120 }}</p>
-                  <div class="recommend-actions">
-                    <form method="post" action="{% url 'reentry_org:toggle_saved_org' %}">
-                      {% csrf_token %}
-                      <input type="hidden" name="organization_id" value="{{ org.id }}">
-                      <input type="hidden" name="next" value="{{ request.path }}">
-                      {% if org.id in saved_org_ids %}
-                        <button class="btn btn-outline btn-sm" type="submit">Unsave</button>
-                      {% else %}
-                        <button class="btn btn-primary btn-sm" type="submit">Save</button>
-                      {% endif %}
-                    </form>
-                    <a class="btn btn-primary btn-sm" href="{% url 'reentry_org:organization_catalog' %}?q={{ org.name|urlencode }}">View</a>
-                    <a class="btn btn-outline btn-sm" href="{{ org.website|default:'#' }}" target="_blank" rel="noopener">Open site</a>
-                  </div>
-                </article>
-              {% endfor %}
-            </div>
-          {% else %}
-            <div class="empty-state minimal">
-              <h4>No organizations to show</h4>
-              <p>Browse the catalog to find housing, legal, and training support.</p>
-              <a class="btn btn-outline btn-sm" href="{% url 'reentry_org:organization_catalog' %}">Browse organizations</a>
-            </div>
-          {% endif %}
-        </div>
-
-        <div class="tab-panel" data-tab-panel="modules">
-          {% if recommended_modules %}
-            <div class="card-grid three-col">
-              {% for mod in recommended_modules %}
-                <article class="recommend-card">
-                  <div class="recommend-top">
-                    <div>
-                      <p class="badge subtle">{{ mod.get_category_display|default:"Module" }}</p>
-                      <h3 class="recommend-title">{{ mod.title }}</h3>
-                    </div>
-                    <span class="pill pill-ghost">Learning</span>
-                  </div>
-                  <p class="muted">{{ mod.description|default:"Keep building your skills with this module."|truncatechars:120 }}</p>
-                  <div class="recommend-actions">
-                    <a class="btn btn-primary btn-sm" href="{% url 'module_detail' mod.id %}">Start</a>
-                    <a class="btn btn-outline btn-sm" href="{% url 'resource_list' %}#modules">More modules</a>
-                  </div>
-                </article>
-              {% endfor %}
-            </div>
-          {% else %}
-            <div class="empty-state minimal">
-              <h4>No module recommendations yet</h4>
-              <p>Pick a track to start learning and we’ll recommend next steps.</p>
-              <a class="btn btn-outline btn-sm" href="{% url 'resource_list' %}#modules">Browse modules</a>
-            </div>
-          {% endif %}
-        </div>
+      <div class="thought-body" data-thought-body>
+        <h3 data-thought-title>Start with what you know</h3>
+        <p data-thought-text>Your life experience is valuable. Skills like communication, leadership, and problem-solving come from many places — not just previous jobs.</p>
+        <button class="text-link" type="button" data-thought-next>Next thought →</button>
       </div>
     </section>
+  </div>
 
-    <!-- User Interviews Modal -->
-    <div id="userInterviewsBackdrop" class="modal-backdrop hidden"></div>
-    <div id="userInterviewsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="userInterviewsTitle">
-      <div class="modal-content" id="userInterviewsContent">
-        <!-- Fetched dynamically -->
+  <section class="card jobs-card">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="section-icon green">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <rect x="3" y="7" width="18" height="13" rx="2" />
+            <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          </svg>
+        </span>
+        <h2>Job Opportunities</h2>
       </div>
     </div>
-  </main>
+
+    {% if not jobs_live %}
+    <div class="jobs-placeholder">
+      <div class="jobs-placeholder-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5l3 2" />
+        </svg>
+      </div>
+      <h3>Jobs are launching soon</h3>
+      <p>Fair-chance employers are getting ready to post roles. The preparation you're doing now puts you ahead — when opportunities go live, you'll be among the first to see them.</p>
+      <form method="post" action="{% url 'dashboard:toggle_job_notifications' %}">
+        {% csrf_token %}
+        <input type="hidden" name="pref" value="jobs_live">
+        <button class="btn-outline" type="submit">
+          {% if notify_jobs_live %}You're on the list{% else %}Notify me when jobs are live{% endif %}
+        </button>
+      </form>
+    </div>
+    {% else %}
+    <div class="jobs-carousel" data-slider data-slider-step="320">
+      <div class="carousel-header">
+        <p class="muted">Hand-picked opportunities based on your profile</p>
+        <div class="carousel-actions">
+          <button type="button" class="carousel-btn" data-slider-prev aria-label="Scroll jobs left">‹</button>
+          <button type="button" class="carousel-btn" data-slider-next aria-label="Scroll jobs right">›</button>
+        </div>
+      </div>
+      <div class="carousel-track" data-slider-track>
+        {% for item in suggested_cards %}
+          <article class="job-card">
+            <div>
+              <p class="job-location">{{ item.job.location|default:"Location flexible" }}</p>
+              <h3>{{ item.job.title }}</h3>
+              <p class="muted">{{ item.job.employer.username }}</p>
+            </div>
+            <a class="text-link" href="{% url 'job_detail' item.job.id %}">View job →</a>
+          </article>
+        {% empty %}
+          <div class="jobs-empty">More roles are on the way. Check back soon.</div>
+        {% endfor %}
+      </div>
+      <div class="jobs-footer">
+        <form method="post" action="{% url 'dashboard:toggle_job_notifications' %}">
+          {% csrf_token %}
+          <input type="hidden" name="pref" value="job_matches">
+          <button class="btn-outline" type="submit">
+            {% if notify_job_matches %}Notifications on{% else %}Notify me when matched with jobs{% endif %}
+          </button>
+        </form>
+        <a class="text-link" href="{% url 'opportunities' %}">View all jobs →</a>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="mini-stats">
+      <div class="mini-card">
+        <p>Applications</p>
+        <span>Coming soon</span>
+      </div>
+      <div class="mini-card">
+        <p>Interviews</p>
+        <span>Coming soon</span>
+      </div>
+      <div class="mini-card">
+        <p>Matches</p>
+        <span>Coming soon</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card orgs-card">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="section-icon green">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M5 21V5a2 2 0 0 1 2-2h6l6 6v12" />
+            <path d="M13 3v6h6" />
+          </svg>
+        </span>
+        <h2>Organizations Near You</h2>
+      </div>
+    </div>
+
+    {% if recommended_orgs %}
+    <div class="org-grid">
+      {% for org in recommended_orgs|slice:':3' %}
+      <article class="org-card">
+        <div class="org-top">
+          <span class="org-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M6 21V5a2 2 0 0 1 2-2h6l4 4v14" />
+              <path d="M14 3v4h4" />
+            </svg>
+          </span>
+          <span class="org-link" aria-hidden="true">↗</span>
+        </div>
+        <h3>{{ org.name }}</h3>
+        <p class="muted">{% if org.city or org.state %}{{ org.city }}{% if org.city and org.state %}, {% endif %}{{ org.state }}{% else %}Multiple locations{% endif %}</p>
+        <span class="org-pill">{{ org.get_category_display|default:"Support" }}</span>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="org-placeholder">
+      <p>We're working to onboard reentry organizations in your area. Recommendations will be based on your ZIP or city.</p>
+      <a class="btn-outline" href="{% url 'reentry_org:organization_catalog' %}">Browse organizations</a>
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="card learning-card">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="section-icon amber">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4 4h14a2 2 0 0 1 2 2v12" />
+            <path d="M4 6v14a2 2 0 0 0 2 2h14" />
+            <path d="M8 6h8" />
+          </svg>
+        </span>
+        <h2>Recommended Learning</h2>
+      </div>
+    </div>
+    <div class="learning-list">
+      {% for mod in recommended_modules|slice:':2' %}
+      <a class="learning-item" href="{% url 'resource_list' %}#modules">
+        <span class="learning-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4 4h16v16H4z" />
+            <path d="M8 4v16" />
+          </svg>
+        </span>
+        <div class="learning-copy">
+          <div class="learning-title">
+            <h3>{{ mod.title }}</h3>
+            <span class="learning-time">10 min</span>
+          </div>
+          <p class="muted">{{ mod.description|default:"Keep building your skills with this module."|truncatechars:90 }}</p>
+          {% if forloop.first %}
+          <div class="learning-progress">
+            <div class="learning-bar" style="width:30%"></div>
+            <span>30%</span>
+          </div>
+          {% endif %}
+        </div>
+        <span class="progress-arrow" aria-hidden="true">›</span>
+      </a>
+      {% empty %}
+      <div class="org-placeholder">
+        <p>Learning recommendations will appear here once modules are available.</p>
+        <a class="btn-outline" href="{% url 'resource_list' %}#modules">Browse modules</a>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
 </div>
 
 <script src="{% static 'dashboard/js/user_dashboard.js' %}"></script>

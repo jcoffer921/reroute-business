@@ -7,34 +7,8 @@
 <link rel="stylesheet" href="{% static 'dashboard/css/user_dashboard.css' %}">
 <link rel="stylesheet" href="{% static 'dashboard/css/employer_admin_layout.css' %}">
 
-<div class="dashboard-shell">
-  <aside class="dash-sidebar">
-    {% with active=request.resolver_match.url_name %}
-    <div class="sidebar-section">
-      <p class="sidebar-label">Main</p>
-      <a class="sidebar-link {% if active == 'employer' %}active{% endif %}" href="{% url 'dashboard:employer' %}">Dashboard</a>
-      <a class="sidebar-link" href="{% url 'dashboard:notifications' %}">Notifications</a>
-    </div>
-    <div class="sidebar-section">
-      <p class="sidebar-label">Jobs</p>
-      <a class="sidebar-link" href="{% url 'create_job' %}">Create Job</a>
-      <a class="sidebar-link" href="{% url 'dashboard:employer' %}">Job Listings</a>
-      <a class="sidebar-link" href="{% url 'dashboard:employer_matcher' %}">Matcher</a>
-    </div>
-    <div class="sidebar-section">
-      <p class="sidebar-label">Talent</p>
-      <a class="sidebar-link" href="{{ PROFILE_URL }}">Employer Profile</a>
-      <a class="sidebar-link" href="{% url 'dashboard:employer_analytics' %}">Analytics</a>
-    </div>
-    <div class="sidebar-section">
-      <p class="sidebar-label">Account</p>
-      <a class="sidebar-link" href="{% url 'settings' %}?panel=profile">Profile Settings</a>
-      <a class="sidebar-link" href="{% url 'contact' %}">Support</a>
-    </div>
-    {% endwith %}
-  </aside>
-
-  <main class="dash-main">
+<section class="dashboard-hero">
+  <div class="dashboard-hero-inner">
     <header class="dash-hero">
       <div class="dash-hero-content">
         <p class="eyebrow">Employer Dashboard</p>
@@ -60,6 +34,11 @@
         </div>
       </div>
     </header>
+  </div>
+</section>
+
+<div class="dashboard-shell">
+  <main class="dash-main">
 
     {% if not employer_verified %}
     <div class="card" role="status">
