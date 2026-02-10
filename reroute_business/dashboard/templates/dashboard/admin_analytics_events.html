@@ -1,119 +1,106 @@
-{% extends "base.html" %}
+{% extends "dashboard/admin_base.html" %}
 {% load static %}
 
 {% block title %}Admin Analytics — Events{% endblock %}
+{% block page_title %}Audit Log{% endblock %}
 
-{% block content %}
-<link rel="stylesheet" href="{% static 'dashboard/css/admin_dashboard.css' %}">
-
-<section class="admin-hero">
-  <div class="admin-hero-content">
-    <h1>Analytics — Events</h1>
-    <p>Insights for the last {{ days }} day(s)</p>
+{% block admin_content %}
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Analytics — Events</div>
+    <a href="{% url 'dashboard:admin' %}" class="admin-btn ghost">Back to Dashboard</a>
   </div>
-  <div class="mt-8">
-    <a href="{% url 'dashboard:admin' %}" class="btn btn-secondary btn-sm">Back to Admin Dashboard</a>
-  </div>
-  <form method="get" class="mt-10 d-flex gap-8 ai-center">
+  <p class="admin-subtitle">Insights for the last {{ days }} day(s).</p>
+  <form method="get" class="admin-filter-row">
     <label for="days">Window:</label>
-    <select name="days" id="days">
+    <select name="days" id="days" class="admin-select">
       <option value="7" {% if days == 7 %}selected{% endif %}>7 days</option>
       <option value="14" {% if days == 14 %}selected{% endif %}>14 days</option>
       <option value="30" {% if days == 30 %}selected{% endif %}>30 days</option>
       <option value="90" {% if days == 90 %}selected{% endif %}>90 days</option>
     </select>
+    <button type="submit" class="admin-btn primary">Apply</button>
   </form>
 </section>
 
-<div class="admin-dashboard">
-  <!-- Tiles -->
-  <div class="stats-grid">
-    <div class="stat-box">
-      <div class="stat-box__label">Page Views</div>
-      <div class="stat-box__value">{{ page_views_total|default:0 }}</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-box__label">Unique Visitors (approx)</div>
-      <div class="stat-box__value">{{ unique_visitors|default:0 }}</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-box__label">Profiles Completed</div>
-      <div class="stat-box__value">{{ profiles_completed|default:0 }}</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-box__label">Resumes Created</div>
-      <div class="stat-box__value">{{ resumes_created|default:0 }}</div>
-    </div>
+<section class="admin-cards">
+  <div class="admin-card">
+    <h3>Page Views</h3>
+    <div class="stat">{{ page_views_total|default:0 }}</div>
   </div>
-
-  <div class="charts-grid">
-    <!-- Pie Chart: Page Views by Path -->
-    <section>
-      <h2>Page Views by Path (share)</h2>
-      <div id="pageViewsPie" class="chart-sm"></div>
-    </section>
-
-    <!-- Line Chart: Page Views by Day -->
-    <section>
-      <h2>Page Views by Day</h2>
-      <div id="pageViewsLine" class="chart-sm"></div>
-    </section>
-
-    <!-- Stacked Bar: Authenticated vs Anonymous by Day -->
-    <section class="grid-span-2">
-      <h2>Authenticated vs Anonymous Views</h2>
-      <div id="viewsStacked" class="chart-sm"></div>
-    </section>
+  <div class="admin-card">
+    <h3>Unique Visitors</h3>
+    <div class="stat">{{ unique_visitors|default:0 }}</div>
   </div>
+  <div class="admin-card">
+    <h3>Profiles Completed</h3>
+    <div class="stat">{{ profiles_completed|default:0 }}</div>
+  </div>
+  <div class="admin-card">
+    <h3>Resumes Created</h3>
+    <div class="stat">{{ resumes_created|default:0 }}</div>
+  </div>
+</section>
 
-  <!-- Top Pages Table -->
-  <section>
-    <h2>Top Pages</h2>
-    {% if top_pages %}
-    <div class="table-responsive">
-      <table>
-        <tr>
-          <th>Path</th>
-          <th>Views</th>
-        </tr>
-        {% for row in top_pages %}
-        <tr>
-          <td>{{ row.path|default:"/" }}</td>
-          <td>{{ row.count }}</td>
-        </tr>
-        {% endfor %}
-      </table>
-    </div>
-    {% else %}
-      <p>No page views in this window.</p>
-    {% endif %}
-  </section>
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Trends</div>
+  </div>
+  <div class="analytics-grid">
+    <div class="analytics-tile"><h3>Page Views by Path</h3><div id="pageViewsPie" class="plotly-chart"></div></div>
+    <div class="analytics-tile"><h3>Page Views by Day</h3><div id="pageViewsLine" class="plotly-chart"></div></div>
+    <div class="analytics-tile"><h3>Authed vs Anonymous Views</h3><div id="viewsStacked" class="plotly-chart"></div></div>
+  </div>
+</section>
 
-  <!-- Top Referrers -->
-  <section>
-    <h2>Top Referrers</h2>
-    {% if top_referrers %}
-    <div class="table-responsive">
-      <table>
-        <tr>
-          <th>Referrer</th>
-          <th>Count</th>
-        </tr>
-        {% for row in top_referrers %}
-        <tr>
-          <td>{{ row.referer }}</td>
-          <td>{{ row.count }}</td>
-        </tr>
-        {% endfor %}
-      </table>
-    </div>
-    {% else %}
-      <p>No referrer data available.</p>
-    {% endif %}
-  </section>
-</div>
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Top Pages</div>
+  </div>
+  {% if top_pages %}
+  <div class="table-responsive">
+    <table class="admin-table">
+      <tr>
+        <th>Path</th>
+        <th>Views</th>
+      </tr>
+      {% for row in top_pages %}
+      <tr>
+        <td>{{ row.path|default:"/" }}</td>
+        <td>{{ row.count }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+  <p class="admin-subtitle">No page views in this window.</p>
+  {% endif %}
+</section>
 
-<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Top Referrers</div>
+  </div>
+  {% if top_referrers %}
+  <div class="table-responsive">
+    <table class="admin-table">
+      <tr>
+        <th>Referrer</th>
+        <th>Count</th>
+      </tr>
+      {% for row in top_referrers %}
+      <tr>
+        <td>{{ row.referer }}</td>
+        <td>{{ row.count }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+  <p class="admin-subtitle">No referrer data available.</p>
+  {% endif %}
+</section>
+
 <script id="analytics-events-data" type="application/json">
   {
     "pieLabels": {{ pie_labels|default:'[]'|safe }},

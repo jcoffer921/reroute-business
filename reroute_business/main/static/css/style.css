@@ -79,6 +79,15 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
   width: 100%;
   gap: 1rem;
 }
+.nav-center-slot:empty { display: none; }
+.nav-right-extra:empty { display: none; }
+.nav-right-group {
+  justify-self: end;
+  grid-column: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
 
 .nav-links {
   display: flex;
@@ -88,7 +97,7 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
   justify-self: center;
   grid-column: 2;
 }
-.user-profile-right { justify-self: end; grid-column: 3; }
+.user-profile-right { position: relative; }
 .hamburger { justify-self: end; grid-column: 3; }
 .nav-links a {
   color: #fff; text-decoration: none; font-weight: 600; line-height: 1;

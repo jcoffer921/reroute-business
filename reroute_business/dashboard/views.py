@@ -83,6 +83,13 @@ def _json_err(errors, status=400):
     return JsonResponse({"ok": False, "errors": errors}, status=status)
 
 
+def _reports_flags_count():
+    try:
+        return Job.objects.filter(is_flagged=True).count()
+    except Exception:
+        return 0
+
+
 # =========================
 # Router / Redirect
 # =========================
@@ -1316,6 +1323,56 @@ def admin_dashboard(request):
     except Exception:
         pass
 
+    active_users_7 = User.objects.filter(last_login__gte=seven_days_ago).count()
+    try:
+        employers_pending = EmployerProfile.objects.filter(verified=False).count()
+    except Exception:
+        employers_pending = 0
+
+    jobs_pending_review = len(flagged_jobs)
+    open_flags = len(flagged_jobs)
+    site_views_7 = analytics_summary["last_7_days"]["page_views"]
+
+    review_queue = []
+    for job in flagged_jobs[:6]:
+        review_queue.append({
+            "title": job.title,
+            "reason": job.flagged_reason or "Job listing flagged for review",
+            "timestamp": job.created_at,
+            "severity": "high",
+            "url": reverse("admin:job_list_job_change", args=[job.id]),
+            "kind": "job",
+        })
+    try:
+        pending_employers = EmployerProfile.objects.filter(verified=False).select_related("user")[:6]
+        for employer in pending_employers:
+            review_queue.append({
+                "title": employer.company_name,
+                "reason": "Pending employer approval",
+                "timestamp": employer.user.date_joined,
+                "severity": "medium",
+                "url": reverse("admin:profiles_employerprofile_change", args=[employer.id]),
+                "kind": "employer",
+            })
+    except Exception:
+        pass
+    review_queue = sorted(review_queue, key=lambda item: item["timestamp"] or now(), reverse=True)[:8]
+
+    activity_items = []
+    for app in Application.objects.select_related("job", "applicant").order_by("-submitted_at")[:6]:
+        activity_items.append({
+            "title": f"{app.applicant.get_full_name() or app.applicant.username} applied",
+            "detail": f"{app.job.title}",
+            "timestamp": app.submitted_at,
+        })
+    for job in Job.objects.select_related("employer").order_by("-created_at")[:4]:
+        activity_items.append({
+            "title": f"{job.title}",
+            "detail": f"Posted by {job.employer.get_full_name() or job.employer.username}",
+            "timestamp": job.created_at,
+        })
+    activity_items = sorted(activity_items, key=lambda item: item["timestamp"] or now(), reverse=True)[:8]
+
     context = {
         "user_count": user_count,
         "employer_count": employer_count,
@@ -1333,6 +1390,14 @@ def admin_dashboard(request):
         "new_applications": new_applications,
         "trend_totals": trend_totals,
         "analytics_summary": analytics_summary,
+        "active_users_7": active_users_7,
+        "jobs_pending_review": jobs_pending_review,
+        "employers_pending": employers_pending,
+        "open_flags": open_flags,
+        "site_views_7": site_views_7,
+        "review_queue": review_queue,
+        "activity_items": activity_items,
+        "reports_flags_count": _reports_flags_count(),
     }
     return render(request, 'dashboard/admin_dashboard.html', context)
 
@@ -1431,6 +1496,7 @@ def admin_analytics_events(request):
         'resumes_created': resumes_created,
         'top_pages': list(page_views_qs[:10]),
         'top_referrers': top_referrers,
+        'reports_flags_count': _reports_flags_count(),
     }
     # Build daily series for the selected window
     try:
@@ -1495,6 +1561,7 @@ def admin_jobs_manage(request):
         'jobs': jobs,
         'q': q,
         'status': status,
+        'reports_flags_count': _reports_flags_count(),
     })
 
 
@@ -1537,6 +1604,7 @@ def admin_applications_manage(request):
         'q': q,
         'status': status,
         'status_choices': status_choices,
+        'reports_flags_count': _reports_flags_count(),
     })
 
 

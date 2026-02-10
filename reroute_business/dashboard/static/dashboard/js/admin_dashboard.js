@@ -1,5 +1,6 @@
 // Admin dashboard charts (Plotly.js) + carousel + modal confirmations
 document.addEventListener("DOMContentLoaded", () => {
+  const hasPlotly = typeof Plotly !== 'undefined';
   const {
     dates = [],
     usersByDay = [],
@@ -29,13 +30,13 @@ document.addEventListener("DOMContentLoaded", () => {
     return el;
   }
 
-  // Charts
-  const usersEl = plotLine('usersChart', 'New Users', dates, usersByDay, '#0d6efd', 'rgba(13,110,253,0.15)');
-  const jobsEl = plotLine('jobsChart', 'New Jobs', dates, jobsByDay, '#198754', 'rgba(25,135,84,0.15)');
-  const appsEl = (Array.isArray(applicationsByDay) && applicationsByDay.length)
+  // Charts (guard Plotly)
+  const usersEl = hasPlotly ? plotLine('usersChart', 'New Users', dates, usersByDay, '#0d6efd', 'rgba(13,110,253,0.15)') : null;
+  const jobsEl = hasPlotly ? plotLine('jobsChart', 'New Jobs', dates, jobsByDay, '#198754', 'rgba(25,135,84,0.15)') : null;
+  const appsEl = (hasPlotly && Array.isArray(applicationsByDay) && applicationsByDay.length)
     ? plotLine('applicationsChart', 'New Applications', dates, applicationsByDay, '#fd7e14', 'rgba(253,126,20,0.15)')
     : null;
-  const empsEl = (Array.isArray(employersByDay) && employersByDay.length)
+  const empsEl = (hasPlotly && Array.isArray(employersByDay) && employersByDay.length)
     ? plotLine('employersChart', 'New Employers', dates, employersByDay, '#17a2b8', 'rgba(23,162,184,0.15)')
     : null;
 
@@ -48,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
       (id === 'employersChart' && Array.isArray(employersByDay) && employersByDay.length) ||
       (id === 'usersChart' || id === 'jobsChart')
     );
-    if (!hasChart) slide.remove();
+    if (!hasPlotly || !hasChart) slide.remove();
   });
 
   // Accessible carousel

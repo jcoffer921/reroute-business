@@ -1,211 +1,88 @@
-{% extends "base.html" %}
+{% extends "dashboard/admin_base.html" %}
 {% load static %}
-{% block content %}
-<link rel="stylesheet" href="{% static 'dashboard/css/user_dashboard.css' %}">
-<link rel="stylesheet" href="{% static 'dashboard/css/employer_admin_layout.css' %}">
 
-<div class="dashboard-shell">
-  <aside class="dash-sidebar">
-    <div class="sidebar-section">
-      <p class="sidebar-label">Main</p>
-      <a class="sidebar-link active" href="{% url 'dashboard:admin' %}">Dashboard</a>
-      <a class="sidebar-link" href="{% url 'dashboard:notifications' %}">Notifications</a>
-    </div>
-    <div class="sidebar-section">
-      <p class="sidebar-label">Entities</p>
-      <a class="sidebar-link" href="{% url 'dashboard:admin_jobs_manage' %}">Jobs</a>
-      <a class="sidebar-link" href="{% url 'dashboard:admin_applications_manage' %}">Applications</a>
-      <a class="sidebar-link" href="{% url 'dashboard:admin_analytics_events' %}">Analytics</a>
-    </div>
-    <div class="sidebar-section">
-      <p class="sidebar-label">Account</p>
-      <a class="sidebar-link" href="{% url 'settings' %}?panel=profile">Profile Settings</a>
-      <a class="sidebar-link" href="{% url 'contact' %}">Support</a>
-    </div>
-  </aside>
+{% block page_title %}Dashboard{% endblock %}
 
-  <main class="dash-main">
-    <header class="dash-hero">
-      <div class="dash-hero-content">
-        <p class="eyebrow">Admin Dashboard</p>
-        <h1>Welcome, Admin!</h1>
-        <p class="muted">Monitor platform health and manage records.</p>
-        <div class="hero-stats tall">
-          <div class="hero-stat"><p class="stat-label">Users</p><p class="stat-number">{{ user_count|default:0 }}</p></div>
-          <div class="hero-stat"><p class="stat-label">Employers</p><p class="stat-number">{{ employer_count|default:0 }}</p></div>
-          <div class="hero-stat"><p class="stat-label">Jobs</p><p class="stat-number">{{ job_count|default:0 }}</p></div>
-          <div class="hero-stat"><p class="stat-label">Applications</p><p class="stat-number">{{ application_count|default:0 }}</p></div>
-          <div class="hero-stat"><p class="stat-label">Resumes</p><p class="stat-number">{{ resume_count|default:0 }}</p></div>
-          <div class="hero-stat"><p class="stat-label">Flagged</p><p class="stat-number">{{ flagged_jobs|length|default:0 }}</p></div>
-        </div>
-      </div>
-    </header>
+{% block admin_content %}
+<header>
+  <div class="admin-page-title">What needs attention right now</div>
+  <p class="admin-subtitle">Operational health for the last 7 days.</p>
+</header>
 
-    <section class="card">
-      <div class="section-heading">
-        <div>
-          <h2>Analytics (Last 30 Days)</h2>
-          <p class="muted">Key trends across the platform</p>
-        </div>
-      </div>
-      <div class="hero-stats">
-        <div class="hero-stat"><p class="stat-label">New Users</p><p class="stat-number">{{ trend_totals.users_30|default:0 }}</p></div>
-        <div class="hero-stat"><p class="stat-label">New Jobs</p><p class="stat-number">{{ trend_totals.jobs_30|default:0 }}</p></div>
-        <div class="hero-stat"><p class="stat-label">New Applications</p><p class="stat-number">{{ trend_totals.applications_30|default:0 }}</p></div>
-        <div class="hero-stat"><p class="stat-label">New Employers</p><p class="stat-number">{{ trend_totals.employers_30|default:0 }}</p></div>
-      </div>
-      <div class="analytics-grid">
-        <div class="analytics-tile"><h3>Users</h3><div id="usersChart" class="plotly-chart"></div></div>
-        <div class="analytics-tile"><h3>Jobs</h3><div id="jobsChart" class="plotly-chart"></div></div>
-        <div class="analytics-tile"><h3>Applications</h3><div id="applicationsChart" class="plotly-chart"></div></div>
-        <div class="analytics-tile"><h3>Employers</h3><div id="employersChart" class="plotly-chart"></div></div>
-      </div>
-    </section>
+<section class="admin-cards">
+  <a class="admin-card" href="{% url 'admin:auth_user_changelist' %}">
+    <h3>Active users (7d)</h3>
+    <div class="stat">{{ active_users_7|default:0 }}</div>
+    <div class="sub">Login activity in the last week</div>
+  </a>
+  <a class="admin-card" href="{% url 'dashboard:admin_jobs_manage' %}?status=flagged">
+    <h3>Jobs pending review</h3>
+    <div class="stat">{{ jobs_pending_review|default:0 }}</div>
+    <div class="sub">Flagged for policy review</div>
+  </a>
+  <a class="admin-card" href="{% url 'admin:profiles_employerprofile_changelist' %}">
+    <h3>Employers awaiting approval</h3>
+    <div class="stat">{{ employers_pending|default:0 }}</div>
+    <div class="sub">Manual verification queue</div>
+  </a>
+  <a class="admin-card" href="{% url 'dashboard:admin_jobs_manage' %}?status=flagged">
+    <h3>Open flags</h3>
+    <div class="stat">{{ open_flags|default:0 }}</div>
+    <div class="sub">Reports &amp; trust issues</div>
+  </a>
+  <a class="admin-card" href="{% url 'dashboard:admin_analytics_events' %}">
+    <h3>Site views</h3>
+    <div class="stat">{{ site_views_7|default:0 }}</div>
+    <div class="sub">Page views (7d)</div>
+  </a>
+</section>
 
-    <section class="card">
-      <div class="section-heading">
-        <div>
-          <h2>Recent Activity (Last 7 Days)</h2>
-          <p class="muted">Snapshot of growth</p>
-        </div>
-      </div>
-      <ul class="list-plain">
-        <li>New Users: {{ new_users|default:0 }}</li>
-        <li>New Jobs: {{ new_jobs|default:0 }}</li>
-        <li>New Applications: {{ new_applications|default:0 }}</li>
-      </ul>
-    </section>
-
-    <section class="card">
-      <div class="section-heading">
-        <div>
-          <h2>Analytics Events</h2>
-          <p class="muted">Engagement metrics</p>
-        </div>
-      </div>
-      <div class="analytics-grid">
-        <div class="analytics-tile">
-          <h3>Page Views (Total)</h3>
-          <div class="value">{{ analytics_summary.page_views_total|default:0 }}</div>
-        </div>
-        <div class="analytics-tile">
-          <h3>Profile Completed (Total)</h3>
-          <div class="value">{{ analytics_summary.profile_completed_total|default:0 }}</div>
-        </div>
-        <div class="analytics-tile">
-          <h3>Page Views (Last 7 Days)</h3>
-          <div class="value">{{ analytics_summary.last_7_days.page_views|default:0 }}</div>
-        </div>
-        <div class="analytics-tile">
-          <h3>Profile Completed (Last 7 Days)</h3>
-          <div class="value">{{ analytics_summary.last_7_days.profile_completed|default:0 }}</div>
-        </div>
-      </div>
-
-      {% if analytics_summary.top_pages %}
-      <h3>Top Pages</h3>
-      <div class="table-responsive">
-        <table>
-          <tr>
-            <th>Path</th>
-            <th>Views</th>
-          </tr>
-          {% for row in analytics_summary.top_pages %}
-          <tr>
-            <td>{{ row.path|default:"/" }}</td>
-            <td>{{ row.count }}</td>
-          </tr>
-          {% endfor %}
-        </table>
-      </div>
-      {% else %}
-        <p>No page views recorded yet.</p>
-      {% endif %}
-    </section>
-
-    <section class="card">
-      <div class="section-heading">
-        <div>
-          <h2>Flagged Jobs (Trust & Safety)</h2>
-          <p class="muted">Review queue</p>
-        </div>
-      </div>
-      {% if flagged_jobs %}
-        <div class="table-responsive">
-          <table>
-            <tr>
-              <th>Title</th>
-              <th>Employer</th>
-              <th>Reason</th>
-              <th>Actions</th>
-            </tr>
-            {% for job in flagged_jobs %}
-              <tr>
-                <td>{{ job.title }}</td>
-                <td>{{ job.employer.username|default:job.employer }}</td>
-                <td>{{ job.flagged_reason|default:"(no reason provided)" }}</td>
-                <td>
-                  <a href="{% url 'admin:job_list_job_change' job.id %}">Review</a> |
-                  <form action="{% url 'dashboard:approve_flagged_job' job.id %}" method="post" class="js-confirm d-inline" data-message="Approve this job? It will be unflagged and activated.">
-                    {% csrf_token %}
-                    <button type="submit" class="link-button">Approve</button>
-                  </form> |
-                  <form action="{% url 'dashboard:remove_flagged_job' job.id %}" method="post" class="js-confirm d-inline" data-message="Remove (deactivate) this job? It will no longer be visible to seekers.">
-                    {% csrf_token %}
-                    <button type="submit" class="link-button danger">Remove</button>
-                  </form>
-                </td>
-              </tr>
-            {% endfor %}
-          </table>
-        </div>
-      {% else %}
-        <p>No flagged jobs right now 🎉</p>
-      {% endif %}
-    </section>
-
-    <section class="card">
-      <div class="section-heading">
-        <div>
-          <h2>Management</h2>
-          <p class="muted">Shortcuts</p>
-        </div>
-      </div>
-      <ul class="list-plain">
-        <li><a href="{% url 'dashboard:admin_analytics_events' %}">Admin Analytics (Events)</a></li>
-        <li><a href="{% url 'dashboard:admin_jobs_manage' %}">Manage Jobs (Site)</a></li>
-        <li><a href="{% url 'dashboard:admin_applications_manage' %}">Manage Applications (Site)</a></li>
-        <li><a href="{% url 'admin:auth_user_changelist' %}">Manage Users (Admin)</a></li>
-        <li><a href="{% url 'admin:job_list_job_changelist' %}">Manage Jobs (Admin)</a></li>
-        <li><a href="{% url 'admin:job_list_application_changelist' %}">Manage Applications (Admin)</a></li>
-        <li><a href="{% url 'admin:profiles_employerprofile_changelist' %}">Manage Employer Profiles</a></li>
-      </ul>
-    </section>
-  </main>
-</div>
-
-<!-- Modal: Action Confirmation -->
-<div id="confirmModal" class="rr-modal" aria-hidden="true">
-  <div class="rr-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
-    <h3 id="confirmModalTitle">Please Confirm</h3>
-    <p id="confirmModalMessage">Are you sure?</p>
-    <div class="rr-modal__actions">
-      <button type="button" id="confirmCancel" class="btn btn-secondary">Cancel</button>
-      <button type="button" id="confirmOk" class="btn btn-primary">Confirm</button>
-    </div>
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Urgent Review Queue</div>
   </div>
-  <button type="button" class="rr-modal__backdrop" aria-label="Close"></button>
-</div>
-<script src="{% static 'dashboard/js/vendor/plotly-2.27.0.min.js' %}"></script>
-<script id="admin-dashboard-data" type="application/json">
-  {
-    "dates": {{ dates|safe }},
-    "usersByDay": {{ users_by_day|safe }},
-    "jobsByDay": {{ jobs_by_day|safe }},
-    "applicationsByDay": {{ applications_by_day|default:'[]'|safe }},
-    "employersByDay": {{ employers_by_day|default:'[]'|safe }}
-  }
-</script>
-<script src="{% static 'dashboard/js/admin_dashboard_boot.js' %}"></script>
-<script src="{% static 'dashboard/js/admin_dashboard.js' %}"></script>
+  {% if review_queue %}
+  <div class="admin-list">
+    {% for item in review_queue %}
+    <a class="admin-list-item" href="{{ item.url }}">
+      <span class="admin-list-icon {% if item.severity == 'high' %}is-high{% elif item.severity == 'medium' %}is-medium{% endif %}">
+        {% if item.severity == 'high' %}
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3l9 16H3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+        {% else %}
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>
+        {% endif %}
+      </span>
+      <div class="admin-list-meta">
+        <h4>{{ item.title }}</h4>
+        <p>{{ item.reason }}</p>
+      </div>
+      <span class="admin-list-time">{% if item.timestamp %}{{ item.timestamp|date:"M d" }}{% endif %}</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="admin-subtitle">No urgent items right now.</p>
+  {% endif %}
+</section>
+
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Recent Activity</div>
+  </div>
+  {% if activity_items %}
+  <div class="admin-feed">
+    {% for item in activity_items %}
+    <div class="admin-feed-item">
+      <div>
+        <strong>{{ item.title }}</strong>
+        <p>{{ item.detail }}</p>
+      </div>
+      <span class="admin-list-time">{% if item.timestamp %}{{ item.timestamp|date:"M d, g:ia" }}{% endif %}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="admin-subtitle">No recent activity logged.</p>
+  {% endif %}
+</section>
 {% endblock %}

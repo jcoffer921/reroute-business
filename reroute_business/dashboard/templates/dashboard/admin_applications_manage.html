@@ -1,54 +1,50 @@
-{% extends "base.html" %}
+{% extends "dashboard/admin_base.html" %}
 {% load static %}
-{% block content %}
-<link rel="stylesheet" href="{% static 'dashboard/css/admin_dashboard.css' %}">
 
-<div class="admin-dashboard">
-  <h1>Manage Applications</h1>
+{% block page_title %}Applications{% endblock %}
 
-  <section>
-    <form method="get" class="d-flex gap-10 fw-wrap ai-center">
-      <input type="text" name="q" value="{{ q }}" placeholder="Search job title or applicant" class="flex-1 min-w-220 p-8-10 b1-ddd br-8" />
-      <label for="status-filter" class="visually-hidden">Filter by status</label>
-      <select id="status-filter" name="status" class="p-8-10 b1-ddd br-8">
-        <option value="">All Statuses</option>
-        {% for val,label in status_choices %}
-          <option value="{{ val }}" {% if status == val %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-      </select>
-      <button type="submit" class="btn btn-primary">Filter</button>
-      <a href="{% url 'dashboard:admin' %}" class="btn btn-secondary">Back to Dashboard</a>
-    </form>
-  </section>
+{% block admin_content %}
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Manage Applications</div>
+  </div>
+  <form method="get" class="admin-filter-row">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search job or applicant" class="admin-input" />
+    <select name="status" class="admin-select">
+      <option value="">All</option>
+      {% for key, label in status_choices %}
+        <option value="{{ key }}" {% if status == key %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="admin-btn primary">Filter</button>
+    <a href="{% url 'dashboard:admin' %}" class="admin-btn ghost">Back to Dashboard</a>
+  </form>
 
   <div class="table-responsive">
-    <table>
+    <table class="admin-table">
       <tr>
-        <th>Job</th>
         <th>Applicant</th>
+        <th>Job</th>
         <th>Status</th>
         <th>Submitted</th>
         <th>Actions</th>
       </tr>
-      {% for app in applications %}
+      {% for application in applications %}
       <tr>
-        <td>{{ app.job.title }}</td>
-        <td>{{ app.applicant.username }}</td>
-        <td>{{ app.get_status_display }}</td>
-        <td>{% if app.submitted_at %}{{ app.submitted_at|date:"M d, Y" }}{% else %}—{% endif %}</td>
+        <td>{{ application.applicant.get_full_name|default:application.applicant.username }}</td>
+        <td>{{ application.job.title }}</td>
+        <td>{{ application.status|default:"—" }}</td>
+        <td>{% if application.submitted_at %}{{ application.submitted_at|date:"M d, Y" }}{% else %}—{% endif %}</td>
         <td>
-          <form method="post" action="{% url 'dashboard:admin_application_update_status' app.id %}" class="d-inline-flex gap-6 ai-center">
+          <form method="post" action="{% url 'dashboard:admin_application_update_status' application.id %}" class="js-confirm d-inline" data-message="Update status for this application?">
             {% csrf_token %}
-            <label for="status-{{ app.id }}" class="visually-hidden">Update status</label>
-            <select id="status-{{ app.id }}" name="status" class="b1-ddd br-6 px-10 py-8">
-              {% for val,label in status_choices %}
-                <option value="{{ val }}" {% if app.status == val %}selected{% endif %}>{{ label }}</option>
+            <select name="status" class="admin-select">
+              {% for key, label in status_choices %}
+                <option value="{{ key }}">{{ label }}</option>
               {% endfor %}
             </select>
-            <button type="submit" class="btn btn-primary">Update</button>
+            <button type="submit" class="admin-btn primary">Update</button>
           </form>
-          |
-          <a href="{% url 'admin:job_list_application_change' app.id %}">Open in Admin</a>
         </td>
       </tr>
       {% empty %}
@@ -56,18 +52,6 @@
       {% endfor %}
     </table>
   </div>
-</div>
-<!-- Modal reused from admin dashboard for confirmations (future actions) -->
-<div id="confirmModal" class="rr-modal" aria-hidden="true">
-  <div class="rr-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
-    <h3 id="confirmModalTitle">Please Confirm</h3>
-    <p id="confirmModalMessage">Are you sure?</p>
-    <div class="rr-modal__actions">
-      <button type="button" id="confirmCancel" class="btn btn-secondary">Cancel</button>
-      <button type="button" id="confirmOk" class="btn btn-primary">Confirm</button>
-    </div>
-  </div>
-  <button type="button" class="rr-modal__backdrop" aria-label="Close"></button>
-  </div>
+</section>
 <script src="{% static 'dashboard/js/admin_dashboard.js' %}"></script>
 {% endblock %}

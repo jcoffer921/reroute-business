@@ -1,27 +1,27 @@
-{% extends "base.html" %}
+{% extends "dashboard/admin_base.html" %}
 {% load static %}
-{% block content %}
-<link rel="stylesheet" href="{% static 'dashboard/css/admin_dashboard.css' %}">
 
-<div class="admin-dashboard">
-  <h1>Manage Jobs</h1>
+{% block page_title %}Jobs{% endblock %}
 
-  <section>
-    <form method="get" class="d-flex gap-10 fw-wrap ai-center">
-      <input type="text" name="q" value="{{ q }}" placeholder="Search title, employer, location" class="flex-1 min-w-220 p-8-10 b1-ddd br-8" />
-      <select name="status" class="p-8-10 b1-ddd br-8">
-        <option value="">All</option>
-        <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
-        <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option>
-        <option value="flagged" {% if status == 'flagged' %}selected{% endif %}>Flagged</option>
-      </select>
-      <button type="submit" class="btn btn-primary">Filter</button>
-      <a href="{% url 'dashboard:admin' %}" class="btn btn-secondary">Back to Dashboard</a>
-    </form>
-  </section>
+{% block admin_content %}
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Manage Jobs</div>
+  </div>
+  <form method="get" class="admin-filter-row">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search title, employer, location" class="admin-input" />
+    <select name="status" class="admin-select">
+      <option value="">All</option>
+      <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+      <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option>
+      <option value="flagged" {% if status == 'flagged' %}selected{% endif %}>Flagged</option>
+    </select>
+    <button type="submit" class="admin-btn primary">Filter</button>
+    <a href="{% url 'dashboard:admin' %}" class="admin-btn ghost">Back to Dashboard</a>
+  </form>
 
   <div class="table-responsive">
-    <table>
+    <table class="admin-table">
       <tr>
         <th>Title</th>
         <th>Employer</th>
@@ -37,7 +37,7 @@
         <td>{{ job.employer.username }}</td>
         <td>{{ job.location }}</td>
         <td>{% if job.is_active %}Yes{% else %}No{% endif %}</td>
-        <td>{% if job.is_flagged %}⚠️{% else %}—{% endif %}</td>
+        <td>{% if job.is_flagged %}Yes{% else %}No{% endif %}</td>
         <td>{% if job.created_at %}{{ job.created_at|date:"M d, Y" }}{% else %}—{% endif %}</td>
         <td>
           <form method="post" action="{% url 'dashboard:admin_job_toggle_active' job.id %}" class="js-confirm d-inline" data-message="Toggle active for this job?">
@@ -53,18 +53,6 @@
       {% endfor %}
     </table>
   </div>
-</div>
-<!-- Modal reused from admin dashboard for confirmations -->
-<div id="confirmModal" class="rr-modal" aria-hidden="true">
-  <div class="rr-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
-    <h3 id="confirmModalTitle">Please Confirm</h3>
-    <p id="confirmModalMessage">Are you sure?</p>
-    <div class="rr-modal__actions">
-      <button type="button" id="confirmCancel" class="btn btn-secondary">Cancel</button>
-      <button type="button" id="confirmOk" class="btn btn-primary">Confirm</button>
-    </div>
-  </div>
-  <button type="button" class="rr-modal__backdrop" aria-label="Close"></button>
-  </div>
+</section>
 <script src="{% static 'dashboard/js/admin_dashboard.js' %}"></script>
 {% endblock %}
