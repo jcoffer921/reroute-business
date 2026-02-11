@@ -40,20 +40,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function parseJsonScript(id) {
-    const el = document.getElementById(id);
-    if (!el) return [];
-    try {
-      return JSON.parse(el.textContent);
-    } catch {
-      return [];
-    }
+  function parseListAttr(section, attrName) {
+    const raw = section.dataset[attrName] || '';
+    if (!raw) return [];
+    return raw.split('||').map((item) => item.trim()).filter(Boolean);
   }
 
   function renderSuggested(section) {
     const wrap = section.querySelector('[data-suggested-list]');
     if (!wrap) return;
-    const all = parseJsonScript(section.dataset.suggestedId);
+    const all = parseListAttr(section, 'suggested');
     const shuffled = all.slice().sort(() => 0.5 - Math.random());
     const slice = shuffled.slice(0, SUGGESTION_COUNT);
     wrap.innerHTML = '';
@@ -88,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   sections.forEach((section) => {
     const input = section.querySelector('[data-skill-entry]');
-    const initial = parseJsonScript(section.dataset.initialId);
+    const initial = parseListAttr(section, 'initial');
     writeList(section, initial);
     renderSuggested(section);
 
