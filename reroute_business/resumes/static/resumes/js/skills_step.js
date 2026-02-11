@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const savedEl = document.querySelector('[data-saved-text]');
 
   const sections = document.querySelectorAll('[data-skill-section]');
+  const SUGGESTION_COUNT = 7;
 
   function readList(section) {
     const input = section.querySelector('[data-skill-input]');
@@ -39,6 +40,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function parseSuggested(section) {
+    const raw = section.dataset.suggested || '[]';
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return [];
+    }
+  }
+
+  function renderSuggested(section) {
+    const wrap = section.querySelector('[data-suggested-list]');
+    if (!wrap) return;
+    const all = parseSuggested(section);
+    const shuffled = all.slice().sort(() => 0.5 - Math.random());
+    const slice = shuffled.slice(0, SUGGESTION_COUNT);
+    wrap.innerHTML = '';
+    slice.forEach((skill) => {
+      const pill = document.createElement('span');
+      pill.className = 'resume-pill';
+      pill.dataset.value = skill;
+      pill.textContent = `+ ${skill}`;
+      pill.addEventListener('click', () => {
+        const listNow = readList(section);
+        if (!listNow.some((item) => item.toLowerCase() === skill.toLowerCase())) {
+          listNow.push(skill);
+          writeList(section, listNow);
+          doSave();
+        }
+      });
+      wrap.appendChild(pill);
+    });
+  }
+
   const saveNow = () => {
     const payload = {
       technical: readList(document.querySelector('[data-skill-section=\"technical\"]')),
@@ -55,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const input = section.querySelector('[data-skill-entry]');
     const list = readList(section);
     renderTags(section, list);
+    renderSuggested(section);
 
     input?.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter') return;
@@ -69,16 +104,21 @@ document.addEventListener('DOMContentLoaded', () => {
       doSave();
     });
 
-    section.querySelectorAll('.resume-pill').forEach((pill) => {
-      pill.addEventListener('click', () => {
-        const value = pill.dataset.value || pill.textContent.trim();
-        const listNow = readList(section);
-        if (!listNow.some((item) => item.toLowerCase() === value.toLowerCase())) {
-          listNow.push(value);
-          writeList(section, listNow);
-          doSave();
-        }
-      });
+    const addBtn = section.querySelector('.skill-add-btn');
+    addBtn?.addEventListener('click', () => {
+      const value = input.value.trim();
+      if (!value) return;
+      const listNow = readList(section);
+      if (listNow.some((item) => item.toLowerCase() === value.toLowerCase())) return;
+      listNow.push(value);
+      input.value = '';
+      writeList(section, listNow);
+      doSave();
+    });
+
+    const refreshBtn = section.querySelector('.skill-refresh-btn');
+    refreshBtn?.addEventListener('click', () => {
+      renderSuggested(section);
     });
   });
 

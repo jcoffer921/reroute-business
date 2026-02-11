@@ -370,14 +370,28 @@
 /* ===== Hero (Homepage) ===== */
 .home-hero { isolation: isolate; }
 .home-hero .hero-content { position: relative; z-index: 2; max-width: 900px; }
-.home-hero .hero-content .hero-logo {
-  width: clamp(220px, 30vw, 360px);
-  height: auto;
-  margin: 0 auto .3rem;
+.home-hero .hero-content .hero-message {
+  margin: 0 auto .5rem;
+  font-size: clamp(2.8rem, 7vw, 5.2rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  text-align: center;
   opacity: 0;
   animation: heroFadeIn .9s ease forwards;
   animation-delay: .15s;
+}
+
+.home-hero .hero-content .hero-message-line {
   display: block;
+}
+
+.home-hero .hero-content .hero-message-line--dark {
+  color: #0f172a;
+}
+
+.home-hero .hero-content .hero-message-line--accent {
+  color: #3b82b0;
 }
 .home-hero .hero-content .hero-tagline {
   margin: 0 auto .75rem;
@@ -463,7 +477,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-hero .hero-logo,
+  .home-hero .hero-message,
   .home-hero .hero-tagline,
   .hero-subheadline,
   .hero-microcopy,
@@ -566,7 +580,7 @@
     padding: 5.5rem 1.25rem 3.25rem;
   }
   .home-hero .hero-content { max-width: 100%; }
-  .home-hero .hero-content .hero-logo { width: clamp(180px, 60vw, 260px); }
+  .home-hero .hero-content .hero-message { font-size: clamp(2.2rem, 10vw, 3.4rem); }
   .home-hero .hero-content .hero-tagline { margin-bottom: .5rem; }
   .home-hero .hero-content .hero-subheadline { font-size: 1rem; }
   .home-hero .hero-content .hero-microcopy { font-size: .9rem; }

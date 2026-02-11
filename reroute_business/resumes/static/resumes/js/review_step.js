@@ -6,12 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let dragged = null;
 
     listEl.querySelectorAll('.drag-item').forEach((item) => {
-      item.draggable = true;
       item.addEventListener('dragstart', () => {
         dragged = item;
         item.classList.add('dragging');
       });
       item.addEventListener('dragend', () => {
+        if (!dragged) return;
         item.classList.remove('dragging');
         dragged = null;
         sendOrder();

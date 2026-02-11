@@ -12,25 +12,49 @@
   <div class="page-shell">
     <div class="resume-hero">
       <img src="{% static 'images/reroute-trans-logo.png' %}" alt="ReRoute logo" class="resume-logo">
-      <h1>Your next chapter starts here</h1>
-      <p>Create a resume that feels honest, clear, and ready for the opportunities ahead.</p>
+      <h1>Your next chapter<br><span>starts here.</span></h1>
+      <p>ReRoute helps you build a resume that highlights your skills, not your setbacks. No judgment. No pressure. Just a clear path forward.</p>
       <div class="resume-actions">
-        <a href="{% url 'resumes:resume_start' %}" class="resume-btn primary">Start Your Resume</a>
+        <a href="{% url 'resumes:resume_start' %}" class="resume-btn primary">
+          <span class="resume-btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img" focusable="false">
+              <path d="M6 3h8l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M14 3v4h4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+          </span>
+          Start Your Resume
+          <span class="resume-btn-arrow" aria-hidden="true">-></span>
+        </a>
       </div>
     </div>
 
-    <div class="resume-value-grid">
-      <div class="resume-value-card">
+    <div class="resume-value-grid resume-value-icons">
+      <div class="resume-value-item">
+        <div class="resume-icon-pill">
+          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+            <path d="M12 20s-6-4.2-6-9a4 4 0 0 1 6-3 4 4 0 0 1 6 3c0 4.8-6 9-6 9z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+          </svg>
+        </div>
         <h3>Dignity First</h3>
-        <p>Lead with your strengths and the work that shaped you.</p>
+        <p>Every question respects your story.</p>
       </div>
-      <div class="resume-value-card">
+      <div class="resume-value-item">
+        <div class="resume-icon-pill">
+          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+            <path d="M12 3l7 3v6c0 4.2-3 7.2-7 9-4-1.8-7-4.8-7-9V6z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+          </svg>
+        </div>
         <h3>Fair Chance</h3>
-        <p>Share your experience with clarity, confidence, and control.</p>
+        <p>Skills-first design for equitable hiring.</p>
       </div>
-      <div class="resume-value-card">
+      <div class="resume-value-item">
+        <div class="resume-icon-pill">
+          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+            <path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17l-5.5 3 1-6.2L3 9.6l6.2-.9z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+          </svg>
+        </div>
         <h3>Always Yours</h3>
-        <p>Save, edit, and own your resume anytime you need it.</p>
+        <p>Edit, update, return — on your terms.</p>
       </div>
     </div>
   </div>

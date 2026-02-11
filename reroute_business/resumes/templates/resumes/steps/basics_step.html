@@ -20,32 +20,50 @@
         {% csrf_token %}
         <div class="resume-form-grid">
           <div class="form-field">
-            <label for="id_full_name">Full Name</label>
+            <label for="id_full_name" class="resume-label">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zM4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+              Full Name
+            </label>
             {{ contact_form.full_name }}
             {{ contact_form.full_name.errors }}
           </div>
           <div class="form-field">
-            <label for="id_email">Email</label>
+            <label for="id_email" class="resume-label">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+              Email
+            </label>
             {{ contact_form.email }}
             {{ contact_form.email.errors }}
           </div>
           <div class="form-field">
-            <label for="id_phone">Phone number</label>
+            <label for="id_phone" class="resume-label">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l4 2-2 4c1.6 2.6 3.4 4.4 6 6l4-2 2 4-2 2c-2 1-6-1-9-4s-5-7-4-9z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+              Phone number
+            </label>
             {{ contact_form.phone }}
             {{ contact_form.phone.errors }}
           </div>
           <div class="form-field">
-            <label for="id_city">City</label>
+            <label for="id_city" class="resume-label">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s6-5.4 6-11a6 6 0 1 0-12 0c0 5.6 6 11 6 11z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="10" r="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+              City
+            </label>
             {{ contact_form.city }}
             {{ contact_form.city.errors }}
           </div>
           <div class="form-field">
-            <label for="id_state">State</label>
+            <label for="id_state" class="resume-label">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s6-5.4 6-11a6 6 0 1 0-12 0c0 5.6 6 11 6 11z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="10" r="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+              State
+            </label>
             {{ contact_form.state }}
             {{ contact_form.state.errors }}
           </div>
           <div class="form-field" style="grid-column: 1 / -1;">
-            <label for="id_headline">Headline (optional)</label>
+            <label for="id_headline" class="resume-label">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h8" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+              Headline (optional)
+            </label>
             <input type="text" id="id_headline" name="headline" class="form-control" value="{{ headline|default:'' }}">
           </div>
         </div>

@@ -53,10 +53,10 @@ class EducationForm(forms.ModelForm):
         fields = ['education_type', 'school', 'field_of_study', 'year', 'details']
         widgets = {
             'education_type': forms.Select(attrs={'class': 'form-control'}),
-            'school': forms.TextInput(attrs={'class': 'form-control'}),
-            'field_of_study': forms.TextInput(attrs={'class': 'form-control'}),
-            'year': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'numeric', 'maxlength': '4'}),
-            'details': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'school': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Where did you study or train?'}),
+            'field_of_study': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Business'}),
+            'year': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'numeric', 'maxlength': '4', 'placeholder': 'e.g. 2020'}),
+            'details': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': "Anything else you'd like to add about this..."}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -123,17 +123,17 @@ class ExperienceForm(forms.ModelForm):
         fields = ['role_type', 'job_title', 'company', 'start_year', 'end_year', 'currently_work_here', 'responsibilities', 'tools']
         widgets = {
             'role_type': forms.Select(attrs={'class': 'form-control'}),
-            'job_title': forms.TextInput(attrs={'class': 'form-control'}),
-            'company': forms.TextInput(attrs={'class': 'form-control'}),
-            'start_year': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'numeric', 'maxlength': '4'}),
-            'end_year': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'numeric', 'maxlength': '4'}),
+            'job_title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Warehouse Associate'}),
+            'company': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Where did you work?'}),
+            'start_year': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'numeric', 'maxlength': '4', 'placeholder': 'e.g. 2019'}),
+            'end_year': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'numeric', 'maxlength': '4', 'placeholder': 'e.g. 2022'}),
             'currently_work_here': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'responsibilities': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 4,
-                'placeholder': 'Add one responsibility per line...'
+                'placeholder': 'Describe your responsibilities, achievements, or day-to-day tasks...'
             }),
-            'tools': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'tools': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'e.g. Forklift, Excel, POS systems'}),
         }
 
     def clean(self):

@@ -9,24 +9,55 @@
 
 {% block content %}
 <section class="resume-flow resume-start">
-  <div class="page-shell">
-    <div class="resume-card">
-      <h2>Start your resume</h2>
-      <p class="lead">Import an existing resume or build one step-by-step. You can come back anytime.</p>
+  <div class="page-shell start-shell">
+    <div class="start-icon">
+      <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+        <path d="M6 3h8l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M14 3v4h4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M8 12h8M8 16h6" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      </svg>
+    </div>
 
-      <div class="resume-actions" style="justify-content:flex-start;">
-        <a href="{% url 'resumes:resume_upload_page' %}" class="resume-btn primary">
-          {% if imported_exists %}Replace Imported Resume{% else %}Import Resume{% endif %}
-        </a>
-        {% if has_in_progress %}
-          <a href="{{ continue_url }}" class="resume-btn secondary">Continue Editing</a>
-        {% else %}
-          <a href="{% url 'resumes:resume_basics_step' %}" class="resume-btn secondary">Create Resume</a>
-        {% endif %}
-      </div>
+    <h2>Your Resume</h2>
+    <p class="lead">
+      {% if has_in_progress %}
+        You have a resume in progress. Pick up where you left off.
+      {% else %}
+        Choose how you want to start. You can come back anytime.
+      {% endif %}
+    </p>
+
+    <div class="start-actions">
+      <a href="{% url 'resumes:resume_upload_page' %}" class="resume-btn primary start-btn">
+        <span class="resume-btn-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="img" focusable="false">
+            <path d="M6 3h8l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M14 3v4h4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+          </svg>
+        </span>
+        {% if imported_exists %}Replace Imported Resume{% else %}Import Resume{% endif %}
+      </a>
 
       {% if has_in_progress %}
-        <p class="resume-hint">You have a resume in progress. Pick up where you left off.</p>
+        <a href="{{ continue_url }}" class="resume-btn secondary start-btn">
+          <span class="resume-btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img" focusable="false">
+              <path d="M4 20l5-1 10-10-4-4L5 15z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M14 6l4 4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+          </span>
+          Continue Building
+        </a>
+      {% else %}
+        <a href="{% url 'resumes:resume_basics_step' %}" class="resume-btn secondary start-btn">
+          <span class="resume-btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img" focusable="false">
+              <path d="M4 20l5-1 10-10-4-4L5 15z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M14 6l4 4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+          </span>
+          Start Building
+        </a>
       {% endif %}
     </div>
   </div>

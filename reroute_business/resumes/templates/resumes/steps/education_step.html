@@ -12,9 +12,9 @@
   <div class="page-shell">
     {% include "resumes/partials/step_progress.html" %}
 
-    <div class="resume-card">
+    <div class="resume-card education-step">
       <h2>Education & Training</h2>
-      <p class="lead">Add anything that strengthens your story. You can skip this for now.</p>
+      <p class="lead">Include formal education, certifications, or any training programs. Everything counts here.</p>
 
       <form method="post" data-autosave-url="{% url 'resumes:resume_education_autosave' %}">
         {% csrf_token %}
@@ -24,7 +24,14 @@
           {% for form in formset %}
             <div class="education-card" data-education-id="{{ form.instance.id|default:'' }}">
               <header>
-                <strong>Entry {{ forloop.counter }}</strong>
+                <div class="role-title">
+                  <span class="role-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M4 10l8-4 8 4-8 4zM6 14v4h12v-4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                    </svg>
+                  </span>
+                  <strong>Entry {{ forloop.counter }}</strong>
+                </div>
                 <button type="button" class="resume-btn secondary" data-remove-education>Remove</button>
               </header>
               {{ form.id }}
@@ -33,25 +40,42 @@
               </div>
               <div class="resume-form-grid">
                 <div class="form-field">
-                  <label>Type</label>
+                  <label class="resume-label">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h8" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                    Type
+                  </label>
                   {{ form.education_type }}
                   {{ form.education_type.errors }}
                 </div>
                 <div class="form-field">
-                  <label>School/Organization</label>
+                  <label class="resume-label">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10l8-4 8 4-8 4zM6 14v4h12v-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                    School/Organization
+                  </label>
                   {{ form.school }}
                 </div>
-                <div class="form-field">
-                  <label>Field/Subject</label>
-                  {{ form.field_of_study }}
-                </div>
-                <div class="form-field">
-                  <label>Year</label>
-                  {{ form.year }}
-                  {{ form.year.errors }}
+                <div class="form-field two-col">
+                  <div>
+                    <label class="resume-label">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h10M5 18h8" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                      Field / Subject (optional)
+                    </label>
+                    {{ form.field_of_study }}
+                  </div>
+                  <div>
+                    <label class="resume-label">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v14H5zM8 3v4M16 3v4M5 9h14" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                      Year (optional)
+                    </label>
+                    {{ form.year }}
+                    {{ form.year.errors }}
+                  </div>
                 </div>
                 <div class="form-field" style="grid-column: 1 / -1;">
-                  <label>Details (optional)</label>
+                  <label class="resume-label">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12M6 12h12M6 17h8" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                    Details (optional)
+                  </label>
                   {{ form.details }}
                 </div>
               </div>
@@ -59,13 +83,17 @@
           {% endfor %}
         </div>
 
-        <button type="button" class="resume-btn secondary" data-add-education>+ Add another entry</button>
+        <button type="button" class="resume-btn secondary dashed-btn" data-add-education>
+          <span aria-hidden="true">+</span> Add another entry
+        </button>
 
         <div class="resume-step-footer">
-          <a href="{% url 'resumes:resume_skills_step' %}" class="resume-btn secondary">Back</a>
+          <a href="{% url 'resumes:resume_skills_step' %}" class="resume-btn secondary">
+            <- Back
+          </a>
           <div>
             <span class="resume-saved" data-saved-text></span>
-            <button type="submit" class="resume-btn primary">Continue</button>
+            <button type="submit" class="resume-btn primary">Continue -></button>
             <button type="submit" name="skip" value="1" class="resume-btn secondary">Skip for now</button>
           </div>
         </div>
@@ -77,12 +105,22 @@
 <template id="education-template">
   <div class="education-card" data-education-id="">
     <header>
-      <strong>New Entry</strong>
+      <div class="role-title">
+        <span class="role-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 10l8-4 8 4-8 4zM6 14v4h12v-4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+          </svg>
+        </span>
+        <strong>New Entry</strong>
+      </div>
       <button type="button" class="resume-btn secondary" data-remove-education>Remove</button>
     </header>
     <div class="resume-form-grid">
       <div class="form-field">
-        <label>Type</label>
+        <label class="resume-label">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h8" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+          Type
+        </label>
         <select name="new-education_type" class="form-control">
           <option value="">Select</option>
           {% for opt in education_types %}
@@ -91,20 +129,34 @@
         </select>
       </div>
       <div class="form-field">
-        <label>School/Organization</label>
-        <input type="text" name="new-school" class="form-control">
+        <label class="resume-label">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10l8-4 8 4-8 4zM6 14v4h12v-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+          School/Organization
+        </label>
+        <input type="text" name="new-school" class="form-control" placeholder="Where did you study or train?">
       </div>
-      <div class="form-field">
-        <label>Field/Subject</label>
-        <input type="text" name="new-field_of_study" class="form-control">
-      </div>
-      <div class="form-field">
-        <label>Year</label>
-        <input type="text" name="new-year" class="form-control" inputmode="numeric" maxlength="4">
+      <div class="form-field two-col">
+        <div>
+          <label class="resume-label">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h10M5 18h8" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+            Field / Subject (optional)
+          </label>
+          <input type="text" name="new-field_of_study" class="form-control" placeholder="e.g. Business">
+        </div>
+        <div>
+          <label class="resume-label">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v14H5zM8 3v4M16 3v4M5 9h14" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+            Year (optional)
+          </label>
+          <input type="text" name="new-year" class="form-control" inputmode="numeric" maxlength="4" placeholder="e.g. 2020">
+        </div>
       </div>
       <div class="form-field" style="grid-column: 1 / -1;">
-        <label>Details (optional)</label>
-        <textarea name="new-details" class="form-control" rows="3"></textarea>
+        <label class="resume-label">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12M6 12h12M6 17h8" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+          Details (optional)
+        </label>
+        <textarea name="new-details" class="form-control" rows="3" placeholder="Anything else you'd like to add about this..."></textarea>
       </div>
     </div>
   </div>

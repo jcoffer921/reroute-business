@@ -19,27 +19,37 @@
       <form method="post" data-autosave-url="{% url 'resumes:resume_skills_autosave' %}">
         {% csrf_token %}
 
-        <div data-skill-section="technical">
-          <h3>Technical / Hard Skills</h3>
+        <div data-skill-section="technical" data-suggested="{{ suggested_technical_json|escapejs }}">
+          <h3 class="resume-label">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 12h10M9 17h6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+            Technical / Hard Skills
+          </h3>
           <div class="resume-tag-list" data-tag-list></div>
           <input type="hidden" name="technical_skills" data-skill-input value="{{ technical_skills_json|escapejs }}">
-          <input type="text" class="form-control" data-skill-entry placeholder="Type a skill and press Enter">
-          <div class="resume-pill-list">
-            {% for skill in suggested_technical %}
-              <span class="resume-pill" data-value="{{ skill }}">{{ skill }}</span>
-            {% endfor %}
+          <div class="skill-input-row">
+            <input type="text" class="form-control" data-skill-entry placeholder="Type a skill and press Enter">
+            <button type="button" class="skill-add-btn">+</button>
+          </div>
+          <div class="skill-suggest-row">
+            <div class="resume-pill-list" data-suggested-list></div>
+            <button type="button" class="skill-refresh-btn">Refresh</button>
           </div>
         </div>
 
-        <div style="margin-top:24px;" data-skill-section="soft">
-          <h3>Soft Skills & Strengths</h3>
+        <div style="margin-top:24px;" data-skill-section="soft" data-suggested="{{ suggested_soft_json|escapejs }}">
+          <h3 class="resume-label">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s6-4.2 6-9a4 4 0 0 0-6-3 4 4 0 0 0-6 3c0 4.8 6 9 6 9z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+            Soft Skills & Strengths
+          </h3>
           <div class="resume-tag-list" data-tag-list></div>
           <input type="hidden" name="soft_skills" data-skill-input value="{{ soft_skills_json|escapejs }}">
-          <input type="text" class="form-control" data-skill-entry placeholder="Type a strength and press Enter">
-          <div class="resume-pill-list">
-            {% for skill in suggested_soft %}
-              <span class="resume-pill" data-value="{{ skill }}">{{ skill }}</span>
-            {% endfor %}
+          <div class="skill-input-row">
+            <input type="text" class="form-control" data-skill-entry placeholder="Type a strength and press Enter">
+            <button type="button" class="skill-add-btn">+</button>
+          </div>
+          <div class="skill-suggest-row">
+            <div class="resume-pill-list" data-suggested-list></div>
+            <button type="button" class="skill-refresh-btn">Refresh</button>
           </div>
         </div>
 

@@ -5,6 +5,7 @@
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'resumes/css/resume_flow.css' %}">
+  <link rel="stylesheet" href="{% static 'resumes/css/created_resume_view.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -12,138 +13,78 @@
   <div class="page-shell">
     {% include "resumes/partials/step_progress.html" %}
 
-    <div class="resume-card">
-      <h2>Looking good!</h2>
-      <p class="lead">One last look, then you're done. You can come back anytime.</p>
-
-      <div class="resume-step-footer" style="margin-bottom:16px;">
-        <div class="resume-actions" style="justify-content:flex-start;">
-          <a href="{% url 'resumes:resume_basics_step' %}" class="resume-btn secondary">Edit Basics</a>
-          <a href="{% url 'resumes:resume_experience_step' %}" class="resume-btn secondary">Edit Experience</a>
-          <a href="{% url 'resumes:resume_skills_step' %}" class="resume-btn secondary">Edit Skills</a>
-          <a href="{% url 'resumes:resume_education_step' %}" class="resume-btn secondary">Edit Education</a>
+    <div class="resume-card review-card">
+      <div class="review-intro">
+        <div class="review-check">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M7.5 12.5l3 3 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-        <form method="post">
-          {% csrf_token %}
-          <input type="hidden" name="action" value="save">
-          <button type="submit" class="resume-btn primary">Save Resume</button>
-        </form>
+        <h2>Looking good!</h2>
+        <p class="lead">Here's how your resume looks. You can edit any section by clicking the edit buttons.</p>
       </div>
 
-      <div class="review-layout">
-        <div class="review-preview">
+      <div class="review-actions">
+        <a href="{% url 'resumes:resume_basics_step' %}" class="resume-btn secondary">
+          <span aria-hidden="true">✎</span> Edit Basics
+        </a>
+        <a href="{% url 'resumes:resume_experience_step' %}" class="resume-btn secondary">
+          <span aria-hidden="true">✎</span> Edit Experience
+        </a>
+        <a href="{% url 'resumes:resume_skills_step' %}" class="resume-btn secondary">
+          <span aria-hidden="true">✎</span> Edit Skills
+        </a>
+        <a href="{% url 'resumes:resume_education_step' %}" class="resume-btn secondary">
+          <span aria-hidden="true">✎</span> Edit Education
+        </a>
+      </div>
+
+      <div class="review-preview">
+        {% include "resumes/reroute.html" %}
+      </div>
+
+      <div class="review-reorder">
+        <h3>Reorder sections</h3>
+        <ul class="drag-list" data-reorder="sections">
           {% for section in section_order %}
-            {% if section == "basics" %}
-              <div class="review-section" data-edit-link="{% url 'resumes:resume_basics_step' %}">
-                <h3>{{ resume.full_name|default:resume.user.get_full_name }}</h3>
-                {% if resume.headline %}<p>{{ resume.headline }}</p>{% endif %}
-                {% if contact_info %}
-                  <p>{{ contact_info.email }}{% if contact_info.phone %} · {{ contact_info.phone }}{% endif %}</p>
-                  {% if contact_info.city or contact_info.state %}
-                    <p>{{ contact_info.city }}{% if contact_info.city and contact_info.state %}, {% endif %}{{ contact_info.state }}</p>
-                  {% endif %}
-                {% endif %}
-              </div>
-            {% elif section == "experience" %}
-              <div class="review-section" data-edit-link="{% url 'resumes:resume_experience_step' %}">
-                <h3>Experience</h3>
-                {% for role in experiences %}
-                  <div>
-                    <strong>{{ role.job_title }}</strong> — {{ role.company }}
-                    {% if role.currently_work_here %}
-                      ({{ role.start_year|default:"" }} - Present)
-                    {% else %}
-                      {% if role.start_year or role.end_year %}
-                        ({{ role.start_year|default:"" }}{% if role.end_year %} - {{ role.end_year }}{% endif %})
-                      {% endif %}
-                    {% endif %}
-                    {% if role.responsibilities %}
-                      <ul>
-                        {% for line in role.responsibilities.splitlines %}
-                          <li>{{ line }}</li>
-                        {% endfor %}
-                      </ul>
-                    {% endif %}
-                  </div>
-                {% empty %}
-                  <p>No experience added yet.</p>
-                {% endfor %}
-              </div>
-            {% elif section == "skills" %}
-              <div class="review-section" data-edit-link="{% url 'resumes:resume_skills_step' %}">
-                <h3>Skills & Strengths</h3>
-                <p><strong>Technical</strong></p>
-                <div class="resume-tag-list">
-                  {% for skill in technical_skills %}
-                    <span class="resume-tag">{{ skill.skill.name|title }}</span>
-                  {% empty %}
-                    <span class="resume-tag">Add skills</span>
-                  {% endfor %}
-                </div>
-                <p style="margin-top:12px;"><strong>Soft Skills</strong></p>
-                <div class="resume-tag-list">
-                  {% for skill in soft_skills %}
-                    <span class="resume-tag">{{ skill.skill.name|title }}</span>
-                  {% empty %}
-                    <span class="resume-tag">Add strengths</span>
-                  {% endfor %}
-                </div>
-              </div>
-            {% elif section == "education" %}
-              <div class="review-section" data-edit-link="{% url 'resumes:resume_education_step' %}">
-                <h3>Education & Training</h3>
-                {% for edu in educations %}
-                  <div>
-                    <strong>{{ edu.education_type.name|default:"Education" }}</strong>
-                    {% if edu.school %} — {{ edu.school }}{% endif %}
-                    {% if edu.year %} ({{ edu.year }}){% endif %}
-                    {% if edu.field_of_study %}<div>{{ edu.field_of_study }}</div>{% endif %}
-                    {% if edu.details %}<div>{{ edu.details }}</div>{% endif %}
-                  </div>
-                {% empty %}
-                  <p>No education added yet.</p>
-                {% endfor %}
-              </div>
-            {% endif %}
+            <li class="drag-item" data-id="{{ section }}" draggable="true">
+              <span>{{ section|title }}</span>
+              <span class="drag-handle">drag</span>
+            </li>
           {% endfor %}
-        </div>
+        </ul>
 
-        <div class="review-sidebar">
-          <h3>Reorder sections</h3>
-          <ul class="drag-list" data-reorder="sections">
-            {% for section in section_order %}
-              <li class="drag-item" data-id="{{ section }}">
-                <span>{{ section|title }}</span>
-                <span>drag</span>
-              </li>
-            {% endfor %}
-          </ul>
+        <h3>Reorder experience</h3>
+        <ul class="drag-list" data-reorder="experience">
+          {% for role in experiences %}
+            <li class="drag-item" data-id="{{ role.id }}" draggable="true">
+              <span>{{ role.job_title|default:"Role" }}</span>
+              <span class="drag-handle">drag</span>
+            </li>
+          {% empty %}
+            <li class="drag-item">No roles yet</li>
+          {% endfor %}
+        </ul>
 
-          <h3 style="margin-top:20px;">Reorder experience</h3>
-          <ul class="drag-list" data-reorder="experience">
-            {% for role in experiences %}
-              <li class="drag-item" data-id="{{ role.id }}">
-                <span>{{ role.job_title|default:"Role" }}</span>
-                <span>drag</span>
-              </li>
-            {% empty %}
-              <li class="drag-item">No roles yet</li>
-            {% endfor %}
-          </ul>
-
-          <h3 style="margin-top:20px;">Reorder education</h3>
-          <ul class="drag-list" data-reorder="education">
-            {% for edu in educations %}
-              <li class="drag-item" data-id="{{ edu.id }}">
-                <span>{{ edu.school|default:"Education" }}</span>
-                <span>drag</span>
-              </li>
-            {% empty %}
-              <li class="drag-item">No education yet</li>
-            {% endfor %}
-          </ul>
-        </div>
+        <h3>Reorder education</h3>
+        <ul class="drag-list" data-reorder="education">
+          {% for edu in educations %}
+            <li class="drag-item" data-id="{{ edu.id }}" draggable="true">
+              <span>{{ edu.school|default:"Education" }}</span>
+              <span class="drag-handle">drag</span>
+            </li>
+          {% empty %}
+            <li class="drag-item">No education yet</li>
+          {% endfor %}
+        </ul>
       </div>
+
+      <form method="post" class="review-save">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="save">
+        <button type="submit" class="resume-btn primary">Save Resume -></button>
+      </form>
     </div>
   </div>
 </section>
