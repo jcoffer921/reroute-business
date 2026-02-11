@@ -1,0 +1,57 @@
+{% extends "admin_portal/base.html" %}
+
+{% block admin_content %}
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Applications</div>
+  </div>
+  <form method="get" class="admin-filter-row">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search job or applicant" class="admin-input" />
+    <select name="status" class="admin-select">
+      <option value="">All</option>
+      {% for value, label in status_choices %}
+        <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <select name="sort" class="admin-select">
+      <option value="">Sort</option>
+      <option value="submitted_at" {% if sort == 'submitted_at' %}selected{% endif %}>Date submitted</option>
+      <option value="status" {% if sort == 'status' %}selected{% endif %}>Status</option>
+    </select>
+    <button type="submit" class="admin-btn primary">Filter</button>
+  </form>
+
+  <div class="table-responsive">
+    <table class="admin-table">
+      <tr>
+        <th>Applicant</th>
+        <th>Job</th>
+        <th>Status</th>
+        <th>Submitted</th>
+      </tr>
+      {% for application in applications %}
+      <tr>
+        <td>{{ application.applicant.get_full_name|default:application.applicant.username }}</td>
+        <td>{{ application.job.title }}</td>
+        <td>{{ application.status|title }}</td>
+        <td>{{ application.submitted_at|date:"M d, Y" }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4">No applications found.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  {% if is_paginated %}
+    <div class="admin-subtitle">
+      {% if page_obj.has_previous %}
+        <a class="link-button" href="?q={{ q }}&status={{ status }}&sort={{ sort }}&page={{ page_obj.previous_page_number }}">Prev</a>
+      {% endif %}
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      {% if page_obj.has_next %}
+        <a class="link-button" href="?q={{ q }}&status={{ status }}&sort={{ sort }}&page={{ page_obj.next_page_number }}">Next</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

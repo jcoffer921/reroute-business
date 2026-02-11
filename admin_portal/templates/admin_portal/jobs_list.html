@@ -1,0 +1,75 @@
+{% extends "admin_portal/base.html" %}
+
+{% block admin_content %}
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Jobs</div>
+  </div>
+  <form method="get" class="admin-filter-row">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search title, employer, location" class="admin-input" />
+    <select name="status" class="admin-select">
+      <option value="">All</option>
+      <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+      <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option>
+      <option value="flagged" {% if status == 'flagged' %}selected{% endif %}>Flagged</option>
+    </select>
+    <select name="sort" class="admin-select">
+      <option value="">Sort</option>
+      <option value="created_at" {% if sort == 'created_at' %}selected{% endif %}>Date created</option>
+      <option value="title" {% if sort == 'title' %}selected{% endif %}>Title</option>
+    </select>
+    <button type="submit" class="admin-btn primary">Filter</button>
+  </form>
+
+  <div class="table-responsive">
+    <table class="admin-table">
+      <tr>
+        <th>Title</th>
+        <th>Employer</th>
+        <th>Status</th>
+        <th>Compliance</th>
+        <th>Posted</th>
+        <th>Actions</th>
+      </tr>
+      {% for job in jobs %}
+      <tr>
+        <td>{{ job.title }}</td>
+        <td>{{ job.employer.username }}</td>
+        <td>
+          {% if job.is_active %}
+            <span class="status-pill success">Active</span>
+          {% else %}
+            <span class="status-pill warning">Inactive</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if job.is_flagged %}
+            <span class="status-pill danger">Flagged</span>
+          {% else %}
+            <span class="status-pill success">Compliant</span>
+          {% endif %}
+        </td>
+        <td>{{ job.created_at|date:"M d, Y" }}</td>
+        <td>
+          <a class="link-button" href="{% url 'admin_portal:job_detail' job.id %}">View</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">No jobs found.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  {% if is_paginated %}
+    <div class="admin-subtitle">
+      {% if page_obj.has_previous %}
+        <a class="link-button" href="?q={{ q }}&status={{ status }}&sort={{ sort }}&page={{ page_obj.previous_page_number }}">Prev</a>
+      {% endif %}
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      {% if page_obj.has_next %}
+        <a class="link-button" href="?q={{ q }}&status={{ status }}&sort={{ sort }}&page={{ page_obj.next_page_number }}">Next</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

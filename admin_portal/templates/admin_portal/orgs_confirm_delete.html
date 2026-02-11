@@ -1,0 +1,15 @@
+{% extends "admin_portal/base.html" %}
+
+{% block admin_content %}
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Delete Organization</div>
+  </div>
+  <p class="admin-subtitle">This will permanently remove {{ object.name }}. This action is logged.</p>
+  <form method="post" class="js-confirm" data-message="Delete this organization?">
+    {% csrf_token %}
+    <button type="submit" class="admin-btn primary">Confirm Delete</button>
+    <a class="admin-btn ghost" href="{% url 'admin_portal:org_detail' object.id %}">Cancel</a>
+  </form>
+</section>
+{% endblock %}

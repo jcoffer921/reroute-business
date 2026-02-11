@@ -1,0 +1,57 @@
+{% extends "admin_portal/base.html" %}
+
+{% block admin_content %}
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">User Details</div>
+    <a class="admin-btn ghost" href="{% url 'admin_portal:user_list' %}">Back to Users</a>
+  </div>
+  <table class="admin-table">
+    <tr><th>Name</th><td>{{ target_user.get_full_name|default:target_user.username }}</td></tr>
+    <tr><th>Email</th><td>{{ target_user.email|default:"—" }}</td></tr>
+    <tr><th>Status</th><td>{% if target_user.is_active %}Active{% else %}Suspended{% endif %}</td></tr>
+    <tr><th>Joined</th><td>{{ target_user.date_joined|date:"M d, Y" }}</td></tr>
+    <tr><th>Last login</th><td>{% if target_user.last_login %}{{ target_user.last_login|date:"M d, Y" }}{% else %}—{% endif %}</td></tr>
+  </table>
+
+  <form method="post" action="{% url 'admin_portal:user_toggle' target_user.id %}" class="js-confirm" data-message="Toggle this user account status?">
+    {% csrf_token %}
+    <button type="submit" class="admin-btn primary">{% if target_user.is_active %}Suspend User{% else %}Reactivate User{% endif %}</button>
+  </form>
+</section>
+
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Internal Notes</div>
+  </div>
+  <form method="post" action="{% url 'admin_portal:user_note' target_user.id %}">
+    {% csrf_token %}
+    <label for="{{ note_form.note.id_for_label }}">Internal note</label>
+    {{ note_form.note }}
+    <div style="margin-top:12px;">
+      <button type="submit" class="admin-btn primary">Save Note</button>
+    </div>
+  </form>
+</section>
+
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Audit History</div>
+  </div>
+  {% if audit_logs %}
+  <div class="admin-feed">
+    {% for log in audit_logs %}
+    <div class="admin-feed-item">
+      <div>
+        <strong>{{ log.action|title }}</strong>
+        <p>{{ log.metadata.note|default:log.object_repr }}</p>
+      </div>
+      <span class="admin-list-time">{{ log.created_at|date:"M d, g:ia" }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="admin-subtitle">No audit activity yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

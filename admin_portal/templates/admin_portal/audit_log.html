@@ -1,0 +1,85 @@
+{% extends "admin_portal/base.html" %}
+
+{% block admin_content %}
+<section class="admin-cards">
+  <div class="admin-card">
+    <h3>Creates</h3>
+    <div class="stat">{{ action_summary.create|default:0 }}</div>
+  </div>
+  <div class="admin-card">
+    <h3>Updates</h3>
+    <div class="stat">{{ action_summary.update|default:0 }}</div>
+  </div>
+  <div class="admin-card">
+    <h3>Approvals</h3>
+    <div class="stat">{{ action_summary.approve|default:0 }}</div>
+  </div>
+  <div class="admin-card">
+    <h3>Flags</h3>
+    <div class="stat">{{ action_summary.reject|default:0 }}</div>
+  </div>
+</section>
+
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Audit Log</div>
+    <a class="admin-btn ghost" href="{% url 'admin_portal:audit_log_export' %}?q={{ q }}&action={{ action }}">Export CSV</a>
+  </div>
+  <form method="get" class="admin-filter-row user-filter-row">
+    <label class="filter-field">
+      <span class="filter-label">Search</span>
+      <input type="text" name="q" value="{{ q }}" placeholder="Search audit log..." class="admin-input" />
+    </label>
+    <label class="filter-field">
+      <span class="filter-label">Type</span>
+      <select name="action" class="admin-select">
+        <option value="">All</option>
+        <option value="create" {% if action == 'create' %}selected{% endif %}>Create</option>
+        <option value="update" {% if action == 'update' %}selected{% endif %}>Update</option>
+        <option value="delete" {% if action == 'delete' %}selected{% endif %}>Delete</option>
+        <option value="approve" {% if action == 'approve' %}selected{% endif %}>Approve</option>
+        <option value="reject" {% if action == 'reject' %}selected{% endif %}>Reject</option>
+        <option value="note" {% if action == 'note' %}selected{% endif %}>Note</option>
+      </select>
+    </label>
+    <button type="submit" class="admin-btn primary">Apply</button>
+  </form>
+
+  <div class="table-responsive">
+    <table class="admin-table employer-table audit-table">
+      <tr>
+        <th>Date</th>
+        <th>Admin</th>
+        <th>Action</th>
+        <th>Target Type</th>
+        <th>Target</th>
+        <th>Details</th>
+      </tr>
+      {% for log in logs %}
+      <tr>
+        <td>{{ log.created_at|date:"M d, Y g:ia" }}</td>
+        <td class="user-name">{{ log.actor.get_full_name|default:log.actor.username }}</td>
+        <td><span class="action-pill">{{ log.action|title }}</span></td>
+        <td>{{ log.object_type }}</td>
+        <td>{{ log.object_repr }}</td>
+        <td>{{ log.metadata.note|default:log.metadata.reason|default:"—" }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">No audit entries found.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  {% if is_paginated %}
+    <div class="admin-subtitle">
+      {% if page_obj.has_previous %}
+        <a class="link-button" href="?q={{ q }}&action={{ action }}&page={{ page_obj.previous_page_number }}">Prev</a>
+      {% endif %}
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      {% if page_obj.has_next %}
+        <a class="link-button" href="?q={{ q }}&action={{ action }}&page={{ page_obj.next_page_number }}">Next</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

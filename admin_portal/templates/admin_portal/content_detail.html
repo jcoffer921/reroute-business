@@ -1,0 +1,55 @@
+{% extends "admin_portal/base.html" %}
+
+{% block admin_content %}
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Module Details</div>
+    <a class="admin-btn ghost" href="{% url 'admin_portal:content_list' %}">Back to Learning</a>
+  </div>
+  <table class="admin-table">
+    <tr><th>Title</th><td>{{ module.title }}</td></tr>
+    <tr><th>Category</th><td>{{ module.get_category_display }}</td></tr>
+    <tr><th>Status</th><td>{% if module.is_archived %}Archived{% elif module.video_url or module.embed_html or module.internal_content %}Published{% else %}Draft{% endif %}</td></tr>
+    <tr><th>Updated</th><td>{{ module.created_at|date:"M d, Y" }}</td></tr>
+  </table>
+
+  <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
+    <a class="admin-btn primary" href="{% url 'admin_portal:content_edit' module.id %}">Edit</a>
+    {% if not module.is_archived %}
+    <form method="post" action="{% url 'admin_portal:content_archive' module.id %}" class="js-confirm" data-message="Archive this module?">
+      {% csrf_token %}
+      <button type="submit" class="admin-btn ghost">Archive</button>
+    </form>
+    {% endif %}
+    <a class="admin-btn ghost" href="{% url 'admin_portal:content_delete' module.id %}">Delete</a>
+  </div>
+</section>
+
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Content</div>
+  </div>
+  <p class="admin-subtitle">{{ module.description|default:"No description provided." }}</p>
+</section>
+
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Audit History</div>
+  </div>
+  {% if audit_logs %}
+  <div class="admin-feed">
+    {% for log in audit_logs %}
+    <div class="admin-feed-item">
+      <div>
+        <strong>{{ log.action|title }}</strong>
+        <p>{{ log.object_repr }}</p>
+      </div>
+      <span class="admin-list-time">{{ log.created_at|date:"M d, g:ia" }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="admin-subtitle">No audit activity yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "admin_portal/base.html" %}
+
+{% block admin_content %}
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Learning</div>
+    <a class="admin-btn primary" href="{% url 'admin_portal:content_create' %}">+ New Content</a>
+  </div>
+  <form method="get" class="admin-filter-row user-filter-row">
+    <label class="filter-field">
+      <span class="filter-label">Search</span>
+      <input type="text" name="q" value="{{ q }}" placeholder="Search content..." class="admin-input" />
+    </label>
+    <label class="filter-field">
+      <span class="filter-label">Type</span>
+      <select name="type" class="admin-select" disabled>
+        <option value="">All</option>
+        <option value="module" selected>Module</option>
+      </select>
+    </label>
+    <label class="filter-field">
+      <span class="filter-label">Status</span>
+      <select name="status" class="admin-select">
+        <option value="">All</option>
+        <option value="published" {% if status == 'published' %}selected{% endif %}>Published</option>
+        <option value="draft" {% if status == 'draft' %}selected{% endif %}>Draft</option>
+        <option value="archived" {% if status == 'archived' %}selected{% endif %}>Archived</option>
+      </select>
+    </label>
+    <button type="submit" class="admin-btn primary">Apply</button>
+  </form>
+
+  <div class="table-responsive">
+    <table class="admin-table employer-table">
+      <tr>
+        <th>Title</th>
+        <th>Type</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th>Updated</th>
+        <th></th>
+      </tr>
+      {% for module in modules %}
+      <tr>
+        <td class="user-name"><a class="link-button" href="{% url 'admin_portal:content_detail' module.id %}">{{ module.title }}</a></td>
+        <td>Module</td>
+        <td>{{ module.get_category_display }}</td>
+        <td>
+          {% if module.is_archived %}
+            <span class="status-pill neutral">Archived</span>
+          {% elif module.video_url or module.embed_html or module.internal_content %}
+            <span class="status-pill success">Published</span>
+          {% else %}
+            <span class="status-pill warning">Draft</span>
+          {% endif %}
+        </td>
+        <td>{{ module.created_at|date:"M d, Y" }}</td>
+        <td><a class="link-button" href="{% url 'admin_portal:content_detail' module.id %}">View</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">No modules found.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  {% if is_paginated %}
+    <div class="admin-subtitle">
+      {% if page_obj.has_previous %}
+        <a class="link-button" href="?q={{ q }}&status={{ status }}&page={{ page_obj.previous_page_number }}">Prev</a>
+      {% endif %}
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      {% if page_obj.has_next %}
+        <a class="link-button" href="?q={{ q }}&status={{ status }}&page={{ page_obj.next_page_number }}">Next</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

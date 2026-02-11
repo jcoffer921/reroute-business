@@ -79,14 +79,16 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
   width: 100%;
   gap: 1rem;
 }
-.nav-center-slot:empty { display: none; }
-.nav-right-extra:empty { display: none; }
-.nav-right-group {
-  justify-self: end;
-  grid-column: 3;
+.admin-role-badge {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  margin-right: 10px;
 }
 
 .nav-links {
@@ -97,7 +99,7 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
   justify-self: center;
   grid-column: 2;
 }
-.user-profile-right { position: relative; }
+.user-profile-right { justify-self: end; grid-column: 3; position: relative; display: inline-flex; align-items: center; }
 .hamburger { justify-self: end; grid-column: 3; }
 .nav-links a {
   color: #fff; text-decoration: none; font-weight: 600; line-height: 1;

@@ -105,6 +105,7 @@ INSTALLED_APPS = [
     'reroute_business.job_list',
     'reroute_business.resources',
     'reroute_business.reentry_org',
+    'admin_portal',
 
     # default Django apps
     'django.contrib.admin',

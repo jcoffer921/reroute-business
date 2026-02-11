@@ -1,0 +1,60 @@
+{% extends "admin_portal/base.html" %}
+
+{% block admin_content %}
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Job Details</div>
+    <a class="admin-btn ghost" href="{% url 'admin_portal:job_list' %}">Back to Jobs</a>
+  </div>
+  <table class="admin-table">
+    <tr><th>Title</th><td>{{ job.title }}</td></tr>
+    <tr><th>Employer</th><td>{{ job.employer.get_full_name|default:job.employer.username }}</td></tr>
+    <tr><th>Location</th><td>{{ job.location }}</td></tr>
+    <tr><th>Status</th><td>{% if job.is_active %}Active{% else %}Inactive{% endif %}</td></tr>
+    <tr><th>Compliance</th><td>{% if job.is_flagged %}Flagged{% else %}Compliant{% endif %}</td></tr>
+  </table>
+
+  <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
+    <form method="post" action="{% url 'admin_portal:job_approve' job.id %}" class="js-confirm" data-message="Approve this job listing?">
+      {% csrf_token %}
+      <button type="submit" class="admin-btn primary">Approve</button>
+    </form>
+    <form method="post" action="{% url 'admin_portal:job_reject' job.id %}" class="js-confirm" data-message="Reject this job listing?">
+      {% csrf_token %}
+      <label for="{{ review_form.flagged_reason.id_for_label }}">Rejection reason</label>
+      {{ review_form.flagged_reason }}
+      <button type="submit" class="admin-btn ghost">Reject</button>
+    </form>
+    <a class="admin-btn ghost" href="{% url 'admin_portal:job_edit' job.id %}">Edit</a>
+  </div>
+</section>
+
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Description</div>
+  </div>
+  <p class="admin-subtitle">{{ job.description }}</p>
+  <p class="admin-subtitle">{{ job.requirements }}</p>
+</section>
+
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Audit History</div>
+  </div>
+  {% if audit_logs %}
+  <div class="admin-feed">
+    {% for log in audit_logs %}
+    <div class="admin-feed-item">
+      <div>
+        <strong>{{ log.action|title }}</strong>
+        <p>{{ log.metadata.reason|default:log.object_repr }}</p>
+      </div>
+      <span class="admin-list-time">{{ log.created_at|date:"M d, g:ia" }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="admin-subtitle">No audit activity yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

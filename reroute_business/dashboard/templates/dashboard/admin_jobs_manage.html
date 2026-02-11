@@ -45,7 +45,7 @@
             <button type="submit" class="link-button">{% if job.is_active %}Deactivate{% else %}Activate{% endif %}</button>
           </form>
           |
-          <a href="{% url 'admin:job_list_job_change' job.id %}">Open in Admin</a>
+          <a href="{% url 'admin_portal:job_detail' job.id %}">View</a>
         </td>
       </tr>
       {% empty %}

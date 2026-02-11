@@ -1,0 +1,38 @@
+from django.urls import path
+from . import views
+
+app_name = "admin_portal"
+
+urlpatterns = [
+    path("", views.AdminDashboardView.as_view(), name="dashboard"),
+    path("dashboard/", views.AdminDashboardView.as_view(), name="dashboard_alt"),
+    path("applications/", views.ApplicationListView.as_view(), name="application_list"),
+    path("audit-log/", views.AuditLogListView.as_view(), name="audit_log"),
+    path("audit-log/export/", views.audit_log_export, name="audit_log_export"),
+    path("learning/", views.ModuleListView.as_view(), name="content_list"),
+    path("learning/create/", views.ModuleCreateView.as_view(), name="content_create"),
+    path("learning/<int:pk>/", views.ModuleDetailView.as_view(), name="content_detail"),
+    path("learning/<int:pk>/edit/", views.ModuleUpdateView.as_view(), name="content_edit"),
+    path("learning/<int:pk>/delete/", views.ModuleDeleteView.as_view(), name="content_delete"),
+    path("learning/<int:pk>/archive/", views.module_archive, name="content_archive"),
+    path("users/", views.UserListView.as_view(), name="user_list"),
+    path("users/<int:pk>/", views.UserDetailView.as_view(), name="user_detail"),
+    path("users/<int:pk>/toggle/", views.user_toggle_active, name="user_toggle"),
+    path("users/<int:pk>/note/", views.user_add_note, name="user_note"),
+    path("employers/", views.EmployerListView.as_view(), name="employer_list"),
+    path("employers/<int:pk>/", views.EmployerDetailView.as_view(), name="employer_detail"),
+    path("employers/<int:pk>/edit/", views.EmployerUpdateView.as_view(), name="employer_edit"),
+    path("employers/<int:pk>/notes/", views.employer_update_notes, name="employer_notes"),
+    path("employers/<int:pk>/approve/", views.employer_approve, name="employer_approve"),
+    path("employers/<int:pk>/reject/", views.employer_reject, name="employer_reject"),
+    path("jobs/", views.JobListView.as_view(), name="job_list"),
+    path("jobs/<int:pk>/", views.JobDetailView.as_view(), name="job_detail"),
+    path("jobs/<int:pk>/edit/", views.JobUpdateView.as_view(), name="job_edit"),
+    path("jobs/<int:pk>/approve/", views.job_approve, name="job_approve"),
+    path("jobs/<int:pk>/reject/", views.job_reject, name="job_reject"),
+    path("orgs/", views.OrganizationListView.as_view(), name="org_list"),
+    path("orgs/create/", views.OrganizationCreateView.as_view(), name="org_create"),
+    path("orgs/<int:pk>/", views.OrganizationDetailView.as_view(), name="org_detail"),
+    path("orgs/<int:pk>/edit/", views.OrganizationUpdateView.as_view(), name="org_edit"),
+    path("orgs/<int:pk>/delete/", views.OrganizationDeleteView.as_view(), name="org_delete"),
+]

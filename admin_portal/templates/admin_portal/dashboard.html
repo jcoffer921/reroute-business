@@ -1,7 +1,4 @@
-{% extends "dashboard/admin_base.html" %}
-{% load static %}
-
-{% block page_title %}Dashboard{% endblock %}
+{% extends "admin_portal/base.html" %}
 
 {% block admin_content %}
 <header>
@@ -15,22 +12,22 @@
     <div class="stat">{{ active_users_7|default:0 }}</div>
     <div class="sub">Login activity in the last week</div>
   </a>
-  <a class="admin-card" href="{% url 'dashboard:admin_jobs_manage' %}?status=flagged">
+  <a class="admin-card" href="{% url 'admin_portal:job_list' %}?status=flagged">
     <h3>Jobs pending review</h3>
     <div class="stat">{{ jobs_pending_review|default:0 }}</div>
     <div class="sub">Flagged for policy review</div>
   </a>
-  <a class="admin-card" href="{% url 'admin_portal:employer_list' %}">
+  <a class="admin-card" href="{% url 'admin_portal:employer_list' %}?status=pending">
     <h3>Employers awaiting approval</h3>
     <div class="stat">{{ employers_pending|default:0 }}</div>
     <div class="sub">Manual verification queue</div>
   </a>
-  <a class="admin-card" href="{% url 'dashboard:admin_jobs_manage' %}?status=flagged">
+  <a class="admin-card" href="{% url 'admin_portal:job_list' %}?status=flagged">
     <h3>Open flags</h3>
     <div class="stat">{{ open_flags|default:0 }}</div>
     <div class="sub">Reports &amp; trust issues</div>
   </a>
-  <a class="admin-card" href="{% url 'dashboard:admin_analytics_events' %}">
+  <a class="admin-card" href="{% url 'admin_portal:audit_log' %}">
     <h3>Site views</h3>
     <div class="stat">{{ site_views_7|default:0 }}</div>
     <div class="sub">Page views (7d)</div>

@@ -1,0 +1,18 @@
+{% extends "admin_portal/base.html" %}
+
+{% block admin_content %}
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Edit Job</div>
+    <a class="admin-btn ghost" href="{% url 'admin_portal:job_detail' object.id %}">Back</a>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div style="margin-top:12px;">
+      <button type="submit" class="admin-btn primary">Save</button>
+      <a class="admin-btn ghost" href="{% url 'admin_portal:job_detail' object.id %}">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "admin_portal/base.html" %}
+
+{% block admin_content %}
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Reentry Organizations</div>
+    <a class="admin-btn primary" href="{% url 'admin_portal:org_create' %}">Add Organization</a>
+  </div>
+  <form method="get" class="admin-filter-row">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search name, city, state" class="admin-input" />
+    <select name="status" class="admin-select">
+      <option value="">All</option>
+      <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
+      <option value="verified" {% if status == 'verified' %}selected{% endif %}>Verified</option>
+    </select>
+    <select name="sort" class="admin-select">
+      <option value="">Sort</option>
+      <option value="name" {% if sort == 'name' %}selected{% endif %}>Name</option>
+      <option value="created_at" {% if sort == 'created_at' %}selected{% endif %}>Created</option>
+    </select>
+    <button type="submit" class="admin-btn primary">Filter</button>
+  </form>
+
+  <div class="table-responsive">
+    <table class="admin-table">
+      <tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th>Location</th>
+        <th>Actions</th>
+      </tr>
+      {% for org in orgs %}
+      <tr>
+        <td>{{ org.name }}</td>
+        <td>{{ org.get_category_display }}</td>
+        <td>
+          {% if org.is_verified %}
+            <span class="status-pill success">Verified</span>
+          {% else %}
+            <span class="status-pill warning">Pending</span>
+          {% endif %}
+        </td>
+        <td>{{ org.city }}{% if org.city and org.state %}, {% endif %}{{ org.state }}</td>
+        <td>
+          <a class="link-button" href="{% url 'admin_portal:org_detail' org.id %}">View</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">No organizations found.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  {% if is_paginated %}
+    <div class="admin-subtitle">
+      {% if page_obj.has_previous %}
+        <a class="link-button" href="?q={{ q }}&status={{ status }}&sort={{ sort }}&page={{ page_obj.previous_page_number }}">Prev</a>
+      {% endif %}
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      {% if page_obj.has_next %}
+        <a class="link-button" href="?q={{ q }}&status={{ status }}&sort={{ sort }}&page={{ page_obj.next_page_number }}">Next</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

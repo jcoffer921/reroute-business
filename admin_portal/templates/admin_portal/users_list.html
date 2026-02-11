@@ -1,0 +1,93 @@
+{% extends "admin_portal/base.html" %}
+
+{% block admin_content %}
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Users</div>
+  </div>
+  <form method="get" class="admin-filter-row user-filter-row">
+    <label class="filter-field">
+      <span class="filter-label">Search</span>
+      <input type="text" name="q" value="{{ q }}" placeholder="Search by name or email..." class="admin-input" />
+    </label>
+    <label class="filter-field">
+      <span class="filter-label">Status</span>
+      <select name="status" class="admin-select">
+        <option value="">All</option>
+        <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+        <option value="suspended" {% if status == 'suspended' %}selected{% endif %}>Suspended</option>
+      </select>
+    </label>
+    <label class="filter-field">
+      <span class="filter-label">Role</span>
+      <select name="role" class="admin-select">
+        <option value="">All</option>
+        <option value="admin" {% if role == 'admin' %}selected{% endif %}>Admin</option>
+        <option value="employer" {% if role == 'employer' %}selected{% endif %}>Employer</option>
+        <option value="seeker" {% if role == 'seeker' %}selected{% endif %}>Seeker</option>
+      </select>
+    </label>
+    <label class="filter-field">
+      <span class="filter-label">Sort</span>
+      <select name="sort" class="admin-select">
+        <option value="">Newest</option>
+        <option value="date_joined" {% if sort == 'date_joined' %}selected{% endif %}>Date joined</option>
+        <option value="last_login" {% if sort == 'last_login' %}selected{% endif %}>Last login</option>
+        <option value="username" {% if sort == 'username' %}selected{% endif %}>Username</option>
+      </select>
+    </label>
+    <button type="submit" class="admin-btn primary">Apply</button>
+  </form>
+
+  <div class="table-responsive">
+    <table class="admin-table user-table">
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Joined</th>
+        <th></th>
+      </tr>
+      {% for user in users %}
+      <tr>
+        <td class="user-name">{{ user.get_full_name|default:user.username }}</td>
+        <td>{{ user.email|default:"—" }}</td>
+        <td>
+          {% if user.is_staff or user.is_superuser %}
+            <span class="role-pill">Admin</span>
+          {% elif user.groups.all|length %}
+            <span class="role-pill">Employer</span>
+          {% else %}
+            <span class="role-pill">Seeker</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if user.is_active %}
+            <span class="status-pill success">Active</span>
+          {% else %}
+            <span class="status-pill danger">Suspended</span>
+          {% endif %}
+        </td>
+        <td>{{ user.date_joined|date:"M d, Y" }}</td>
+        <td><a class="link-button" href="{% url 'admin_portal:user_detail' user.id %}">View</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">No users found.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  {% if is_paginated %}
+    <div class="admin-subtitle">
+      {% if page_obj.has_previous %}
+        <a class="link-button" href="?q={{ q }}&status={{ status }}&role={{ role }}&sort={{ sort }}&page={{ page_obj.previous_page_number }}">Prev</a>
+      {% endif %}
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      {% if page_obj.has_next %}
+        <a class="link-button" href="?q={{ q }}&status={{ status }}&role={{ role }}&sort={{ sort }}&page={{ page_obj.next_page_number }}">Next</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

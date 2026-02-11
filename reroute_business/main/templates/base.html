@@ -18,13 +18,9 @@
                 <a href="{% url 'home' %}">
                     <img src="{% static 'images/reroute-trans-logo.png' %}" alt="ReRoute Logo" class="brand-logo">
                 </a>
-                {% block nav_wordmark %}{% endblock %}
             </div>
 
             <div class="navbar-links-container">
-                <div class="nav-center-slot">
-                    {% block nav_center %}{% endblock %}
-                </div>
                 <!-- ---------- Left-side navigation links ---------- -->
                 <div class="nav-links">
                     <a href="{% url 'about_us' %}">About Us</a>
@@ -54,15 +50,14 @@
 
                 <!-- ---------- Right-side profile menu ---------- -->
                 {% if user.is_authenticated %}
-                <div class="nav-right-group">
-                    <div class="nav-right-extra">
-                        {% block nav_right_extra %}{% endblock %}
-                    </div>
-                    <div class="user-profile-right">
+                <div class="user-profile-right">
                     <!--
                       Button shows user's initials; clicking toggles dropdown menu.
                       JS in base.js should control .show on #userDropdown and body.no-scroll for mobile.
                     -->
+                    {% if user.is_staff or user.is_superuser %}
+                    <span class="admin-role-badge">Admin</span>
+                    {% endif %}
                     <button class="user-initials-btn user-menu-trigger" id="userMenuButton" aria-expanded="false" aria-controls="userDropdown">
                         <span class="user-menu-icon" aria-hidden="true">
                             <svg viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false">
@@ -83,7 +78,6 @@
                             {% csrf_token %}
                             <button type="submit" class="logout-btn">Sign out</button>
                         </form>
-                    </div>
                     </div>
                     </div>
                 {% endif %}

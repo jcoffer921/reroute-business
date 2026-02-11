@@ -38,6 +38,7 @@ urlpatterns = [
     path('organizations/', include(('reroute_business.reentry_org.urls', 'reentry_org'), namespace='reentry_org')),
     path('blog/',      include('reroute_business.blog.urls')),
     path('api/',       include('reroute_business.core.urls')),
+    path('admin-portal/', include(('admin_portal.urls', 'admin_portal'), namespace='admin_portal')),
 ]
 
 if settings.DEBUG:

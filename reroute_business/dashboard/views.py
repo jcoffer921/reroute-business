@@ -1340,7 +1340,7 @@ def admin_dashboard(request):
             "reason": job.flagged_reason or "Job listing flagged for review",
             "timestamp": job.created_at,
             "severity": "high",
-            "url": reverse("admin:job_list_job_change", args=[job.id]),
+            "url": reverse("admin_portal:job_detail", args=[job.id]),
             "kind": "job",
         })
     try:
@@ -1351,7 +1351,7 @@ def admin_dashboard(request):
                 "reason": "Pending employer approval",
                 "timestamp": employer.user.date_joined,
                 "severity": "medium",
-                "url": reverse("admin:profiles_employerprofile_change", args=[employer.id]),
+                "url": reverse("admin_portal:employer_detail", args=[employer.id]),
                 "kind": "employer",
             })
     except Exception:

@@ -1,0 +1,63 @@
+{% extends "admin_portal/base.html" %}
+
+{% block admin_content %}
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Employer Details</div>
+    <a class="admin-btn ghost" href="{% url 'admin_portal:employer_list' %}">Back to Employers</a>
+  </div>
+  <table class="admin-table">
+    <tr><th>Company</th><td>{{ employer.company_name }}</td></tr>
+    <tr><th>Contact</th><td>{{ employer.user.get_full_name|default:employer.user.username }} ({{ employer.user.email|default:"—" }})</td></tr>
+    <tr><th>Status</th><td>{% if employer.verified %}Approved{% else %}Pending{% endif %}</td></tr>
+    <tr><th>Website</th><td>{{ employer.website|default:"—" }}</td></tr>
+  </table>
+
+  <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
+    <form method="post" action="{% url 'admin_portal:employer_approve' employer.id %}" class="js-confirm" data-message="Approve this employer?">
+      {% csrf_token %}
+      <button type="submit" class="admin-btn primary">Approve</button>
+    </form>
+    <form method="post" action="{% url 'admin_portal:employer_reject' employer.id %}" class="js-confirm" data-message="Reject this employer?">
+      {% csrf_token %}
+      <button type="submit" class="admin-btn ghost">Reject</button>
+    </form>
+    <a class="admin-btn ghost" href="{% url 'admin_portal:employer_edit' employer.id %}">Edit</a>
+  </div>
+</section>
+
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Internal Notes</div>
+  </div>
+  <form method="post" action="{% url 'admin_portal:employer_notes' employer.id %}">
+    {% csrf_token %}
+    <label for="{{ notes_form.verification_notes.id_for_label }}">Internal notes</label>
+    {{ notes_form.verification_notes }}
+    <div style="margin-top:12px;">
+      <button type="submit" class="admin-btn primary">Save Notes</button>
+    </div>
+  </form>
+</section>
+
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Audit History</div>
+  </div>
+  {% if audit_logs %}
+  <div class="admin-feed">
+    {% for log in audit_logs %}
+    <div class="admin-feed-item">
+      <div>
+        <strong>{{ log.action|title }}</strong>
+        <p>{{ log.metadata.note|default:log.object_repr }}</p>
+      </div>
+      <span class="admin-list-time">{{ log.created_at|date:"M d, g:ia" }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="admin-subtitle">No audit activity yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

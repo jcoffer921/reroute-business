@@ -1,0 +1,77 @@
+{% extends "admin_portal/base.html" %}
+
+{% block admin_content %}
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Employers</div>
+  </div>
+  <form method="get" class="admin-filter-row user-filter-row">
+    <label class="filter-field">
+      <span class="filter-label">Search</span>
+      <input type="text" name="q" value="{{ q }}" placeholder="Search employers..." class="admin-input" />
+    </label>
+    <label class="filter-field">
+      <span class="filter-label">Status</span>
+      <select name="status" class="admin-select">
+        <option value="">All</option>
+        <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
+        <option value="approved" {% if status == 'approved' %}selected{% endif %}>Approved</option>
+      </select>
+    </label>
+    <label class="filter-field">
+      <span class="filter-label">Sort</span>
+      <select name="sort" class="admin-select">
+        <option value="">Newest</option>
+        <option value="company_name" {% if sort == 'company_name' %}selected{% endif %}>Company name</option>
+        <option value="user__date_joined" {% if sort == 'user__date_joined' %}selected{% endif %}>Applied date</option>
+      </select>
+    </label>
+    <button type="submit" class="admin-btn primary">Apply</button>
+  </form>
+
+  <div class="table-responsive">
+    <table class="admin-table employer-table">
+      <tr>
+        <th>Business</th>
+        <th>Email</th>
+        <th>City</th>
+        <th>State</th>
+        <th>Status</th>
+        <th>Applied</th>
+        <th></th>
+      </tr>
+      {% for employer in employers %}
+      <tr>
+        <td class="user-name">{{ employer.company_name }}</td>
+        <td>{{ employer.user.email|default:employer.user.username }}</td>
+        <td>{{ employer.user.profile.city|default:"—" }}</td>
+        <td>{{ employer.user.profile.state|default:"—" }}</td>
+        <td>
+          {% if employer.verified %}
+            <span class="status-pill success">Approved</span>
+          {% else %}
+            <span class="status-pill warning">Pending</span>
+          {% endif %}
+        </td>
+        <td>{{ employer.user.date_joined|date:"M d, Y" }}</td>
+        <td><a class="link-button" href="{% url 'admin_portal:employer_detail' employer.id %}">View</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7">No employers found.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  {% if is_paginated %}
+    <div class="admin-subtitle">
+      {% if page_obj.has_previous %}
+        <a class="link-button" href="?q={{ q }}&status={{ status }}&sort={{ sort }}&page={{ page_obj.previous_page_number }}">Prev</a>
+      {% endif %}
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      {% if page_obj.has_next %}
+        <a class="link-button" href="?q={{ q }}&status={{ status }}&sort={{ sort }}&page={{ page_obj.next_page_number }}">Next</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

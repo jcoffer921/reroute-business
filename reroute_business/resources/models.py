@@ -50,6 +50,7 @@ class Module(models.Model):
     quiz_data = models.JSONField(blank=True, null=True)
     key_takeaways = models.JSONField(blank=True, default=list)
     poster_image = models.ImageField(upload_to="modules/posters/", blank=True, null=True)
+    is_archived = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
