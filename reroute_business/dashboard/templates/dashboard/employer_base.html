@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block extra_css %}{{ block.super }}{% endblock %}
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'dashboard/css/employer_dashboard.css' %}">
+{% endblock %}
 
 {% block content %}
   <div class="employer-shell" data-employer-shell>
