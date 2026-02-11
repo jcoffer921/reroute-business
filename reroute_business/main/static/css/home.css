@@ -373,7 +373,7 @@
 .home-hero .hero-content .hero-message {
   margin: 0 auto 4.75rem;
   font-size: clamp(2.8rem, 7vw, 5.2rem);
-  line-height: 1.15;
+  line-height: 1.30;
   letter-spacing: -0.02em;
   font-weight: 800;
   text-align: center;
