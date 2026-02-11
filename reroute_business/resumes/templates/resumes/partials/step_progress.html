@@ -1,0 +1,8 @@
+<div class="resume-progress">
+  {% for step in steps %}
+    <div class="progress-step {% if step.key == active_step %}active{% endif %} {% if step.complete %}complete{% endif %}">
+      <span class="step-pill">{% if step.complete %}OK{% else %}{{ step.number }}{% endif %}</span>
+      <span>{{ step.label }}</span>
+    </div>
+  {% endfor %}
+</div>

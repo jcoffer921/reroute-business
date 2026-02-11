@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.template.loader import render_to_string, get_template
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.clickjacking import xframe_options_sameorigin
@@ -28,7 +29,7 @@ from reroute_business.core.models import Skill
 
 from .models import (
     Resume, ContactInfo, Education, Experience,
-    EducationEntry, ExperienceEntry
+    EducationEntry, ExperienceEntry, EducationType, ResumeSkill
 )
 from .forms import (
     ContactInfoForm, EducationForm, EducationFormSet,
@@ -67,6 +68,54 @@ def _get_or_create_resume(user):
     return resume
 
 
+RESUME_STEP_ORDER = ["basics", "experience", "skills", "education", "review"]
+RESUME_SECTION_DEFAULT = ["basics", "experience", "skills", "education"]
+
+
+def _normalize_phone(raw: str) -> str:
+    return "".join(ch for ch in (raw or "") if ch.isdigit())
+
+
+def _ensure_section_order(resume: Resume) -> None:
+    if not resume.section_order:
+        resume.section_order = RESUME_SECTION_DEFAULT[:]
+        resume.save(update_fields=["section_order"])
+
+
+def _get_or_create_created_resume(user):
+    resume = Resume.objects.filter(user=user, is_imported=False).order_by("-created_at").first()
+    if not resume:
+        resume = Resume.objects.create(user=user, is_imported=False, section_order=RESUME_SECTION_DEFAULT[:])
+    else:
+        _ensure_section_order(resume)
+    return resume
+
+
+def _next_incomplete_step(resume: Resume) -> str:
+    if not resume.step_basics_complete:
+        return "basics"
+    if not resume.step_experience_complete:
+        return "experience"
+    if not resume.step_skills_complete:
+        return "skills"
+    if not resume.step_education_complete:
+        return "education"
+    return "review"
+
+
+def _build_step_context(resume: Resume, active_step: str) -> dict:
+    return {
+        "steps": [
+            {"key": "basics", "label": "Basics", "number": 1, "complete": resume.step_basics_complete},
+            {"key": "experience", "label": "Experience", "number": 2, "complete": resume.step_experience_complete},
+            {"key": "skills", "label": "Skills", "number": 3, "complete": resume.step_skills_complete},
+            {"key": "education", "label": "Education", "number": 4, "complete": resume.step_education_complete},
+            {"key": "review", "label": "Review", "number": 5, "complete": resume.step_review_complete},
+        ],
+        "active_step": active_step,
+    }
+
+
 def _get_skill_categories():
     """
     Provide consistent buckets for the skills step (front-end uses this).
@@ -81,7 +130,7 @@ def _get_skill_categories():
 # ------------------ Entry / Welcome ------------------
 
 @login_required
-def resume_welcome(request):
+def resume_landing(request):
     try:
         profile, _ = UserProfile.objects.get_or_create(user=request.user)
         if profile.onboarding_step in {"start", "profile_started", "profile_completed"}:
@@ -95,18 +144,37 @@ def resume_welcome(request):
     except Exception:
         pass
 
-    return render(request, 'resumes/welcome.html', {
-        "early_access_message": (
-            "ReRoute is in early access. Employers and reentry organizations are onboarding now. "
-            "Completed profiles get priority access when jobs launch."
-        ),
+    return render(request, "resumes/landing.html")
+
+
+@login_required
+def resume_welcome(request):
+    return resume_landing(request)
+
+
+@login_required
+def resume_start(request):
+    created_resume = Resume.objects.filter(user=request.user, is_imported=False).order_by("-created_at").first()
+    imported_exists = Resume.objects.filter(user=request.user, is_imported=True).exists()
+    has_in_progress = bool(created_resume and not created_resume.is_complete)
+    next_step = _next_incomplete_step(created_resume) if created_resume else "basics"
+
+    continue_url = reverse(f"resumes:resume_{next_step}_step")
+    return render(request, "resumes/start.html", {
+        "imported_exists": imported_exists,
+        "created_resume": created_resume,
+        "has_in_progress": has_in_progress,
+        "continue_url": continue_url,
     })
 
 
 @login_required
 def create_resume(request):
     # Single entry point for builder flow
-    return redirect('resumes:resume_contact_info')
+    resume = _get_or_create_created_resume(request.user)
+    _ensure_section_order(resume)
+    step = _next_incomplete_step(resume)
+    return redirect(f"resumes:resume_{step}_step")
 
 # ------------------ Imported Resume Views ------------------
 
@@ -531,10 +599,18 @@ def discard_imported_resume(request, resume_id: int):
 
 @login_required
 def contact_info_step(request):
+    return basics_step(request)
+
+
+@login_required
+def basics_step(request):
     """
-    Step 1: user-provided contact info (builder).
+    Step 1: Basics (contact details + headline).
     """
-    resume = _get_or_create_resume(request.user)
+    resume = _get_or_create_created_resume(request.user)
+    _ensure_section_order(resume)
+    _ensure_section_order(resume)
+
     try:
         profile, _ = UserProfile.objects.get_or_create(user=request.user)
         if profile.onboarding_step in {"start", "profile_started", "profile_completed"}:
@@ -542,157 +618,501 @@ def contact_info_step(request):
             profile.save(update_fields=["onboarding_step"])
         log_onboarding_event(request.user, "resume_started", once=True)
     except Exception:
-        pass
-    # Do NOT create ContactInfo until we have valid POSTed data.
+        profile = None
+
     try:
         contact_info = resume.contact_info
     except ContactInfo.DoesNotExist:
         contact_info = None
 
-    if request.method == 'POST':
-        contact_form = ContactInfoForm(request.POST, instance=contact_info)
+    initial = {}
+    if not contact_info:
+        full_name = request.user.get_full_name().strip() or ""
+        if profile:
+            full_name = full_name or f"{profile.firstname} {profile.lastname}".strip()
+        initial = {
+            "full_name": full_name or request.user.username,
+            "email": request.user.email or (getattr(profile, "personal_email", "") if profile else ""),
+            "phone": getattr(profile, "phone_number", ""),
+            "city": getattr(profile, "city", ""),
+            "state": getattr(profile, "state", "")[:2].upper() if getattr(profile, "state", "") else "",
+        }
+
+    if request.method == "POST":
+        contact_form = ContactInfoForm(request.POST, instance=contact_info, initial=initial)
         if contact_form.is_valid():
             obj = contact_form.save(commit=False)
             obj.resume = resume
+            obj.phone = _normalize_phone(obj.phone)
             obj.save()
-            # Sync resume header fields for final rendering
-            try:
-                full_name = (contact_form.cleaned_data.get('full_name') or '').strip()
-                summary_text = (request.POST.get('summary') or '').strip()
-                updates = []
-                if full_name and full_name != (resume.full_name or ''):
-                    resume.full_name = full_name
-                    updates.append('full_name')
-                if summary_text and summary_text != (resume.summary or ''):
-                    resume.summary = summary_text
-                    updates.append('summary')
-                if updates:
-                    resume.save(update_fields=updates)
-            except Exception:
-                # Non-fatal: do not block the flow if optional fields fail
-                pass
-            # Analytics: resume contact info saved (builder step)
-            try:
-                track_event(event_type='resume_builder_contact_saved', user=request.user, metadata={'resume_id': resume.id})
-            except Exception:
-                pass
-            return redirect('resumes:resume_education_step')
-    else:
-        contact_form = ContactInfoForm(instance=contact_info)
 
-    return render(request, 'resumes/steps/contact_info_step.html', {
-        'contact_form': contact_form,
-        'resume_summary': getattr(resume, 'summary', ''),
+            resume.full_name = obj.full_name
+            resume.headline = (request.POST.get("headline") or "").strip()
+            resume.step_basics_complete = True
+            resume.last_step = "experience"
+            resume.save(update_fields=["full_name", "headline", "step_basics_complete", "last_step"])
+
+            try:
+                track_event(event_type="resume_builder_contact_saved", user=request.user, metadata={"resume_id": resume.id})
+            except Exception:
+                pass
+            return redirect("resumes:resume_experience_step")
+    else:
+        contact_form = ContactInfoForm(instance=contact_info, initial=initial)
+
+    if not resume.step_basics_complete and resume.last_step != "basics":
+        resume.last_step = "basics"
+        resume.save(update_fields=["last_step"])
+
+    return render(request, "resumes/steps/basics_step.html", {
+        "contact_form": contact_form,
+        "resume": resume,
+        "headline": resume.headline or "",
+        **_build_step_context(resume, "basics"),
     })
 
 
 @login_required
 def education_step(request):
     """
-    Step 2: builder education entries. We replace existing builder entries
-    on each POST to keep the step idempotent.
+    Step 4: Education & Training (optional).
     """
-    resume = _get_or_create_resume(request.user)
-    formset = EducationFormSet(queryset=Education.objects.filter(resume=resume))
+    resume = _get_or_create_created_resume(request.user)
+    _ensure_section_order(resume)
+    formset = EducationFormSet(queryset=Education.objects.filter(resume=resume).order_by("order", "id"))
 
-    if request.method == 'POST':
-        formset = EducationFormSet(request.POST)
+    if request.method == "POST":
+        if request.POST.get("skip") == "1":
+            resume.step_education_complete = True
+            resume.last_step = "review"
+            resume.save(update_fields=["step_education_complete", "last_step"])
+            return redirect("resumes:resume_review_step")
+
+        formset = EducationFormSet(request.POST, queryset=Education.objects.filter(resume=resume))
         if formset.is_valid():
-            Education.objects.filter(resume=resume).delete()
-            for form in formset:
-                cd = getattr(form, 'cleaned_data', None) or {}
-                # Skip rows marked for deletion or empty rows
-                if not cd or cd.get('DELETE'):
+            saved_ids = []
+            for index, form in enumerate(formset.forms):
+                cd = getattr(form, "cleaned_data", None) or {}
+                if not cd or cd.get("DELETE"):
+                    if form.instance and form.instance.pk:
+                        form.instance.delete()
                     continue
                 instance = form.save(commit=False)
                 instance.resume = resume
+                instance.order = index
                 instance.save()
+                saved_ids.append(instance.id)
+
+            resume.step_education_complete = True
+            resume.last_step = "review"
+            resume.save(update_fields=["step_education_complete", "last_step"])
+
             try:
-                track_event(event_type='resume_builder_education_saved', user=request.user, metadata={'resume_id': resume.id, 'rows': len(formset.forms)})
+                track_event(event_type="resume_builder_education_saved", user=request.user, metadata={"resume_id": resume.id, "rows": len(saved_ids)})
             except Exception:
                 pass
-            return redirect('resumes:resume_experience_step')
+            return redirect("resumes:resume_review_step")
 
-    return render(request, 'resumes/steps/education_step.html', {'formset': formset})
+    if not resume.step_education_complete and resume.last_step != "education":
+        resume.last_step = "education"
+        resume.save(update_fields=["last_step"])
+
+    return render(request, "resumes/steps/education_step.html", {
+        "formset": formset,
+        "resume": resume,
+        "education_types": EducationType.objects.all(),
+        **_build_step_context(resume, "education"),
+    })
 
 
 @login_required
 def experience_step(request):
     """
-    Step 3: builder experience entries. Same idempotent pattern as education.
+    Step 2: Experience entries.
     """
-    resume = _get_or_create_resume(request.user)
-    formset = ExperienceFormSet(queryset=Experience.objects.filter(resume=resume))
+    resume = _get_or_create_created_resume(request.user)
+    formset = ExperienceFormSet(queryset=Experience.objects.filter(resume=resume).order_by("order", "id"))
 
-    if request.method == 'POST':
-        formset = ExperienceFormSet(request.POST)
+    if request.method == "POST":
+        formset = ExperienceFormSet(request.POST, queryset=Experience.objects.filter(resume=resume))
         if formset.is_valid():
-            Experience.objects.filter(resume=resume).delete()
-            for form in formset:
-                cd = getattr(form, 'cleaned_data', None) or {}
-                if not cd or cd.get('DELETE'):
+            saved_ids = []
+            for index, form in enumerate(formset.forms):
+                cd = getattr(form, "cleaned_data", None) or {}
+                if not cd or cd.get("DELETE"):
+                    if form.instance and form.instance.pk:
+                        form.instance.delete()
                     continue
                 instance = form.save(commit=False)
                 instance.resume = resume
+                instance.order = index
+                lines = [ln.strip().lstrip("•").strip() for ln in (instance.responsibilities or "").splitlines() if ln.strip()]
+                instance.responsibilities = "\n".join(lines)
+                if instance.currently_work_here:
+                    instance.end_year = ""
                 instance.save()
+                saved_ids.append(instance.id)
+
+            resume.step_experience_complete = bool(saved_ids)
+            resume.last_step = "skills"
+            resume.save(update_fields=["step_experience_complete", "last_step"])
+
             try:
-                track_event(event_type='resume_builder_experience_saved', user=request.user, metadata={'resume_id': resume.id, 'rows': len(formset.forms)})
+                track_event(event_type="resume_builder_experience_saved", user=request.user, metadata={"resume_id": resume.id, "rows": len(saved_ids)})
             except Exception:
                 pass
-            return redirect('resumes:resume_skills_step')
+            return redirect("resumes:resume_skills_step")
 
-    return render(request, 'resumes/steps/experience_step.html', {'formset': formset})
+    if not resume.step_experience_complete and resume.last_step != "experience":
+        resume.last_step = "experience"
+        resume.save(update_fields=["last_step"])
+
+    return render(request, "resumes/steps/experience_step.html", {
+        "formset": formset,
+        "resume": resume,
+        **_build_step_context(resume, "experience"),
+    })
 
 
 @login_required
 def skills_step(request):
     """
-    Step 4: Skills. The template expects:
-      - hidden textarea 'selected_skills' (CSV)
-      - context vars: 'initial_skills' (list[str]), 'suggested_skills' (list[str])
+    Step 3: Skills & Strengths.
     """
-    resume = _get_or_create_resume(request.user)
+    resume = _get_or_create_created_resume(request.user)
 
-    if request.method == 'POST':
-        # Form posts CSV of skills via the hidden <textarea name="selected_skills">
-        csv = request.POST.get('selected_skills', '')
-        names = [s for s in (x.strip() for x in csv.split(',')) if s]
+    if request.method == "POST":
+        try:
+            technical = json.loads(request.POST.get("technical_skills", "[]"))
+            soft = json.loads(request.POST.get("soft_skills", "[]"))
+        except Exception:
+            technical = []
+            soft = []
 
-        # Replace existing skills with normalized set
         resume.skills.clear()
-        for raw in names:
+        ResumeSkill.objects.filter(resume=resume).delete()
+
+        added_ids = set()
+
+        def _save_skills(items, category):
+            for idx, raw in enumerate(items):
+                norm = _normalize_skill_name(raw)
+                if not norm:
+                    continue
+                skill, _ = Skill.objects.get_or_create(name=norm)
+                if skill.id in added_ids:
+                    continue
+                resume.skills.add(skill)
+                ResumeSkill.objects.create(resume=resume, skill=skill, category=category, order=idx)
+                added_ids.add(skill.id)
+
+        _save_skills(technical, "technical")
+        _save_skills(soft, "soft")
+
+        resume.step_skills_complete = bool(technical or soft)
+        resume.last_step = "education"
+        resume.save(update_fields=["step_skills_complete", "last_step"])
+
+        try:
+            track_event(event_type="resume_builder_skills_saved", user=request.user, metadata={"resume_id": resume.id, "skills_count": len(technical) + len(soft)})
+        except Exception:
+            pass
+        return redirect("resumes:resume_education_step")
+
+    technical_skills = list(ResumeSkill.objects.filter(resume=resume, category="technical").order_by("order").values_list("skill__name", flat=True))
+    soft_skills = list(ResumeSkill.objects.filter(resume=resume, category="soft").order_by("order").values_list("skill__name", flat=True))
+    if not technical_skills and not soft_skills:
+        technical_skills = list(resume.skills.all().values_list("name", flat=True))
+
+    suggested = _get_skill_categories()
+    return render(request, "resumes/steps/skills_step.html", {
+        "resume": resume,
+        "technical_skills": technical_skills,
+        "soft_skills": soft_skills,
+        "technical_skills_json": json.dumps(technical_skills),
+        "soft_skills_json": json.dumps(soft_skills),
+        "suggested_technical": suggested.get("Trade / Hands-On", []) + suggested.get("Job Readiness", []),
+        "suggested_soft": suggested.get("Soft Skills", []) + suggested.get("Entrepreneurial", []),
+        **_build_step_context(resume, "skills"),
+    })
+
+
+@login_required
+def basics_autosave(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid method"}, status=405)
+
+    resume = _get_or_create_created_resume(request.user)
+    try:
+        data = json.loads(request.body or "{}")
+    except Exception:
+        data = {}
+
+    try:
+        contact_info = resume.contact_info
+    except ContactInfo.DoesNotExist:
+        contact_info = None
+
+    updates = {}
+    for key in ["full_name", "email", "phone", "city", "state"]:
+        if key in data:
+            updates[key] = (data.get(key) or "").strip()
+
+    if "phone" in updates:
+        updates["phone"] = _normalize_phone(updates["phone"])
+    if "state" in updates:
+        updates["state"] = updates["state"][:2].upper()
+
+    if contact_info:
+        for key, value in updates.items():
+            setattr(contact_info, key, value or getattr(contact_info, key))
+        contact_info.save()
+    elif updates:
+        fallback_name = request.user.get_full_name().strip() or request.user.username
+        fallback_email = request.user.email or ""
+        contact_info = ContactInfo.objects.create(
+            resume=resume,
+            full_name=updates.get("full_name") or fallback_name,
+            email=updates.get("email") or fallback_email,
+            phone=updates.get("phone", ""),
+            city=updates.get("city", ""),
+            state=updates.get("state", ""),
+        )
+
+    headline = (data.get("headline") or "").strip()
+    if headline != (resume.headline or ""):
+        resume.headline = headline
+
+    resume.last_step = "basics"
+    resume.step_basics_complete = bool(
+        contact_info and contact_info.full_name and contact_info.email and contact_info.phone
+    )
+    resume.full_name = contact_info.full_name if contact_info else resume.full_name
+    resume.save(update_fields=["headline", "last_step", "step_basics_complete", "full_name"])
+
+    return JsonResponse({"status": "ok", "complete": resume.step_basics_complete})
+
+
+@login_required
+def experience_autosave(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid method"}, status=405)
+    resume = _get_or_create_created_resume(request.user)
+    try:
+        data = json.loads(request.body or "{}")
+    except Exception:
+        data = {}
+
+    roles = data.get("roles") or []
+    saved_ids = []
+
+    for index, item in enumerate(roles):
+        if item.get("delete"):
+            try:
+                Experience.objects.filter(id=int(item.get("id") or 0), resume=resume).delete()
+            except Exception:
+                pass
+            continue
+
+        job_title = (item.get("job_title") or "").strip()
+        company = (item.get("company") or "").strip()
+        responsibilities = (item.get("responsibilities") or "").strip()
+        if not job_title and not company and not responsibilities:
+            continue
+
+        instance = None
+        if item.get("id"):
+            try:
+                instance = Experience.objects.get(id=int(item["id"]), resume=resume)
+            except Exception:
+                instance = None
+
+        if not instance:
+            instance = Experience(resume=resume)
+
+        instance.role_type = (item.get("role_type") or "job")
+        instance.job_title = job_title
+        instance.company = company
+        instance.start_year = (item.get("start_year") or "").strip()
+        instance.end_year = (item.get("end_year") or "").strip()
+        instance.currently_work_here = bool(item.get("currently_work_here"))
+        instance.tools = (item.get("tools") or "").strip()
+        lines = [ln.strip().lstrip("•").strip() for ln in responsibilities.splitlines() if ln.strip()]
+        instance.responsibilities = "\n".join(lines)
+        if instance.currently_work_here:
+            instance.end_year = ""
+        instance.order = index
+        instance.save()
+        saved_ids.append(instance.id)
+
+    resume.step_experience_complete = bool(saved_ids)
+    resume.last_step = "experience"
+    resume.save(update_fields=["step_experience_complete", "last_step"])
+
+    return JsonResponse({"status": "ok", "complete": resume.step_experience_complete})
+
+
+@login_required
+def skills_autosave(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid method"}, status=405)
+    resume = _get_or_create_created_resume(request.user)
+    try:
+        data = json.loads(request.body or "{}")
+    except Exception:
+        data = {}
+
+    technical = data.get("technical") or []
+    soft = data.get("soft") or []
+
+    resume.skills.clear()
+    ResumeSkill.objects.filter(resume=resume).delete()
+
+    added_ids = set()
+
+    def _save(items, category):
+        for idx, raw in enumerate(items):
             norm = _normalize_skill_name(raw)
             if not norm:
                 continue
             skill, _ = Skill.objects.get_or_create(name=norm)
+            if skill.id in added_ids:
+                continue
             resume.skills.add(skill)
+            ResumeSkill.objects.create(resume=resume, skill=skill, category=category, order=idx)
+            added_ids.add(skill.id)
 
-        # Optional: Certifications textarea where each line is a cert name
-        certs_text = (request.POST.get('certifications') or '').strip()
-        try:
-            if hasattr(resume, 'certifications'):
-                resume.certifications = certs_text
-                resume.save(update_fields=['certifications'])
-        except Exception:
-            pass
+    _save(technical, "technical")
+    _save(soft, "soft")
 
-        # Continue to your preview/created page
-        try:
-            track_event(event_type='resume_builder_skills_saved', user=request.user, metadata={'resume_id': resume.id, 'skills_count': len(names)})
-        except Exception:
-            pass
-        return redirect('resumes:created_resume_view', resume_id=resume.id)
+    resume.step_skills_complete = bool(technical or soft)
+    resume.last_step = "skills"
+    resume.save(update_fields=["step_skills_complete", "last_step"])
 
-    # For initial hydration, show what the resume already has
-    initial_skills = [s.name for s in resume.skills.all()]
+    return JsonResponse({"status": "ok", "complete": resume.step_skills_complete})
 
-    # Pull 20–30 sensible suggestions (you can tune this slice)
-    suggested_skills = RELATABLE_SKILLS[:30]
 
-    return render(request, 'resumes/steps/skills_step.html', {
-        'initial_skills': initial_skills,
-        'suggested_skills': suggested_skills,
+@login_required
+def education_autosave(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid method"}, status=405)
+    resume = _get_or_create_created_resume(request.user)
+    try:
+        data = json.loads(request.body or "{}")
+    except Exception:
+        data = {}
+
+    entries = data.get("education") or []
+    saved_ids = []
+
+    for index, item in enumerate(entries):
+        if item.get("delete"):
+            try:
+                Education.objects.filter(id=int(item.get("id") or 0), resume=resume).delete()
+            except Exception:
+                pass
+            continue
+
+        school = (item.get("school") or "").strip()
+        edu_type_id = item.get("education_type")
+        if not school and not edu_type_id and not (item.get("field_of_study") or "").strip():
+            continue
+
+        instance = None
+        if item.get("id"):
+            try:
+                instance = Education.objects.get(id=int(item["id"]), resume=resume)
+            except Exception:
+                instance = None
+
+        if not instance:
+            instance = Education(resume=resume)
+
+        if edu_type_id:
+            instance.education_type_id = int(edu_type_id)
+        instance.school = school
+        instance.field_of_study = (item.get("field_of_study") or "").strip()
+        instance.year = (item.get("year") or "").strip()
+        instance.details = (item.get("details") or "").strip()
+        instance.order = index
+        instance.save()
+        saved_ids.append(instance.id)
+
+    resume.step_education_complete = bool(saved_ids) or bool(data.get("skipped"))
+    resume.last_step = "education"
+    resume.save(update_fields=["step_education_complete", "last_step"])
+
+    return JsonResponse({"status": "ok", "complete": resume.step_education_complete})
+
+
+@login_required
+def review_step(request):
+    resume = _get_or_create_created_resume(request.user)
+    _ensure_section_order(resume)
+
+    if request.method == "POST" and request.POST.get("action") == "save":
+        resume.step_review_complete = True
+        resume.is_complete = True
+        resume.last_step = "review"
+        resume.save(update_fields=["step_review_complete", "is_complete", "last_step"])
+        return redirect("resumes:created_resume_view", resume_id=resume.id)
+
+    contact_info = getattr(resume, "contact_info", None)
+    experiences = list(Experience.objects.filter(resume=resume).order_by("order", "id"))
+    educations = list(Education.objects.filter(resume=resume).order_by("order", "id"))
+    technical_skills = list(ResumeSkill.objects.filter(resume=resume, category="technical").order_by("order"))
+    soft_skills = list(ResumeSkill.objects.filter(resume=resume, category="soft").order_by("order"))
+
+    if not resume.step_review_complete and resume.last_step != "review":
+        resume.last_step = "review"
+        resume.save(update_fields=["last_step"])
+
+    return render(request, "resumes/steps/review_step.html", {
+        "resume": resume,
+        "contact_info": contact_info,
+        "experiences": experiences,
+        "educations": educations,
+        "technical_skills": technical_skills,
+        "soft_skills": soft_skills,
+        "section_order": resume.section_order or RESUME_SECTION_DEFAULT,
+        **_build_step_context(resume, "review"),
     })
+
+
+@login_required
+def review_reorder(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid method"}, status=405)
+    resume = _get_or_create_created_resume(request.user)
+    try:
+        data = json.loads(request.body or "{}")
+    except Exception:
+        data = {}
+
+    section_order = data.get("section_order") or []
+    if section_order:
+        filtered = [s for s in section_order if s in RESUME_SECTION_DEFAULT]
+        for missing in RESUME_SECTION_DEFAULT:
+            if missing not in filtered:
+                filtered.append(missing)
+        resume.section_order = filtered
+        resume.save(update_fields=["section_order"])
+
+    exp_order = data.get("experience_order") or []
+    for idx, rid in enumerate(exp_order):
+        try:
+            Experience.objects.filter(id=int(rid), resume=resume).update(order=idx)
+        except Exception:
+            pass
+
+    edu_order = data.get("education_order") or []
+    for idx, rid in enumerate(edu_order):
+        try:
+            Education.objects.filter(id=int(rid), resume=resume).update(order=idx)
+        except Exception:
+            pass
+
+    return JsonResponse({"status": "ok"})
 
 # ------------------ Views (Preview, Created, Download) ------------------
 
@@ -710,8 +1130,8 @@ def created_resume_view(request, resume_id):
     )
 
     # Prefer builder data; fall back to imported entries if builder is empty.
-    education_entries = list(resume.education.all()) or list(resume.education_entries.all())
-    experience_entries = list(resume.experiences.all()) or list(resume.experience_entries.all())
+    education_entries = list(resume.education.all().order_by("order", "id")) or list(resume.education_entries.all())
+    experience_entries = list(resume.experiences.all().order_by("order", "id")) or list(resume.experience_entries.all())
     contact_info = getattr(resume, 'contact_info', None)
 
     # If you need profile data:

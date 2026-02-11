@@ -6,15 +6,23 @@ app_name = 'resumes'
 
 urlpatterns = [
     # Welcome / entry
+    path('', views.resume_landing, name='resume_landing'),
     path('welcome/', views.resume_welcome, name='resume_welcome'),
+    path('start/', views.resume_start, name='resume_start'),
     path('create/', views.create_resume, name='create_resume'),
 
     # Builder steps
-    path('build/contact/', views.contact_info_step, name='resume_contact_info'),
-    path('build/education/', views.education_step, name='resume_education_step'),
+    path('build/basics/', views.basics_step, name='resume_basics_step'),
     path('build/experience/', views.experience_step, name='resume_experience_step'),
     path('build/skills/', views.skills_step, name='resume_skills_step'),
-    path('build/preview/', views.resume_preview, name='resume_preview_step'),
+    path('build/education/', views.education_step, name='resume_education_step'),
+    path('build/review/', views.review_step, name='resume_review_step'),
+    path('build/basics/autosave/', views.basics_autosave, name='resume_basics_autosave'),
+    path('build/experience/autosave/', views.experience_autosave, name='resume_experience_autosave'),
+    path('build/skills/autosave/', views.skills_autosave, name='resume_skills_autosave'),
+    path('build/education/autosave/', views.education_autosave, name='resume_education_autosave'),
+    path('build/review/reorder/', views.review_reorder, name='resume_review_reorder'),
+    path('build/contact/', views.contact_info_step, name='resume_contact_info'),
 
     # Created resume details + save
     path('created/<int:resume_id>/', views.created_resume_view, name='created_resume_view'),

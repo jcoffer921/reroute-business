@@ -159,7 +159,7 @@ def early_access_cta(request):
     except Exception:
         pass
     if getattr(request.user, "is_authenticated", False):
-        return redirect("resumes:resume_welcome")
+        return redirect("resumes:resume_landing")
     return redirect("signup")
 
 
@@ -1423,7 +1423,7 @@ def create_resume_redirect(request):
     Temporary redirect into your resumes app flow.
     Update the namespace/path if needed.
     """
-    return redirect('resumes:resume_contact_info')
+    return redirect('resumes:resume_start')
 
 def resume_preview(request, resume_id: int):
     """

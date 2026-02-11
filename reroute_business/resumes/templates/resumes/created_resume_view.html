@@ -43,7 +43,7 @@
       <h1 class="quickFade delayTwo">
         {{ resume.full_name|default:resume.user.first_name }} {{ resume.user.last_name }}
       </h1>
-      <h2 class="quickFade delayThree">Job Seeker | Ready to Work</h2>
+      <h2 class="quickFade delayThree">{{ resume.headline|default:"Job Seeker | Ready to Work" }}</h2>
     </div>
 
     <div id="contactDetails" class="quickFade delayFour">
@@ -107,10 +107,10 @@
               {% endif %}
             {% endif %}
 
-            {# Description → true bullets (each line = bullet) #}
-            {% if entry.description %}
+            {# Responsibilities → true bullets (each line = bullet) #}
+            {% if entry.responsibilities %}
               <ul class="bullets">
-                {% for line in entry.description.splitlines %}
+                {% for line in entry.responsibilities.splitlines %}
                   {% if line|not_blank %}<li>{{ line|strip_bullet }}</li>{% endif %}
                 {% endfor %}
               </ul>
@@ -153,22 +153,17 @@
                 {% if edu.graduation_year %} ({{ edu.graduation_year }}){% endif %}
               </p>
             {% else %}
-              {# Builder shape: school/degree/start_date/end_date/description #}
-              {% with yr_range="" %}
-                {% if edu.start_date %}
-                  {% if edu.end_date %}
-                    {% with yr_range=edu.start_date|date:"Y"|add:" - "|add:edu.end_date|date:"Y" %}{% endwith %}
-                  {% else %}
-                    {% with yr_range=edu.start_date|date:"Y"|add:" - Present" %}{% endwith %}
-                  {% endif %}
-                {% endif %}
-                <p>
-                  <strong>{{ edu.degree|default:"Education/Training" }}</strong> — {{ edu.school }}
-                  {% if yr_range %} ({{ yr_range }}){% endif %}
-                </p>
-              {% endwith %}
-              {% if edu.description %}
-                <div class="edu-notes">{{ edu.description }}</div>
+              {# Builder shape: education_type/field_of_study/year/details #}
+              <p>
+                <strong>{{ edu.education_type.name|default:"Education/Training" }}</strong>
+                {% if edu.school %} — {{ edu.school }}{% endif %}
+                {% if edu.year %} ({{ edu.year }}){% endif %}
+              </p>
+              {% if edu.field_of_study %}
+                <div class="edu-notes">{{ edu.field_of_study }}</div>
+              {% endif %}
+              {% if edu.details %}
+                <div class="edu-notes">{{ edu.details }}</div>
               {% endif %}
             {% endif %}
           </article>

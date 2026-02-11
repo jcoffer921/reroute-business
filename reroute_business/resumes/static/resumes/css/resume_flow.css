@@ -1,0 +1,353 @@
+:root {
+  --rr-navy: #0c1e45;
+  --rr-blue: #0a77b4;
+  --rr-cyan: #22b3e6;
+  --rr-ink: #0f172a;
+  --rr-muted: #6b7280;
+  --rr-offwhite: #f6f7fb;
+  --rr-card: #ffffff;
+  --rr-border: #e2e8f0;
+  --rr-shadow: 0 18px 45px rgba(12, 30, 69, 0.12);
+}
+
+.resume-flow {
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(34, 179, 230, 0.12), transparent),
+              linear-gradient(180deg, #f8fafc 0%, #f3f6fb 100%);
+  padding: 48px 16px 80px;
+  color: var(--rr-ink);
+}
+
+.resume-flow .page-shell {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.resume-hero {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.resume-hero img.resume-logo {
+  width: 110px;
+  margin-bottom: 12px;
+}
+
+.resume-hero h1 {
+  font-size: 2.4rem;
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+}
+
+.resume-hero p {
+  color: var(--rr-muted);
+  max-width: 600px;
+  margin: 0 auto 20px;
+}
+
+.resume-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.resume-btn {
+  border-radius: 999px;
+  padding: 12px 24px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.resume-btn.primary {
+  background: var(--rr-navy);
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(12, 30, 69, 0.2);
+}
+
+.resume-btn.secondary {
+  background: #fff;
+  color: var(--rr-navy);
+  border-color: var(--rr-border);
+  box-shadow: 0 8px 20px rgba(12, 30, 69, 0.08);
+}
+
+.resume-btn:hover {
+  transform: translateY(-1px);
+}
+
+.resume-value-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 34px;
+}
+
+.resume-value-card {
+  background: var(--rr-card);
+  border-radius: 18px;
+  padding: 18px 20px;
+  box-shadow: var(--rr-shadow);
+  border: 1px solid rgba(12, 30, 69, 0.06);
+}
+
+.resume-value-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  color: var(--rr-navy);
+}
+
+.resume-value-card p {
+  color: var(--rr-muted);
+  font-size: 0.95rem;
+}
+
+.resume-card {
+  background: var(--rr-card);
+  border-radius: 18px;
+  box-shadow: var(--rr-shadow);
+  padding: 28px;
+  border: 1px solid rgba(12, 30, 69, 0.08);
+}
+
+.resume-card h2 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: var(--rr-navy);
+}
+
+.resume-card p.lead {
+  color: var(--rr-muted);
+  margin-bottom: 20px;
+}
+
+.resume-hint {
+  margin-top: 12px;
+  color: var(--rr-muted);
+  font-size: 0.95rem;
+}
+
+.resume-progress {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.resume-progress .progress-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(12, 30, 69, 0.06);
+  color: var(--rr-muted);
+  font-size: 0.9rem;
+}
+
+.resume-progress .progress-step.active {
+  background: rgba(10, 119, 180, 0.14);
+  color: var(--rr-navy);
+  font-weight: 600;
+}
+
+.resume-progress .progress-step.complete .step-pill {
+  background: var(--rr-blue);
+  color: #fff;
+}
+
+.resume-progress .step-pill {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid var(--rr-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.resume-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.resume-form-grid .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.resume-form-grid input,
+.resume-form-grid select,
+.resume-form-grid textarea {
+  border: 1px solid var(--rr-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+}
+
+.resume-form-grid textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.resume-step-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.resume-saved {
+  font-size: 0.85rem;
+  color: var(--rr-muted);
+}
+
+.role-card,
+.education-card {
+  border: 1px solid rgba(12, 30, 69, 0.08);
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 16px;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(12, 30, 69, 0.08);
+}
+
+.role-card header,
+.education-card header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.resume-pill-list {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.resume-pill {
+  border: 1px solid var(--rr-border);
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  background: #fff;
+  font-size: 0.9rem;
+}
+
+.resume-pill.selected {
+  background: rgba(10, 119, 180, 0.15);
+  border-color: rgba(10, 119, 180, 0.4);
+  color: var(--rr-navy);
+  font-weight: 600;
+}
+
+.resume-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.resume-tag {
+  background: rgba(12, 30, 69, 0.08);
+  color: var(--rr-navy);
+  padding: 6px 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.resume-tag button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.review-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 20px;
+}
+
+.review-preview {
+  background: #fff;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: var(--rr-shadow);
+}
+
+.review-preview h3 {
+  margin-top: 0;
+  color: var(--rr-navy);
+}
+
+.review-section {
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(12, 30, 69, 0.08);
+  cursor: pointer;
+}
+
+.review-section:last-child {
+  border-bottom: none;
+}
+
+.review-sidebar {
+  background: #fff;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: var(--rr-shadow);
+}
+
+.drag-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.drag-item {
+  padding: 10px 12px;
+  background: #f8fafc;
+  border: 1px solid var(--rr-border);
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: grab;
+}
+
+.drag-item.dragging {
+  opacity: 0.6;
+}
+
+@media (max-width: 900px) {
+  .review-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .resume-progress {
+    gap: 8px;
+  }
+
+  .resume-progress .progress-step {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}

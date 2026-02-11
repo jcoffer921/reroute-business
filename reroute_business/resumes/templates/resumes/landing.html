@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ReRoute | Resume Builder{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'resumes/css/resume_flow.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="resume-flow resume-landing">
+  <div class="page-shell">
+    <div class="resume-hero">
+      <img src="{% static 'images/reroute-trans-logo.png' %}" alt="ReRoute logo" class="resume-logo">
+      <h1>Your next chapter starts here</h1>
+      <p>Create a resume that feels honest, clear, and ready for the opportunities ahead.</p>
+      <div class="resume-actions">
+        <a href="{% url 'resumes:resume_start' %}" class="resume-btn primary">Start Your Resume</a>
+      </div>
+    </div>
+
+    <div class="resume-value-grid">
+      <div class="resume-value-card">
+        <h3>Dignity First</h3>
+        <p>Lead with your strengths and the work that shaped you.</p>
+      </div>
+      <div class="resume-value-card">
+        <h3>Fair Chance</h3>
+        <p>Share your experience with clarity, confidence, and control.</p>
+      </div>
+      <div class="resume-value-card">
+        <h3>Always Yours</h3>
+        <p>Save, edit, and own your resume anytime you need it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

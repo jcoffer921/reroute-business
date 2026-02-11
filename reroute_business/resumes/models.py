@@ -98,6 +98,17 @@ class Resume(models.Model):
 
     summary = models.TextField(blank=True, null=True)
     certifications = models.TextField(blank=True, help_text="One per line. Optional.")
+    headline = models.CharField(max_length=120, blank=True)
+
+    # Created-resume builder flow tracking
+    last_step = models.CharField(max_length=32, blank=True, default="basics")
+    step_basics_complete = models.BooleanField(default=False)
+    step_experience_complete = models.BooleanField(default=False)
+    step_skills_complete = models.BooleanField(default=False)
+    step_education_complete = models.BooleanField(default=False)
+    step_review_complete = models.BooleanField(default=False)
+    is_complete = models.BooleanField(default=False)
+    section_order = models.JSONField(blank=True, default=list)
 
     def __str__(self):
         return f"Resume for {self.user.username}"
@@ -144,11 +155,22 @@ class Education(models.Model):
     Builder-flow education/training entry.
     """
     resume = models.ForeignKey('resumes.Resume', on_delete=models.CASCADE, related_name='education')
-    school = models.CharField("School / Program / Training Name", max_length=255)
+    school = models.CharField("School / Program / Training Name", max_length=255, blank=True)
     degree = models.CharField("Degree / Certification / Course", max_length=255, blank=True)
-    start_date = models.DateField()
+    start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     description = models.TextField("Description (optional)", blank=True)
+    education_type = models.ForeignKey(
+        'resumes.EducationType',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='education_entries',
+    )
+    field_of_study = models.CharField(max_length=255, blank=True)
+    year = models.CharField(max_length=4, blank=True)
+    details = models.TextField(blank=True)
+    order = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"{self.school} - {self.degree}" if self.degree else f"{self.school}"
@@ -159,12 +181,23 @@ class Experience(models.Model):
     Builder-flow experience entry.
     """
     resume = models.ForeignKey('resumes.Resume', on_delete=models.CASCADE, related_name='experiences')
+    ROLE_TYPE_CHOICES = [
+        ("job", "Job"),
+        ("other", "Other experience / programs"),
+    ]
+
     job_title = models.CharField(max_length=100)
     company = models.CharField(max_length=100)
-    start_date = models.DateField()
+    start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     currently_work_here = models.BooleanField(default=False)
     description = models.TextField(blank=True)
+    role_type = models.CharField(max_length=40, choices=ROLE_TYPE_CHOICES, default="job")
+    start_year = models.CharField(max_length=4, blank=True)
+    end_year = models.CharField(max_length=4, blank=True)
+    responsibilities = models.TextField(blank=True)
+    tools = models.TextField(blank=True)
+    order = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"{self.job_title} at {self.company}"
@@ -203,3 +236,30 @@ class ExperienceEntry(models.Model):
     job_title = models.CharField(max_length=255)
     company = models.CharField(max_length=255)
     dates = models.CharField(max_length=100, blank=True)
+
+
+class EducationType(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "name"]
+
+    def __str__(self):
+        return self.name
+
+
+class ResumeSkill(models.Model):
+    CATEGORY_CHOICES = [
+        ("technical", "Technical/Hard Skills"),
+        ("soft", "Soft Skills & Strengths"),
+    ]
+
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name="categorized_skills")
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name="resume_links")
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ("resume", "skill")
+        ordering = ["order", "id"]

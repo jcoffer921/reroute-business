@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ReRoute | Resume Builder{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'resumes/css/resume_flow.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="resume-flow resume-start">
+  <div class="page-shell">
+    <div class="resume-card">
+      <h2>Start your resume</h2>
+      <p class="lead">Import an existing resume or build one step-by-step. You can come back anytime.</p>
+
+      <div class="resume-actions" style="justify-content:flex-start;">
+        <a href="{% url 'resumes:resume_upload_page' %}" class="resume-btn primary">
+          {% if imported_exists %}Replace Imported Resume{% else %}Import Resume{% endif %}
+        </a>
+        {% if has_in_progress %}
+          <a href="{{ continue_url }}" class="resume-btn secondary">Continue Editing</a>
+        {% else %}
+          <a href="{% url 'resumes:resume_basics_step' %}" class="resume-btn secondary">Create Resume</a>
+        {% endif %}
+      </div>
+
+      {% if has_in_progress %}
+        <p class="resume-hint">You have a resume in progress. Pick up where you left off.</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,97 +1,137 @@
 {% extends "base.html" %}
 {% load static %}
-{% load widget_tweaks %}
 
-{% block title %}Step 3: Experience{% endblock %}
+{% block title %}ReRoute | Resume Experience{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'resumes/css/resume_flow.css' %}">
+{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'resumes/css/steps.css' %}">
-<link rel="stylesheet" href="{% static 'resumes/css/steps/experience.css' %}">
+<section class="resume-flow">
+  <div class="page-shell">
+    {% include "resumes/partials/step_progress.html" %}
 
-<div class="form-step-wrapper">
-  <h2>Step 3: Experience</h2>
+    <div class="resume-card">
+      <h2>Experience</h2>
+      <p class="lead">Add your work, programs, or other experience. One role per card.</p>
 
-  {# ✅ Show any formset-level (non-field) errors #}
-  {% if formset.non_form_errors %}
-    <div class="alert alert-danger" role="alert">
-      {{ formset.non_form_errors }}
+      <form method="post" data-autosave-url="{% url 'resumes:resume_experience_autosave' %}">
+        {% csrf_token %}
+        {{ formset.management_form }}
+
+        <div data-role-list>
+          {% for form in formset %}
+            <div class="role-card" data-role-id="{{ form.instance.id|default:'' }}">
+              <header>
+                <strong>Role {{ forloop.counter }}</strong>
+                <button type="button" class="resume-btn secondary" data-remove-role>Remove</button>
+              </header>
+              {{ form.id }}
+              <div style="display:none;">
+                {{ form.DELETE }}
+              </div>
+              <div class="resume-form-grid">
+                <div class="form-field">
+                  <label>Role Type</label>
+                  {{ form.role_type }}
+                </div>
+                <div class="form-field">
+                  <label>Job Title</label>
+                  {{ form.job_title }}
+                  {{ form.job_title.errors }}
+                </div>
+                <div class="form-field">
+                  <label>Company/Organization</label>
+                  {{ form.company }}
+                  {{ form.company.errors }}
+                </div>
+                <div class="form-field">
+                  <label>Start Year</label>
+                  {{ form.start_year }}
+                </div>
+                <div class="form-field">
+                  <label>End Year</label>
+                  {{ form.end_year }}
+                </div>
+                <div class="form-field">
+                  <label>Currently work here</label>
+                  {{ form.currently_work_here }}
+                </div>
+                <div class="form-field" style="grid-column: 1 / -1;">
+                  <label>Responsibilities</label>
+                  {{ form.responsibilities }}
+                  {{ form.responsibilities.errors }}
+                </div>
+                <div class="form-field" style="grid-column: 1 / -1;">
+                  <label>Tools/Equipment (optional)</label>
+                  {{ form.tools }}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <button type="button" class="resume-btn secondary" data-add-role>+ Add another role</button>
+
+        <div class="resume-step-footer">
+          <a href="{% url 'resumes:resume_basics_step' %}" class="resume-btn secondary">Back</a>
+          <div>
+            <span class="resume-saved" data-saved-text></span>
+            <button type="submit" class="resume-btn primary">Continue</button>
+          </div>
+        </div>
+      </form>
     </div>
-  {% endif %}
+  </div>
+</section>
 
-  <form method="post" id="experience-form" novalidate>
-    {% csrf_token %}
-    {{ formset.management_form }}
-
-    {% for form in formset %}
-      <div class="formset-row border rounded p-4 mb-4">
-        {{ form.id }}
-        {{ form.non_field_errors }}
-
-        <div class="form-group">
-          <label for="{{ form.job_title.id_for_label }}">Job Title</label>
-          {{ form.job_title|add_class:"form-control"|attr:"autocomplete=organization-title"|attr:"placeholder=e.g., Warehouse Associate" }}
-          {% if form.job_title.errors %}<div class="invalid-feedback d-block">{{ form.job_title.errors|striptags }}</div>{% endif %}
-        </div>
-
-        <div class="form-group">
-          <label for="{{ form.company.id_for_label }}">Company</label>
-          {{ form.company|add_class:"form-control"|attr:"autocomplete=organization"|attr:"placeholder=e.g., ACME Logistics" }}
-          {% if form.company.errors %}<div class="invalid-feedback d-block">{{ form.company.errors|striptags }}</div>{% endif %}
-        </div>
-
-        <div class="form-row d-flex gap-2">
-          <div class="form-group flex-1">
-            <label for="{{ form.start_date.id_for_label }}">Start Date</label>
-            {{ form.start_date|add_class:"form-control"|attr:"autocomplete=bday-month" }}
-            {% if form.start_date.errors %}<div class="invalid-feedback d-block">{{ form.start_date.errors|striptags }}</div>{% endif %}
-          </div>
-
-          <div class="form-group flex-1">
-            <label for="{{ form.end_date.id_for_label }}">End Date</label>
-            {# JS will disable this when "currently_work_here" is checked #}
-            {{ form.end_date|add_class:"form-control"|attr:"autocomplete=bday-month" }}
-            {% if form.end_date.errors %}<div class="invalid-feedback d-block">{{ form.end_date.errors|striptags }}</div>{% endif %}
-          </div>
-        </div>
-
-        <div class="form-check mb-2">
-          {{ form.currently_work_here|add_class:"form-check-input" }}
-          <label class="form-check-label" for="{{ form.currently_work_here.id_for_label }}">I currently work here</label>
-        </div>
-
-        <div class="form-group">
-          <label for="{{ form.description.id_for_label }}">Description</label>
-          <small class="form-text text-muted">Each line becomes a bullet point.</small>
-          {{ form.description|add_class:"form-control"|attr:"rows=4"|attr:"placeholder=• Loaded/unloaded pallets\n• Operated sit-down forklift\n• Trained 3 new hires" }}
-          {% if form.description.errors %}<div class="invalid-feedback d-block">{{ form.description.errors|striptags }}</div>{% endif %}
-        </div>
-
-        {% if form.DELETE %}
-          <div class="form-check delete mt-2">
-            {{ form.DELETE|add_class:"form-check-input" }}
-            <label class="form-check-label" for="{{ form.DELETE.id_for_label }}">Delete this entry</label>
-          </div>
-        {% endif %}
+<template id="role-template">
+  <div class="role-card" data-role-id="">
+    <header>
+      <strong>New Role</strong>
+      <button type="button" class="resume-btn secondary" data-remove-role>Remove</button>
+    </header>
+    <div class="resume-form-grid">
+      <div class="form-field">
+        <label>Role Type</label>
+        <select name="new-role_type" class="form-control">
+          <option value="job">Job</option>
+          <option value="other">Other experience / programs</option>
+        </select>
       </div>
-    {% endfor %}
-
-    {# 🔧 Template the JS clones for new rows (keeps Django's naming/indexing) #}
-    <div id="empty-form-template" hidden>
-      {{ formset.empty_form.as_p }}
+      <div class="form-field">
+        <label>Job Title</label>
+        <input type="text" name="new-job_title" class="form-control">
+      </div>
+      <div class="form-field">
+        <label>Company/Organization</label>
+        <input type="text" name="new-company" class="form-control">
+      </div>
+      <div class="form-field">
+        <label>Start Year</label>
+        <input type="text" name="new-start_year" class="form-control" inputmode="numeric" maxlength="4">
+      </div>
+      <div class="form-field">
+        <label>End Year</label>
+        <input type="text" name="new-end_year" class="form-control" inputmode="numeric" maxlength="4">
+      </div>
+      <div class="form-field">
+        <label>Currently work here</label>
+        <input type="checkbox" name="new-currently_work_here" class="form-check-input">
+      </div>
+      <div class="form-field" style="grid-column: 1 / -1;">
+        <label>Responsibilities</label>
+        <textarea name="new-responsibilities" class="form-control" rows="4"></textarea>
+      </div>
+      <div class="form-field" style="grid-column: 1 / -1;">
+        <label>Tools/Equipment (optional)</label>
+        <textarea name="new-tools" class="form-control" rows="2"></textarea>
+      </div>
     </div>
+  </div>
+</template>
 
-    <!-- Add Button -->
-    <div class="form-actions-right">
-      <button type="button" id="add-experience-btn" class="add-row">➕ Add Experience</button>
-    </div>
-
-    <div class="form-navigation">
-      <a href="{% url 'resumes:resume_education_step' %}" class="btn btn-secondary">Back</a>
-      <button type="submit" class="btn btn-primary" id="experience-next-btn">Next</button>
-    </div>
-  </form>
-</div>
-
-<script src="{% static 'resumes/js/steps.js' %}"></script>
+<script src="{% static 'resumes/js/resume_autosave.js' %}"></script>
 <script src="{% static 'resumes/js/experience_step.js' %}"></script>
 {% endblock %}

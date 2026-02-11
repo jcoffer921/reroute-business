@@ -305,7 +305,7 @@ def user_dashboard(request):
         {
             "label": "Resume uploaded",
             "subtext": "Looking great" if resume_complete else "Upload to unlock matches",
-            "url": reverse("resumes:resume_welcome"),
+            "url": reverse("resumes:resume_landing"),
             "done": resume_complete,
         },
         {

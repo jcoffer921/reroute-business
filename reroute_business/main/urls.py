@@ -53,7 +53,7 @@ urlpatterns = [
     path('match/<int:seeker_id>/', user_views.match_jobs, name='match_jobs'),
 
     # ================ Profile Onboarding Redirect ================
-    path('profile/step1/', lambda request: redirect('resumes:resume_contact_info')),
+    path('profile/step1/', lambda request: redirect('resumes:resume_basics_step')),
 
     # ================ APIs ================
     path('api/skills/', views.get_skills_json, name='get_skills_json'),

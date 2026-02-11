@@ -198,7 +198,7 @@ class UserProfile(models.Model):
         if not self.profile_is_complete():
             return f"{reverse('settings')}?panel=profile"
         if not self.resume_is_complete():
-            return reverse("resumes:resume_welcome")
+            return reverse("resumes:resume_landing")
         return reverse("dashboard:user")
 
     class Meta:
