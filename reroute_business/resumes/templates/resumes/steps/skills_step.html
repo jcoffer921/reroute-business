@@ -19,13 +19,15 @@
       <form method="post" data-autosave-url="{% url 'resumes:resume_skills_autosave' %}">
         {% csrf_token %}
 
-        <div data-skill-section="technical" data-suggested="{{ suggested_technical_json|escapejs }}">
+        {% json_script technical_skills "initial-technical" %}
+        {% json_script suggested_technical "suggested-technical" %}
+        <div data-skill-section="technical" data-initial-id="initial-technical" data-suggested-id="suggested-technical">
           <h3 class="resume-label">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 12h10M9 17h6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
             Technical / Hard Skills
           </h3>
           <div class="resume-tag-list" data-tag-list></div>
-          <input type="hidden" name="technical_skills" data-skill-input value="{{ technical_skills_json|escapejs }}">
+          <input type="hidden" name="technical_skills" data-skill-input value="[]">
           <div class="skill-input-row">
             <input type="text" class="form-control" data-skill-entry placeholder="Type a skill and press Enter">
             <button type="button" class="skill-add-btn">+</button>
@@ -36,13 +38,15 @@
           </div>
         </div>
 
-        <div style="margin-top:24px;" data-skill-section="soft" data-suggested="{{ suggested_soft_json|escapejs }}">
+        {% json_script soft_skills "initial-soft" %}
+        {% json_script suggested_soft "suggested-soft" %}
+        <div style="margin-top:24px;" data-skill-section="soft" data-initial-id="initial-soft" data-suggested-id="suggested-soft">
           <h3 class="resume-label">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s6-4.2 6-9a4 4 0 0 0-6-3 4 4 0 0 0-6 3c0 4.8 6 9 6 9z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
             Soft Skills & Strengths
           </h3>
           <div class="resume-tag-list" data-tag-list></div>
-          <input type="hidden" name="soft_skills" data-skill-input value="{{ soft_skills_json|escapejs }}">
+          <input type="hidden" name="soft_skills" data-skill-input value="[]">
           <div class="skill-input-row">
             <input type="text" class="form-control" data-skill-entry placeholder="Type a strength and press Enter">
             <button type="button" class="skill-add-btn">+</button>

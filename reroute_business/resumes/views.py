@@ -829,10 +829,8 @@ def skills_step(request):
         "resume": resume,
         "technical_skills": technical_skills,
         "soft_skills": soft_skills,
-        "technical_skills_json": json.dumps(technical_skills),
-        "soft_skills_json": json.dumps(soft_skills),
-        "suggested_technical_json": json.dumps(suggested.get("Trade / Hands-On", []) + suggested.get("Job Readiness", [])),
-        "suggested_soft_json": json.dumps(suggested.get("Soft Skills", []) + suggested.get("Entrepreneurial", [])),
+        "suggested_technical": suggested.get("Trade / Hands-On", []) + suggested.get("Job Readiness", []),
+        "suggested_soft": suggested.get("Soft Skills", []) + suggested.get("Entrepreneurial", []),
         **_build_step_context(resume, "skills"),
     })
 

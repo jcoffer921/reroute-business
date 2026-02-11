@@ -336,6 +336,24 @@
   border-radius: 18px;
   background: #fdfaf6;
   box-shadow: 0 12px 28px rgba(12, 30, 69, 0.08);
+  display: none;
+}
+
+.role-card.is-active {
+  display: block;
+}
+
+.role-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 10px 0 16px;
+}
+
+.role-count {
+  color: var(--rr-muted);
+  font-weight: 600;
 }
 
 .education-card {

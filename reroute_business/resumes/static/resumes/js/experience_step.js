@@ -5,6 +5,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const savedEl = document.querySelector('[data-saved-text]');
   const list = document.querySelector('[data-role-list]');
   const addBtn = document.querySelector('[data-add-role]');
+  const nav = document.querySelector('[data-role-nav]');
+  const prevBtn = document.querySelector('[data-role-prev]');
+  const nextBtn = document.querySelector('[data-role-next]');
+  const countEl = document.querySelector('[data-role-count]');
+  let currentIndex = 0;
 
   const roleTemplate = document.getElementById('role-template');
 
@@ -28,6 +33,24 @@ document.addEventListener('DOMContentLoaded', () => {
     return roles;
   }
 
+  function getVisibleCards() {
+    return [...list.querySelectorAll('.role-card')].filter((card) => card.dataset.deleted !== 'true');
+  }
+
+  function updateRoleVisibility() {
+    const cards = getVisibleCards();
+    if (currentIndex >= cards.length) currentIndex = Math.max(0, cards.length - 1);
+    cards.forEach((card, index) => {
+      card.classList.toggle('is-active', index === currentIndex);
+    });
+    if (countEl) {
+      countEl.textContent = cards.length ? `Role ${currentIndex + 1} of ${cards.length}` : '';
+    }
+    if (nav) {
+      nav.style.display = cards.length > 1 ? 'flex' : 'none';
+    }
+  }
+
   const saveNow = () => {
     return postJSON(autosaveUrl, { roles: collectRoles() })
       .then(() => setSavedText(savedEl, 'Saved'))
@@ -49,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (deleteInput) deleteInput.checked = true;
         card.classList.add('is-removed');
         card.style.display = 'none';
+        updateRoleVisibility();
         doSave();
       });
     }
@@ -68,6 +92,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   list.querySelectorAll('.role-card').forEach(wireCard);
+  updateRoleVisibility();
+
+  prevBtn?.addEventListener('click', () => {
+    const cards = getVisibleCards();
+    if (!cards.length) return;
+    currentIndex = Math.max(0, currentIndex - 1);
+    updateRoleVisibility();
+  });
+
+  nextBtn?.addEventListener('click', () => {
+    const cards = getVisibleCards();
+    if (!cards.length) return;
+    currentIndex = Math.min(cards.length - 1, currentIndex + 1);
+    updateRoleVisibility();
+  });
 
   if (addBtn && roleTemplate) {
     addBtn.addEventListener('click', () => {
@@ -75,6 +114,8 @@ document.addEventListener('DOMContentLoaded', () => {
       list.appendChild(clone);
       const newCard = list.querySelector('.role-card:last-child');
       wireCard(newCard);
+      currentIndex = getVisibleCards().length - 1;
+      updateRoleVisibility();
       doSave();
     });
   }

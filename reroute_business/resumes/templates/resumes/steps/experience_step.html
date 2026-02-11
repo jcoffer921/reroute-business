@@ -22,7 +22,7 @@
 
         <div data-role-list>
           {% for form in formset %}
-            <div class="role-card" data-role-id="{{ form.instance.id|default:'' }}">
+            <div class="role-card {% if forloop.first %}is-active{% endif %}" data-role-id="{{ form.instance.id|default:'' }}">
               <header>
                 <div class="role-title">
                   <span class="role-icon" aria-hidden="true">
@@ -103,6 +103,12 @@
               </div>
             </div>
           {% endfor %}
+        </div>
+
+        <div class="role-nav" data-role-nav>
+          <button type="button" class="resume-btn secondary" data-role-prev>Previous</button>
+          <span class="role-count" data-role-count></span>
+          <button type="button" class="resume-btn secondary" data-role-next>Next</button>
         </div>
 
         <button type="button" class="resume-btn secondary dashed-btn" data-add-role>

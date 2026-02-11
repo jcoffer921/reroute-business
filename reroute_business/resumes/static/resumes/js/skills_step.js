@@ -40,10 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function parseSuggested(section) {
-    const raw = section.dataset.suggested || '[]';
+  function parseJsonScript(id) {
+    const el = document.getElementById(id);
+    if (!el) return [];
     try {
-      return JSON.parse(raw);
+      return JSON.parse(el.textContent);
     } catch {
       return [];
     }
@@ -52,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderSuggested(section) {
     const wrap = section.querySelector('[data-suggested-list]');
     if (!wrap) return;
-    const all = parseSuggested(section);
+    const all = parseJsonScript(section.dataset.suggestedId);
     const shuffled = all.slice().sort(() => 0.5 - Math.random());
     const slice = shuffled.slice(0, SUGGESTION_COUNT);
     wrap.innerHTML = '';
@@ -87,8 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   sections.forEach((section) => {
     const input = section.querySelector('[data-skill-entry]');
-    const list = readList(section);
-    renderTags(section, list);
+    const initial = parseJsonScript(section.dataset.initialId);
+    writeList(section, initial);
     renderSuggested(section);
 
     input?.addEventListener('keydown', (e) => {

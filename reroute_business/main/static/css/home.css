@@ -387,11 +387,14 @@
 }
 
 .home-hero .hero-content .hero-message-line--dark {
-  color: #0f172a;
+  color: #ffffff;
 }
 
 .home-hero .hero-content .hero-message-line--accent {
-  color: #3b82b0;
+  background: linear-gradient(90deg, #1e3a5f, #4da8da);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 .home-hero .hero-content .hero-tagline {
   margin: 0 auto .75rem;
