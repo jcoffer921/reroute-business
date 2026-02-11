@@ -10,7 +10,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.timezone import now
 from django.views.decorators.http import require_POST
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import JsonResponse
 from django.urls import reverse
 
@@ -526,9 +526,6 @@ def employer_dashboard(request):
     order = '-created_at' if sort_by == 'newest' else 'created_at'
     jobs = Job.objects.filter(employer=employer_user).order_by(order)
 
-    # Match candidates to this employer's jobs (top few per job)
-    from reroute_business.job_list.matching import match_seekers_for_employer
-    matched_seekers = match_seekers_for_employer(employer_user, limit_per_job=3)[:9]
     # Recent in-app notifications for this employer (include broadcasts)
     try:
         from .models import Notification
@@ -568,7 +565,8 @@ def employer_dashboard(request):
     # Basic analytics (live numbers)
     total_jobs = Job.objects.filter(employer=employer_user).count()
     active_jobs = Job.objects.filter(employer=employer_user, is_active=True).count()
-    total_applications = Application.objects.filter(job__employer=employer_user).count()
+    apps_qs = Application.objects.filter(job__employer=employer_user)
+    total_applications = apps_qs.count()
     # Treat "filled" as inactive jobs for this dashboard
     jobs_filled = Job.objects.filter(employer=employer_user, is_active=False).count()
 
@@ -578,6 +576,21 @@ def employer_dashboard(request):
         "total_applicants": total_applications,
         "jobs_filled": jobs_filled,
     }
+
+    status_counts = {
+        row["status"]: row["c"]
+        for row in apps_qs.values("status").annotate(c=Count("id"))
+    }
+    pipeline_counts = {
+        "new": status_counts.get("pending", 0),
+        "under_review": status_counts.get("reviewed", 0),
+        "interview": status_counts.get("interview", 0),
+        "decision": status_counts.get("accepted", 0) + status_counts.get("rejected", 0),
+    }
+
+    recent_applications = list(
+        apps_qs.select_related("applicant", "job").order_by("-submitted_at")[:6]
+    )
 
     # Employer verification flag (controls alert banner)
     employer_verified = False
@@ -590,10 +603,11 @@ def employer_dashboard(request):
 
     return render(request, 'dashboard/employer_dashboard.html', {
         'jobs': jobs,
-        'matched_seekers': matched_seekers,
         'notifications': notifications,
         'interviews': interviews,
         'analytics': analytics,
+        'pipeline_counts': pipeline_counts,
+        'recent_applications': recent_applications,
         # Expose individual variables for template clarity
         'total_jobs': total_jobs,
         'active_jobs': active_jobs,
