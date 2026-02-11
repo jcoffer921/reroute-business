@@ -42,5 +42,4 @@ class ProfileRoutingTests(TestCase):
         req.user = self.employer
         ctx = role_flags(req)
         self.assertIn('PROFILE_URL', ctx)
-        self.assertIn('/settings/', ctx['PROFILE_URL'])
-        self.assertIn('panel=profile', ctx['PROFILE_URL'])
+        self.assertIn('/dashboard/employer/company-profile/', ctx['PROFILE_URL'])

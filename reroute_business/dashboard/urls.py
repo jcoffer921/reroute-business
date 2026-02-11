@@ -37,6 +37,12 @@ urlpatterns = [
     # ===== Employer analytics =====
     path('employer/analytics/', views.employer_analytics, name='employer_analytics'),
     path('employer/candidates/', views.employer_candidates, name='employer_candidates'),
+    path('employer/job-postings/', views.employer_job_postings, name='employer_job_postings'),
+    path('employer/applicants/', views.employer_applicants, name='employer_applicants'),
+    path('employer/applications/<int:app_id>/status/', views.employer_application_update_status, name='employer_application_update_status'),
+    path('employer/applications/<int:app_id>/notes/', views.employer_application_update_notes, name='employer_application_update_notes'),
+    path('employer/company-profile/', views.employer_company_profile, name='employer_company_profile'),
+    path('employer/fair-chance-guide/', views.employer_fair_chance_guide, name='employer_fair_chance_guide'),
 
     # ===== Employer job management =====
     path('employer/job/<int:job_id>/toggle/', views.employer_job_toggle, name='employer_job_toggle'),

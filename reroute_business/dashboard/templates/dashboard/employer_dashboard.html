@@ -6,394 +6,176 @@
 {% block page_title %}Dashboard{% endblock %}
 
 {% block extra_css %}
+{{ block.super }}
 <link rel="stylesheet" href="{% static 'dashboard/css/employer_dashboard.css' %}">
 {% endblock %}
 
-{% block content %}
-<section class="welcome-panel">
-  <div class="welcome-card">
-    <p class="eyebrow">Welcome back</p>
-    <h1>Welcome back, {{ request.user.first_name|default:request.user.username }}.</h1>
-    <p class="welcome-subhead">Here is your hiring overview across active roles and applicant momentum.</p>
-    {% if not employer_verified %}
-      <div class="status-banner" role="status">
-        <strong>Pending verification:</strong> Complete your company profile to unlock job posting.
-      </div>
-    {% endif %}
+{% block employer_content %}
+<section class="dashboard-hero">
+  <div class="hero-copy">
+    <h1>Welcome back</h1>
+    <p class="muted">Here is an overview of your hiring activity.</p>
   </div>
-  <div class="summary-grid">
-    <a class="summary-card" href="#job-postings">
-      <span class="summary-label">Active Postings</span>
-      <span class="summary-value">{{ active_jobs|default:0 }}</span>
-      <span class="summary-meta">Live roles ready for applicants</span>
-    </a>
-    <a class="summary-card" href="#applicants">
-      <span class="summary-label">Total Applicants</span>
-      <span class="summary-value">{{ total_applications|default:0 }}</span>
-      <span class="summary-meta">All applications to date</span>
-    </a>
-    <a class="summary-card {% if pipeline_counts.under_review|default:0|add:0 > 0 %}is-highlight{% endif %}" href="#pipeline">
-      <span class="summary-label">Under Review</span>
-      <span class="summary-value">{{ pipeline_counts.under_review|default:0 }}</span>
-      <span class="summary-meta">Awaiting your decision</span>
-    </a>
-    <a class="summary-card" href="#pipeline">
-      <span class="summary-label">Interviews</span>
-      <span class="summary-value">{{ interviews|length }}</span>
-      <span class="summary-meta">Scheduled conversations</span>
-    </a>
-  </div>
+  {% if not employer_verified %}
+    <div class="status-banner" role="status">
+      <strong>Pending verification:</strong> Complete your company profile to unlock job posting.
+    </div>
+  {% endif %}
 </section>
 
-<section id="pipeline" class="panel">
+<section class="summary-grid">
+  <article class="summary-card">
+    <span class="summary-icon">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <rect x="4" y="5" width="16" height="14" rx="2" />
+        <path d="M8 5V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1" />
+      </svg>
+    </span>
+    <span class="summary-value">{{ active_jobs|default:0 }}</span>
+    <span class="summary-label">Active Postings</span>
+  </article>
+  <article class="summary-card">
+    <span class="summary-icon">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
+      </svg>
+    </span>
+    <span class="summary-value">{{ total_applications|default:0 }}</span>
+    <span class="summary-label">Total Applicants</span>
+  </article>
+  <article class="summary-card">
+    <span class="summary-icon">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6-10-6-10-6z" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+    </span>
+    <span class="summary-value">{{ pipeline_counts.under_review|default:0 }}</span>
+    <span class="summary-label">Under Review</span>
+    {% if pipeline_counts.under_review|default:0|add:0 > 0 %}
+      <span class="summary-alert">Needs your attention</span>
+    {% endif %}
+  </article>
+  <article class="summary-card">
+    <span class="summary-icon">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <rect x="4" y="5" width="16" height="16" rx="2" />
+        <path d="M8 3v4M16 3v4M4 11h16" />
+      </svg>
+    </span>
+    <span class="summary-value">{{ interviews|length }}</span>
+    <span class="summary-label">Interviews</span>
+  </article>
+</section>
+
+<section class="panel">
   <div class="panel-header">
     <div>
-      <h2>Hiring Pipeline Snapshot</h2>
-      <p class="muted">Track candidates through each stage at a glance.</p>
+      <h2>Hiring Pipeline</h2>
+      <p class="muted">Track candidates through your hiring process.</p>
     </div>
-    <a class="text-link" href="#applicants">Go to Applicants &rarr;</a>
+    <a class="text-link" href="#recent-applicants">View all applicants &rarr;</a>
   </div>
   <div class="pipeline-grid">
-    <a class="pipeline-card" href="#applicants" aria-label="New applicants">
-      <span class="dot dot-blue"></span>
+    <article class="pipeline-card">
+      <div class="pipeline-dot"></div>
       <div>
         <p class="pipeline-label">New</p>
         <p class="pipeline-value">{{ pipeline_counts.new|default:0 }}</p>
+        <p class="pipeline-meta">candidates</p>
       </div>
-    </a>
-    <a class="pipeline-card" href="#applicants" aria-label="Under review applicants">
-      <span class="dot dot-cyan"></span>
+    </article>
+    <article class="pipeline-card">
+      <div class="pipeline-dot"></div>
       <div>
         <p class="pipeline-label">Under Review</p>
         <p class="pipeline-value">{{ pipeline_counts.under_review|default:0 }}</p>
+        <p class="pipeline-meta">candidates</p>
       </div>
-    </a>
-    <a class="pipeline-card" href="#applicants" aria-label="Interview applicants">
-      <span class="dot dot-navy"></span>
+    </article>
+    <article class="pipeline-card">
+      <div class="pipeline-dot"></div>
       <div>
         <p class="pipeline-label">Interview</p>
         <p class="pipeline-value">{{ pipeline_counts.interview|default:0 }}</p>
+        <p class="pipeline-meta">candidates</p>
       </div>
-    </a>
-    <a class="pipeline-card" href="#applicants" aria-label="Decision applicants">
-      <span class="dot dot-soft"></span>
+    </article>
+    <article class="pipeline-card">
+      <div class="pipeline-dot"></div>
       <div>
         <p class="pipeline-label">Decision</p>
         <p class="pipeline-value">{{ pipeline_counts.decision|default:0 }}</p>
+        <p class="pipeline-meta">candidate</p>
       </div>
-    </a>
+    </article>
   </div>
 </section>
 
-<section id="job-postings" class="panel">
-  <div class="panel-header">
-    <div>
-      <h2>Job Postings</h2>
-      <p class="muted">Create, manage, and monitor every role from one place.</p>
+<section class="dashboard-grid">
+  <div class="panel" id="recent-applicants">
+    <div class="panel-header">
+      <h2>Recent Applicants</h2>
+      <a class="text-link" href="{% url 'dashboard:employer' %}#applicants">View all</a>
     </div>
-    {% if employer_verified %}
-      <a href="{% url 'create_job' %}" class="btn-primary">Post a Job</a>
-    {% else %}
-      <button class="btn-outline" type="button" aria-disabled="true" title="Pending verification">Post a Job</button>
-    {% endif %}
-  </div>
-  <div class="panel-toolbar">
-    <div class="search-field">
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <circle cx="11" cy="11" r="7" />
-        <path d="M20 20l-3.5-3.5" />
-      </svg>
-      <input type="search" placeholder="Search job titles, locations, or categories" aria-label="Search job postings">
-    </div>
-    <div class="status-filters" role="tablist" aria-label="Job status filters">
-      <button type="button" class="filter-btn is-active" role="tab">All</button>
-      <button type="button" class="filter-btn" role="tab">Live</button>
-      <button type="button" class="filter-btn" role="tab">Draft</button>
-      <button type="button" class="filter-btn" role="tab">Pending Approval</button>
-      <button type="button" class="filter-btn" role="tab">Archived</button>
-      <button type="button" class="filter-btn" role="tab">Closed</button>
-    </div>
-  </div>
-
-  <div class="job-grid">
-    {% for job in jobs %}
-      <article class="job-card">
-        <div class="job-header">
-          <div>
-            <h3>{{ job.title }}</h3>
-            <p class="job-meta">{{ job.location|default:"Location flexible" }}</p>
-          </div>
-          <span class="status-pill {% if job.is_active %}status-live{% else %}status-closed{% endif %}">
-            {% if not employer_verified %}Pending Approval{% elif job.is_active %}Live{% else %}Closed{% endif %}
-          </span>
-        </div>
-        <div class="job-details">
-          <span class="detail-pill">{{ job.tags|default:"General" }}</span>
-          <span class="detail-pill">{{ job.get_job_type_display|default:"Full-Time" }}</span>
-          <span class="detail-pill">
-            {% if job.salary_min or job.salary_max %}
-              {% if job.salary_min %}${{ job.salary_min }}k{% endif %}{% if job.salary_min and job.salary_max %} - {% endif %}{% if job.salary_max %}${{ job.salary_max }}k{% endif %} / {{ job.get_salary_type_display|default:"Year" }}
-            {% else %}
-              Salary flexible
-            {% endif %}
-          </span>
-        </div>
-        <div class="job-footer">
-          <span class="badge-soft">Fair-chance compliant</span>
-          <span class="app-count">{{ job.applications.count }} applicants</span>
-        </div>
-        <div class="job-actions">
-          <a href="{% url 'dashboard:job_applicants' job.id %}" class="text-link">View applicants &rarr;</a>
-          <form method="post" action="{% url 'dashboard:employer_job_toggle' job.id %}">
-            {% csrf_token %}
-            <button type="submit" class="btn-outline btn-sm">{% if job.is_active %}Close{% else %}Reopen{% endif %}</button>
-          </form>
-        </div>
-      </article>
-    {% empty %}
-      <div class="empty-state">
-        <h3>No job postings yet</h3>
-        <p>Start with one role to unlock candidate matching and applicant tracking.</p>
-      </div>
-    {% endfor %}
-  </div>
-</section>
-
-<section id="applicants" class="panel">
-  <div class="panel-header">
-    <div>
-      <h2>Applicants</h2>
-      <p class="muted">Review applicants, update stages, and keep communication moving.</p>
-    </div>
-    <a class="btn-outline btn-sm" href="#pipeline">View pipeline</a>
-  </div>
-  <div class="panel-toolbar">
-    <div class="search-field">
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <circle cx="11" cy="11" r="7" />
-        <path d="M20 20l-3.5-3.5" />
-      </svg>
-      <input type="search" placeholder="Search by name, job, or skill" aria-label="Search applicants">
-    </div>
-    <div class="status-filters" role="tablist" aria-label="Applicant status filters">
-      <button type="button" class="filter-btn is-active" role="tab">All</button>
-      <button type="button" class="filter-btn" role="tab">New</button>
-      <button type="button" class="filter-btn" role="tab">Under Review</button>
-      <button type="button" class="filter-btn" role="tab">Interview</button>
-      <button type="button" class="filter-btn" role="tab">Decision</button>
-    </div>
-  </div>
-
-  <div class="applicant-grid">
-    {% for app in recent_applications %}
-      <article class="applicant-card">
-        <div class="applicant-header">
+    <div class="applicant-list">
+      {% for app in recent_applications %}
+        <div class="applicant-row">
           <div class="avatar-circle">{{ app.applicant.first_name|default:app.applicant.username|slice:":1" }}</div>
-          <div>
-            <h3>{{ app.applicant.first_name|default:app.applicant.username }}</h3>
-            <p class="muted">Applied for {{ app.job.title }}</p>
+          <div class="applicant-info">
+            <p class="applicant-name">{{ app.applicant.first_name|default:app.applicant.username }}</p>
+            <p class="muted">{{ app.job.location|default:"Remote" }} &middot; {{ app.job.title }}</p>
           </div>
-          <span class="stage-pill" id="stage-{{ app.id }}">
+          <span class="stage-pill">
             {% if app.status == 'pending' %}New{% elif app.status == 'reviewed' %}Under Review{% elif app.status == 'interview' %}Interview{% else %}Decision{% endif %}
           </span>
         </div>
-        <div class="applicant-meta">
-          <span class="tag">Communication</span>
-          <span class="tag">Reliability</span>
-          <span class="tag">{{ app.job.location|default:"Remote" }}</span>
+      {% empty %}
+        <div class="empty-state">
+          <p>No applicants yet.</p>
         </div>
-        <div class="applicant-footer">
-          <span class="muted">Applied {{ app.submitted_at|date:"M d, Y" }}</span>
-          <div class="applicant-actions">
-            <label class="visually-hidden" for="stage-select-{{ app.id }}">Stage</label>
-            <select id="stage-select-{{ app.id }}" class="stage-select" data-stage-select data-stage-target="stage-{{ app.id }}">
-              <option value="pending" {% if app.status == 'pending' %}selected{% endif %}>New</option>
-              <option value="reviewed" {% if app.status == 'reviewed' %}selected{% endif %}>Under Review</option>
-              <option value="interview" {% if app.status == 'interview' %}selected{% endif %}>Interview</option>
-              <option value="decision" {% if app.status == 'accepted' or app.status == 'rejected' %}selected{% endif %}>Decision</option>
-            </select>
-            <button type="button" class="btn-outline btn-sm">Notes</button>
-          </div>
-        </div>
-      </article>
-    {% empty %}
-      <div class="empty-state">
-        <h3>No applicants yet</h3>
-        <p>Once you publish a job, new applicants will appear here with next-step actions.</p>
-      </div>
-    {% endfor %}
-  </div>
-</section>
-
-<section class="panel grid-two">
-  <div class="panel-card">
-    <div class="panel-header">
-      <div>
-        <h2>Upcoming Interviews</h2>
-        <p class="muted">Stay on schedule with shortlists.</p>
-      </div>
-      <button type="button" class="btn-primary btn-sm" id="openScheduleInterview">Add Interview</button>
+      {% endfor %}
     </div>
-    {% if interviews %}
-      <ul class="list-plain">
-        {% for interview in interviews|slice:":4" %}
-          <li>
-            <div class="list-row">
-              <div>
-                <strong>{{ interview.job.title }}</strong>
-                <div class="muted">{{ interview.scheduled_at|date:"M d, Y g:ia" }} &middot; {{ interview.candidate.get_full_name|default:interview.candidate.username }}</div>
-              </div>
-              <div class="actions-dropdown">
-                <button type="button" class="btn-outline btn-sm dropdown-toggle" data-menu-id="dd-{{ interview.id }}">Actions v</button>
-                <div class="dropdown-menu" id="dd-{{ interview.id }}">
-                  <button type="button" class="dropdown-item openReschedule" data-interview="{{ interview.id }}" data-datetime="{{ interview.scheduled_at|date:'Y-m-d\\TH:i' }}">Reschedule</button>
-                  <form method="post" action="{% url 'dashboard:cancel_interview' %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="interview_id" value="{{ interview.id }}">
-                    <button type="submit" class="dropdown-item" onclick="return confirm('Cancel this interview?');">Cancel</button>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <div class="empty-state">
-        <p>No interviews scheduled yet.</p>
-      </div>
-    {% endif %}
   </div>
 
-  <div class="panel-card">
-    <div class="panel-header">
-      <div>
-        <h2>Employer Notifications</h2>
-        <p class="muted">Recent updates from ReRoute.</p>
+  <aside class="side-panel">
+    <div class="panel tip-card">
+      <div class="tip-header">
+        <span class="summary-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4 4h14a2 2 0 0 1 2 2v12" />
+            <path d="M4 6v14a2 2 0 0 0 2 2h14" />
+          </svg>
+        </span>
+        <h3>Fair-Chance Tip</h3>
       </div>
-      <form method="post" action="{% url 'dashboard:notifications' %}">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="mark_all_read">
-        <button type="submit" class="btn-outline btn-sm">Mark all read</button>
-      </form>
+      <p class="muted">Fair-chance employers report higher retention rates and workplace loyalty.</p>
+      <a class="text-link" href="{% url 'resource_list' %}">View full guide &rarr;</a>
     </div>
-    {% if notifications %}
-      <ul class="list-plain">
-        {% for note in notifications|slice:":4" %}
-          <li>
-            <div class="list-row">
-              <div>{{ note.message }}</div>
-              <div class="time muted">{{ note.created_at|timesince }} ago</div>
-            </div>
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <div class="empty-state">
-        <p>No notifications right now.</p>
-      </div>
-    {% endif %}
-  </div>
-</section>
 
-<section class="panel">
-  <div class="panel-header">
-    <div>
-      <h2>Company Profile</h2>
-      <p class="muted">Public-facing preview with fair-chance commitment.</p>
+    <div class="panel quick-actions">
+      <h3>Quick Actions</h3>
+      <a class="action-row" href="{% url 'create_job' %}">
+        <span class="summary-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <rect x="4" y="5" width="16" height="14" rx="2" />
+            <path d="M8 5V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1" />
+          </svg>
+        </span>
+        Post a new job
+      </a>
+      <a class="action-row" href="{% url 'dashboard:employer_company_profile' %}">
+        <span class="summary-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
+          </svg>
+        </span>
+        Update company profile
+      </a>
     </div>
-    <a class="btn-outline btn-sm" href="{{ PROFILE_URL }}">Edit Profile</a>
-  </div>
-  <div class="profile-grid">
-    <div class="profile-card">
-      <h3>Company Snapshot</h3>
-      <div class="profile-row">
-        <span class="profile-label">Company Name</span>
-        <span class="profile-value">{{ request.user.get_full_name|default:request.user.username }}</span>
-      </div>
-      <div class="profile-row">
-        <span class="profile-label">Industry</span>
-        <span class="profile-value">Logistics &amp; Operations</span>
-      </div>
-      <div class="profile-row">
-        <span class="profile-label">Website</span>
-        <span class="profile-value">www.example.com</span>
-      </div>
-      <div class="profile-row">
-        <span class="profile-label">Company Size</span>
-        <span class="profile-value">51-200 employees</span>
-      </div>
-    </div>
-    <div class="profile-card">
-      <h3>Fair-Chance Employer</h3>
-      <p class="muted">ReRoute verifies your inclusive hiring standards.</p>
-      <div class="badge-soft">Fair-Chance Employer</div>
-      <div class="profile-row">
-        <span class="profile-label">Commitment Statement</span>
-        <span class="profile-value">We evaluate every candidate based on skills, potential, and readiness for success.</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="fair-chance-guide" class="panel">
-  <div class="panel-header">
-    <div>
-      <h2>Fair-Chance Hiring Guide</h2>
-      <p class="muted">Education without enforcement, built for employer teams.</p>
-    </div>
-    <a class="text-link" href="{% url 'resource_list' %}">Explore resources &rarr;</a>
-  </div>
-  <div class="guide-grid">
-    <div class="guide-card">
-      <h3>Intro</h3>
-      <p>Frame fair-chance hiring as a growth strategy aligned with long-term retention.</p>
-    </div>
-    <div class="guide-card">
-      <h3>Legal Context</h3>
-      <p>Understand state guidance, timing for background checks, and disclosure best practices.</p>
-    </div>
-    <div class="guide-card">
-      <h3>Best Practices</h3>
-      <p>Use structured interviews, skills-first rubrics, and consistent onboarding pathways.</p>
-    </div>
-    <div class="guide-card">
-      <h3>Inclusive Workplace</h3>
-      <p>Build mentorship loops, manager training, and clear growth milestones.</p>
-    </div>
-  </div>
-</section>
-
-<section class="panel">
-  <div class="panel-header">
-    <div>
-      <h2>Settings</h2>
-      <p class="muted">Keep account access and notifications aligned.</p>
-    </div>
-    <a class="btn-outline btn-sm" href="{% url 'settings' %}">Open Settings</a>
-  </div>
-  <div class="settings-grid">
-    <div class="settings-card">
-      <h3>Account Info</h3>
-      <p class="muted">Update primary contact email and authorized team members.</p>
-      <a class="text-link" href="{% url 'settings' %}">Manage account &rarr;</a>
-    </div>
-    <div class="settings-card">
-      <h3>Password Reset</h3>
-      <p class="muted">Secure your dashboard with regular credential updates.</p>
-      <a class="text-link" href="{% url 'settings' %}">Reset password &rarr;</a>
-    </div>
-    <div class="settings-card">
-      <h3>Notification Preferences</h3>
-      <p class="muted">Prepare future alerts for new applicants and interview confirmations.</p>
-      <a class="text-link" href="{% url 'settings' %}">Manage alerts &rarr;</a>
-    </div>
-    <div class="settings-card">
-      <h3>Deactivate Account</h3>
-      <p class="muted">Disable hiring access with a confirmation step.</p>
-      <button class="btn-outline btn-sm" type="button" onclick="return confirm('Deactivate this employer account?');">Deactivate</button>
-    </div>
-  </div>
+  </aside>
 </section>
 
 <!-- ====== Schedule Interview Modal ====== -->
@@ -464,6 +246,7 @@
 {% endblock %}
 
 {% block extra_js %}
+  {{ block.super }}
   <script src="{% static 'dashboard/js/employer_dashboard.js' %}" defer></script>
   <script src="{% static 'dashboard/js/employer_dashboard_modals.js' %}" defer></script>
 {% endblock %}

@@ -111,51 +111,7 @@ def employer_profile_view(request):
     - Submitting the form saves changes and reloads this page.
     - The green Verified badge appears if verification is true; otherwise a yellow pending badge shows.
     """
-    # Get or create an EmployerProfile linked to the current user so the page always has data to show/edit
-    # Lazy import to avoid any circular import surprises at module load time
-    from .forms import EmployerProfileForm
-
-    employer_profile, _ = EmployerProfile.objects.get_or_create(user=request.user)
-
-    if request.method == "POST":
-        # Bind submitted values and files (for logo uploads)
-        form = EmployerProfileForm(request.POST, request.FILES, instance=employer_profile)
-        if form.is_valid():
-            form.save()
-            # After saving, redirect back to this page (named URL: employer_profile)
-            return redirect('employer_profile')
-    else:
-        # First page load or GET after save: show current values
-        form = EmployerProfileForm(instance=employer_profile)
-
-    # Supply current jobs and view-all link like the public page
-    try:
-        from reroute_business.job_list.models import Job
-        jobs_qs = Job.objects.filter(is_active=True, employer=request.user).order_by('-created_at')
-        total_jobs = jobs_qs.count()
-        jobs = list(jobs_qs[:3])
-    except Exception:
-        jobs, total_jobs = [], 0
-
-    from django.urls import reverse
-    view_all_url = None
-    try:
-        view_all_base = reverse('opportunities')
-        view_all_url = f"{view_all_base}?employer={request.user.username}"
-    except Exception:
-        pass
-
-    return render(
-        request,
-        "profiles/employer_profile.html",
-        {
-            "employer_profile": employer_profile,
-            "form": form,
-            "jobs": jobs,
-            "total_jobs": total_jobs,
-            "view_all_url": view_all_url,
-        },
-    )
+    return redirect('dashboard:employer_company_profile')
 
 
 def employer_public_profile_view(request, username: str):

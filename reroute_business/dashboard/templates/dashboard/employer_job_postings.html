@@ -1,0 +1,89 @@
+{% extends "dashboard/employer_base.html" %}
+{% load static %}
+
+{% block title %}Job Postings{% endblock %}
+{% block page_title %}Job Postings{% endblock %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'dashboard/css/employer_job_postings.css' %}">
+{% endblock %}
+
+{% block employer_content %}
+<section class="job-postings-header">
+  <div>
+    <h1>Job Postings</h1>
+    <p class="muted">Manage and track all your job listings.</p>
+  </div>
+  {% if employer_verified %}
+    <a class="btn-primary" href="{% url 'create_job' %}">Post a Job</a>
+  {% else %}
+    <button class="btn-outline" type="button" aria-disabled="true" title="Pending verification">Post a Job</button>
+  {% endif %}
+</section>
+
+<section class="job-toolbar">
+  <div class="search-field">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20l-3.5-3.5" />
+    </svg>
+    <input type="search" placeholder="Search jobs..." aria-label="Search job postings">
+  </div>
+  <div class="status-tabs" role="tablist" aria-label="Job status filters">
+    <button class="tab-btn is-active" type="button" role="tab">All ({{ total_jobs|default:0 }})</button>
+    <button class="tab-btn" type="button" role="tab">Live ({{ live_jobs|default:0 }})</button>
+    <button class="tab-btn" type="button" role="tab">Draft ({{ draft_jobs|default:0 }})</button>
+    <button class="tab-btn" type="button" role="tab">Pending ({{ pending_jobs|default:0 }})</button>
+  </div>
+</section>
+
+<section class="job-list">
+  {% for job in jobs %}
+    <article class="job-card">
+      <div class="job-card-header">
+        <div class="job-title-wrap">
+          <h2>{{ job.title }}</h2>
+          <span class="pill {% if job.is_active and employer_verified %}pill-live{% else %}pill-pending{% endif %}">
+            {% if not employer_verified %}Pending Approval{% elif job.is_active %}Live{% else %}Closed{% endif %}
+          </span>
+        </div>
+        <button class="icon-btn" type="button" aria-label="Job actions">...</button>
+      </div>
+      <div class="job-meta">
+        <span>{{ job.location|default:"Remote" }}</span>
+        <span>&middot;</span>
+        <span>{{ job.tags|default:"Operations" }}</span>
+        <span>&middot;</span>
+        <span>{{ job.get_job_type_display|default:"Full-Time" }}</span>
+      </div>
+      <div class="job-meta">
+        <span>{{ job.applications.count }} applicants</span>
+        <span>&middot;</span>
+        <span>Fair-chance compliant</span>
+      </div>
+      <div class="job-salary">
+        {% if job.salary_min or job.salary_max %}
+          {% if job.salary_min %}${{ job.salary_min }}k{% endif %}{% if job.salary_min and job.salary_max %} - {% endif %}{% if job.salary_max %}${{ job.salary_max }}k{% endif %}
+        {% else %}
+          Salary flexible
+        {% endif %}
+      </div>
+      <div class="job-footer">
+        <span>Posted {{ job.created_at|date:"M d, Y" }}</span>
+        <a class="text-link" href="{% url 'dashboard:job_applicants' job.id %}">View applicants &rarr;</a>
+      </div>
+    </article>
+  {% empty %}
+    <div class="empty-state">
+      <h3>No job postings yet</h3>
+      <p>Post your first role to start reviewing applicants.</p>
+    </div>
+  {% endfor %}
+</section>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script src="{% static 'dashboard/js/employer_dashboard.js' %}" defer></script>
+{% endblock %}

@@ -1,0 +1,140 @@
+:root {
+  --rr-ink: #17242e;
+  --rr-muted: #5b6b78;
+  --rr-border: #e1e7ee;
+  --rr-card: #ffffff;
+  --rr-bg: #f5f7fa;
+  --rr-navy: #0f1f2e;
+  --rr-accent: #006da0;
+  --rr-accent-strong: #005a84;
+  --rr-accent-soft: #d9f1ef;
+  --rr-shadow: 0 18px 40px rgba(15, 31, 46, 0.08);
+}
+
+.profile-header h1 {
+  margin: 0 0 6px;
+  font-size: 26px;
+  color: var(--rr-navy);
+}
+
+.profile-preview {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 16px;
+  align-items: center;
+  padding: 20px 22px;
+  border-radius: 20px;
+  border: 1px solid var(--rr-border);
+  background: #fff;
+  box-shadow: var(--rr-shadow);
+}
+
+.preview-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: #e9f1f8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--rr-accent);
+}
+
+.preview-icon svg {
+  width: 28px;
+  height: 28px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  fill: none;
+}
+
+.badge-soft {
+  display: inline-flex;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--rr-accent-soft);
+  color: var(--rr-accent-strong);
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+.preview-note {
+  margin-top: 10px;
+}
+
+.profile-form {
+  margin-top: 20px;
+  padding: 24px;
+  border-radius: 20px;
+  border: 1px solid var(--rr-border);
+  background: #fff;
+  box-shadow: var(--rr-shadow);
+  display: grid;
+  gap: 18px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.form-field {
+  display: grid;
+  gap: 8px;
+}
+
+.form-field label {
+  font-weight: 600;
+  color: var(--rr-ink);
+}
+
+.form-field input,
+.form-field textarea {
+  border: 1px solid var(--rr-border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.form-field textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.helper-text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--rr-muted);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-primary {
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  border: 1px solid var(--rr-accent);
+  cursor: pointer;
+  background: var(--rr-accent);
+  color: #fff;
+}
+
+@media (max-width: 720px) {
+  .profile-preview {
+    grid-template-columns: 1fr;
+  }
+  .form-actions {
+    justify-content: flex-start;
+  }
+}

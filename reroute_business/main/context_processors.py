@@ -71,10 +71,16 @@ def role_flags(request):
 
     # Canonical profile settings URL (private editor)
     if is_auth:
-        try:
-            profile_url = reverse("settings") + "?panel=profile"
-        except Exception:
-            profile_url = "/settings/?panel=profile"
+        if is_employer:
+            try:
+                profile_url = reverse("dashboard:employer_company_profile")
+            except Exception:
+                profile_url = "/dashboard/employer/company-profile/"
+        else:
+            try:
+                profile_url = reverse("settings") + "?panel=profile"
+            except Exception:
+                profile_url = "/settings/?panel=profile"
     else:
         profile_url = reverse("login")
 

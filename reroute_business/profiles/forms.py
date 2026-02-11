@@ -279,6 +279,38 @@ class EmployerProfileForm(forms.ModelForm):
         return bg
 
 
+class EmployerCompanyProfileForm(forms.ModelForm):
+    class Meta:
+        model = EmployerProfile
+        fields = [
+            'company_name',
+            'industry',
+            'website',
+            'company_size',
+            'description',
+            'fair_chance_statement',
+            'logo_url',
+        ]
+        widgets = {
+            'company_name': forms.TextInput(attrs={'placeholder': 'Company name'}),
+            'industry': forms.TextInput(attrs={'placeholder': 'Manufacturing, Tech, etc.'}),
+            'website': forms.URLInput(attrs={'placeholder': 'https://yourcompany.com'}),
+            'company_size': forms.TextInput(attrs={'placeholder': 'e.g. 50-200 employees'}),
+            'description': forms.Textarea(attrs={'rows': 4, 'placeholder': "Tell candidates about your company, culture, and mission..."}),
+            'fair_chance_statement': forms.Textarea(attrs={'rows': 4, 'placeholder': "Share your company's commitment to fair-chance hiring..."}),
+            'logo_url': forms.URLInput(attrs={'placeholder': 'https://...'}),
+        }
+        labels = {
+            'company_name': 'Company Name',
+            'industry': 'Industry',
+            'website': 'Website',
+            'company_size': 'Company Size',
+            'description': 'Company Description',
+            'fair_chance_statement': 'Fair-Chance Commitment Statement',
+            'logo_url': 'Logo URL',
+        }
+
+
 class EmployerOnboardingForm(forms.ModelForm):
     class Meta:
         model = EmployerProfile

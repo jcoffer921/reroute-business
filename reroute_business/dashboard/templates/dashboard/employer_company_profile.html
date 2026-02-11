@@ -1,0 +1,71 @@
+{% extends "dashboard/employer_base.html" %}
+{% load static %}
+
+{% block title %}Company Profile{% endblock %}
+{% block page_title %}Company Profile{% endblock %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'dashboard/css/employer_company_profile.css' %}">
+{% endblock %}
+
+{% block employer_content %}
+<section class="profile-header">
+  <div>
+    <h1>Company Profile</h1>
+    <p class="muted">This is how candidates will see your company.</p>
+  </div>
+</section>
+
+<section class="profile-preview">
+  <div class="preview-icon">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="4" y="3" width="16" height="18" rx="2" />
+      <path d="M8 7h8M8 11h8M8 15h6" />
+    </svg>
+  </div>
+  <div>
+    <h2>{{ employer_profile.company_name|default:"Your Company Name" }}</h2>
+    <span class="badge-soft">Fair-Chance Employer</span>
+    <div class="preview-note muted">This is a preview of how candidates will see your profile.</div>
+  </div>
+</section>
+
+<form method="post" class="profile-form">
+  {% csrf_token %}
+  <div class="form-grid">
+    <div class="form-field">
+      <label for="{{ form.company_name.id_for_label }}">Company Name</label>
+      {{ form.company_name }}
+    </div>
+    <div class="form-field">
+      <label for="{{ form.industry.id_for_label }}">Industry</label>
+      {{ form.industry }}
+    </div>
+    <div class="form-field">
+      <label for="{{ form.website.id_for_label }}">Website</label>
+      {{ form.website }}
+    </div>
+    <div class="form-field">
+      <label for="{{ form.company_size.id_for_label }}">Company Size</label>
+      {{ form.company_size }}
+    </div>
+  </div>
+  <div class="form-field">
+    <label for="{{ form.description.id_for_label }}">Company Description</label>
+    {{ form.description }}
+  </div>
+  <div class="form-field">
+    <label for="{{ form.fair_chance_statement.id_for_label }}">Fair-Chance Commitment Statement</label>
+    {{ form.fair_chance_statement }}
+    <p class="helper-text">This statement will be visible on your job postings and company profile.</p>
+  </div>
+  <div class="form-field">
+    <label for="{{ form.logo_url.id_for_label }}">Logo URL</label>
+    {{ form.logo_url }}
+  </div>
+  <div class="form-actions">
+    <button type="submit" class="btn-primary">Save Profile</button>
+  </div>
+</form>
+{% endblock %}

@@ -619,6 +619,126 @@ def employer_dashboard(request):
 
 
 @login_required
+def employer_job_postings(request):
+    employer_user = request.user
+    jobs = Job.objects.filter(employer=employer_user).order_by('-created_at')
+    total_jobs = jobs.count()
+    live_jobs = jobs.filter(is_active=True).count()
+    closed_jobs = jobs.filter(is_active=False).count()
+    draft_jobs = 0
+    pending_jobs = 0
+
+    employer_verified = False
+    try:
+        from reroute_business.profiles.models import EmployerProfile as _EP
+        ep = _EP.objects.filter(user=employer_user).first()
+        employer_verified = bool(getattr(ep, 'verified', False)) if ep else False
+    except Exception:
+        employer_verified = False
+
+    return render(request, 'dashboard/employer_job_postings.html', {
+        'jobs': jobs,
+        'total_jobs': total_jobs,
+        'live_jobs': live_jobs,
+        'closed_jobs': closed_jobs,
+        'draft_jobs': draft_jobs,
+        'pending_jobs': pending_jobs,
+        'employer_verified': employer_verified,
+    })
+
+
+@login_required
+def employer_applicants(request):
+    employer_user = request.user
+    apps_qs = (
+        Application.objects
+        .filter(job__employer=employer_user)
+        .select_related('applicant', 'job')
+        .order_by('-submitted_at')
+    )
+
+    status_counts = {
+        row["status"]: row["c"]
+        for row in apps_qs.values("status").annotate(c=Count("id"))
+    }
+    pipeline_counts = {
+        "all": apps_qs.count(),
+        "new": status_counts.get("pending", 0),
+        "under_review": status_counts.get("reviewed", 0),
+        "interview": status_counts.get("interview", 0),
+        "decision": status_counts.get("accepted", 0) + status_counts.get("rejected", 0),
+    }
+
+    return render(request, 'dashboard/employer_applicants.html', {
+        'applications': apps_qs[:20],
+        'pipeline_counts': pipeline_counts,
+    })
+
+
+@login_required
+@require_POST
+def employer_application_update_status(request, app_id: int):
+    app = Application.objects.select_related('job').filter(id=app_id, job__employer=request.user).first()
+    if not app:
+        return _json_err({'application': 'Not found.'}, status=404)
+
+    new_status = (request.POST.get('status') or '').strip()
+    if new_status == 'decision':
+        new_status = 'accepted'
+
+    valid = {s for s, _ in getattr(Application, 'STATUS_CHOICES', [])}
+    if new_status not in valid:
+        return _json_err({'status': 'Invalid status.'}, status=400)
+
+    app.status = new_status
+    app.save(update_fields=['status', 'updated_at'])
+    return _json_ok({'status': new_status})
+
+
+@login_required
+@require_POST
+def employer_application_update_notes(request, app_id: int):
+    app = Application.objects.select_related('job').filter(id=app_id, job__employer=request.user).first()
+    if not app:
+        return _json_err({'application': 'Not found.'}, status=404)
+
+    notes = (request.POST.get('notes') or '').strip()
+    app.notes = notes
+    app.save(update_fields=['notes', 'updated_at'])
+    return _json_ok({'notes': notes})
+
+
+@login_required
+def employer_company_profile(request):
+    from reroute_business.profiles.forms import EmployerCompanyProfileForm
+    from reroute_business.profiles.models import EmployerProfile
+
+    employer_profile, _ = EmployerProfile.objects.get_or_create(
+        user=request.user,
+        defaults={'company_name': request.user.get_full_name() or request.user.username},
+    )
+
+    if request.method == "POST":
+        form = EmployerCompanyProfileForm(request.POST, instance=employer_profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Company profile updated.")
+            return redirect('dashboard:employer_company_profile')
+    else:
+        form = EmployerCompanyProfileForm(instance=employer_profile)
+
+    return render(request, 'dashboard/employer_company_profile.html', {
+        'form': form,
+        'employer_profile': employer_profile,
+    })
+
+
+@login_required
+def employer_fair_chance_guide(request):
+    return render(request, 'dashboard/employer_fair_chance_guide.html')
+
+
+@login_required
 def employer_job_matches(request, job_id: int):
     """
     Show all matched candidates for a specific job owned by the employer.

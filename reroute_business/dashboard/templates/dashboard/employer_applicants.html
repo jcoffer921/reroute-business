@@ -1,0 +1,96 @@
+{% extends "dashboard/employer_base.html" %}
+{% load static %}
+
+{% block title %}Applicants{% endblock %}
+{% block page_title %}Applicants{% endblock %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'dashboard/css/employer_applicants.css' %}">
+{% endblock %}
+
+{% block employer_content %}
+<section class="applicants-header">
+  <div>
+    <h1>Applicants</h1>
+    <p class="muted">Review and manage your candidates.</p>
+  </div>
+</section>
+
+<section class="applicants-toolbar">
+  <div class="search-field">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20l-3.5-3.5" />
+    </svg>
+    <input type="search" placeholder="Search by name, job, or skill..." aria-label="Search applicants">
+  </div>
+  <div class="status-tabs" role="tablist" aria-label="Applicant status filters">
+    <button class="tab-btn is-active" type="button" role="tab">All ({{ pipeline_counts.all|default:0 }})</button>
+    <button class="tab-btn" type="button" role="tab">New ({{ pipeline_counts.new|default:0 }})</button>
+    <button class="tab-btn" type="button" role="tab">Under Review ({{ pipeline_counts.under_review|default:0 }})</button>
+    <button class="tab-btn" type="button" role="tab">Interview ({{ pipeline_counts.interview|default:0 }})</button>
+    <button class="tab-btn" type="button" role="tab">Decision ({{ pipeline_counts.decision|default:0 }})</button>
+  </div>
+</section>
+
+<section class="notice-card">
+  <span class="notice-dot"></span>
+  <p><strong>Remember:</strong> Evaluate skills and qualifications before reviewing any background information.</p>
+</section>
+
+<section class="applicant-list">
+  {% for app in applications %}
+    <article class="applicant-card">
+      <div class="applicant-card-header">
+        <div class="applicant-main">
+          <div class="avatar-circle">{{ app.applicant.first_name|default:app.applicant.username|slice:":1" }}</div>
+          <div>
+            <h2>{{ app.applicant.first_name|default:app.applicant.username }}</h2>
+            <p class="muted">Applied for {{ app.job.title }}</p>
+          </div>
+        </div>
+        <div class="stage-select-wrap">
+          <label class="visually-hidden" for="stage-{{ app.id }}">Stage</label>
+          <select id="stage-{{ app.id }}" class="stage-select" data-status-select data-status-url="{% url 'dashboard:employer_application_update_status' app.id %}">
+            <option value="pending" {% if app.status == 'pending' %}selected{% endif %}>New</option>
+            <option value="reviewed" {% if app.status == 'reviewed' %}selected{% endif %}>Under Review</option>
+            <option value="interview" {% if app.status == 'interview' %}selected{% endif %}>Interview</option>
+            <option value="decision" {% if app.status == 'accepted' or app.status == 'rejected' %}selected{% endif %}>Decision</option>
+          </select>
+        </div>
+      </div>
+      <div class="skill-tags">
+        <span class="tag">Customer Service</span>
+        <span class="tag">Inventory Management</span>
+        <span class="tag">Team Leadership</span>
+      </div>
+      <div class="applicant-meta">
+        <span>{{ app.job.location|default:"Remote" }}</span>
+        <span>&middot;</span>
+        <span>Applied {{ app.submitted_at|date:"M d, Y" }}</span>
+      </div>
+      <button class="notes-toggle" type="button" data-notes-toggle>{% if app.notes %}Edit Notes{% else %}+ Add Notes{% endif %}</button>
+      <div class="notes-panel" data-notes-panel>
+        <label class="visually-hidden" for="notes-{{ app.id }}">Notes</label>
+        <textarea id="notes-{{ app.id }}" rows="3" placeholder="Add notes for this applicant..." data-notes-field>{{ app.notes }}</textarea>
+        <div class="notes-actions">
+          <button type="button" class="btn-outline btn-sm" data-notes-save data-notes-url="{% url 'dashboard:employer_application_update_notes' app.id %}">Save Notes</button>
+          <button type="button" class="btn-secondary btn-sm" data-notes-cancel>Cancel</button>
+        </div>
+      </div>
+    </article>
+  {% empty %}
+    <div class="empty-state">
+      <h3>No applicants yet</h3>
+      <p>Once you publish a job, new applicants will appear here.</p>
+    </div>
+  {% endfor %}
+</section>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script src="{% static 'dashboard/js/employer_applicants.js' %}" defer></script>
+  <script src="{% static 'dashboard/js/employer_dashboard.js' %}" defer></script>
+{% endblock %}

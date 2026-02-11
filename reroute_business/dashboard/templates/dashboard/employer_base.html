@@ -1,14 +1,9 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}ReRoute | Employer{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  {% block extra_css %}{% endblock %}
-</head>
-<body class="{% block body_class %}employer-dashboard{% endblock %}">
+
+{% block extra_css %}{{ block.super }}{% endblock %}
+
+{% block content %}
   <div class="employer-shell" data-employer-shell>
     <aside class="employer-sidebar" data-employer-sidebar>
       <div class="sidebar-brand">
@@ -25,25 +20,25 @@
           </span>
           Dashboard
         </a>
-        <a class="sidebar-link" href="{% url 'dashboard:employer' %}#job-postings">
+        <a class="sidebar-link {% if active == 'employer_job_postings' %}is-active{% endif %}" href="{% url 'dashboard:employer_job_postings' %}">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
           </span>
           Job Postings
         </a>
-        <a class="sidebar-link" href="{% url 'dashboard:employer' %}#applicants">
+        <a class="sidebar-link {% if active == 'employer_applicants' %}is-active{% endif %}" href="{% url 'dashboard:employer_applicants' %}">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
           </span>
           Applicants
         </a>
-        <a class="sidebar-link" href="{{ PROFILE_URL }}">
+        <a class="sidebar-link {% if active == 'employer_company_profile' %}is-active{% endif %}" href="{% url 'dashboard:employer_company_profile' %}">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h6"/></svg>
           </span>
           Company Profile
         </a>
-        <a class="sidebar-link" href="{% url 'dashboard:employer' %}#fair-chance-guide">
+        <a class="sidebar-link {% if active == 'employer_fair_chance_guide' %}is-active{% endif %}" href="{% url 'dashboard:employer_fair_chance_guide' %}">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M4 4h14a2 2 0 0 1 2 2v12"/><path d="M4 6v14a2 2 0 0 0 2 2h14"/></svg>
           </span>
@@ -61,59 +56,16 @@
     </aside>
 
     <div class="employer-main">
-      <header class="employer-topbar">
-        <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-label="Open navigation">Menu</button>
-        <div class="topbar-left">
-          <a class="topbar-logo" href="{% url 'dashboard:employer' %}">
-            <img src="{% static 'images/reroute-trans-logo.png' %}" alt="ReRoute Logo">
-          </a>
-          <span class="topbar-title">{% block page_title %}Dashboard{% endblock %}</span>
-        </div>
-        <div class="topbar-actions">
-          <a class="icon-btn" href="{% url 'dashboard:notifications' %}" aria-label="Notifications">
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 7h18s-3 0-3-7" />
-              <path d="M13.7 21a2 2 0 0 1-3.4 0" />
-            </svg>
-            {% if UNREAD_NOTIFICATIONS %}
-              <span class="icon-badge">{{ UNREAD_NOTIFICATIONS }}</span>
-            {% endif %}
-          </a>
-          <div class="user-profile-right">
-            <button class="user-initials-btn user-menu-trigger" id="userMenuButton" aria-expanded="false" aria-controls="userDropdown">
-              <span class="user-menu-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false">
-                  <circle cx="12" cy="8" r="4"></circle>
-                  <path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>
-                </svg>
-              </span>
-              <span class="user-menu-name">{{ user.first_name|default:user.username }}</span>
-            </button>
-            <div class="user-dropdown" id="userDropdown" role="menu" aria-labelledby="userMenuButton">
-              <a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a>
-              <a href="{% url 'dashboard:notifications' %}">Notifications{% if UNREAD_NOTIFICATIONS %}<span class="nav-badge">{{ UNREAD_NOTIFICATIONS }}</span>{% endif %}</a>
-              <a href="{{ PUBLIC_PROFILE_URL }}">View Profile</a>
-              <a href="{{ PROFILE_URL }}">Profile Settings</a>
-              <a href="{% url 'contact' %}">Report Issues</a>
-              <a href="{% url 'settings' %}">Settings</a>
-              <form method="POST" action="{% url 'logout' %}" class="m-0">
-                {% csrf_token %}
-                <button type="submit" class="logout-btn">Sign out</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </header>
-
       <main class="dashboard-content">
-        {% block content %}{% endblock %}
+        <div class="employer-header">
+          <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-label="Open navigation">Menu</button>
+          <span class="employer-page-title">{% block page_title %}Dashboard{% endblock %}</span>
+        </div>
+        {% block employer_content %}{% endblock %}
       </main>
     </div>
   </div>
   <div class="sidebar-backdrop" data-sidebar-backdrop></div>
+{% endblock %}
 
-  <script src="{% static 'js/base.js' %}" defer></script>
-  <script src="{% static 'js/mobile_menu.js' %}" defer></script>
-  {% block extra_js %}{% endblock %}
-</body>
-</html>
+{% block extra_js %}{{ block.super }}{% endblock %}

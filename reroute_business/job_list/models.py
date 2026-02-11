@@ -134,5 +134,8 @@ class Application(models.Model):
     # Time last updated (e.g. status changed)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # Employer notes (private, internal)
+    notes = models.TextField(blank=True)
+
     def __str__(self):
         return f"{self.applicant.username} applied to {self.job.title}"

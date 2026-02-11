@@ -213,8 +213,12 @@ class EmployerProfile(models.Model):
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='employerprofile')
     company_name = models.CharField(max_length=255)
+    industry = models.CharField(max_length=255, blank=True)
     website = models.URLField(blank=True)
+    company_size = models.CharField(max_length=120, blank=True)
     description = models.TextField(blank=True)
+    fair_chance_statement = models.TextField(blank=True)
+    logo_url = models.URLField(blank=True)
     # Company logo (employer profile picture). Note: update upload_to path per request.
     logo = models.ImageField(upload_to='employers/logos/', blank=True, null=True)
     # Optional hero background image for public/employer views

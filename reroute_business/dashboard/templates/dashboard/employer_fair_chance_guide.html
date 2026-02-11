@@ -1,0 +1,112 @@
+{% extends "dashboard/employer_base.html" %}
+{% load static %}
+
+{% block title %}Fair-Chance Hiring Guide{% endblock %}
+{% block page_title %}Fair-Chance Hiring Guide{% endblock %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'dashboard/css/employer_fair_chance_guide.css' %}">
+{% endblock %}
+
+{% block employer_content %}
+<section class="guide-hero">
+  <div class="hero-icon">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12 3l7 3v6c0 4.4-3 8-7 9-4-1-7-4.6-7-9V6l7-3z" />
+      <path d="M9 12l2 2 4-4" />
+    </svg>
+  </div>
+  <div>
+    <h1>Fair-Chance Hiring Guide</h1>
+    <p>Fair-chance hiring is not just the right thing to do. This guide will help you build equitable, effective hiring practices.</p>
+  </div>
+</section>
+
+<section class="guide-card">
+  <div class="card-icon">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12 3l7 3v6c0 4.4-3 8-7 9-4-1-7-4.6-7-9V6l7-3z" />
+      <path d="M9 12l2 2 4-4" />
+    </svg>
+  </div>
+  <div>
+    <h2>What is Fair-Chance Hiring?</h2>
+    <p>Fair-chance hiring means evaluating job candidates based on their skills, qualifications, and potential before considering criminal history. It is about giving people an equitable opportunity to be assessed for who they are today.</p>
+  </div>
+</section>
+
+<section class="guide-card">
+  <div class="card-icon">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12 3l9 4-9 4-9-4 9-4z" />
+      <path d="M3 11v6c0 2 4 4 9 4s9-2 9-4v-6" />
+      <path d="M12 11v10" />
+    </svg>
+  </div>
+  <div>
+    <h2>Legal Framework</h2>
+    <p>Many states and cities have "Ban the Box" laws that prohibit asking about criminal history on initial job applications. Even where not legally required, fair-chance practices are increasingly recognized as best practice for responsible employers.</p>
+  </div>
+</section>
+
+<section class="guide-card">
+  <div class="card-icon">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="4" y="3" width="16" height="18" rx="2" />
+      <path d="M8 7h8M8 11h6M8 15h4" />
+      <path d="M7 19l2-2" />
+    </svg>
+  </div>
+  <div>
+    <h2>Best Practices for Screening</h2>
+    <ul class="guide-list">
+      <li>Remove conviction history questions from initial applications</li>
+      <li>Evaluate candidates on skills and qualifications first</li>
+      <li>Conduct background checks only after a conditional offer</li>
+      <li>Consider the nature and age of any offense relative to the job</li>
+      <li>Give candidates a chance to explain and provide context</li>
+      <li>Document your evaluation process for consistency</li>
+    </ul>
+  </div>
+</section>
+
+<section class="guide-card">
+  <div class="card-icon">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12 21s-6-4.4-8.5-7C1.5 11.5 2.4 8 5.8 8c2 0 3.2 1.1 4.2 2.3C11 9.1 12.2 8 14.2 8c3.4 0 4.3 3.5 2.3 6-2.5 2.6-8.5 7-8.5 7z" />
+    </svg>
+  </div>
+  <div>
+    <h2>The Business Case</h2>
+    <ul class="guide-list">
+      <li>Access a wider talent pool of motivated candidates</li>
+      <li>Higher retention rates as fair-chance hires often stay longer</li>
+      <li>Positive brand reputation and community impact</li>
+      <li>Tax credits and incentives in many jurisdictions</li>
+      <li>Reduced hiring costs through loyalty and engagement</li>
+    </ul>
+  </div>
+</section>
+
+<section class="guide-card">
+  <div class="card-icon">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="8" cy="9" r="3" />
+      <circle cx="16" cy="9" r="3" />
+      <path d="M2 20c0-4 4-6 6-6" />
+      <path d="M22 20c0-4-4-6-6-6" />
+      <path d="M9 20c0-3 2-5 3-5s3 2 3 5" />
+    </svg>
+  </div>
+  <div>
+    <h2>Creating an Inclusive Workplace</h2>
+    <p>Fair-chance hiring is most effective when paired with supportive onboarding. Consider mentorship programs, clear expectations, and a culture that values growth and second chances. Your existing team benefits from diversity of experience.</p>
+  </div>
+</section>
+
+<section class="guide-footer">
+  <h3>Need more guidance?</h3>
+  <p>ReRoute provides personalized support for employers navigating fair-chance hiring. Reach out to our team for help with compliance, training, or policy development.</p>
+</section>
+{% endblock %}
