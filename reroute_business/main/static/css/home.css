@@ -371,7 +371,7 @@
 .home-hero { isolation: isolate; }
 .home-hero .hero-content { position: relative; z-index: 2; max-width: 900px; }
 .home-hero .hero-content .hero-message {
-  margin: 0 auto .25rem;
+  margin: 0 auto 1.75rem;
   font-size: clamp(2.8rem, 7vw, 5.2rem);
   line-height: 1.05;
   letter-spacing: -0.02em;
@@ -397,7 +397,7 @@
   color: transparent;
 }
 .home-hero .hero-content .hero-tagline {
-  margin: .25rem auto .85rem;
+  margin: 0 auto 1.2rem;
   font-size: clamp(1rem, 2.2vw, 1.2rem);
   font-weight: 400;
   color: rgba(226, 232, 240, 0.8);
