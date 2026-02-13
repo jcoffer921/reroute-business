@@ -1289,7 +1289,7 @@ def settings_view(request):
     recovery_form = RecoveryOptionsForm(user=request.user, initial=recovery_initial)
 
     if request.method == 'POST':
-        if 'save_profile' in request.POST:
+        if request.POST.get('profile_form') == '1' or 'save_profile' in request.POST:
             headline = (request.POST.get('headline') or '').strip()
             location = (request.POST.get('location') or '').strip()
             status = (request.POST.get('status') or '').strip()

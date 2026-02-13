@@ -8,7 +8,7 @@
 
 .public-profile .profile-hero {
   position: relative;
-  padding: 0 1.75rem 2.9rem;
+  padding: 0 1.75rem 2.3rem;
 }
 
 .public-profile .profile-hero::before {
@@ -17,8 +17,8 @@
   left: 1.75rem;
   right: 1.75rem;
   top: 0.9rem;
-  height: 220px;
-  border-radius: 30px;
+  height: 190px;
+  border-radius: 24px;
   background: linear-gradient(118deg, #0f1b30 0%, #2f3c52 84%);
 }
 
@@ -27,51 +27,51 @@
   position: absolute;
   left: 1.75rem;
   right: 1.75rem;
-  top: 170px;
-  height: 74px;
-  border-radius: 0 0 30px 30px;
+  top: 145px;
+  height: 58px;
+  border-radius: 0 0 24px 24px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #ffffff 100%);
 }
 
 .public-profile .profile-hero-card {
   position: relative;
   z-index: 1;
-  max-width: 980px;
+  max-width: 940px;
   margin: 0 auto;
-  margin-top: 118px;
+  margin-top: 98px;
   background: #ffffff;
-  border-radius: 28px;
+  border-radius: 22px;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 26px 58px rgba(15, 23, 42, 0.14);
-  padding: 2.8rem 2.6rem 2.5rem;
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.12);
+  padding: 1.95rem 1.9rem 1.75rem;
 }
 
 .public-profile .hero-top {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 2.4rem;
+  gap: 1.4rem;
   align-items: start;
 }
 
 .public-profile .hero-left {
   display: grid;
-  grid-template-columns: 152px 1fr;
-  gap: 1.7rem;
+  grid-template-columns: 128px 1fr;
+  gap: 1.2rem;
   align-items: start;
 }
 
 .public-profile .profile-avatar {
-  width: 152px;
-  height: 152px;
-  margin-top: -62px;
-  border-radius: 22px;
+  width: 128px;
+  height: 128px;
+  margin-top: -48px;
+  border-radius: 18px;
   background: linear-gradient(180deg, #1e293b, #334155);
   overflow: hidden;
   position: relative;
   display: grid;
   place-items: center;
-  border: 6px solid #fff;
-  box-shadow: 0 24px 44px rgba(15, 23, 42, 0.26);
+  border: 4px solid #fff;
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.2);
 }
 
 .public-profile .profile-avatar img {
@@ -90,32 +90,32 @@
 
 .public-profile .verified-badge {
   position: absolute;
-  bottom: -10px;
-  right: -10px;
-  width: 42px;
-  height: 42px;
+  bottom: -8px;
+  right: -8px;
+  width: 34px;
+  height: 34px;
   background: #22c55e;
   color: #fff;
   border-radius: 50%;
   display: grid;
   place-items: center;
   border: 3px solid #fff;
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.22);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.2);
 }
 
 .public-profile .verified-badge svg {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
 }
 
 .public-profile .hero-meta {
   display: grid;
-  gap: 0.95rem;
+  gap: 0.65rem;
   padding-top: 0.05rem;
 }
 
 .public-profile .profile-name {
-  font-size: clamp(2.4rem, 4vw, 3.7rem);
+  font-size: clamp(2rem, 3vw, 2.8rem);
   font-weight: 800;
   line-height: 1.07;
   margin: 0;
@@ -124,36 +124,36 @@
 
 .public-profile .profile-headline {
   margin: 0;
-  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
-  line-height: 1.45;
+  font-size: clamp(1.02rem, 1.4vw, 1.22rem);
+  line-height: 1.35;
   color: #556d8f;
 }
 
 .public-profile .hero-status-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.95rem;
+  gap: 0.65rem;
   align-items: center;
 }
 
 .public-profile .status-pill {
-  padding: 0.6rem 1.2rem;
+  padding: 0.42rem 0.82rem;
   border-radius: 999px;
   background: #dcfce7;
   color: #047857;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.9rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.45rem;
   border: 1px solid #86efac;
 }
 
 .public-profile .status-pill svg,
 .public-profile .location-item svg,
 .public-profile .joined-item svg {
-  width: 22px;
-  height: 22px;
+  width: 17px;
+  height: 17px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
@@ -161,7 +161,7 @@
 
 .public-profile .location-item {
   color: #5f718d;
-  font-size: 1.07rem;
+  font-size: 0.95rem;
   font-weight: 500;
   display: inline-flex;
   align-items: center;
@@ -175,7 +175,7 @@
 
 .public-profile .joined-item {
   color: #64748b;
-  font-size: 1rem;
+  font-size: 0.92rem;
   font-weight: 500;
   display: inline-flex;
   align-items: center;
@@ -191,7 +191,7 @@
 
 .public-profile .hero-actions {
   display: flex;
-  gap: 0.85rem;
+  gap: 0.6rem;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
@@ -201,10 +201,10 @@
   align-items: center;
   justify-content: center;
   gap: 0.55rem;
-  padding: 0.86rem 1.45rem;
-  border-radius: 14px;
+  padding: 0.62rem 1rem;
+  border-radius: 10px;
   font-weight: 700;
-  font-size: 1.03rem;
+  font-size: 0.92rem;
   border: 1px solid transparent;
   cursor: pointer;
   text-decoration: none;
@@ -230,8 +230,8 @@
 }
 
 .public-profile .btn-outline svg {
-  width: 22px;
-  height: 22px;
+  width: 16px;
+  height: 16px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
@@ -244,9 +244,9 @@
 }
 
 .public-profile .icon-btn {
-  width: 50px;
-  height: 50px;
-  border-radius: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   border: 1px solid #dbe4ee;
   background: #fff;
   display: grid;
@@ -257,8 +257,8 @@
 }
 
 .public-profile .icon-btn svg {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   fill: #0f172a;
 }
 
@@ -274,9 +274,9 @@
 .public-profile .metrics-row {
   width: 100%;
   display: grid;
-  gap: 1.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  padding-top: 1rem;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  padding-top: 0.55rem;
 }
 
 .public-profile .metric {
@@ -287,22 +287,22 @@
 }
 
 .public-profile .metric-label {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   color: #61728c;
   font-weight: 500;
 }
 
 .public-profile .metric-value {
   display: block;
-  font-size: clamp(2.4rem, 3vw, 3rem);
+  font-size: clamp(1.8rem, 2.4vw, 2.3rem);
   line-height: 1.05;
   font-weight: 800;
   color: #071b45;
 }
 
 .public-profile .metric-icon {
-  width: 42px;
-  height: 42px;
+  width: 34px;
+  height: 34px;
   border-radius: 12px;
   color: #8c9cb3;
   display: grid;
@@ -310,8 +310,8 @@
 }
 
 .public-profile .metric-icon svg {
-  width: 31px;
-  height: 31px;
+  width: 23px;
+  height: 23px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
@@ -320,13 +320,13 @@
 .public-profile .hero-divider {
   height: 1px;
   background: #dce6f2;
-  margin: 2.3rem 0 1rem;
+  margin: 1.5rem 0 0.65rem;
 }
 
 .public-profile .profile-sections {
-  max-width: 980px;
+  max-width: 940px;
   margin: -1.5rem auto 0;
-  padding: 0 1.75rem;
+  padding: 0 1.5rem;
   display: grid;
   gap: 1.6rem;
 }
@@ -680,7 +680,7 @@
 
 @media (max-width: 900px) {
   .public-profile .profile-hero {
-    padding: 0 1.2rem 2.6rem;
+    padding: 0 1.2rem 2.2rem;
   }
 
   .public-profile .profile-hero::before,
@@ -690,16 +690,16 @@
   }
 
   .public-profile .profile-hero::before {
-    height: 208px;
+    height: 176px;
   }
 
   .public-profile .profile-hero::after {
-    top: 164px;
+    top: 136px;
   }
 
   .public-profile .profile-hero-card {
-    margin-top: 108px;
-    padding: 2rem 1.7rem;
+    margin-top: 88px;
+    padding: 1.45rem 1.2rem;
   }
 
   .public-profile .hero-top {
@@ -709,14 +709,14 @@
   }
 
   .public-profile .hero-left {
-    grid-template-columns: 130px 1fr;
-    gap: 1.2rem;
+    grid-template-columns: 108px 1fr;
+    gap: 0.9rem;
   }
 
   .public-profile .profile-avatar {
-    width: 130px;
-    height: 130px;
-    margin-top: -50px;
+    width: 108px;
+    height: 108px;
+    margin-top: -36px;
   }
 
   .public-profile .hero-right {
@@ -730,7 +730,7 @@
 
 @media (max-width: 640px) {
   .public-profile .profile-hero {
-    padding: 0 1rem 2.4rem;
+    padding: 0 1rem 2.1rem;
   }
 
   .public-profile .profile-hero::before,
@@ -741,19 +741,19 @@
   }
 
   .public-profile .profile-hero::before {
-    height: 196px;
+    height: 164px;
   }
 
   .public-profile .profile-hero::after {
-    top: 154px;
-    height: 62px;
+    top: 130px;
+    height: 52px;
     border-radius: 0 0 24px 24px;
   }
 
   .public-profile .profile-hero-card {
-    margin-top: 98px;
-    border-radius: 22px;
-    padding: 1.55rem 1.15rem 1.45rem;
+    margin-top: 82px;
+    border-radius: 18px;
+    padding: 1.2rem 0.95rem 1.1rem;
   }
 
   .public-profile .hero-left {
@@ -762,9 +762,9 @@
   }
 
   .public-profile .profile-avatar {
-    width: 110px;
-    height: 110px;
-    margin-top: -42px;
+    width: 94px;
+    height: 94px;
+    margin-top: -30px;
   }
 
   .public-profile .profile-sections {
@@ -777,24 +777,24 @@
   }
 
   .public-profile .profile-name {
-    font-size: clamp(1.9rem, 8vw, 2.45rem);
+    font-size: clamp(1.45rem, 7vw, 1.9rem);
   }
 
   .public-profile .profile-headline {
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
 
   .public-profile .status-pill {
-    font-size: 0.95rem;
-    padding: 0.52rem 0.95rem;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.75rem;
   }
 
   .public-profile .location-item,
   .public-profile .joined-item {
-    font-size: 0.97rem;
+    font-size: 0.88rem;
   }
 
   .public-profile .metric-value {
-    font-size: 2.3rem;
+    font-size: 1.85rem;
   }
 }

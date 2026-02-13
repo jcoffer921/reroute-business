@@ -85,6 +85,7 @@
         <p class="help-text mt--4 text-gray-500">Keep your profile polished and resume-ready.</p>
         <form id="profileEditForm" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
+          <input type="hidden" name="profile_form" value="1">
           <input type="hidden" name="core_skills_json" id="coreSkillsInput">
           <input type="hidden" name="soft_skills_json" id="softSkillsInput">
           <input type="hidden" name="experiences_json" id="experiencesInput">
