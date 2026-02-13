@@ -18,6 +18,7 @@ from __future__ import annotations
 # -----------------------------
 import json
 import logging
+import re
 import traceback
 
 from django.conf import settings
@@ -1318,6 +1319,19 @@ def settings_view(request):
                     cleaned.append(value)
                 return cleaned
 
+            def _normalize_year(raw):
+                value = " ".join(str(raw or "").split()).strip()
+                if not value:
+                    return ""
+                lower = value.lower()
+                if any(token in lower for token in ("present", "current", "now", "ongoing")):
+                    return ""
+                match = re.search(r"(19|20)\d{2}", value)
+                if match:
+                    return match.group(0)
+                digits = "".join(ch for ch in value if ch.isdigit())
+                return digits[:4] if len(digits) >= 4 else ""
+
             core_items = _clean_list(_load_json_list(request.POST.get('core_skills_json')))
             soft_items = _clean_list(_load_json_list(request.POST.get('soft_skills_json')))
             exp_items = _load_json_list(request.POST.get('experiences_json'))
@@ -1357,8 +1371,8 @@ def settings_view(request):
                     continue
                 title = (item.get("title") or "").strip()
                 company = (item.get("company") or "").strip()
-                start_year = (item.get("start_year") or "").strip()
-                end_year = (item.get("end_year") or "").strip()
+                start_year = _normalize_year(item.get("start_year"))
+                end_year = _normalize_year(item.get("end_year"))
                 highlights = _clean_list(item.get("highlights") or [])
                 if not title and not company and not start_year and not end_year and not highlights:
                     continue
