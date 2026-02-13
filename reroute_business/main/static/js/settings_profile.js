@@ -99,6 +99,31 @@
   initSkillSection(qs('[data-skill-section="soft"]', form));
   syncSkills();
 
+  // Profile photo preview (visual only until Save Profile is submitted)
+  const photoInput = document.getElementById('profile_photo');
+  const photoShell = qs('.profile-photo-shell', form);
+  if (photoInput && photoShell) {
+    photoInput.addEventListener('change', () => {
+      const file = photoInput.files && photoInput.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        let img = qs('img', photoShell);
+        if (!img) {
+          img = document.createElement('img');
+          img.alt = 'Profile photo preview';
+          photoShell.prepend(img);
+        }
+        img.src = String(event.target?.result || '');
+        const initials = qs('.profile-photo-initials', photoShell);
+        if (initials) initials.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
   // Experience editor
   const experienceList = qs('[data-experience-list]', form);
   const addExperienceBtn = qs('[data-add-experience]', form);
@@ -177,7 +202,7 @@
       const highlights = qsa('[data-highlight-input]', block)
         .map((input) => (input.value || '').trim())
         .filter(Boolean);
-      if (!title && !company) return;
+      if (!title && !company && !startYear && !endYear && highlights.length === 0) return;
       items.push({
         title,
         company,

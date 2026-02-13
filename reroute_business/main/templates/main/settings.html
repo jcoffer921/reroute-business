@@ -80,7 +80,7 @@
   <div class="settings-panels">
     <!-- Profile Settings Panel -->
     <section class="panel" id="panel-profile" aria-labelledby="tab-profile">
-      <div class="settings-section">
+      <div class="settings-section settings-section--flat profile-panel-shell">
         <h2 id="heading-profile-settings">Profile Edit</h2>
         <p class="help-text mt--4 text-gray-500">Keep your profile polished and resume-ready.</p>
         <form id="profileEditForm" method="POST" enctype="multipart/form-data">
@@ -115,6 +115,7 @@
                 </div>
                 <label class="input-label" for="profile_photo">Profile Photo</label>
                 <input type="file" id="profile_photo" name="profile_photo" accept="image/*">
+                <p class="input-help">Upload and click Save Profile to persist your photo.</p>
               </div>
               <div class="profile-info-block">
                 <div class="form-row-2">
@@ -150,90 +151,91 @@
             </div>
           </div>
 
-          <div class="settings-card settings-card--flat">
+          <div class="settings-card settings-card--flat skills-card">
             <div class="settings-card__head">
-              <h3 class="settings-card__title">Skills &amp; Strengths</h3>
+              <h3 class="settings-card__title">Skills</h3>
             </div>
             <div class="skills-editor">
               <div class="skills-column" data-skill-section="core">
                 <h4>Core Skills</h4>
-                <div class="pill-wrap" data-skill-list>
+                <div class="pill-input-row">
+                  <input type="text" maxlength="40" placeholder="e.g. Forklift Operation" data-skill-input>
+                  <button type="button" class="btn btn-secondary btn-pill" data-skill-add aria-label="Add core skill">+</button>
+                </div>
+                <div class="pill-wrap skills-pill-wrap" data-skill-list>
                   {% for skill in profile_core_skills %}
                     <span class="pill-chip pill-chip--editable">{{ skill }}<button type="button" class="pill-remove" aria-label="Remove {{ skill }}">×</button></span>
                   {% empty %}
                     <span class="muted">No core skills yet.</span>
                   {% endfor %}
                 </div>
-                <div class="pill-input-row">
-                  <input type="text" maxlength="40" placeholder="Add a core skill" data-skill-input>
-                  <button type="button" class="btn btn-secondary btn-pill" data-skill-add>Add</button>
-                </div>
               </div>
               <div class="skills-column" data-skill-section="soft">
                 <h4>Soft Skills</h4>
-                <div class="pill-wrap" data-skill-list>
+                <div class="pill-input-row">
+                  <input type="text" maxlength="40" placeholder="e.g. Reliability" data-skill-input>
+                  <button type="button" class="btn btn-secondary btn-pill" data-skill-add aria-label="Add soft skill">+</button>
+                </div>
+                <div class="pill-wrap skills-pill-wrap" data-skill-list>
                   {% for skill in profile_soft_skills %}
                     <span class="pill-chip pill-chip--editable">{{ skill }}<button type="button" class="pill-remove" aria-label="Remove {{ skill }}">×</button></span>
                   {% empty %}
                     <span class="muted">No soft skills yet.</span>
                   {% endfor %}
                 </div>
-                <div class="pill-input-row">
-                  <input type="text" maxlength="40" placeholder="Add a soft skill" data-skill-input>
-                  <button type="button" class="btn btn-secondary btn-pill" data-skill-add>Add</button>
-                </div>
               </div>
             </div>
           </div>
 
-          <div class="settings-card settings-card--flat">
+          <div class="settings-card settings-card--flat experience-card">
             <div class="settings-card__head">
               <h3 class="settings-card__title">Work Experience</h3>
-              <button type="button" class="btn btn-secondary btn-pill" data-add-experience>+ Add</button>
+              <button type="button" class="btn btn-outline experience-add-btn" data-add-experience>+ Add</button>
             </div>
             <div class="experience-editor" data-experience-list>
               {% for exp in profile_experiences %}
                 <div class="experience-block" data-experience>
                   <div class="experience-header">
-                    <h4>Experience {{ forloop.counter }}</h4>
-                    <button type="button" class="btn btn-outline btn-sm" data-remove-experience>Remove</button>
+                    <button type="button" class="experience-remove-btn" data-remove-experience aria-label="Remove experience">×</button>
                   </div>
                   <div class="form-row-2">
                     <div class="form-group">
                       <label>Job Title</label>
-                      <input type="text" value="{{ exp.title }}" data-exp-title>
+                      <input type="text" value="{{ exp.title }}" placeholder="e.g. Warehouse Associate" data-exp-title>
                     </div>
                     <div class="form-group">
                       <label>Company</label>
-                      <input type="text" value="{{ exp.company }}" data-exp-company>
+                      <input type="text" value="{{ exp.company }}" placeholder="e.g. ABC Logistics" data-exp-company>
                     </div>
                   </div>
                   <div class="form-row-2">
                     <div class="form-group">
                       <label>Start Year</label>
-                      <input type="text" value="{{ exp.start_year }}" placeholder="2019" data-exp-start-year>
+                      <input type="text" value="{{ exp.start_year }}" placeholder="e.g. 2021" data-exp-start-year>
                     </div>
                     <div class="form-group">
                       <label>End Year</label>
-                      <input type="text" value="{{ exp.end_year }}" placeholder="2024" data-exp-end-year>
+                      <input type="text" value="{{ exp.end_year }}" placeholder="e.g. 2023 or Present" data-exp-end-year>
                     </div>
                   </div>
-                  <div class="form-group">
-                    <label>Key Highlights</label>
+                  <div class="form-group form-group--highlights">
+                    <div class="highlights-head">
+                      <label>Key Highlights</label>
+                      <button type="button" class="highlight-add-btn" data-add-highlight>+ Add</button>
+                    </div>
                     <div class="highlights-list" data-highlights>
                       {% for highlight in exp.highlights %}
                         <div class="highlight-row" data-highlight>
-                          <input type="text" value="{{ highlight }}" placeholder="Add highlight" data-highlight-input>
-                          <button type="button" class="icon-btn icon-btn--danger" data-remove-highlight>×</button>
+                          <input type="text" value="{{ highlight }}" placeholder="e.g. Reduced shrinkage by 8%" data-highlight-input>
+                          <button type="button" class="highlight-remove-btn" data-remove-highlight aria-label="Remove highlight">×</button>
                         </div>
                       {% empty %}
                         <div class="highlight-row" data-highlight>
-                          <input type="text" value="" placeholder="Add highlight" data-highlight-input>
-                          <button type="button" class="icon-btn icon-btn--danger" data-remove-highlight>×</button>
+                          <input type="text" value="" placeholder="e.g. Reduced shrinkage by 8%" data-highlight-input>
+                          <button type="button" class="highlight-remove-btn" data-remove-highlight aria-label="Remove highlight">×</button>
                         </div>
                       {% endfor %}
                     </div>
-                    <button type="button" class="btn btn-outline btn-sm" data-add-highlight>+ Add highlight</button>
                   </div>
                 </div>
               {% empty %}
@@ -270,37 +272,43 @@
               <input type="file" id="resume_file" name="resume_file" accept=".pdf">
               {% if resume and resume.file %}
                 <p class="input-help">Current: {{ resume.file.name|default:"Resume uploaded" }}</p>
+                <p class="input-help"><a href="{{ resume.file.url }}" target="_blank" rel="noopener">Open current resume</a></p>
               {% endif %}
             </div>
           </div>
 
-          <div class="settings-card settings-card--flat">
+          <div class="settings-card settings-card--flat privacy-card">
             <div class="settings-card__head">
               <h3 class="settings-card__title">Privacy &amp; Visibility</h3>
             </div>
-            <div class="form-group">
-              <label class="toggle-row" for="profile_is_public">
+            <div class="privacy-option-row">
+              <div class="privacy-option-copy">
+                <label class="privacy-option-title" for="profile_is_public">Make Profile Public</label>
+                <span class="privacy-option-subtitle">Allow employers to view your profile</span>
+              </div>
+              <label class="privacy-switch" for="profile_is_public" aria-label="Toggle profile visibility">
                 <input type="checkbox" id="profile_is_public" name="is_public" {% if profile_is_public %}checked{% endif %}>
-                <span class="toggle-copy">
-                  Make Profile Public
-                  <span class="input-help">Visible to employers and reentry orgs only.</span>
-                </span>
+                <span class="privacy-switch__slider" aria-hidden="true"></span>
               </label>
             </div>
-            <div class="form-group">
-              <label class="toggle-row" for="profile_ready_background">
+            <div class="privacy-option-row">
+              <div class="privacy-option-copy">
+                <label class="privacy-option-title" for="profile_ready_background">"Ready to Discuss My Background"</label>
+                <span class="privacy-option-subtitle">Shows a tasteful badge signaling openness — on your terms</span>
+              </div>
+              <label class="privacy-switch" for="profile_ready_background" aria-label="Toggle ready to discuss background">
                 <input type="checkbox" id="profile_ready_background" name="ready_to_discuss_background" {% if profile_ready_to_discuss_background %}checked{% endif %}>
-                <span class="toggle-copy">
-                  Ready to Discuss My Background
-                  <span class="input-help">Share this on your terms.</span>
-                </span>
+                <span class="privacy-switch__slider" aria-hidden="true"></span>
               </label>
             </div>
           </div>
 
           <div class="settings-card__actions settings-card__actions--footer profile-actions">
-            <a class="btn btn-secondary" href="{% url 'settings' %}?panel=profile">Cancel</a>
-            <button type="submit" name="save_profile" class="btn btn-primary" data-save-profile>Save Profile</button>
+            <a class="btn btn-outline profile-cancel-btn" href="{% url 'settings' %}?panel=profile">Cancel</a>
+            <button type="submit" name="save_profile" class="btn profile-save-btn" data-save-profile>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h11l3 3v15H5V3Zm3 0v6h8V3M9 21v-6h6v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+              Save Profile
+            </button>
           </div>
         </form>
       </div>
@@ -308,41 +316,42 @@
       <template id="experienceTemplate">
         <div class="experience-block" data-experience>
           <div class="experience-header">
-            <h4>Experience</h4>
-            <button type="button" class="btn btn-outline btn-sm" data-remove-experience>Remove</button>
+            <button type="button" class="experience-remove-btn" data-remove-experience aria-label="Remove experience">×</button>
           </div>
           <div class="form-row-2">
             <div class="form-group">
               <label>Job Title</label>
-              <input type="text" value="" data-exp-title>
+              <input type="text" value="" placeholder="e.g. Warehouse Associate" data-exp-title>
             </div>
             <div class="form-group">
               <label>Company</label>
-              <input type="text" value="" data-exp-company>
+              <input type="text" value="" placeholder="e.g. ABC Logistics" data-exp-company>
             </div>
           </div>
           <div class="form-row-2">
             <div class="form-group">
               <label>Start Year</label>
-              <input type="text" value="" placeholder="2019" data-exp-start-year>
+              <input type="text" value="" placeholder="e.g. 2021" data-exp-start-year>
             </div>
             <div class="form-group">
               <label>End Year</label>
-              <input type="text" value="" placeholder="2024" data-exp-end-year>
+              <input type="text" value="" placeholder="e.g. 2023 or Present" data-exp-end-year>
             </div>
           </div>
-          <div class="form-group">
-            <label>Key Highlights</label>
+          <div class="form-group form-group--highlights">
+            <div class="highlights-head">
+              <label>Key Highlights</label>
+              <button type="button" class="highlight-add-btn" data-add-highlight>+ Add</button>
+            </div>
             <div class="highlights-list" data-highlights></div>
-            <button type="button" class="btn btn-outline btn-sm" data-add-highlight>+ Add highlight</button>
           </div>
         </div>
       </template>
 
       <template id="highlightTemplate">
         <div class="highlight-row" data-highlight>
-          <input type="text" value="" placeholder="Add highlight" data-highlight-input>
-          <button type="button" class="icon-btn icon-btn--danger" data-remove-highlight>×</button>
+          <input type="text" value="" placeholder="e.g. Reduced shrinkage by 8%" data-highlight-input>
+          <button type="button" class="highlight-remove-btn" data-remove-highlight aria-label="Remove highlight">×</button>
         </div>
       </template>
 

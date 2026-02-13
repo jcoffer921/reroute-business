@@ -1356,15 +1356,20 @@ def settings_view(request):
                 if not isinstance(item, dict):
                     continue
                 title = (item.get("title") or "").strip()
-                if not title:
-                    continue
+                company = (item.get("company") or "").strip()
+                start_year = (item.get("start_year") or "").strip()
+                end_year = (item.get("end_year") or "").strip()
                 highlights = _clean_list(item.get("highlights") or [])
+                if not title and not company and not start_year and not end_year and not highlights:
+                    continue
+                if not title:
+                    title = company or "Experience"
                 ProfileExperience.objects.create(
                     profile=profile,
                     title=title,
-                    company=(item.get("company") or "").strip(),
-                    start_year=(item.get("start_year") or "").strip(),
-                    end_year=(item.get("end_year") or "").strip(),
+                    company=company,
+                    start_year=start_year,
+                    end_year=end_year,
                     highlights=highlights,
                     order=idx,
                 )
