@@ -10,6 +10,7 @@ urlpatterns = [
 
     # Public profile (employer view)
     path("view/<str:username>/", views.public_profile_view, name="public_profile"),
+    path("view/<str:username>/bookmark/", views.toggle_candidate_bookmark, name="bookmark_candidate"),
 
     # Employer profile (owner edit view)
     path("employer/profile/", views.employer_profile_view, name="employer_profile"),

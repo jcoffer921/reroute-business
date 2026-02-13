@@ -6,25 +6,35 @@
 
 <div class="notifications-page">
   <header class="notifications-header">
-    <div>
-      <h1>Notifications</h1>
-      <p class="notifications-subhead">Stay on top of matches, updates, and announcements.</p>
+    <div class="header-left">
+      <div class="bell-badge" aria-hidden="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2Zm6-6V9a6 6 0 0 0-5-5.91V2h-2v1.09A6 6 0 0 0 6 9v7l-2 2v1h16v-1Z"/></svg>
+      </div>
+      <div>
+        <h1>Notifications</h1>
+        <p class="notifications-subhead">{{ unread_count|default:0 }} unread</p>
+      </div>
     </div>
     <form id="markAllForm" method="post">
       {% csrf_token %}
       <input type="hidden" name="action" value="mark_all_read">
-      <button type="submit" class="btn-mark-read">Mark All as Read</button>
+      <button type="submit" class="btn-mark-read">Mark all read</button>
     </form>
   </header>
 
-  <!-- Tabs -->
-  <nav class="notifications-tabs">
-    <button class="tab active" data-filter="all" type="button">All</button>
-    <button class="tab" data-filter="jobs" type="button">Jobs</button>
-    <button class="tab" data-filter="system" type="button">System</button>
-    <button class="tab" data-filter="admin" type="button">Admin</button>
-    <button class="tab" data-filter="tips" type="button">Tips</button>
-  </nav>
+  <div class="notifications-toolbar">
+    <nav class="notifications-tabs">
+      <button class="tab active" data-filter="all" type="button">All</button>
+      <button class="tab" data-filter="jobs" type="button">Jobs</button>
+      <button class="tab" data-filter="applications" type="button">Applications</button>
+      <button class="tab" data-filter="invites" type="button">Invites</button>
+      <button class="tab" data-filter="platform" type="button">Platform</button>
+    </nav>
+    <label class="unread-toggle">
+      <input type="checkbox" id="unreadOnlyToggle">
+      <span>Unread only</span>
+    </label>
+  </div>
 
   <!-- Notification List -->
   <section class="notifications-list" id="notificationsList">
@@ -33,7 +43,7 @@
         {# derive a simple type for styling/filtering #}
         <article
           class="notification-card {% if not n.is_read %}unread{% endif %}"
-          data-type="{% if n.job or n.application or 'appl' in n.verb|default:''|lower %}jobs{% elif 'tip' in n.title|default:''|lower or 'tip' in n.message|default:''|lower %}tips{% elif n.target_group or not n.actor and not n.user %}admin{% else %}system{% endif %}"
+          data-type="{% if n.application or 'application' in n.title|default:''|lower or 'application' in n.message|default:''|lower or 'appl' in n.verb|default:''|lower %}applications{% elif 'invite' in n.title|default:''|lower or 'invite' in n.message|default:''|lower or 'invite' in n.verb|default:''|lower %}invites{% elif n.job %}jobs{% else %}platform{% endif %}"
           data-id="{{ n.id }}"
           data-markable="{% if n.user_id %}1{% else %}0{% endif %}"
           data-title="{{ n.title|default:n.verb|default:'Update' }}"
@@ -43,7 +53,7 @@
         >
           <div class="avatar-wrapper">
             <div class="avatar
-              {% if n.job or n.application or 'appl' in n.verb|default:''|lower %} type-jobs{% elif 'tip' in n.title|default:''|lower or 'tip' in n.message|default:''|lower %} type-tips{% elif n.target_group or not n.actor and not n.user %} type-admin{% else %} type-system{% endif %}">
+              {% if n.application or 'application' in n.title|default:''|lower or 'application' in n.message|default:''|lower or 'appl' in n.verb|default:''|lower %} type-applications{% elif 'invite' in n.title|default:''|lower or 'invite' in n.message|default:''|lower or 'invite' in n.verb|default:''|lower %} type-invites{% elif n.job %} type-jobs{% else %} type-platform{% endif %}">
               {% if n.actor and n.actor|profile_picture_url %}
                 <img src="{{ n.actor|profile_picture_url }}" alt="Avatar">
               {% elif n.actor %}
@@ -51,14 +61,14 @@
               {% else %}
                 {# Icon by type #}
                 {% comment %} simple inline SVG icons {% endcomment %}
-                {% if n.job or n.application or 'appl' in n.verb|default:''|lower %}
+                {% if n.application or 'application' in n.title|default:''|lower or 'application' in n.message|default:''|lower or 'appl' in n.verb|default:''|lower %}
                   <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path fill="currentColor" d="M4 7h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Zm4-4h8a2 2 0 0 1 2 2v2H6V5a2 2 0 0 1 2-2Z"/></svg>
-                {% elif n.target_group or not n.actor and not n.user %}
-                  <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 15h-2v-6h2Zm0-8h-2V7h2Z"/></svg>
-                {% elif 'tip' in n.title|default:''|lower or 'tip' in n.message|default:''|lower %}
-                  <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path fill="currentColor" d="M9 21h6v-1H9v1Zm7.07-4.05A7 7 0 1 0 7.93 16.95C9.1 16 10 14.6 10 13h4c0 1.6.9 3 2.07 3.95Z"/></svg>
+                {% elif 'invite' in n.title|default:''|lower or 'invite' in n.message|default:''|lower or 'invite' in n.verb|default:''|lower %}
+                  <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path fill="currentColor" d="M12 2a5 5 0 0 1 5 5v1h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h2V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v1h6V7a3 3 0 0 0-3-3Z"/></svg>
+                {% elif n.job %}
+                  <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path fill="currentColor" d="M4 7h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Zm4-4h8a2 2 0 0 1 2 2v2H6V5a2 2 0 0 1 2-2Z"/></svg>
                 {% else %}
-                  <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path fill="currentColor" d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2Zm6-6V9a6 6 0 0 0-5-5.91V2h-2v1.09A6 6 0 0 0 6 9v7l-2 2v1h16v-1Z"/></svg>
+                  <svg viewBox="0 0 24 24" aria-hidden="true" class="icon"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm1 15h-2v-6h2Zm0-8h-2V7h2Z"/></svg>
                 {% endif %}
               {% endif %}
             </div>
@@ -67,21 +77,23 @@
             <div class="title">{{ n.title|default:n.verb|default:"Update" }}</div>
             <div class="message">{{ n.message }}</div>
             <div class="meta">
-              {% if not n.is_read %}<span class="unread-dot" aria-label="Unread"></span>{% endif %}
-              <span class="pill pill-ghost tiny">{% if not n.is_read %}New{% else %}Update{% endif %}</span>
               <time datetime="{{ n.created_at|date:'c' }}">{{ n.created_at|timesince }} ago</time>
             </div>
           </div>
           <div class="actions">
             {% if n.url %}
-              <a href="{{ n.url }}" class="btn-action">View</a>
+              <a href="{{ n.url }}" class="btn-action" data-cta>View</a>
+            {% else %}
+              <button type="button" class="btn-action btn-disabled" disabled>View</button>
             {% endif %}
             {% if not n.is_read and n.user_id %}
               <form method="post" class="mark-read-form inline-form" data-id="{{ n.id }}">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="mark_read">
                 <input type="hidden" name="id" value="{{ n.id }}">
-                <button type="submit" class="btn-mark-one" title="Mark as read" aria-label="Mark as read">✓</button>
+                <button type="submit" class="btn-mark-one" title="Mark as read" aria-label="Mark as read">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12l4 4 8-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
               </form>
             {% endif %}
           </div>
@@ -98,22 +110,6 @@
     <div class="empty-text">You're all caught up.</div>
   </div>
 
-  <!-- Drawer for notification details -->
-  <div id="notifDrawerOverlay" class="notif-drawer-overlay" role="presentation" hidden></div>
-  <aside id="notifDrawer" class="notif-drawer" aria-hidden="true" aria-label="Notification details">
-    <header>
-      <h2 id="notifDrawerTitle" class="drawer-title">Notification</h2>
-      <button id="notifDrawerClose" class="btn-secondary" type="button">Close</button>
-    </header>
-    <div class="content drawer-content">
-      <p id="notifDrawerMessage" class="drawer-message"></p>
-      <p id="notifDrawerTime" class="drawer-time"></p>
-    </div>
-    <div class="actions">
-      <a id="notifDrawerLink" class="btn-action" href="#" target="_self" hidden>Open Link</a>
-      <button id="notifDrawerClose2" class="btn-secondary" type="button">Done</button>
-    </div>
-  </aside>
 </div>
 
 <script src="{% static 'dashboard/js/notifications.js' %}"></script>

@@ -904,6 +904,10 @@ body.employer-dashboard {
   gap: 18px;
 }
 
+.skeleton-grid[hidden] {
+  display: none !important;
+}
+
 .skeleton-card {
   background: #fff;
   border: 1px solid var(--rr-border);

@@ -51,6 +51,14 @@
                 <!-- ---------- Right-side profile menu ---------- -->
                 {% if user.is_authenticated %}
                 <div class="user-profile-right">
+                    <a href="{% url 'dashboard:notifications' %}" class="notif-bell-link" aria-label="Notifications">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2Zm6-6V9a6 6 0 0 0-5-5.91V2h-2v1.09A6 6 0 0 0 6 9v7l-2 2v1h16v-1Z"></path>
+                        </svg>
+                        {% if UNREAD_NOTIFICATIONS %}
+                          <span class="notif-bell-dot" aria-hidden="true"></span>
+                        {% endif %}
+                    </a>
                     <!--
                       Button shows user's initials; clicking toggles dropdown menu.
                       JS in base.js should control .show on #userDropdown and body.no-scroll for mobile.
@@ -69,7 +77,6 @@
                     </button>
                     <div class="user-dropdown" id="userDropdown" role="menu" aria-labelledby="userMenuButton">
                         <a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a>
-                        <a href="{% url 'dashboard:notifications' %}">Notifications{% if UNREAD_NOTIFICATIONS %}<span class="nav-badge">{{ UNREAD_NOTIFICATIONS }}</span>{% endif %}</a>
                         <a href="{{ PUBLIC_PROFILE_URL }}">View Profile</a>
                         <a href="{{ PROFILE_URL }}">Profile Settings</a>
                         <a href="{% url 'contact' %}">Report Issues</a>
@@ -180,7 +187,6 @@
         <li><a href="{% url 'faq' %}">FAQ</a></li>
         {% if user.is_authenticated %}
         <li><a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'dashboard:notifications' %}">Notifications{% if UNREAD_NOTIFICATIONS %}<span class="nav-badge">{{ UNREAD_NOTIFICATIONS }}</span>{% endif %}</a></li>
         {% else %}
         <li><a href="{% url 'login' %}">Login</a></li>
         <li><a href="{% url 'signup' %}">Get Started</a></li>

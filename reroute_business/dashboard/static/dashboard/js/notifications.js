@@ -1,21 +1,11 @@
-// Notifications page interactions: tabs filter, empty states, and drawer
 (function() {
   const tabs = document.querySelectorAll('.notifications-tabs .tab');
   const cards = Array.from(document.querySelectorAll('.notification-card'));
   const emptyState = document.getElementById('notificationsEmptyState');
   const markAllForm = document.getElementById('markAllForm');
-
-  const drawer = document.getElementById('notifDrawer');
-  const overlay = document.getElementById('notifDrawerOverlay');
-  const drawerTitle = document.getElementById('notifDrawerTitle');
-  const drawerMsg = document.getElementById('notifDrawerMessage');
-  const drawerTime = document.getElementById('notifDrawerTime');
-  const drawerLink = document.getElementById('notifDrawerLink');
-  const closeBtns = [document.getElementById('notifDrawerClose'), document.getElementById('notifDrawerClose2')].filter(Boolean);
-  const MARK_ON_OPEN = true; // toggle to false to disable auto mark as read on open
+  const unreadToggle = document.getElementById('unreadOnlyToggle');
 
   function getCSRFToken() {
-    // Prefer cookie (Django default name 'csrftoken')
     const match = document.cookie.match(/(?:^|; )csrftoken=([^;]+)/);
     return match ? decodeURIComponent(match[1]) : (document.querySelector('input[name="csrfmiddlewaretoken"]')?.value || '');
   }
@@ -40,66 +30,50 @@
 
   function updateCardUIAsRead(card) {
     card.classList.remove('unread');
-    const dot = card.querySelector('.meta .unread-dot');
-    if (dot) dot.remove();
     const form = card.querySelector('.mark-read-form');
     if (form) form.remove();
-    // After updating the card, sync the navbar badge
     syncNavbarUnreadBadge();
   }
 
   function updateEmptyState(filter) {
-    // Count visible cards after filter applied
     const visible = cards.filter(c => !c.hasAttribute('hidden'));
     if (visible.length > 0) {
-      if (emptyState) emptyState.setAttribute('hidden','');
+      emptyState?.setAttribute('hidden','');
       return;
     }
     if (!emptyState) return;
-
-    // Friendly message per tab
     const map = {
       all: "You're all caught up.",
-      jobs: 'No job notifications yet — check back soon!',
-      system: 'No system notifications yet.',
-      admin: 'No admin announcements right now.',
-      tips: 'No tips to show yet.'
+      jobs: 'No job notifications yet.',
+      applications: 'No application updates yet.',
+      invites: 'No invites yet.',
+      platform: 'No platform updates yet.',
     };
     emptyState.querySelector('.empty-text').textContent = map[filter] || map.all;
     emptyState.removeAttribute('hidden');
   }
 
-  function setActive(tab) {
-    tabs.forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    const filter = tab.getAttribute('data-filter');
+  function applyFilters() {
+    const active = document.querySelector('.notifications-tabs .tab.active');
+    const filter = active ? active.getAttribute('data-filter') : 'all';
+    const unreadOnly = unreadToggle?.checked;
     cards.forEach(c => {
-      if (filter === 'all') {
-        c.removeAttribute('hidden');
-      } else {
-        const ok = (c.getAttribute('data-type') === filter);
-        if (ok) c.removeAttribute('hidden'); else c.setAttribute('hidden','');
-      }
+      const matchesType = filter === 'all' || c.getAttribute('data-type') === filter;
+      const matchesUnread = !unreadOnly || c.classList.contains('unread');
+      if (matchesType && matchesUnread) c.removeAttribute('hidden');
+      else c.setAttribute('hidden','');
     });
     updateEmptyState(filter);
   }
 
-  tabs.forEach(tab => tab.addEventListener('click', () => setActive(tab)));
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    applyFilters();
+  }));
 
-  // Lightweight toast
-  function showToast(msg) {
-    const toast = document.createElement('div');
-    toast.className = 'toast toast-success';
-    toast.textContent = msg;
-    document.body.appendChild(toast);
-    setTimeout(() => { toast.classList.add('show'); }, 10);
-    setTimeout(() => {
-      toast.classList.remove('show');
-      toast.addEventListener('transitionend', () => toast.remove(), { once: true });
-    }, 2000);
-  }
+  unreadToggle?.addEventListener('change', applyFilters);
 
-  // AJAX Mark All as Read
   if (markAllForm) {
     markAllForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -117,65 +91,58 @@
         });
         const data = await res.json().catch(() => ({}));
         if (res.ok && data && data.ok) {
-          // Update all cards locally
           cards.forEach(card => {
             if (card.classList.contains('unread')) {
               card.classList.remove('unread');
-              const dot = card.querySelector('.meta .unread-dot');
-              if (dot) dot.remove();
               const form = card.querySelector('.mark-read-form');
               if (form) form.remove();
             }
           });
-          showToast('All notifications marked as read');
-          // Navbar badge → zero
           updateNavbarBadge(0);
+          applyFilters();
         }
       } catch(_) {}
     });
   }
 
-  // Drawer helpers
-  function openDrawer(fromCard) {
-    if (!drawer || !overlay) return;
-    drawerTitle.textContent = fromCard.getAttribute('data-title') || 'Notification';
-    drawerMsg.textContent = fromCard.getAttribute('data-message') || '';
-    drawerTime.textContent = fromCard.getAttribute('data-time') || '';
-    const url = fromCard.getAttribute('data-url');
-    if (url) { drawerLink.removeAttribute('hidden'); drawerLink.setAttribute('href', url); }
-    else { drawerLink.setAttribute('hidden',''); }
-    overlay.removeAttribute('hidden');
-    drawer.classList.add('open');
-    drawer.setAttribute('aria-hidden', 'false');
-
-    // Optional: mark-as-read when opening the drawer
-    if (MARK_ON_OPEN && fromCard.getAttribute('data-markable') === '1' && fromCard.classList.contains('unread')) {
-      const id = fromCard.getAttribute('data-id');
-      if (id) {
-        ajaxMarkRead(id).then((ok) => { if (ok) updateCardUIAsRead(fromCard); });
-      }
-    }
-  }
-  function closeDrawer() {
-    if (!drawer || !overlay) return;
-    drawer.classList.remove('open');
-    drawer.setAttribute('aria-hidden', 'true');
-    overlay.setAttribute('hidden','');
-  }
-  closeBtns.forEach(btn => btn && btn.addEventListener('click', closeDrawer));
-  if (overlay) overlay.addEventListener('click', closeDrawer);
-
-  // Click to open drawer, but ignore clicks on actionable elements
+  // Card click marks as read (and navigates if there is a URL)
   cards.forEach(card => {
-    card.addEventListener('click', (e) => {
+    card.addEventListener('click', async (e) => {
       const target = e.target;
-      // Ignore clicks on links, buttons, inputs, forms inside actions
-      if (target.closest('a, button, input, form, .actions')) return;
-      openDrawer(card);
+      if (target.closest('.mark-read-form')) return;
+      const url = card.getAttribute('data-url');
+      const markable = card.getAttribute('data-markable') === '1';
+      const isUnread = card.classList.contains('unread');
+      if (markable && isUnread) {
+        const id = card.getAttribute('data-id');
+        if (id) {
+          const ok = await ajaxMarkRead(id);
+          if (ok) updateCardUIAsRead(card);
+        }
+      }
+      if (url && !target.closest('.btn-action')) {
+        window.location.href = url;
+      }
     });
   });
 
-  // Intercept per-item mark-as-read forms and do AJAX
+  // CTA click should also mark as read before navigating
+  document.querySelectorAll('[data-cta]').forEach(link => {
+    link.addEventListener('click', async (e) => {
+      const card = link.closest('.notification-card');
+      if (!card) return;
+      if (!card.classList.contains('unread')) return;
+      if (card.getAttribute('data-markable') !== '1') return;
+      const id = card.getAttribute('data-id');
+      if (!id) return;
+      e.preventDefault();
+      const ok = await ajaxMarkRead(id);
+      if (ok) updateCardUIAsRead(card);
+      window.location.href = link.getAttribute('href');
+    });
+  });
+
+  // Intercept per-item mark-as-read forms
   document.querySelectorAll('.mark-read-form').forEach(form => {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -183,16 +150,14 @@
       const card = form.closest('.notification-card');
       const ok = await ajaxMarkRead(id);
       if (ok && card) updateCardUIAsRead(card);
+      applyFilters();
     });
   });
 
-  // Initialize empty state visibility for default tab
-  const active = document.querySelector('.notifications-tabs .tab.active');
-  if (active) updateEmptyState(active.getAttribute('data-filter') || 'all');
+  applyFilters();
 
-  // ---------- Navbar badge helpers ----------
+  // Navbar badge helpers
   function computeUnreadCount() {
-    // Count only user-owned unread cards (data-markable="1")
     return cards.filter(c => c.classList.contains('unread') && c.getAttribute('data-markable') === '1').length;
   }
 

@@ -80,291 +80,280 @@
   <div class="settings-panels">
     <!-- Profile Settings Panel -->
     <section class="panel" id="panel-profile" aria-labelledby="tab-profile">
-      <div
-        id="profileSettingsData"
-        data-avatar-upload-url="{% url 'dashboard:profile_avatar_upload' %}"
-        data-avatar-delete-url="{% url 'dashboard:profile_avatar_delete' %}"
-        data-background-url="{% url 'dashboard:profile_background_set' %}"
-        data-details-url="{% url 'dashboard:profile_details_update' %}"
-        data-bio-url="{% url 'dashboard:profile_bio_update' %}"
-        data-experience-add-url="{% url 'dashboard:profile_experience_add' %}"
-        data-skill-add-url="{% url 'dashboard:profile_skill_add' %}"
-        data-language-add-url="{% url 'dashboard:profile_language_add' %}"
-        data-experience-delete-base-url="{% url 'dashboard:profile_experience_delete' 0 %}"
-        data-skill-delete-base-url="{% url 'dashboard:profile_skill_delete' 0 %}"
-        data-language-delete-base-url="{% url 'dashboard:profile_language_delete' 0 %}"
-        data-avatar-default-url="{% static 'images/default-avatar.png' %}"
-        hidden
-      ></div>
-
       <div class="settings-section">
-        <h2 id="heading-profile-settings">Profile Settings</h2>
-        <p class="help-text mt--4 text-gray-500">Update your profile photo, background, and private info.</p>
-        <div class="profile-settings-grid">
-          <div class="profile-avatar-block">
-            <div class="avatar-shell avatar-shell--empty">
-              <div id="profileAvatarInitials" class="avatar-initials" aria-hidden="false">
-                {% with fn=profile_first_name|default:'' ln=profile_last_name|default:'' %}
-                  {% if fn and ln %}
-                    {{ fn|slice:":1" }}{{ ln|slice:":1" }}
-                  {% elif fn %}
-                    {{ fn|slice:":1" }}
-                  {% else %}
-                    U
-                  {% endif %}
-                {% endwith %}
-              </div>
-            </div>
-            <p class="input-help">Profile photo uploads are temporarily disabled.</p>
-          </div>
-
-          <div class="profile-background-block">
-            <label class="input-label">Change Background</label>
-            <div class="background-picker">
-              <div class="background-preview">
-                <div id="profileBackgroundPreview" class="background-preview__swatch gradient-{% if profile_background_gradient %}{{ profile_background_gradient }}{% else %}aurora{% endif %}"></div>
-                <div class="background-preview__label">Current background</div>
-              </div>
-              <div class="gradient-grid" role="listbox" aria-label="Background gradients">
-                {% for key,label in profile_gradients %}
-                  <button
-                    type="button"
-                    class="gradient-option {% if profile_background_gradient == key %}selected{% endif %}"
-                    data-gradient="{{ key }}"
-                    aria-pressed="{% if profile_background_gradient == key %}true{% else %}false{% endif %}"
-                  >
-                    <span class="gradient-chip gradient-{{ key }}" aria-hidden="true"></span>
-                    <span class="gradient-label">{{ label }}</span>
-                  </button>
-                {% endfor %}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="settings-section">
-        <h3>Profile Details</h3>
-        <form id="profileDetailsForm">
+        <h2 id="heading-profile-settings">Profile Edit</h2>
+        <p class="help-text mt--4 text-gray-500">Keep your profile polished and resume-ready.</p>
+        <form id="profileEditForm" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
-          <div class="form-row-2">
-            <div class="form-group">
-              <label for="profile_first_name">First Name<span class="required-asterisk" aria-hidden="true">*</span></label>
-              <input type="text" id="profile_first_name" name="first_name" value="{{ profile_first_name }}" required aria-required="true">
+          <input type="hidden" name="core_skills_json" id="coreSkillsInput">
+          <input type="hidden" name="soft_skills_json" id="softSkillsInput">
+          <input type="hidden" name="experiences_json" id="experiencesInput">
+          <input type="hidden" name="certifications_json" id="certificationsInput">
+
+          <div class="settings-card settings-card--flat">
+            <div class="settings-card__head">
+              <h3 class="settings-card__title">Basic Info</h3>
             </div>
-            <div class="form-group">
-              <label for="profile_last_name">Last Name<span class="required-asterisk" aria-hidden="true">*</span></label>
-              <input type="text" id="profile_last_name" name="last_name" value="{{ profile_last_name }}" required aria-required="true">
+            <div class="profile-edit-grid">
+              <div class="profile-photo-block">
+                <div class="profile-photo-shell">
+                  {% if profile_details.profile_picture %}
+                    <img src="{{ profile_details.profile_picture.url }}" alt="{{ profile_first_name }} profile photo">
+                  {% else %}
+                    <div class="profile-photo-initials">
+                      {% with fn=profile_first_name|default:'' ln=profile_last_name|default:'' %}
+                        {% if fn and ln %}
+                          {{ fn|slice:":1" }}{{ ln|slice:":1" }}
+                        {% elif fn %}
+                          {{ fn|slice:":1" }}
+                        {% else %}
+                          U
+                        {% endif %}
+                      {% endwith %}
+                    </div>
+                  {% endif %}
+                </div>
+                <label class="input-label" for="profile_photo">Profile Photo</label>
+                <input type="file" id="profile_photo" name="profile_photo" accept="image/*">
+              </div>
+              <div class="profile-info-block">
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label for="profile_headline">Headline</label>
+                    <input type="text" id="profile_headline" name="headline" value="{{ profile_headline }}" placeholder="Certified Forklift Operator &amp; Warehouse Lead">
+                  </div>
+                  <div class="form-group">
+                    <label for="profile_location">Location</label>
+                    <input type="text" id="profile_location" name="location" value="{{ profile_location }}" placeholder="Atlanta, GA">
+                  </div>
+                </div>
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label for="profile_status">Status</label>
+                    <select id="profile_status" name="status">
+                      <option value="">Select status</option>
+                      {% for value,label in status_choices %}
+                        <option value="{{ value }}" {% if profile_status == value %}selected{% endif %}>{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="profile_user_id">User ID</label>
+                    <input type="text" id="profile_user_id" value="{{ profile_user_uid }}" disabled>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="profile_about">About Me</label>
+                  <textarea id="profile_about" name="about" rows="5" placeholder="Share a concise professional summary.">{{ profile_about }}</textarea>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="form-row-2">
+
+          <div class="settings-card settings-card--flat">
+            <div class="settings-card__head">
+              <h3 class="settings-card__title">Skills &amp; Strengths</h3>
+            </div>
+            <div class="skills-editor">
+              <div class="skills-column" data-skill-section="core">
+                <h4>Core Skills</h4>
+                <div class="pill-wrap" data-skill-list>
+                  {% for skill in profile_core_skills %}
+                    <span class="pill-chip pill-chip--editable">{{ skill }}<button type="button" class="pill-remove" aria-label="Remove {{ skill }}">×</button></span>
+                  {% empty %}
+                    <span class="muted">No core skills yet.</span>
+                  {% endfor %}
+                </div>
+                <div class="pill-input-row">
+                  <input type="text" maxlength="40" placeholder="Add a core skill" data-skill-input>
+                  <button type="button" class="btn btn-secondary btn-pill" data-skill-add>Add</button>
+                </div>
+              </div>
+              <div class="skills-column" data-skill-section="soft">
+                <h4>Soft Skills</h4>
+                <div class="pill-wrap" data-skill-list>
+                  {% for skill in profile_soft_skills %}
+                    <span class="pill-chip pill-chip--editable">{{ skill }}<button type="button" class="pill-remove" aria-label="Remove {{ skill }}">×</button></span>
+                  {% empty %}
+                    <span class="muted">No soft skills yet.</span>
+                  {% endfor %}
+                </div>
+                <div class="pill-input-row">
+                  <input type="text" maxlength="40" placeholder="Add a soft skill" data-skill-input>
+                  <button type="button" class="btn btn-secondary btn-pill" data-skill-add>Add</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-card settings-card--flat">
+            <div class="settings-card__head">
+              <h3 class="settings-card__title">Work Experience</h3>
+              <button type="button" class="btn btn-secondary btn-pill" data-add-experience>+ Add</button>
+            </div>
+            <div class="experience-editor" data-experience-list>
+              {% for exp in profile_experiences %}
+                <div class="experience-block" data-experience>
+                  <div class="experience-header">
+                    <h4>Experience {{ forloop.counter }}</h4>
+                    <button type="button" class="btn btn-outline btn-sm" data-remove-experience>Remove</button>
+                  </div>
+                  <div class="form-row-2">
+                    <div class="form-group">
+                      <label>Job Title</label>
+                      <input type="text" value="{{ exp.title }}" data-exp-title>
+                    </div>
+                    <div class="form-group">
+                      <label>Company</label>
+                      <input type="text" value="{{ exp.company }}" data-exp-company>
+                    </div>
+                  </div>
+                  <div class="form-row-2">
+                    <div class="form-group">
+                      <label>Start Year</label>
+                      <input type="text" value="{{ exp.start_year }}" placeholder="2019" data-exp-start-year>
+                    </div>
+                    <div class="form-group">
+                      <label>End Year</label>
+                      <input type="text" value="{{ exp.end_year }}" placeholder="2024" data-exp-end-year>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Key Highlights</label>
+                    <div class="highlights-list" data-highlights>
+                      {% for highlight in exp.highlights %}
+                        <div class="highlight-row" data-highlight>
+                          <input type="text" value="{{ highlight }}" placeholder="Add highlight" data-highlight-input>
+                          <button type="button" class="icon-btn icon-btn--danger" data-remove-highlight>×</button>
+                        </div>
+                      {% empty %}
+                        <div class="highlight-row" data-highlight>
+                          <input type="text" value="" placeholder="Add highlight" data-highlight-input>
+                          <button type="button" class="icon-btn icon-btn--danger" data-remove-highlight>×</button>
+                        </div>
+                      {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-outline btn-sm" data-add-highlight>+ Add highlight</button>
+                  </div>
+                </div>
+              {% empty %}
+                <p class="muted">No experience added yet.</p>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="settings-card settings-card--flat">
+            <div class="settings-card__head">
+              <h3 class="settings-card__title">Certifications &amp; Training</h3>
+              <button type="button" class="btn btn-secondary btn-pill" data-add-cert>+ Add</button>
+            </div>
+            <div class="cert-editor" data-cert-list>
+              {% for cert in profile_certifications %}
+                <div class="cert-row" data-cert>
+                  <input type="text" value="{{ cert.title }}" placeholder="Certificate" data-cert-title>
+                  <input type="text" value="{{ cert.issuer }}" placeholder="Issuer" data-cert-issuer>
+                  <input type="text" value="{{ cert.year }}" placeholder="Year" data-cert-year>
+                  <button type="button" class="icon-btn icon-btn--danger" data-remove-cert>×</button>
+                </div>
+              {% empty %}
+                <p class="muted">No certifications added yet.</p>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="settings-card settings-card--flat">
+            <div class="settings-card__head">
+              <h3 class="settings-card__title">Resume</h3>
+            </div>
             <div class="form-group">
-              <label for="profile_email">Email</label>
-              <input type="email" id="profile_email" name="email" value="{{ profile_email }}" {% if not email_change_allowed %}disabled{% endif %}>
-              {% if not email_change_allowed %}
-                <p class="input-help">Email changes are currently managed in Sign-in &amp; Security.</p>
+              <label for="resume_file">Upload Resume (PDF)</label>
+              <input type="file" id="resume_file" name="resume_file" accept=".pdf">
+              {% if resume and resume.file %}
+                <p class="input-help">Current: {{ resume.file.name|default:"Resume uploaded" }}</p>
               {% endif %}
             </div>
+          </div>
+
+          <div class="settings-card settings-card--flat">
+            <div class="settings-card__head">
+              <h3 class="settings-card__title">Privacy &amp; Visibility</h3>
+            </div>
             <div class="form-group">
-              <label for="profile_phone">Mobile Number</label>
-              <input type="text" id="profile_phone" name="phone" value="{{ profile_phone }}" placeholder="(555) 555-5555">
+              <label class="toggle-row" for="profile_is_public">
+                <input type="checkbox" id="profile_is_public" name="is_public" {% if profile_is_public %}checked{% endif %}>
+                <span class="toggle-copy">
+                  Make Profile Public
+                  <span class="input-help">Visible to employers and reentry orgs only.</span>
+                </span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label class="toggle-row" for="profile_ready_background">
+                <input type="checkbox" id="profile_ready_background" name="ready_to_discuss_background" {% if profile_ready_to_discuss_background %}checked{% endif %}>
+                <span class="toggle-copy">
+                  Ready to Discuss My Background
+                  <span class="input-help">Share this on your terms.</span>
+                </span>
+              </label>
             </div>
           </div>
-          <div class="form-row-2">
-            <div class="form-group">
-              <label for="profile_gender">Gender</label>
-              <select id="profile_gender" name="gender">
-                <option value="">Select gender</option>
-                {% for value,label in gender_choices %}
-                  <option value="{{ value }}" {% if profile_gender == value %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="profile_user_id">User ID</label>
-              <input type="text" id="profile_user_id" value="{{ profile_user_uid }}" disabled>
-            </div>
+
+          <div class="settings-card__actions settings-card__actions--footer profile-actions">
+            <a class="btn btn-secondary" href="{% url 'settings' %}?panel=profile">Cancel</a>
+            <button type="submit" name="save_profile" class="btn btn-primary" data-save-profile>Save Profile</button>
           </div>
-          <button type="submit" class="btn-primary btn-pill">Save Profile</button>
         </form>
       </div>
 
-      <div class="settings-section">
-        <div class="section-header-row">
-          <h3>Who Am I?</h3>
-          <button type="button" class="icon-btn" data-modal-open="bioModal" aria-label="Edit Who Am I">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 20h4l10-10-4-4L4 16v4z" stroke="#0f172a" stroke-width="1.6" stroke-linejoin="round"/>
-              <path d="M13 6l4 4" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round"/>
-            </svg>
-          </button>
-        </div>
-        <p id="profileBioText" class="profile-bio-text">
-          {% if profile_bio %}{{ profile_bio }}{% else %}<em>No bio yet.</em>{% endif %}
-        </p>
-      </div>
-
-      <div class="settings-section">
-        <div class="section-header-row">
-          <h3>Experience / Skills / Languages</h3>
-          <button type="button" class="icon-btn" data-modal-open="eslModal" aria-label="Edit experience, skills, and languages">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 20h4l10-10-4-4L4 16v4z" stroke="#0f172a" stroke-width="1.6" stroke-linejoin="round"/>
-              <path d="M13 6l4 4" stroke="#0f172a" stroke-width="1.6" stroke-linecap="round"/>
-            </svg>
-          </button>
-        </div>
-        <div class="profile-esl-summary">
-          <div class="summary-block">
-            <h4>Skills</h4>
-            <div class="pill-wrap" id="profileSkillsPreview">
-              {% for skill in profile_skills %}
-                <span class="pill-chip">{{ skill.name }}</span>
-              {% empty %}
-                <span class="muted">No skills yet.</span>
-              {% endfor %}
-            </div>
-          </div>
-          <div class="summary-block">
-            <h4>Languages</h4>
-            <div class="pill-wrap" id="profileLanguagesPreview">
-              {% for language in profile_languages %}
-                <span class="pill-chip">{{ language.name }}</span>
-              {% empty %}
-                <span class="muted">No languages yet.</span>
-              {% endfor %}
-            </div>
-          </div>
-          <div class="summary-block">
+      <template id="experienceTemplate">
+        <div class="experience-block" data-experience>
+          <div class="experience-header">
             <h4>Experience</h4>
-            <p class="muted">{% if profile_experiences %}{{ profile_experiences|length }} entries{% else %}No experience added yet.{% endif %}</p>
+            <button type="button" class="btn btn-outline btn-sm" data-remove-experience>Remove</button>
           </div>
-        </div>
-      </div>
-
-      <!-- Who Am I Modal -->
-      <div class="settings-modal" id="bioModal" role="dialog" aria-modal="true" aria-labelledby="bioModalTitle" hidden>
-        <div class="settings-modal__dialog">
-          <button type="button" class="settings-modal__close" data-modal-close aria-label="Close">×</button>
-          <h3 id="bioModalTitle">Who Am I?</h3>
-          <form id="bioForm">
-            {% csrf_token %}
-            <textarea id="bioTextarea" name="bio" rows="6" maxlength="600" placeholder="Share a short intro about yourself.">{{ profile_bio }}</textarea>
-            <div class="modal-actions">
-              <button type="button" class="btn btn-secondary btn-pill" data-modal-close>Cancel</button>
-              <button type="submit" class="btn btn-primary btn-pill">Save</button>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Job Title</label>
+              <input type="text" value="" data-exp-title>
             </div>
-            <div class="char-counter" id="bioCharCounter">0 / 600</div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Experience / Skills / Languages Modal -->
-      <div class="settings-modal" id="eslModal" role="dialog" aria-modal="true" aria-labelledby="eslModalTitle" hidden>
-        <div class="settings-modal__dialog settings-modal__dialog--wide">
-          <button type="button" class="settings-modal__close" data-modal-close aria-label="Close">×</button>
-          <h3 id="eslModalTitle">Experience / Skills / Languages</h3>
-          <div class="esl-grid">
-            <section class="esl-section">
-              <h4>Experience</h4>
-              <div id="experienceList" class="experience-list">
-                {% for exp in profile_experiences %}
-                  <div class="experience-item" data-experience-id="{{ exp.id }}">
-                    <div class="experience-main">
-                      <div class="experience-title">{{ exp.job_title }}</div>
-                      <div class="experience-meta">
-                        {{ exp.company }}
-                        • {{ exp.start_date|date:"M Y" }}
-                        {% if exp.end_date %}— {{ exp.end_date|date:"M Y" }}{% elif exp.currently_work_here %}— Present{% endif %}
-                      </div>
-                      {% if exp.description %}
-                        <div class="experience-desc">{{ exp.description }}</div>
-                      {% endif %}
-                    </div>
-                    <button type="button" class="icon-btn icon-btn--danger" data-experience-delete="{{ exp.id }}" aria-label="Delete experience">×</button>
-                  </div>
-                {% empty %}
-                  <p class="muted">No experience added yet.</p>
-                {% endfor %}
-              </div>
-              <form id="experienceForm" class="experience-form">
-                {% csrf_token %}
-                <div class="form-row-2">
-                  <div class="form-group">
-                    <label for="experienceJobTitle">Job Title</label>
-                    <input type="text" id="experienceJobTitle" name="job_title" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="experienceCompany">Company</label>
-                    <input type="text" id="experienceCompany" name="company" required>
-                  </div>
-                </div>
-                <div class="form-row-2">
-                  <div class="form-group">
-                    <label for="experienceStart">Start Date</label>
-                    <input type="date" id="experienceStart" name="start_date" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="experienceEnd">End Date</label>
-                    <input type="date" id="experienceEnd" name="end_date">
-                  </div>
-                </div>
-                <div class="form-group inline-check">
-                  <label for="experienceCurrent">
-                    <input type="checkbox" id="experienceCurrent" name="currently_work_here">
-                    Currently work here
-                  </label>
-                </div>
-                <div class="form-group">
-                  <label for="experienceDescription">Description (optional)</label>
-                  <textarea id="experienceDescription" name="description" rows="3"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary btn-pill">Add Experience</button>
-              </form>
-            </section>
-
-            <section class="esl-section">
-              <h4>Skills</h4>
-              <div class="pill-editor">
-                <div id="skillsPills" class="pill-wrap">
-                  {% for skill in profile_skills %}
-                    <span class="pill-chip pill-chip--editable" data-skill-id="{{ skill.id }}" data-skill-name="{{ skill.name }}">
-                      {{ skill.name }}
-                      <button type="button" class="pill-remove" data-skill-remove="{{ skill.id }}" aria-label="Remove {{ skill.name }}">×</button>
-                    </span>
-                  {% empty %}
-                    <span class="muted">No skills yet.</span>
-                  {% endfor %}
-                </div>
-                <div class="pill-input-row">
-                  <input type="text" id="skillInput" maxlength="40" placeholder="Add a skill">
-                  <button type="button" class="btn btn-secondary btn-pill" id="skillAddBtn">Add</button>
-                </div>
-              </div>
-            </section>
-
-            <section class="esl-section">
-              <h4>Languages</h4>
-              <div class="pill-editor">
-                <div id="languagesPills" class="pill-wrap">
-                  {% for language in profile_languages %}
-                    <span class="pill-chip pill-chip--editable" data-language-id="{{ language.id }}" data-language-name="{{ language.name }}">
-                      {{ language.name }}
-                      <button type="button" class="pill-remove" data-language-remove="{{ language.id }}" aria-label="Remove {{ language.name }}">×</button>
-                    </span>
-                  {% empty %}
-                    <span class="muted">No languages yet.</span>
-                  {% endfor %}
-                </div>
-                <div class="pill-input-row">
-                  <input type="text" id="languageInput" maxlength="40" placeholder="Add a language">
-                  <button type="button" class="btn btn-secondary btn-pill" id="languageAddBtn">Add</button>
-                </div>
-              </div>
-            </section>
+            <div class="form-group">
+              <label>Company</label>
+              <input type="text" value="" data-exp-company>
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Start Year</label>
+              <input type="text" value="" placeholder="2019" data-exp-start-year>
+            </div>
+            <div class="form-group">
+              <label>End Year</label>
+              <input type="text" value="" placeholder="2024" data-exp-end-year>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Key Highlights</label>
+            <div class="highlights-list" data-highlights></div>
+            <button type="button" class="btn btn-outline btn-sm" data-add-highlight>+ Add highlight</button>
           </div>
         </div>
-      </div>
+      </template>
+
+      <template id="highlightTemplate">
+        <div class="highlight-row" data-highlight>
+          <input type="text" value="" placeholder="Add highlight" data-highlight-input>
+          <button type="button" class="icon-btn icon-btn--danger" data-remove-highlight>×</button>
+        </div>
+      </template>
+
+      <template id="certTemplate">
+        <div class="cert-row" data-cert>
+          <input type="text" value="" placeholder="Certificate" data-cert-title>
+          <input type="text" value="" placeholder="Issuer" data-cert-issuer>
+          <input type="text" value="" placeholder="Year" data-cert-year>
+          <button type="button" class="icon-btn icon-btn--danger" data-remove-cert>×</button>
+        </div>
+      </template>
     </section>
 
     <!-- Account Panel -->
@@ -392,15 +381,6 @@
           <div class="form-group">
             <label for="id_status">Employment Status</label>
             {{ account_prefs_form.status }}
-          </div>
-          <div class="form-group">
-            <label class="toggle-row" for="id_ready_to_discuss_background">
-              {{ account_prefs_form.ready_to_discuss_background }}
-              <span class="toggle-copy">
-                Ready to Discuss Background
-                <span class="input-help">Only shown to employers when enabled.</span>
-              </span>
-            </label>
           </div>
           <button type="submit" name="update_account_prefs" class="btn-primary btn-pill">Save Preferences</button>
         </form>

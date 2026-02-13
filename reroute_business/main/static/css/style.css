@@ -178,6 +178,41 @@ iframe { max-width: 100%; border: 0; }
   vertical-align: middle;
 }
 
+/* Navbar notification bell */
+.notif-bell-link {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  margin-right: 12px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #0f172a;
+  text-decoration: none;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.notif-bell-link svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.notif-bell-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f59e0b;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
 /* CTA or special link behavior, if any */
 .cta-button { transition: color .3s, background .3s; }
 .cta-button:hover { color: #6495ED; background: #fff; }

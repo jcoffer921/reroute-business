@@ -64,7 +64,7 @@ except Exception:
 # -----------------------------
 from reroute_business.profiles.models import EmployerProfile, UserProfile, Subscription
 from reroute_business.profiles.forms import EmployerOnboardingForm
-from reroute_business.profiles.constants import GENDER_CHOICES, PROFILE_GRADIENT_CHOICES
+from reroute_business.profiles.constants import GENDER_CHOICES, PROFILE_GRADIENT_CHOICES, USER_STATUS_CHOICES
 from reroute_business.main.models import YouTubeVideo
 try:
     # Optional: map gallery videos to interactive lessons when IDs match
@@ -1261,14 +1261,16 @@ def settings_view(request):
 
     # Profile settings data (private profile editor)
     try:
-        from reroute_business.resumes.models import Resume, Experience
+        from reroute_business.resumes.models import Resume
     except Exception:
         Resume = None
-        Experience = None
+    from reroute_business.profiles.models import ProfileExperience, ProfileCertification
+    import json
     resume = Resume.objects.filter(user=request.user).order_by("-created_at").first() if Resume else None
-    experiences = list(resume.experiences.all()) if resume else []
-    skills = list(profile.skills.all())
-    languages = list(profile.languages.all()) if hasattr(profile, "languages") else []
+    experiences = list(ProfileExperience.objects.filter(profile=profile))
+    certifications = list(ProfileCertification.objects.filter(profile=profile))
+    core_skills = list(getattr(profile, "core_skills", None) or [])
+    soft_skills = list(getattr(profile, "soft_skills", None) or [])
     email_change_allowed = True
 
     # Account preferences form (username, display name, status)
@@ -1277,7 +1279,6 @@ def settings_view(request):
         'username': request.user.username,
         'display_name': getattr(profile, 'preferred_name', '') or '',
         'status': getattr(profile, 'status', '') or '',
-        'ready_to_discuss_background': bool(getattr(profile, 'ready_to_discuss_background', False)),
     }
     account_prefs_form = AccountPreferencesForm(user=request.user, initial=initial_prefs)
     # Recovery options form (backup contact)
@@ -1288,6 +1289,104 @@ def settings_view(request):
     recovery_form = RecoveryOptionsForm(user=request.user, initial=recovery_initial)
 
     if request.method == 'POST':
+        if 'save_profile' in request.POST:
+            headline = (request.POST.get('headline') or '').strip()
+            location = (request.POST.get('location') or '').strip()
+            status = (request.POST.get('status') or '').strip()
+            about = (request.POST.get('about') or '').strip()
+            is_public = bool(request.POST.get('is_public'))
+            ready_flag = bool(request.POST.get('ready_to_discuss_background'))
+
+            def _load_json_list(raw):
+                try:
+                    data = json.loads(raw or "[]")
+                except Exception:
+                    data = []
+                return data if isinstance(data, list) else []
+
+            def _clean_list(items):
+                cleaned = []
+                seen = set()
+                for item in items:
+                    value = " ".join(str(item).split()).strip()
+                    if not value:
+                        continue
+                    key = value.lower()
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    cleaned.append(value)
+                return cleaned
+
+            core_items = _clean_list(_load_json_list(request.POST.get('core_skills_json')))
+            soft_items = _clean_list(_load_json_list(request.POST.get('soft_skills_json')))
+            exp_items = _load_json_list(request.POST.get('experiences_json'))
+            cert_items = _load_json_list(request.POST.get('certifications_json'))
+
+            profile.headline = headline
+            profile.location = location
+            profile.status = status
+            profile.bio = about
+            profile.is_public = is_public
+            profile.ready_to_discuss_background = ready_flag
+            profile.core_skills = core_items
+            profile.soft_skills = soft_items
+
+            avatar = request.FILES.get('profile_photo')
+            if avatar:
+                profile.profile_picture = avatar
+            profile.save()
+
+            if Resume and resume:
+                try:
+                    resume.headline = headline
+                    resume.save(update_fields=["headline"])
+                except Exception:
+                    pass
+
+            resume_file = request.FILES.get('resume_file')
+            if Resume and resume_file:
+                if not resume:
+                    resume = Resume.objects.create(user=request.user)
+                resume.file = resume_file
+                resume.save()
+
+            ProfileExperience.objects.filter(profile=profile).delete()
+            for idx, item in enumerate(exp_items):
+                if not isinstance(item, dict):
+                    continue
+                title = (item.get("title") or "").strip()
+                if not title:
+                    continue
+                highlights = _clean_list(item.get("highlights") or [])
+                ProfileExperience.objects.create(
+                    profile=profile,
+                    title=title,
+                    company=(item.get("company") or "").strip(),
+                    start_year=(item.get("start_year") or "").strip(),
+                    end_year=(item.get("end_year") or "").strip(),
+                    highlights=highlights,
+                    order=idx,
+                )
+
+            ProfileCertification.objects.filter(profile=profile).delete()
+            for idx, item in enumerate(cert_items):
+                if not isinstance(item, dict):
+                    continue
+                title = (item.get("title") or "").strip()
+                if not title:
+                    continue
+                ProfileCertification.objects.create(
+                    profile=profile,
+                    title=title,
+                    issuer=(item.get("issuer") or "").strip(),
+                    year=(item.get("year") or "").strip(),
+                    order=idx,
+                )
+
+            messages.success(request, "Profile updated.")
+            return redirect('settings')
+
         # Change Password
         if 'change_password' in request.POST:
             password_form = PasswordForm(request.user, request.POST)
@@ -1313,8 +1412,6 @@ def settings_view(request):
                 new_username = account_prefs_form.cleaned_data['username']
                 display_name = account_prefs_form.cleaned_data.get('display_name', '')
                 status = account_prefs_form.cleaned_data.get('status', '')
-                ready_flag = bool(account_prefs_form.cleaned_data.get('ready_to_discuss_background', False))
-
                 # Apply to models
                 if new_username and new_username != request.user.username:
                     request.user.username = new_username
@@ -1322,9 +1419,8 @@ def settings_view(request):
 
                 profile.preferred_name = display_name
                 profile.status = status
-                profile.ready_to_discuss_background = ready_flag
                 try:
-                    profile.save(update_fields=["preferred_name", "status", "ready_to_discuss_background"])
+                    profile.save(update_fields=["preferred_name", "status"])
                 except Exception:
                     profile.save()
 
@@ -1408,12 +1504,21 @@ def settings_view(request):
         'profile_gender': profile.gender or '',
         'profile_user_uid': str(profile.user_uid),
         'profile_bio': profile.bio or '',
-        'profile_skills': skills,
-        'profile_languages': languages,
+        'profile_headline': profile.headline or '',
+        'profile_location': profile.location or '',
+        'profile_status': profile.status or '',
+        'profile_about': profile.bio or '',
+        'profile_core_skills': core_skills,
+        'profile_soft_skills': soft_skills,
         'profile_experiences': experiences,
+        'profile_certifications': certifications,
+        'profile_is_public': bool(getattr(profile, "is_public", True)),
+        'profile_ready_to_discuss_background': bool(getattr(profile, "ready_to_discuss_background", False)),
+        'resume': resume,
         'profile_background_gradient': getattr(profile, "background_gradient", "") or "",
         'profile_gradients': PROFILE_GRADIENT_CHOICES,
         'gender_choices': GENDER_CHOICES,
+        'status_choices': USER_STATUS_CHOICES,
         'email_change_allowed': email_change_allowed,
     })
 

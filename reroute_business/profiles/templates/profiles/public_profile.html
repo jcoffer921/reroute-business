@@ -6,107 +6,376 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/public_profile.css' %}">
 
-<div class="public-profile" data-user="{{ viewed_user.username }}">
-  <section class="profile-hero gradient-{{ gradient_key }}"></section>
-
-  <section class="profile-content">
-    <div class="profile-card">
-      <div class="profile-grid">
-        <aside class="profile-col profile-col--left">
-          <div class="profile-identity">
-            <div class="profile-avatar">
-              <div class="profile-avatar__initials" aria-hidden="true">
-                {% if display_first or display_last %}
-                  {{ display_first|slice:':1' }}{{ display_last|slice:':1' }}
-                {% else %}
-                  {{ viewed_user.username|slice:':2' }}
-                {% endif %}
-              </div>
-            </div>
-            <h1 class="profile-name">{{ display_name }}</h1>
-            {% if profile.verified %}
-              <span class="hero-verified hero-verified--sm" title="Verified">Verified</span>
-            {% endif %}
-          </div>
-
-          <div class="profile-section">
-            <h2 class="profile-section-title">General</h2>
-            <div class="profile-info">
-              <div class="info-row">
-                <span class="label">Phone</span>
-                <span class="value">{{ profile.phone_number|default:"—" }}</span>
-              </div>
-              <div class="info-row">
-                <span class="label">Email</span>
-                <span class="value">{{ profile.personal_email|default:"—" }}</span>
-              </div>
-              <div class="info-row">
-                <span class="label">Gender</span>
-                <span class="value">{{ profile.gender|default:"—" }}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="profile-section">
-            <h2 class="profile-section-title">Languages</h2>
-            <div class="pill-row">
-              {% for language in languages %}
-                <span class="pill-chip">{{ language.name }}</span>
-              {% empty %}
-                <span class="muted">—</span>
-              {% endfor %}
-            </div>
-          </div>
-        </aside>
-
-        <div class="profile-col profile-col--right">
-          <div class="profile-section">
-            <h2 class="profile-section-title">Who Am I?</h2>
-            <div class="profile-body-text">
-              {% if profile.bio %}
-                {{ profile.bio|linebreaksbr }}
+<div class="public-profile" data-user="{{ viewed_user.username }}" data-bookmark-url="{% url 'profiles:bookmark_candidate' viewed_user.username %}">
+  <section class="profile-hero">
+    <div class="profile-hero-card">
+      <div class="hero-left">
+        <div class="profile-avatar">
+          {% if profile.profile_picture %}
+            <img src="{{ profile.profile_picture.url }}" alt="{{ display_name }} profile photo">
+          {% else %}
+            <span class="profile-avatar__initials" aria-hidden="true">
+              {% if display_first or display_last %}
+                {{ display_first|slice:':1' }}{{ display_last|slice:':1' }}
               {% else %}
-                <span class="muted">This user hasn't added a bio yet.</span>
+                {{ viewed_user.username|slice:':2' }}
               {% endif %}
-            </div>
+            </span>
+          {% endif %}
+          {% if profile.verified %}
+            <span class="verified-badge" title="Verified">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l7 3v6c0 4.4-3 8.4-7 9-4-0.6-7-4.6-7-9V5l7-3z"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          {% endif %}
+        </div>
+        <div class="hero-meta">
+          <h1 class="profile-name">{{ display_name }}</h1>
+          <p class="profile-headline">{{ headline }}</p>
+          <div class="hero-subline">
+            {% if status_label %}<span class="status-pill">{{ status_label }}</span>{% endif %}
+            {% if location_line %}<span class="hero-chip">{{ location_line }}</span>{% endif %}
+            <span class="hero-chip">Joined {{ viewed_user.date_joined|date:"F Y" }}</span>
           </div>
+        </div>
+      </div>
 
-          <div class="profile-section">
-            <h2 class="profile-section-title">Experience</h2>
-            <div class="experience-list">
-              {% for exp in experiences %}
-                <div class="experience-item">
-                  <div class="experience-header">
-                    <div class="experience-title">{{ exp.job_title }}</div>
-                    <div class="experience-company">{{ exp.company }}</div>
-                    <div class="experience-dates">
-                      {{ exp.start_date|date:"M Y" }}
-                      {% if exp.end_date %}— {{ exp.end_date|date:"M Y" }}{% elif exp.currently_work_here %}— Present{% endif %}
-                    </div>
-                  </div>
-                  {% if exp.description %}
-                    <p class="experience-desc">{{ exp.description }}</p>
-                  {% endif %}
-                </div>
-              {% empty %}
-                <div class="muted">No experience added yet.</div>
-              {% endfor %}
-            </div>
+      <div class="hero-right">
+        <div class="hero-actions">
+          {% if is_owner %}
+            <a class="btn btn-primary" href="{% url 'settings' %}?panel=profile">Edit Profile</a>
+          {% else %}
+            {% if can_invite %}
+              <button type="button" class="btn btn-primary invite-btn" data-candidate-id="{{ viewed_user.id }}" data-candidate-name="{{ display_name }}" {% if invite_sent or not active_jobs %}disabled{% endif %}>
+                {% if invite_sent %}Invite Sent{% else %}Invite to Job{% endif %}
+              </button>
+            {% endif %}
+            <button type="button" class="icon-btn bookmark-btn {% if is_saved %}is-saved{% endif %}" aria-pressed="{% if is_saved %}true{% else %}false{% endif %}" aria-label="Save candidate">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12a1 1 0 0 1 1 1v16l-7-4-7 4V5a1 1 0 0 1 1-1z"/></svg>
+            </button>
+          {% endif %}
+        </div>
+        <div class="metrics-row">
+          <div class="metric">
+            <span class="metric-label">Applications</span>
+            <span class="metric-value">{{ applications_count }}</span>
           </div>
-
-          <div class="profile-section">
-            <h2 class="profile-section-title">Skills</h2>
-            <div class="pill-row">
-              {% for skill in skills %}
-                <span class="pill-chip">{{ skill.name }}</span>
-              {% empty %}
-                <span class="muted">—</span>
-              {% endfor %}
-            </div>
+          <div class="metric">
+            <span class="metric-label">Interviews</span>
+            <span class="metric-value">{{ interviews_count }}</span>
           </div>
         </div>
       </div>
     </div>
   </section>
+
+  <section class="profile-sections">
+    <article class="profile-card">
+      <h2>About Me</h2>
+      {% if about_text %}
+        <p class="profile-body-text">{{ about_text|linebreaksbr }}</p>
+      {% else %}
+        <p class="muted">No summary added yet.</p>
+      {% endif %}
+      {% if profile.ready_to_discuss_background %}
+        <div class="ready-badge">Ready to Discuss My Background</div>
+      {% endif %}
+    </article>
+
+    <article class="profile-card">
+      <h2>Skills &amp; Strengths</h2>
+      <div class="skills-group">
+        <h3>Core Skills</h3>
+        <div class="pill-row">
+          {% for skill in core_skills %}
+            <span class="pill-chip pill-chip--dark">{{ skill }}</span>
+          {% empty %}
+            <span class="muted">No core skills listed yet.</span>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="skills-group">
+        <h3>Soft Skills</h3>
+        <div class="pill-row">
+          {% for skill in soft_skills %}
+            <span class="pill-chip pill-chip--light">{{ skill }}</span>
+          {% empty %}
+            <span class="muted">No soft skills listed yet.</span>
+          {% endfor %}
+        </div>
+      </div>
+    </article>
+
+    <article class="profile-card">
+      <h2>Work Experience</h2>
+      <div class="timeline">
+        {% for exp in experiences %}
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">{{ exp.title|default:exp.job_title }}</div>
+              <div class="timeline-meta">
+                {% if exp.company %}{{ exp.company }}{% endif %}
+                {% if exp.start_year or exp.start_date or exp.end_year or exp.end_date %}
+                  <span class="timeline-dates">
+                    {% if exp.start_year %}{{ exp.start_year }}{% elif exp.start_date %}{{ exp.start_date|date:"Y" }}{% endif %}
+                    {% if exp.end_year or exp.end_date %} — {% if exp.end_year %}{{ exp.end_year }}{% elif exp.end_date %}{{ exp.end_date|date:"Y" }}{% endif %}{% endif %}
+                    {% if exp.currently_work_here %} — Present{% endif %}
+                  </span>
+                {% endif %}
+              </div>
+              {% if exp.highlights %}
+                <ul class="timeline-highlights">
+                  {% for highlight in exp.highlights %}
+                    <li>{{ highlight }}</li>
+                  {% endfor %}
+                </ul>
+              {% elif exp.description %}
+                <p class="profile-body-text">{{ exp.description }}</p>
+              {% endif %}
+            </div>
+          </div>
+        {% empty %}
+          <p class="muted">No experience added yet.</p>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="profile-card">
+      <h2>Certifications &amp; Training</h2>
+      <div class="cert-grid">
+        {% for cert in certifications %}
+          <div class="cert-card">
+            <div class="cert-title">{{ cert.title }}</div>
+            {% if cert.issuer %}<div class="cert-issuer">{{ cert.issuer }}</div>{% endif %}
+            {% if cert.year %}<div class="cert-year">{{ cert.year }}</div>{% endif %}
+          </div>
+        {% empty %}
+          <p class="muted">No certifications listed yet.</p>
+        {% endfor %}
+      </div>
+      {% if resume %}
+        {% if is_owner or is_employer_view %}
+          <div class="resume-actions">
+            {% if is_owner %}
+              <a class="btn btn-secondary" href="{% url 'resumes:resume_preview' resume.id %}" target="_blank" rel="noopener">View Resume</a>
+              <a class="btn btn-outline" href="{% url 'resumes:download_resume' resume.id %}">Download Resume</a>
+            {% else %}
+              <a class="btn btn-secondary" href="{% url 'resumes:employer_view_resume' viewed_user.username %}" target="_blank" rel="noopener">View Resume</a>
+              <a class="btn btn-outline" href="{% url 'resumes:employer_download_resume' viewed_user.username %}">Download Resume</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endif %}
+    </article>
+  </section>
+
+  <div class="toast" role="status" aria-live="polite" aria-hidden="true" data-toast>Saved</div>
+
+  {% if can_invite %}
+    <div class="modal-backdrop hidden" data-invite-backdrop></div>
+    <div class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="inviteModalTitle" data-invite-modal>
+      <div class="modal-content invite-modal">
+        <button class="modal-close" type="button" data-invite-close aria-label="Close">x</button>
+        <h3 id="inviteModalTitle">Invite candidate</h3>
+        <form class="edit-form" data-invite-form>
+          {% csrf_token %}
+          <input type="hidden" name="candidate_id" value="" data-invite-candidate>
+          <p class="muted" data-invite-subhead></p>
+          <p>
+            <label for="inviteJob">Active Job Listing</label>
+            <select id="inviteJob" name="job_id" required>
+              <option value="">Select a job</option>
+              {% for job in active_jobs %}
+                <option value="{{ job.id }}">{{ job.title }}</option>
+              {% endfor %}
+            </select>
+          </p>
+          <p>
+            <label for="inviteMessage">Message (optional)</label>
+            <textarea id="inviteMessage" name="message" rows="3" placeholder="Introduce your team and role..."></textarea>
+          </p>
+          <div class="form-error" data-invite-error hidden>Unable to send invitation. Please try again.</div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" data-invite-cancel>Cancel</button>
+            <button type="submit" class="btn btn-primary" data-invite-submit>
+              <span class="btn-spinner" aria-hidden="true"></span>
+              Send Invitation
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+(() => {
+  const root = document.querySelector('.public-profile');
+  if (!root) return;
+
+  const toast = document.querySelector('[data-toast]');
+  const bookmarkBtn = document.querySelector('.bookmark-btn');
+  const bookmarkUrl = root.dataset.bookmarkUrl;
+
+  if (bookmarkBtn && bookmarkUrl) {
+    const csrfToken = (() => {
+      const match = document.cookie.match(/csrftoken=([^;]+)/);
+      return match ? match[1] : '';
+    })();
+
+    bookmarkBtn.addEventListener('click', async () => {
+      bookmarkBtn.disabled = true;
+      try {
+        const res = await fetch(bookmarkUrl, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': csrfToken },
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error('Bookmark failed');
+        bookmarkBtn.classList.toggle('is-saved', !!data.saved);
+        bookmarkBtn.setAttribute('aria-pressed', data.saved ? 'true' : 'false');
+        if (toast) {
+          toast.textContent = data.saved ? 'Saved candidate' : 'Removed bookmark';
+          toast.classList.add('is-visible');
+          toast.setAttribute('aria-hidden', 'false');
+          setTimeout(() => {
+            toast.classList.remove('is-visible');
+            toast.setAttribute('aria-hidden', 'true');
+          }, 2400);
+        }
+      } catch (err) {
+        if (toast) {
+          toast.textContent = 'Unable to save candidate.';
+          toast.classList.add('is-visible');
+          toast.setAttribute('aria-hidden', 'false');
+          setTimeout(() => {
+            toast.classList.remove('is-visible');
+            toast.setAttribute('aria-hidden', 'true');
+          }, 2400);
+        }
+      } finally {
+        bookmarkBtn.disabled = false;
+      }
+    });
+  }
+
+  const modal = document.querySelector('[data-invite-modal]');
+  const backdrop = document.querySelector('[data-invite-backdrop]');
+  const openBtn = document.querySelector('.invite-btn');
+  const closeBtn = document.querySelector('[data-invite-close]');
+  const cancelBtn = document.querySelector('[data-invite-cancel]');
+  const form = document.querySelector('[data-invite-form]');
+  const candidateInput = document.querySelector('[data-invite-candidate]');
+  const subhead = document.querySelector('[data-invite-subhead]');
+  const titleEl = document.getElementById('inviteModalTitle');
+  const errorBox = document.querySelector('[data-invite-error]');
+  const submitBtn = document.querySelector('[data-invite-submit]');
+  let lastFocused = null;
+
+  function openModal(name, id) {
+    if (!modal || !backdrop) return;
+    lastFocused = document.activeElement;
+    candidateInput.value = id;
+    if (titleEl) titleEl.textContent = `Invite ${name} to a Job`;
+    subhead.textContent = 'Select an active job listing to send an invitation.';
+    modal.classList.remove('hidden');
+    backdrop.classList.remove('hidden');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    const focusable = modal.querySelector('select, textarea, button');
+    if (focusable) focusable.focus();
+  }
+
+  function closeModal() {
+    if (!modal || !backdrop) return;
+    modal.classList.add('hidden');
+    backdrop.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+    if (errorBox) errorBox.hidden = true;
+    if (form) form.reset();
+    if (lastFocused) lastFocused.focus();
+  }
+
+  function trapFocus(e) {
+    if (!modal || modal.classList.contains('hidden')) return;
+    if (e.key !== 'Tab') return;
+    const focusable = modal.querySelectorAll('button, [href], select, textarea');
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      last.focus();
+      e.preventDefault();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      first.focus();
+      e.preventDefault();
+    }
+  }
+
+  if (openBtn) {
+    openBtn.addEventListener('click', () => {
+      openModal(openBtn.dataset.candidateName, openBtn.dataset.candidateId);
+    });
+  }
+  closeBtn?.addEventListener('click', closeModal);
+  cancelBtn?.addEventListener('click', closeModal);
+  backdrop?.addEventListener('click', closeModal);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+    trapFocus(e);
+  });
+
+  const csrfToken = (() => {
+    const match = document.cookie.match(/csrftoken=([^;]+)/);
+    return match ? match[1] : '';
+  })();
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (errorBox) errorBox.hidden = true;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.classList.add('is-loading');
+    }
+
+    const formData = new FormData(form);
+    try {
+      const res = await fetch('{% url "dashboard:employer_send_invitation" %}', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrfToken },
+        body: formData,
+      });
+      if (!res.ok) throw new Error('Invite failed');
+      const data = await res.json();
+      if (!data.ok) throw new Error('Invite failed');
+      if (openBtn) {
+        openBtn.textContent = 'Invite Sent';
+        openBtn.disabled = true;
+        openBtn.classList.remove('btn-primary');
+        openBtn.classList.add('btn-secondary');
+      }
+      closeModal();
+      if (toast) {
+        toast.textContent = 'Invitation sent';
+        toast.classList.add('is-visible');
+        toast.setAttribute('aria-hidden', 'false');
+        setTimeout(() => {
+          toast.classList.remove('is-visible');
+          toast.setAttribute('aria-hidden', 'true');
+        }, 2400);
+      }
+    } catch (err) {
+      if (errorBox) errorBox.hidden = false;
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('is-loading');
+      }
+    }
+  });
+})();
+</script>
 {% endblock %}

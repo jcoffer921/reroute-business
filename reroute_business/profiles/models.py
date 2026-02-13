@@ -49,6 +49,14 @@ class UserProfile(models.Model):
     state = models.CharField(max_length=100, blank=True)
     zip_code = models.CharField(max_length=20, blank=True)
     bio = models.TextField(blank=True)
+    headline = models.CharField(max_length=160, blank=True)
+    location = models.CharField(max_length=160, blank=True)
+    is_public = models.BooleanField(
+        default=True,
+        help_text="Allow employers/reentry orgs to view this profile.",
+    )
+    core_skills = JSONField(default=list, blank=True, null=True)
+    soft_skills = JSONField(default=list, blank=True, null=True)
 
     # --- Step 2: Additional Info ---
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
@@ -211,6 +219,36 @@ class UserProfile(models.Model):
         ordering = ['user_uid']
         verbose_name = "User Profile"
         verbose_name_plural = "User Profiles"
+
+
+class ProfileExperience(models.Model):
+    profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="experiences")
+    title = models.CharField(max_length=120)
+    company = models.CharField(max_length=120, blank=True)
+    start_year = models.CharField(max_length=4, blank=True)
+    end_year = models.CharField(max_length=4, blank=True)
+    highlights = JSONField(default=list, blank=True, null=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "-start_year", "-end_year", "id"]
+
+    def __str__(self) -> str:
+        return f"{self.title} at {self.company}".strip()
+
+
+class ProfileCertification(models.Model):
+    profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="certifications")
+    title = models.CharField(max_length=200)
+    issuer = models.CharField(max_length=200, blank=True)
+    year = models.CharField(max_length=4, blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "-year", "id"]
+
+    def __str__(self) -> str:
+        return f"{self.title} ({self.issuer})".strip()
 
 
 class EmployerProfile(models.Model):

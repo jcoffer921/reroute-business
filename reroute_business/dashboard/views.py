@@ -862,8 +862,8 @@ def employer_browse_returning_citizens(request):
         display_name = (profile.preferred_name or f"{display_first} {display_last}".strip() or user.username)
         initials = ''.join([part[0] for part in display_name.split()[:2] if part]).upper() or user.username[:1].upper()
 
-        headline = ''
-        if resume:
+        headline = (getattr(profile, "headline", "") or "").strip()
+        if not headline and resume:
             headline = (resume.headline or resume.summary or '').strip()
         if not headline:
             headline = "Motivated candidate"
@@ -889,11 +889,12 @@ def employer_browse_returning_citizens(request):
 
         skills_count = len(skill_names)
 
-        location_line = ''
-        if profile.city or profile.state:
-            location_line = f"{profile.city or ''}{', ' if profile.city and profile.state else ''}{profile.state or ''}".strip(', ')
-        elif profile.zip_code:
-            location_line = profile.zip_code
+        location_line = (getattr(profile, "location", "") or "").strip()
+        if not location_line:
+            if profile.city or profile.state:
+                location_line = f"{profile.city or ''}{', ' if profile.city and profile.state else ''}{profile.state or ''}".strip(', ')
+            elif profile.zip_code:
+                location_line = profile.zip_code
 
         status_label = profile.get_status_display() if profile.status else "Status not set"
 
@@ -1097,7 +1098,11 @@ def notifications_view(request):
         Q(target_group=Notification.TARGET_EMPLOYERS if is_emp else Notification.TARGET_SEEKERS)
     )
     notes = Notification.objects.filter(Q(user=request.user) | bcast).order_by('-created_at', '-id')
-    return render(request, 'dashboard/notifications.html', { 'notifications': notes })
+    unread_count = Notification.objects.filter(user=request.user, is_read=False).count()
+    return render(request, 'dashboard/notifications.html', {
+        'notifications': notes,
+        'unread_count': unread_count,
+    })
 
 
 # =========================

@@ -165,3 +165,19 @@ class JobInvitation(models.Model):
 
     def __str__(self):
         return f"Invitation({self.employer.username} -> {self.candidate.username} for {self.job.title})"
+
+
+class SavedCandidate(models.Model):
+    saved_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='saved_candidates')
+    candidate = models.ForeignKey(User, on_delete=models.CASCADE, related_name='saved_by_employers')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('saved_by', 'candidate')
+        ordering = ['-created_at', '-id']
+        indexes = [
+            models.Index(fields=['saved_by', 'candidate']),
+        ]
+
+    def __str__(self):
+        return f"{self.saved_by.username} saved {self.candidate.username}"
