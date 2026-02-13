@@ -42,7 +42,9 @@ urlpatterns = [
     path('employer/applications/<int:app_id>/status/', views.employer_application_update_status, name='employer_application_update_status'),
     path('employer/applications/<int:app_id>/notes/', views.employer_application_update_notes, name='employer_application_update_notes'),
     path('employer/company-profile/', views.employer_company_profile, name='employer_company_profile'),
+    path('employer/browse-returning-citizens/', views.employer_browse_returning_citizens, name='employer_browse_returning_citizens'),
     path('employer/fair-chance-guide/', views.employer_fair_chance_guide, name='employer_fair_chance_guide'),
+    path('employer/invite/', views.employer_send_invitation, name='employer_send_invitation'),
 
     # ===== Employer job management =====
     path('employer/job/<int:job_id>/toggle/', views.employer_job_toggle, name='employer_job_toggle'),

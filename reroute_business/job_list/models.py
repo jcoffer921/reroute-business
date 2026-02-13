@@ -139,3 +139,29 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.applicant.username} applied to {self.job.title}"
+
+
+class JobInvitation(models.Model):
+    """Employer-initiated invitation for a candidate to apply to a job."""
+    STATUS_SENT = 'sent'
+    STATUS_CHOICES = [
+        (STATUS_SENT, 'Sent'),
+    ]
+
+    employer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='job_invitations_sent')
+    candidate = models.ForeignKey(User, on_delete=models.CASCADE, related_name='job_invitations_received')
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='job_invitations')
+    message = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_SENT)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('employer', 'candidate', 'job')
+        ordering = ['-created_at', '-id']
+        indexes = [
+            models.Index(fields=['employer', 'candidate']),
+            models.Index(fields=['employer', 'job']),
+        ]
+
+    def __str__(self):
+        return f"Invitation({self.employer.username} -> {self.candidate.username} for {self.job.title})"

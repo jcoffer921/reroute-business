@@ -41,6 +41,12 @@
           </span>
           Company Profile
         </a>
+        <a class="sidebar-link {% if active == 'employer_browse_returning_citizens' %}is-active{% endif %}" href="{% url 'dashboard:employer_browse_returning_citizens' %}">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M3 20c0-4 3-6 6-6"/><circle cx="17" cy="10" r="3"/><path d="M14 20c0-3 2-5 5-5"/></svg>
+          </span>
+          Browse Returning Citizens
+        </a>
         <a class="sidebar-link {% if active == 'employer_fair_chance_guide' %}is-active{% endif %}" href="{% url 'dashboard:employer_fair_chance_guide' %}">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M4 4h14a2 2 0 0 1 2 2v12"/><path d="M4 6v14a2 2 0 0 0 2 2h14"/></svg>

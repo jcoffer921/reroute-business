@@ -86,6 +86,12 @@ class UserProfile(models.Model):
         help_text="User-defined status reflecting their current journey.",
     )
 
+    # --- Visibility controls ---
+    ready_to_discuss_background = models.BooleanField(
+        default=False,
+        help_text="User-controlled toggle for employers to see readiness to discuss background.",
+    )
+
     # --- Onboarding (early access) ---
     ONBOARDING_STEP_CHOICES = [
         ("start", "Start"),

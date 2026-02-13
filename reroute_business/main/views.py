@@ -1277,6 +1277,7 @@ def settings_view(request):
         'username': request.user.username,
         'display_name': getattr(profile, 'preferred_name', '') or '',
         'status': getattr(profile, 'status', '') or '',
+        'ready_to_discuss_background': bool(getattr(profile, 'ready_to_discuss_background', False)),
     }
     account_prefs_form = AccountPreferencesForm(user=request.user, initial=initial_prefs)
     # Recovery options form (backup contact)
@@ -1312,6 +1313,7 @@ def settings_view(request):
                 new_username = account_prefs_form.cleaned_data['username']
                 display_name = account_prefs_form.cleaned_data.get('display_name', '')
                 status = account_prefs_form.cleaned_data.get('status', '')
+                ready_flag = bool(account_prefs_form.cleaned_data.get('ready_to_discuss_background', False))
 
                 # Apply to models
                 if new_username and new_username != request.user.username:
@@ -1320,8 +1322,9 @@ def settings_view(request):
 
                 profile.preferred_name = display_name
                 profile.status = status
+                profile.ready_to_discuss_background = ready_flag
                 try:
-                    profile.save(update_fields=["preferred_name", "status"])
+                    profile.save(update_fields=["preferred_name", "status", "ready_to_discuss_background"])
                 except Exception:
                     profile.save()
 

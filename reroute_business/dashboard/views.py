@@ -13,6 +13,7 @@ from django.contrib import messages
 from django.db.models import Q, Count
 from django.http import JsonResponse
 from django.urls import reverse
+from django.core.paginator import Paginator
 
 
 
@@ -175,11 +176,31 @@ def user_dashboard(request):
                 if job_skills:
                     overlap = len(user_skills & job_skills)
                     percent = int(round(100 * overlap / max(1, len(job_skills))))
-                suggested_cards.append({"job": job, "match": percent})
+                suggested_cards.append({"job": job, "match": percent, "source": "matched"})
         else:
-            suggested_cards = [{"job": j, "match": None} for j in (suggested_jobs or [])]
+            suggested_cards = [{"job": j, "match": None, "source": "matched"} for j in (suggested_jobs or [])]
     except Exception:
-        suggested_cards = [{"job": j, "match": None} for j in (suggested_jobs or [])]
+        suggested_cards = [{"job": j, "match": None, "source": "matched"} for j in (suggested_jobs or [])]
+
+    # Invitations: surface as "Invited to Apply"
+    invited_cards = []
+    try:
+        from reroute_business.job_list.models import JobInvitation
+        invited_qs = (
+            JobInvitation.objects
+            .filter(candidate=request.user, job__is_active=True)
+            .select_related('job')
+            .order_by('-created_at')
+        )
+        invited_cards = [{"job": inv.job, "match": None, "source": "invited"} for inv in invited_qs]
+    except Exception:
+        invited_cards = []
+
+    if invited_cards:
+        invited_job_ids = {c['job'].id for c in invited_cards}
+        suggested_cards = invited_cards + [c for c in suggested_cards if c['job'].id not in invited_job_ids]
+
+    has_invites = any(c.get('source') == 'invited' for c in suggested_cards)
 
     # Friendly join date string
     joined_date = request.user.date_joined.strftime("%b %d, %Y") if request.user.date_joined else None
@@ -342,6 +363,7 @@ def user_dashboard(request):
         'joined_date': joined_date,
         'suggested_jobs': suggested_jobs,
         'suggested_cards': suggested_cards,
+        'has_invites': has_invites,
         'notifications': notifications,
         'stats': {
             'applications_sent': applications_sent,
@@ -736,6 +758,227 @@ def employer_company_profile(request):
 @login_required
 def employer_fair_chance_guide(request):
     return render(request, 'dashboard/employer_fair_chance_guide.html')
+
+
+@login_required
+def employer_browse_returning_citizens(request):
+    if not is_employer(request.user):
+        messages.error(request, "You do not have access to that page.")
+        return redirect('dashboard:my_dashboard')
+
+    from reroute_business.job_list.models import Job, JobInvitation
+    try:
+        from reroute_business.resumes.models import Resume
+    except Exception:
+        Resume = None
+
+    active_jobs = Job.objects.filter(employer=request.user, is_active=True).order_by('-created_at')
+
+    profiles_qs = (
+        UserProfile.objects.select_related('user')
+        .prefetch_related('skills')
+        .filter(account_status='active', user__is_active=True)
+        .exclude(user=request.user)
+        .filter(user__employerprofile__isnull=True)
+        .exclude(user__groups__name__in=['Employer', 'Employers'])
+    )
+
+    search = (request.GET.get('q') or '').strip()
+    status = (request.GET.get('status') or '').strip()
+    location = (request.GET.get('location') or '').strip()
+    skill = (request.GET.get('skill') or '').strip()
+    cert = (request.GET.get('cert') or '').strip()
+    invited_filter = (request.GET.get('invited') or '').strip()
+    ready_only = (request.GET.get('ready') or '').strip()
+
+    if status:
+        profiles_qs = profiles_qs.filter(status=status)
+    if ready_only in {'1', 'true', 'yes', 'on'}:
+        profiles_qs = profiles_qs.filter(ready_to_discuss_background=True)
+    if location:
+        profiles_qs = profiles_qs.filter(
+            Q(city__icontains=location) |
+            Q(state__icontains=location) |
+            Q(zip_code__icontains=location) |
+            Q(street_address__icontains=location)
+        )
+    if search:
+        profiles_qs = profiles_qs.filter(
+            Q(user__first_name__icontains=search) |
+            Q(user__last_name__icontains=search) |
+            Q(user__username__icontains=search) |
+            Q(preferred_name__icontains=search) |
+            Q(city__icontains=search) |
+            Q(state__icontains=search) |
+            Q(zip_code__icontains=search) |
+            Q(skills__name__icontains=search) |
+            Q(user__resume_resumes__skills__name__icontains=search)
+        )
+    if skill:
+        profiles_qs = profiles_qs.filter(
+            Q(skills__name__icontains=skill) |
+            Q(user__resume_resumes__skills__name__icontains=skill)
+        )
+    if cert and Resume:
+        resume_user_ids = Resume.objects.filter(certifications__icontains=cert).values_list('user_id', flat=True)
+        profiles_qs = profiles_qs.filter(user_id__in=resume_user_ids)
+
+    profiles_qs = profiles_qs.distinct()
+
+    invited_ids = set(
+        JobInvitation.objects.filter(employer=request.user).values_list('candidate_id', flat=True)
+    )
+    if invited_filter == 'invited':
+        profiles_qs = profiles_qs.filter(user_id__in=invited_ids)
+    elif invited_filter == 'not_invited':
+        profiles_qs = profiles_qs.exclude(user_id__in=invited_ids)
+
+    profiles_qs = profiles_qs.order_by('user__first_name', 'user__last_name', 'user__username')
+
+    paginator = Paginator(profiles_qs, 12)
+    page_number = request.GET.get('page') or 1
+    page_obj = paginator.get_page(page_number)
+
+    profiles = list(page_obj.object_list)
+    user_ids = [p.user_id for p in profiles]
+
+    resume_by_user = {}
+    if Resume and user_ids:
+        resumes = (
+            Resume.objects.filter(user_id__in=user_ids)
+            .order_by('user_id', '-created_at')
+            .prefetch_related('skills', 'experiences', 'experience_entries')
+        )
+        for res in resumes:
+            if res.user_id not in resume_by_user:
+                resume_by_user[res.user_id] = res
+
+    candidates = []
+    for profile in profiles:
+        user = profile.user
+        resume = resume_by_user.get(profile.user_id)
+        display_first = (profile.firstname or user.first_name or '').strip()
+        display_last = (profile.lastname or user.last_name or '').strip()
+        display_name = (profile.preferred_name or f"{display_first} {display_last}".strip() or user.username)
+        initials = ''.join([part[0] for part in display_name.split()[:2] if part]).upper() or user.username[:1].upper()
+
+        headline = ''
+        if resume:
+            headline = (resume.headline or resume.summary or '').strip()
+        if not headline:
+            headline = "Motivated candidate"
+
+        bio = (profile.bio or (resume.summary if resume else '') or '').strip()
+
+        skills_qs = list(profile.skills.all())
+        if not skills_qs and resume:
+            skills_qs = list(resume.skills.all())
+        skill_names = [s.name for s in skills_qs if getattr(s, 'name', '').strip()]
+        skills_display = skill_names[:4]
+        skills_more = max(0, len(skill_names) - len(skills_display))
+
+        roles_count = 0
+        certs_count = 0
+        if resume:
+            try:
+                roles_count = resume.experiences.count() + resume.experience_entries.count()
+            except Exception:
+                roles_count = 0
+            certs_raw = (resume.certifications or '').splitlines()
+            certs_count = len([ln for ln in certs_raw if ln.strip()])
+
+        skills_count = len(skill_names)
+
+        location_line = ''
+        if profile.city or profile.state:
+            location_line = f"{profile.city or ''}{', ' if profile.city and profile.state else ''}{profile.state or ''}".strip(', ')
+        elif profile.zip_code:
+            location_line = profile.zip_code
+
+        status_label = profile.get_status_display() if profile.status else "Status not set"
+
+        candidates.append({
+            'id': user.id,
+            'username': user.username,
+            'display_name': display_name,
+            'initials': initials,
+            'profile_picture': profile.profile_picture.url if profile.profile_picture else '',
+            'headline': headline,
+            'status_label': status_label,
+            'location': location_line,
+            'bio': bio,
+            'skills': skills_display,
+            'skills_more': skills_more,
+            'roles_count': roles_count,
+            'certs_count': certs_count,
+            'skills_count': skills_count,
+            'ready_to_discuss_background': bool(getattr(profile, 'ready_to_discuss_background', False)),
+            'invited': user.id in invited_ids,
+        })
+
+    return render(request, 'dashboard/employer_browse_returning_citizens.html', {
+        'candidates': candidates,
+        'active_jobs': active_jobs,
+        'total_candidates': paginator.count,
+        'page_obj': page_obj,
+        'filters': {
+            'q': search,
+            'status': status,
+            'location': location,
+            'skill': skill,
+            'cert': cert,
+            'invited': invited_filter,
+            'ready': ready_only,
+        },
+        'status_choices': UserProfile._meta.get_field('status').choices,
+    })
+
+
+@login_required
+@require_POST
+def employer_send_invitation(request):
+    if not is_employer(request.user):
+        return _json_err({'permission': 'Not allowed.'}, status=403)
+
+    from django.contrib.auth.models import User
+    from reroute_business.job_list.models import Job, JobInvitation
+    try:
+        candidate_id = int(request.POST.get('candidate_id') or 0)
+        job_id = int(request.POST.get('job_id') or 0)
+    except (TypeError, ValueError):
+        candidate_id = 0
+        job_id = 0
+
+    if not candidate_id or not job_id:
+        return _json_err({'fields': 'Candidate and job are required.'}, status=400)
+
+    job = Job.objects.filter(id=job_id, employer=request.user, is_active=True).first()
+    if not job:
+        return _json_err({'job': 'Please select an active job listing.'}, status=400)
+
+    candidate = User.objects.filter(id=candidate_id, is_active=True).first()
+    if not candidate:
+        return _json_err({'candidate': 'Candidate not found.'}, status=404)
+
+    # Ensure candidate is not an employer
+    try:
+        if hasattr(candidate, 'employerprofile') and candidate.employerprofile:
+            return _json_err({'candidate': 'Cannot invite employer accounts.'}, status=400)
+    except Exception:
+        pass
+
+    if JobInvitation.objects.filter(employer=request.user, candidate=candidate, job=job).exists():
+        return _json_err({'duplicate': 'Invitation already sent.'}, status=409)
+
+    message = (request.POST.get('message') or '').strip()
+    invite = JobInvitation.objects.create(
+        employer=request.user,
+        candidate=candidate,
+        job=job,
+        message=message,
+    )
+
+    return _json_ok({'invitation_id': invite.id})
 
 
 @login_required

@@ -200,6 +200,13 @@ class AccountPreferencesForm(forms.Form):
             "class": "input-small",
         })
     )
+    ready_to_discuss_background = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            "class": "toggle-input",
+        }),
+        label="Ready to Discuss Background",
+    )
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)

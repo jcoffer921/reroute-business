@@ -96,6 +96,34 @@
   margin-bottom: 1.5rem;
 }
 
+.toggle-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  cursor: pointer;
+}
+
+.toggle-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+}
+
+.toggle-copy {
+  display: grid;
+  gap: 4px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.toggle-copy .input-help {
+  font-weight: 400;
+  color: #6b7280;
+}
+
 .input-label {
   font-weight: 600;
   color: #1f2937;

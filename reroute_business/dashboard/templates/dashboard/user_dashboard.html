@@ -100,7 +100,7 @@
       </div>
     </div>
 
-    {% if not jobs_live %}
+    {% if not jobs_live and not has_invites %}
     <div class="jobs-placeholder">
       <div class="jobs-placeholder-icon">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -130,6 +130,11 @@
       <div class="carousel-track" data-slider-track>
         {% for item in suggested_cards %}
           <article class="job-card">
+            {% if item.source == 'invited' %}
+              <span class="job-badge job-badge--invited">Invited to Apply</span>
+            {% else %}
+              <span class="job-badge">Matched</span>
+            {% endif %}
             <div>
               <p class="job-location">{{ item.job.location|default:"Location flexible" }}</p>
               <h3>{{ item.job.title }}</h3>

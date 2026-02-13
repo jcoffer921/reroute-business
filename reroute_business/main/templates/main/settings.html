@@ -393,6 +393,15 @@
             <label for="id_status">Employment Status</label>
             {{ account_prefs_form.status }}
           </div>
+          <div class="form-group">
+            <label class="toggle-row" for="id_ready_to_discuss_background">
+              {{ account_prefs_form.ready_to_discuss_background }}
+              <span class="toggle-copy">
+                Ready to Discuss Background
+                <span class="input-help">Only shown to employers when enabled.</span>
+              </span>
+            </label>
+          </div>
           <button type="submit" name="update_account_prefs" class="btn-primary btn-pill">Save Preferences</button>
         </form>
       </div>

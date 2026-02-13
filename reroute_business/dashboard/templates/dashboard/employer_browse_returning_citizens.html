@@ -1,0 +1,374 @@
+{% extends "dashboard/employer_base.html" %}
+{% load static %}
+
+{% block title %}Browse Returning Citizens{% endblock %}
+{% block body_class %}employer-dashboard employer-browse{% endblock %}
+{% block page_title %}Browse Returning Citizens{% endblock %}
+
+{% block employer_content %}
+<section class="browse-hero">
+  <div class="browse-title-row">
+    <span class="browse-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" focusable="false"><circle cx="10" cy="9" r="4"/><path d="M3 20c0-4 3-6 7-6"/><circle cx="18" cy="11" r="3"/><path d="M15 20c0-3 2-5 5-5"/></svg>
+    </span>
+    <div>
+      <h1>Browse Returning Citizens</h1>
+      <p class="muted">Connect with motivated candidates ready for their next opportunity</p>
+    </div>
+  </div>
+</section>
+
+<section class="browse-controls">
+  {% if not active_jobs %}
+  <div class="status-banner" role="status">
+    <strong>No active job listings yet.</strong> Post or activate a job to send invitations.
+  </div>
+  {% endif %}
+
+  <form class="browse-filter-form" method="get" action="{% url 'dashboard:employer_browse_returning_citizens' %}" data-browse-form>
+    <div class="search-row">
+      <span class="search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      </span>
+      <input
+        type="text"
+        name="q"
+        value="{{ filters.q }}"
+        placeholder="Search by name, skills, or location..."
+        aria-label="Search by name, skills, or location"
+      >
+      <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+
+    <div class="filter-grid">
+      <div class="filter-field">
+        <label for="filter-status">Status</label>
+        <select id="filter-status" name="status">
+          {% for value, label in status_choices %}
+            <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filter-field">
+        <label for="filter-location">Location</label>
+        <input id="filter-location" type="text" name="location" value="{{ filters.location }}" placeholder="City, state, or ZIP">
+      </div>
+      <div class="filter-field">
+        <label for="filter-skill">Skills</label>
+        <input id="filter-skill" type="text" name="skill" value="{{ filters.skill }}" placeholder="e.g., forklift">
+      </div>
+      <div class="filter-field">
+        <label for="filter-cert">Certifications</label>
+        <input id="filter-cert" type="text" name="cert" value="{{ filters.cert }}" placeholder="e.g., OSHA">
+      </div>
+      <div class="filter-field">
+        <label for="filter-invited">Invitation Status</label>
+        <select id="filter-invited" name="invited">
+          <option value="" {% if not filters.invited %}selected{% endif %}>All</option>
+          <option value="invited" {% if filters.invited == 'invited' %}selected{% endif %}>Invited</option>
+          <option value="not_invited" {% if filters.invited == 'not_invited' %}selected{% endif %}>Not Invited</option>
+        </select>
+      </div>
+      <label class="filter-toggle">
+        <input type="checkbox" name="ready" value="1" {% if filters.ready %}checked{% endif %}>
+        <span>Ready to Discuss Background</span>
+      </label>
+    </div>
+  </form>
+
+  <p class="results-count">{{ total_candidates }} candidate(s) found</p>
+</section>
+
+<section class="browse-results" data-results-wrap>
+  <div class="skeleton-grid" data-skeleton-grid hidden>
+    {% for _ in '123456' %}
+    <div class="skeleton-card">
+      <div class="skeleton-avatar"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line short"></div>
+      <div class="skeleton-pill"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-stats"></div>
+      <div class="skeleton-btn"></div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if candidates %}
+  <div class="candidate-grid" data-candidate-grid>
+    {% for candidate in candidates %}
+    <article class="candidate-card {% if candidate.invited %}is-invited{% endif %}" data-profile-url="{% url 'profiles:public_profile' candidate.username %}">
+      <div class="candidate-header">
+        <div class="candidate-avatar">
+          {% if candidate.profile_picture %}
+            <img src="{{ candidate.profile_picture }}" alt="{{ candidate.display_name }}">
+          {% else %}
+            <span class="candidate-initials">{{ candidate.initials }}</span>
+          {% endif %}
+        </div>
+        <div class="candidate-title">
+          <a class="candidate-name" href="{% url 'profiles:public_profile' candidate.username %}">{{ candidate.display_name }}</a>
+          <p class="candidate-headline" title="{{ candidate.headline }}">{{ candidate.headline }}</p>
+          <span class="status-pill">{{ candidate.status_label }}</span>
+          {% if candidate.location %}
+          <p class="candidate-location">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-7.2 7-12a7 7 0 0 0-14 0c0 4.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            {{ candidate.location }}
+          </p>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if candidate.bio %}
+      <p class="candidate-bio">{{ candidate.bio|truncatechars:120 }}</p>
+      {% endif %}
+
+      <div class="skill-row">
+        {% for skill in candidate.skills %}
+          <span class="skill-pill">{{ skill }}</span>
+        {% endfor %}
+        {% if candidate.skills_more > 0 %}
+          <span class="skill-pill skill-pill--more">+{{ candidate.skills_more }} more</span>
+        {% endif %}
+      </div>
+
+      <div class="stats-row">
+        <div>
+          <span class="stat-value">{{ candidate.roles_count }}</span>
+          <span class="stat-label">Roles</span>
+        </div>
+        <div>
+          <span class="stat-value">{{ candidate.certs_count }}</span>
+          <span class="stat-label">Certs</span>
+        </div>
+        <div>
+          <span class="stat-value">{{ candidate.skills_count }}</span>
+          <span class="stat-label">Skills</span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="btn invite-btn {% if candidate.invited %}btn-secondary{% else %}btn-primary{% endif %}"
+        data-candidate-id="{{ candidate.id }}"
+        data-candidate-name="{{ candidate.display_name }}"
+        {% if candidate.invited or not active_jobs %}disabled{% endif %}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l18-8-7 18-3-7-8-3z"/><path d="M11 13l4-4"/></svg>
+        {% if candidate.invited %}Invite Sent{% else %}Send Job Invitation{% endif %}
+      </button>
+
+      {% if candidate.ready_to_discuss_background %}
+      <p class="ready-flag">
+        <span aria-hidden="true">*</span>
+        Ready to Discuss Background
+      </p>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <p>No candidates found. Try adjusting your filters.</p>
+  </div>
+  {% endif %}
+</section>
+
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+<nav class="pagination" aria-label="Candidate pages">
+  {% if page_obj.has_previous %}
+    <a class="page-link" href="?{% if filters.q %}q={{ filters.q|urlencode }}&{% endif %}{% if filters.status %}status={{ filters.status }}&{% endif %}{% if filters.location %}location={{ filters.location|urlencode }}&{% endif %}{% if filters.skill %}skill={{ filters.skill|urlencode }}&{% endif %}{% if filters.cert %}cert={{ filters.cert|urlencode }}&{% endif %}{% if filters.invited %}invited={{ filters.invited }}&{% endif %}{% if filters.ready %}ready={{ filters.ready }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+  {% endif %}
+  <span class="page-count">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+    <a class="page-link" href="?{% if filters.q %}q={{ filters.q|urlencode }}&{% endif %}{% if filters.status %}status={{ filters.status }}&{% endif %}{% if filters.location %}location={{ filters.location|urlencode }}&{% endif %}{% if filters.skill %}skill={{ filters.skill|urlencode }}&{% endif %}{% if filters.cert %}cert={{ filters.cert|urlencode }}&{% endif %}{% if filters.invited %}invited={{ filters.invited }}&{% endif %}{% if filters.ready %}ready={{ filters.ready }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+  {% endif %}
+</nav>
+{% endif %}
+
+<div class="toast" role="status" aria-live="polite" aria-hidden="true" data-toast>Invitation sent</div>
+
+<div class="modal-backdrop hidden" data-invite-backdrop></div>
+<div class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="inviteModalTitle" data-invite-modal>
+  <div class="modal-content invite-modal">
+    <button class="modal-close" type="button" data-invite-close aria-label="Close">x</button>
+    <h3 id="inviteModalTitle">Invite candidate</h3>
+    <form class="edit-form" data-invite-form>
+      {% csrf_token %}
+      <input type="hidden" name="candidate_id" value="" data-invite-candidate>
+      <p class="muted" data-invite-subhead></p>
+      <p>
+        <label for="inviteJob">Active Job Listing</label>
+        <select id="inviteJob" name="job_id" required>
+          <option value="">Select a job</option>
+          {% for job in active_jobs %}
+            <option value="{{ job.id }}">{{ job.title }}</option>
+          {% endfor %}
+        </select>
+      </p>
+      <p>
+        <label for="inviteMessage">Message (optional)</label>
+        <textarea id="inviteMessage" name="message" rows="3" placeholder="Introduce your team and role..."></textarea>
+      </p>
+      <div class="form-error" data-invite-error hidden>Unable to send invitation. Please try again.</div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" data-invite-cancel>Cancel</button>
+        <button type="submit" class="btn btn-primary" data-invite-submit>
+          <span class="btn-spinner" aria-hidden="true"></span>
+          Send Invitation
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+(() => {
+  const modal = document.querySelector('[data-invite-modal]');
+  const backdrop = document.querySelector('[data-invite-backdrop]');
+  const openButtons = document.querySelectorAll('.invite-btn');
+  const closeBtn = document.querySelector('[data-invite-close]');
+  const cancelBtn = document.querySelector('[data-invite-cancel]');
+  const form = document.querySelector('[data-invite-form]');
+  const candidateInput = document.querySelector('[data-invite-candidate]');
+  const subhead = document.querySelector('[data-invite-subhead]');
+  const titleEl = document.getElementById('inviteModalTitle');
+  const errorBox = document.querySelector('[data-invite-error]');
+  const submitBtn = document.querySelector('[data-invite-submit]');
+  const toast = document.querySelector('[data-toast]');
+  const browseForm = document.querySelector('[data-browse-form]');
+  const skeletonGrid = document.querySelector('[data-skeleton-grid]');
+  const candidateGrid = document.querySelector('[data-candidate-grid]');
+  let lastFocused = null;
+  const planeSvg = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l18-8-7 18-3-7-8-3z"/><path d="M11 13l4-4"/></svg>';
+
+  function openModal(name, id) {
+    if (!modal || !backdrop) return;
+    lastFocused = document.activeElement;
+    candidateInput.value = id;
+    if (titleEl) titleEl.textContent = `Invite ${name} to a Job`;
+    subhead.textContent = 'Select an active job listing to send an invitation.';
+    modal.classList.remove('hidden');
+    backdrop.classList.remove('hidden');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    const focusable = modal.querySelector('select, textarea, button');
+    if (focusable) focusable.focus();
+  }
+
+  function closeModal() {
+    if (!modal || !backdrop) return;
+    modal.classList.add('hidden');
+    backdrop.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+    errorBox.hidden = true;
+    form.reset();
+    if (lastFocused) lastFocused.focus();
+  }
+
+  function trapFocus(e) {
+    if (!modal || modal.classList.contains('hidden')) return;
+    if (e.key !== 'Tab') return;
+    const focusable = modal.querySelectorAll('button, [href], select, textarea');
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      last.focus();
+      e.preventDefault();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      first.focus();
+      e.preventDefault();
+    }
+  }
+
+  openButtons.forEach(btn => {
+    if (btn.disabled) return;
+    btn.addEventListener('click', () => {
+      openModal(btn.dataset.candidateName, btn.dataset.candidateId);
+    });
+  });
+
+  closeBtn?.addEventListener('click', closeModal);
+  cancelBtn?.addEventListener('click', closeModal);
+  backdrop?.addEventListener('click', closeModal);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+    trapFocus(e);
+  });
+
+  const csrfToken = (() => {
+    const match = document.cookie.match(/csrftoken=([^;]+)/);
+    return match ? match[1] : '';
+  })();
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorBox.hidden = true;
+    submitBtn.disabled = true;
+    submitBtn.classList.add('is-loading');
+
+    const formData = new FormData(form);
+    try {
+      const res = await fetch('{% url "dashboard:employer_send_invitation" %}', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrfToken },
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error('Invite failed');
+      }
+
+      const data = await res.json();
+      if (!data.ok) throw new Error('Invite failed');
+
+      const cardBtn = document.querySelector(`.invite-btn[data-candidate-id="${candidateInput.value}"]`);
+      if (cardBtn) {
+        cardBtn.innerHTML = `${planeSvg}Invite Sent`;
+        cardBtn.disabled = true;
+        cardBtn.classList.remove('btn-primary');
+        cardBtn.classList.add('btn-secondary');
+        const card = cardBtn.closest('.candidate-card');
+        if (card) card.classList.add('is-invited');
+      }
+
+      closeModal();
+      if (toast) {
+        toast.textContent = 'Invitation sent';
+        toast.classList.add('is-visible');
+        toast.setAttribute('aria-hidden', 'false');
+        setTimeout(() => {
+          toast.classList.remove('is-visible');
+          toast.setAttribute('aria-hidden', 'true');
+        }, 2400);
+      }
+    } catch (err) {
+      errorBox.hidden = false;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('is-loading');
+    }
+  });
+
+  if (browseForm) {
+    browseForm.addEventListener('submit', () => {
+      if (skeletonGrid) skeletonGrid.hidden = false;
+      if (candidateGrid) candidateGrid.classList.add('is-loading');
+    });
+  }
+
+  document.querySelectorAll('.candidate-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('button') || e.target.closest('a')) return;
+      const url = card.dataset.profileUrl;
+      if (url) window.location.href = url;
+    });
+  });
+})();
+</script>
+{% endblock %}
