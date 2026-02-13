@@ -9,59 +9,90 @@
 <div class="public-profile" data-user="{{ viewed_user.username }}" data-bookmark-url="{% url 'profiles:bookmark_candidate' viewed_user.username %}">
   <section class="profile-hero">
     <div class="profile-hero-card">
-      <div class="hero-left">
-        <div class="profile-avatar">
-          {% if profile.profile_picture %}
-            <img src="{{ profile.profile_picture.url }}" alt="{{ display_name }} profile photo">
-          {% else %}
-            <span class="profile-avatar__initials" aria-hidden="true">
-              {% if display_first or display_last %}
-                {{ display_first|slice:':1' }}{{ display_last|slice:':1' }}
-              {% else %}
-                {{ viewed_user.username|slice:':2' }}
+      <div class="hero-top">
+        <div class="hero-left">
+          <div class="profile-avatar">
+            {% if profile.profile_picture %}
+              <img src="{{ profile.profile_picture.url }}" alt="{{ display_name }} profile photo">
+            {% else %}
+              <span class="profile-avatar__initials" aria-hidden="true">
+                {% if display_first or display_last %}
+                  {{ display_first|slice:':1' }}{{ display_last|slice:':1' }}
+                {% else %}
+                  {{ viewed_user.username|slice:':2' }}
+                {% endif %}
+              </span>
+            {% endif %}
+            {% if profile.verified %}
+              <span class="verified-badge" title="Verified">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l7 3v6c0 4.4-3 8.4-7 9-4-0.6-7-4.6-7-9V5l7-3z"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+            {% endif %}
+          </div>
+          <div class="hero-meta">
+            <h1 class="profile-name">{{ display_name }}</h1>
+            <p class="profile-headline">{{ headline }}</p>
+            <div class="hero-subline">
+              {% if status_label %}
+                <span class="status-pill">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 20.3l-5.2-5.2a7.5 7.5 0 1 0-1.4 1.4L20.3 22zM10.5 17a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13z"/></svg>
+                  {{ status_label }}
+                </span>
               {% endif %}
-            </span>
-          {% endif %}
-          {% if profile.verified %}
-            <span class="verified-badge" title="Verified">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l7 3v6c0 4.4-3 8.4-7 9-4-0.6-7-4.6-7-9V5l7-3z"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-          {% endif %}
+              {% if location_line %}
+                <span class="hero-chip">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg>
+                  {{ location_line }}
+                </span>
+              {% endif %}
+              <span class="hero-chip">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-4 4h-4v4h4v-4Z"/></svg>
+                Joined {{ viewed_user.date_joined|date:"F Y" }}
+              </span>
+            </div>
+          </div>
         </div>
-        <div class="hero-meta">
-          <h1 class="profile-name">{{ display_name }}</h1>
-          <p class="profile-headline">{{ headline }}</p>
-          <div class="hero-subline">
-            {% if status_label %}<span class="status-pill">{{ status_label }}</span>{% endif %}
-            {% if location_line %}<span class="hero-chip">{{ location_line }}</span>{% endif %}
-            <span class="hero-chip">Joined {{ viewed_user.date_joined|date:"F Y" }}</span>
+
+        <div class="hero-right">
+          <div class="hero-actions">
+            {% if is_owner %}
+              <a class="btn btn-outline" href="{% url 'settings' %}?panel=profile">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16v4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13 6l4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                Edit Profile
+              </a>
+            {% else %}
+              {% if can_invite %}
+                <button type="button" class="btn btn-primary invite-btn" data-candidate-id="{{ viewed_user.id }}" data-candidate-name="{{ display_name }}" {% if invite_sent or not active_jobs %}disabled{% endif %}>
+                  {% if invite_sent %}Invite Sent{% else %}Invite to Job{% endif %}
+                </button>
+              {% endif %}
+              <button type="button" class="icon-btn bookmark-btn {% if is_saved %}is-saved{% endif %}" aria-pressed="{% if is_saved %}true{% else %}false{% endif %}" aria-label="Save candidate">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12a1 1 0 0 1 1 1v16l-7-4-7 4V5a1 1 0 0 1 1-1z"/></svg>
+              </button>
+            {% endif %}
           </div>
         </div>
       </div>
 
-      <div class="hero-right">
-        <div class="hero-actions">
-          {% if is_owner %}
-            <a class="btn btn-primary" href="{% url 'settings' %}?panel=profile">Edit Profile</a>
-          {% else %}
-            {% if can_invite %}
-              <button type="button" class="btn btn-primary invite-btn" data-candidate-id="{{ viewed_user.id }}" data-candidate-name="{{ display_name }}" {% if invite_sent or not active_jobs %}disabled{% endif %}>
-                {% if invite_sent %}Invite Sent{% else %}Invite to Job{% endif %}
-              </button>
-            {% endif %}
-            <button type="button" class="icon-btn bookmark-btn {% if is_saved %}is-saved{% endif %}" aria-pressed="{% if is_saved %}true{% else %}false{% endif %}" aria-label="Save candidate">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12a1 1 0 0 1 1 1v16l-7-4-7 4V5a1 1 0 0 1 1-1z"/></svg>
-            </button>
-          {% endif %}
-        </div>
-        <div class="metrics-row">
-          <div class="metric">
-            <span class="metric-label">Applications</span>
+      <div class="hero-divider"></div>
+
+      <div class="metrics-row">
+        <div class="metric">
+          <span class="metric-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l18-8-7 18-3-7-8-3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M11 13l4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <div>
             <span class="metric-value">{{ applications_count }}</span>
+            <span class="metric-label">Applications</span>
           </div>
-          <div class="metric">
-            <span class="metric-label">Interviews</span>
+        </div>
+        <div class="metric">
+          <span class="metric-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-4 4h-4v4h4v-4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          </span>
+          <div>
             <span class="metric-value">{{ interviews_count }}</span>
+            <span class="metric-label">Interviews</span>
           </div>
         </div>
       </div>
@@ -70,19 +101,32 @@
 
   <section class="profile-sections">
     <article class="profile-card">
-      <h2>About Me</h2>
+      <div class="section-header">
+        <span class="section-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        </span>
+        <h2>About Me</h2>
+      </div>
       {% if about_text %}
         <p class="profile-body-text">{{ about_text|linebreaksbr }}</p>
       {% else %}
         <p class="muted">No summary added yet.</p>
       {% endif %}
       {% if profile.ready_to_discuss_background %}
-        <div class="ready-badge">Ready to Discuss My Background</div>
+        <div class="ready-badge">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.5 5 5.5.8-4 3.9.9 5.4L12 14.9 7.1 17l.9-5.4-4-3.9 5.5-.8L12 2z" fill="currentColor"/></svg>
+          Ready to Discuss My Background
+        </div>
       {% endif %}
     </article>
 
     <article class="profile-card">
-      <h2>Skills &amp; Strengths</h2>
+      <div class="section-header">
+        <span class="section-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        </span>
+        <h2>Skills &amp; Strengths</h2>
+      </div>
       <div class="skills-group">
         <h3>Core Skills</h3>
         <div class="pill-row">
@@ -106,7 +150,12 @@
     </article>
 
     <article class="profile-card">
-      <h2>Work Experience</h2>
+      <div class="section-header">
+        <span class="section-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2h3a2 2 0 0 1 2 2v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8a2 2 0 0 1 2-2h3Zm2 0h4V4h-4v2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        </span>
+        <h2>Work Experience</h2>
+      </div>
       <div class="timeline">
         {% for exp in experiences %}
           <div class="timeline-item">
@@ -114,7 +163,7 @@
             <div class="timeline-content">
               <div class="timeline-title">{{ exp.title|default:exp.job_title }}</div>
               <div class="timeline-meta">
-                {% if exp.company %}{{ exp.company }}{% endif %}
+                {% if exp.company %}<span class="timeline-company">{{ exp.company }}</span>{% endif %}
                 {% if exp.start_year or exp.start_date or exp.end_year or exp.end_date %}
                   <span class="timeline-dates">
                     {% if exp.start_year %}{{ exp.start_year }}{% elif exp.start_date %}{{ exp.start_date|date:"Y" }}{% endif %}
@@ -141,13 +190,27 @@
     </article>
 
     <article class="profile-card">
-      <h2>Certifications &amp; Training</h2>
+      <div class="section-header">
+        <span class="section-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 7 4v6c0 4 5 6.5 5 6.5s5-2.5 5-6.5V4l-5-2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m10 14-3 6 5-3 5 3-3-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        </span>
+        <h2>Certifications &amp; Training</h2>
+      </div>
       <div class="cert-grid">
         {% for cert in certifications %}
           <div class="cert-card">
-            <div class="cert-title">{{ cert.title }}</div>
-            {% if cert.issuer %}<div class="cert-issuer">{{ cert.issuer }}</div>{% endif %}
-            {% if cert.year %}<div class="cert-year">{{ cert.year }}</div>{% endif %}
+            <div class="cert-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 7 4v6c0 4 5 6.5 5 6.5s5-2.5 5-6.5V4l-5-2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m10 14-3 6 5-3 5 3-3-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div class="cert-title">{{ cert.title }}</div>
+              {% if cert.issuer or cert.year %}
+                <div class="cert-meta">
+                  {% if cert.issuer %}{{ cert.issuer }}{% endif %}
+                  {% if cert.year %}<span>· {{ cert.year }}</span>{% endif %}
+                </div>
+              {% endif %}
+            </div>
           </div>
         {% empty %}
           <p class="muted">No certifications listed yet.</p>
