@@ -143,12 +143,22 @@ def public_profile_view(request, username: str):
 
     applications_count = 0
     interviews_count = 0
+    profile_views_count = 0
     try:
         from reroute_business.job_list.models import Application
         applications_count = Application.objects.filter(applicant=target_user).count()
         interviews_count = Application.objects.filter(applicant=target_user, status="interview").count()
     except Exception:
         pass
+    if is_owner:
+        try:
+            from reroute_business.core.models import AnalyticsEvent
+            profile_views_count = AnalyticsEvent.objects.filter(
+                event_type="profile_view",
+                metadata__viewed_user=target_user.username,
+            ).count()
+        except Exception:
+            profile_views_count = 0
 
     active_jobs = []
     if viewer_is_employer:
@@ -201,6 +211,7 @@ def public_profile_view(request, username: str):
             "status_label": status_label,
             "applications_count": applications_count,
             "interviews_count": interviews_count,
+            "profile_views_count": profile_views_count,
             "gradient_key": gradient_key,
             "is_owner": is_owner,
             "is_employer_view": viewer_is_employer,

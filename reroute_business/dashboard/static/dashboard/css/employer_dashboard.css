@@ -523,9 +523,17 @@ body.employer-dashboard {
   gap: 12px;
 }
 
+.modal .edit-form.edit-form-flush {
+  padding: 0;
+}
+
 .modal .edit-form label {
   font-weight: 700;
   color: var(--rr-ink);
+}
+
+.modal-title-flush {
+  margin-top: 0;
 }
 
 .form-actions {

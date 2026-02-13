@@ -32,7 +32,7 @@
           <div class="hero-meta">
             <h1 class="profile-name">{{ display_name }}</h1>
             <p class="profile-headline">{{ headline }}</p>
-            <div class="hero-subline">
+            <div class="hero-status-row">
               {% if status_label %}
                 <span class="status-pill">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 20.3l-5.2-5.2a7.5 7.5 0 1 0-1.4 1.4L20.3 22zM10.5 17a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13z"/></svg>
@@ -40,12 +40,14 @@
                 </span>
               {% endif %}
               {% if location_line %}
-                <span class="hero-chip">
+                <span class="location-item">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg>
                   {{ location_line }}
                 </span>
               {% endif %}
-              <span class="hero-chip">
+            </div>
+            <div class="hero-joined-row">
+              <span class="joined-item">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-4 4h-4v4h4v-4Z"/></svg>
                 Joined {{ viewed_user.date_joined|date:"F Y" }}
               </span>
@@ -61,14 +63,16 @@
                 Edit Profile
               </a>
             {% else %}
-              {% if can_invite %}
+              {% if is_employer_view or is_reentry_view %}
+                {% if can_invite %}
                 <button type="button" class="btn btn-primary invite-btn" data-candidate-id="{{ viewed_user.id }}" data-candidate-name="{{ display_name }}" {% if invite_sent or not active_jobs %}disabled{% endif %}>
                   {% if invite_sent %}Invite Sent{% else %}Invite to Job{% endif %}
                 </button>
+                {% endif %}
+                <button type="button" class="icon-btn bookmark-btn {% if is_saved %}is-saved{% endif %}" aria-pressed="{% if is_saved %}true{% else %}false{% endif %}" aria-label="Save candidate">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12a1 1 0 0 1 1 1v16l-7-4-7 4V5a1 1 0 0 1 1-1z"/></svg>
+                </button>
               {% endif %}
-              <button type="button" class="icon-btn bookmark-btn {% if is_saved %}is-saved{% endif %}" aria-pressed="{% if is_saved %}true{% else %}false{% endif %}" aria-label="Save candidate">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12a1 1 0 0 1 1 1v16l-7-4-7 4V5a1 1 0 0 1 1-1z"/></svg>
-              </button>
             {% endif %}
           </div>
         </div>
@@ -95,6 +99,17 @@
             <span class="metric-label">Interviews</span>
           </div>
         </div>
+        {% if is_owner %}
+          <div class="metric">
+            <span class="metric-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6-10-6-10-6Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </span>
+            <div>
+              <span class="metric-value">{{ profile_views_count }}</span>
+              <span class="metric-label">Profile Views</span>
+            </div>
+          </div>
+        {% endif %}
       </div>
     </div>
   </section>

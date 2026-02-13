@@ -191,8 +191,8 @@
 <div id="scheduleInterviewModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="scheduleInterviewTitle">
   <div class="modal-content">
     <button class="modal-close" id="scheduleInterviewClose" aria-label="Close">x</button>
-    <h3 id="scheduleInterviewTitle" style="margin-top:0;">Schedule Interview</h3>
-    <form method="post" action="{% url 'dashboard:schedule_interview' %}" class="edit-form" style="padding:0;">
+    <h3 id="scheduleInterviewTitle" class="modal-title-flush">Schedule Interview</h3>
+    <form method="post" action="{% url 'dashboard:schedule_interview' %}" class="edit-form edit-form-flush">
       {% csrf_token %}
       <p>
         <label for="jobSelect">Job</label>
@@ -227,8 +227,8 @@
 <div id="rescheduleInterviewModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="rescheduleInterviewTitle">
   <div class="modal-content">
     <button class="modal-close" id="rescheduleInterviewClose" aria-label="Close">x</button>
-    <h3 id="rescheduleInterviewTitle" style="margin-top:0;">Reschedule Interview</h3>
-    <form method="post" action="{% url 'dashboard:reschedule_interview' %}" class="edit-form" style="padding:0;">
+    <h3 id="rescheduleInterviewTitle" class="modal-title-flush">Reschedule Interview</h3>
+    <form method="post" action="{% url 'dashboard:reschedule_interview' %}" class="edit-form edit-form-flush">
       {% csrf_token %}
       <input type="hidden" id="rescheduleInterviewId" name="interview_id" value="">
       <p>

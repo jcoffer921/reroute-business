@@ -663,7 +663,6 @@
 /* step 0 .. 10 → overlay .35..0.95 and translateY 0 .. -20px */
 /* Overlay */
 /* Using multiple classes for clarity */
-@for $i from 0 through 0 {}
 .about-mission.mission-step-0  .mission-overlay{ background: rgba(255,255,255,.35); }
 .about-mission.mission-step-1  .mission-overlay{ background: rgba(255,255,255,.41); }
 .about-mission.mission-step-2  .mission-overlay{ background: rgba(255,255,255,.47); }
