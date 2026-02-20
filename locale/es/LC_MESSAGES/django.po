@@ -424,7 +424,7 @@ msgstr ""
 #: .\reroute_business\main\templates\main\home.html:172
 #: .\reroute_business\venv\Lib\site-packages\django\db\models\fields\__init__.py:1920
 msgid "Email address"
-msgstr ""
+msgstr "Dirección de correo electrónico"
 
 #: .\env\Lib\site-packages\django\db\models\fields\__init__.py:1945
 #: .\reroute_business\env\Lib\site-packages\django\db\models\fields\__init__.py:1945
@@ -1568,7 +1568,7 @@ msgstr ""
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:5
 msgid "Benefit Finder | ReRoute"
-msgstr ""
+msgstr "Buscador de Beneficios | ReRoute"
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:16
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:17
@@ -1578,16 +1578,18 @@ msgstr ""
 #: .\reroute_business\main\templates\base.html:188
 #: .\reroute_business\main\templates\main\home.html:103
 msgid "Benefit Finder"
-msgstr ""
+msgstr "Buscador de Beneficios"
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:18
 msgid ""
 "Answer a few questions to find programs and benefits you may qualify for."
 msgstr ""
+"Responde algunas preguntas para encontrar programas y beneficios para los que "
+"podrías calificar."
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:23
 msgid "Question 1 of 10"
-msgstr ""
+msgstr "Pregunta 1 de 10"
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:28
 #: .\reroute_business\main\templates\main\settings.html:555
@@ -1597,128 +1599,139 @@ msgstr "Modo de bajo consumo de datos"
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:43
 msgid "Back"
-msgstr ""
+msgstr "Atrás"
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:51
 msgid "Save and finish later"
-msgstr ""
+msgstr "Guardar y terminar después"
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:53
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:136
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:138
 msgid "Next"
-msgstr ""
+msgstr "Siguiente"
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:56
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:110
 msgid "ReRoute provides guidance only and does not determine eligibility."
-msgstr ""
+msgstr "ReRoute solo brinda orientación y no determina elegibilidad."
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:66
 msgid ""
 "Getting support is a strength. These programs exist to help you stabilize "
 "and move forward."
 msgstr ""
+"Buscar apoyo es una fortaleza. Estos programas existen para ayudarte a "
+"estabilizarte y avanzar."
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:70
 msgid "Your ReRoute Action Plan"
-msgstr ""
+msgstr "Tu Plan de Acción ReRoute"
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:71
 msgid ""
 "Based on your answers, here are programs and next steps that may help you."
 msgstr ""
+"Según tus respuestas, aquí tienes programas y próximos pasos que pueden "
+"ayudarte."
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:75
 msgid "Personalized Checklist"
-msgstr ""
+msgstr "Lista Personalizada"
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:80
 msgid "Recommended For You"
-msgstr ""
+msgstr "Recomendado para Ti"
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:87
 msgid "Download / Print My Plan"
-msgstr ""
+msgstr "Descargar / Imprimir Mi Plan"
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:91
 msgid "Browse Resources Near Me"
-msgstr ""
+msgstr "Explorar Recursos Cerca de Mí"
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:95
 msgid "Get Help From a Reentry Org"
-msgstr ""
+msgstr "Obtener Ayuda de una Organización de Reingreso"
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:100
 msgid "Sources & Information"
-msgstr ""
+msgstr "Fuentes e Información"
 
 #: .\reroute_business\benefit_finder\templates\benefit_finder\wizard.html:101
 msgid ""
 "Information compiled from Philadelphia city resources, 211 database, and "
 "verified partner organizations."
 msgstr ""
+"Información recopilada de recursos de la ciudad de Filadelfia, la base de "
+"datos 211 y organizaciones aliadas verificadas."
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:5
 msgid "User Dashboard"
-msgstr ""
+msgstr "Panel de Usuario"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:14
 msgid "EARLY ACCESS"
-msgstr ""
+msgstr "ACCESO TEMPRANO"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:15
 #, python-format
 msgid "Welcome back, %(name)s"
-msgstr ""
+msgstr "Bienvenido de nuevo, %(name)s"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:16
 msgid "You're making real progress"
-msgstr ""
+msgstr "Estás logrando un progreso real"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:17
 msgid ""
 "Employers are onboarding now. Keep going, you're building something that "
 "matters."
 msgstr ""
+"Los empleadores se están incorporando ahora. Sigue adelante, estás "
+"construyendo algo que importa."
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:35
 msgid "Your Progress"
-msgstr ""
+msgstr "Tu Progreso"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:37
 msgid "Every step forward counts. You're building momentum."
-msgstr ""
+msgstr "Cada paso cuenta. Estás construyendo impulso."
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:43
 msgid "Profile"
-msgstr ""
+msgstr "Perfil"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:78
 msgid "A THOUGHT FOR TODAY"
-msgstr ""
+msgstr "UN PENSAMIENTO PARA HOY"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:84
 msgid "Start with what you know"
-msgstr ""
+msgstr "Empieza con lo que sabes"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:85
 msgid ""
 "Your life experience is valuable. Skills like communication, leadership, and "
 "problem-solving come from many places — not just previous jobs."
 msgstr ""
+"Tu experiencia de vida es valiosa. Habilidades como comunicación, liderazgo "
+"y resolución de problemas vienen de muchos lugares, no solo de empleos "
+"anteriores."
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:86
 msgid "Next thought"
-msgstr ""
+msgstr "Siguiente pensamiento"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:100
 msgid "Job Opportunities"
-msgstr ""
+msgstr "Oportunidades Laborales"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:112
 msgid "Jobs are launching soon"
-msgstr ""
+msgstr "Los empleos se lanzarán pronto"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:113
 msgid ""
@@ -1726,126 +1739,131 @@ msgid ""
 "you're doing now puts you ahead — when opportunities go live, you'll be "
 "among the first to see them."
 msgstr ""
+"Los empleadores inclusivos se están preparando para publicar vacantes. La "
+"preparación que haces ahora te pone adelante; cuando se activen las "
+"oportunidades, estarás entre las primeras personas en verlas."
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:118
 msgid "You're on the list"
-msgstr ""
+msgstr "Ya estás en la lista"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:118
 msgid "Notify me when jobs are live"
-msgstr ""
+msgstr "Avísame cuando los empleos estén activos"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:125
 msgid "Hand-picked opportunities based on your profile"
-msgstr ""
+msgstr "Oportunidades seleccionadas según tu perfil"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:127
 msgid "Scroll jobs left"
-msgstr ""
+msgstr "Desplazar empleos a la izquierda"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:128
 msgid "Scroll jobs right"
-msgstr ""
+msgstr "Desplazar empleos a la derecha"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:135
 msgid "Invited to Apply"
-msgstr ""
+msgstr "Invitado a postular"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:137
 msgid "Matched"
-msgstr ""
+msgstr "Coincide contigo"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:140
 msgid "Location flexible"
-msgstr ""
+msgstr "Ubicación flexible"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:144
 msgid "View job"
-msgstr ""
+msgstr "Ver empleo"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:147
 msgid "More roles are on the way. Check back soon."
-msgstr ""
+msgstr "Más vacantes vienen en camino. Vuelve pronto."
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:155
 msgid "Notifications on"
-msgstr ""
+msgstr "Notificaciones activadas"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:155
 msgid "Notify me when matched with jobs"
-msgstr ""
+msgstr "Avísame cuando tenga coincidencias laborales"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:158
 msgid "View all jobs"
-msgstr ""
+msgstr "Ver todos los empleos"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:165
 msgid "Applications"
-msgstr ""
+msgstr "Postulaciones"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:166
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:170
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:174
 msgid "Coming soon"
-msgstr ""
+msgstr "Próximamente"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:169
 msgid "Interviews"
-msgstr ""
+msgstr "Entrevistas"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:173
 msgid "Matches"
-msgstr ""
+msgstr "Coincidencias"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:188
 msgid "Organizations Near You"
-msgstr ""
+msgstr "Organizaciones Cerca de Ti"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:206
 msgid "Multiple locations"
-msgstr ""
+msgstr "Varias ubicaciones"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:207
 msgid "Support"
-msgstr ""
+msgstr "Apoyo"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:213
 msgid ""
 "We're working to onboard reentry organizations in your area. Recommendations "
 "will be based on your ZIP or city."
 msgstr ""
+"Estamos trabajando para incorporar organizaciones de reingreso en tu zona. "
+"Las recomendaciones se basarán en tu código postal o ciudad."
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:214
 msgid "Browse organizations"
-msgstr ""
+msgstr "Explorar organizaciones"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:229
 msgid "Recommended Modules"
-msgstr ""
+msgstr "Módulos Recomendados"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:247
 msgid "Keep building your skills with this module."
-msgstr ""
+msgstr "Sigue fortaleciendo tus habilidades con este módulo."
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:251
 msgid "Open module"
-msgstr ""
+msgstr "Abrir módulo"
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:255
 msgid "Learning recommendations will appear here once modules are available."
-msgstr ""
+msgstr "Las recomendaciones de aprendizaje aparecerán aquí cuando haya módulos disponibles."
 
 #: .\reroute_business\dashboard\templates\dashboard\user_dashboard.html:256
 msgid "Browse modules"
-msgstr ""
+msgstr "Explorar módulos"
 
 #: .\reroute_business\main\templates\account\email_confirm.html:5
 msgid "Confirm E-mail Address"
-msgstr ""
+msgstr "Confirmar dirección de correo"
 
 #: .\reroute_business\main\templates\account\email_confirm.html:12
 msgid "Confirm your email"
-msgstr ""
+msgstr "Confirma tu correo electrónico"
 
 #: .\reroute_business\main\templates\account\email_confirm.html:16
 #, python-format
@@ -1855,14 +1873,18 @@ msgid ""
 "account.\n"
 "      "
 msgstr ""
+"\n"
+"        Por favor confirma que <strong>%(email)s</strong> pertenece a tu "
+"cuenta.\n"
+"      "
 
 #: .\reroute_business\main\templates\account\email_confirm.html:23
 msgid "Confirm email"
-msgstr ""
+msgstr "Confirmar correo"
 
 #: .\reroute_business\main\templates\account\email_confirm.html:27
 msgid "This confirmation link is invalid or has expired."
-msgstr ""
+msgstr "Este enlace de confirmación no es válido o ha expirado."
 
 #: .\reroute_business\main\templates\account\email_confirm.html:31
 #, python-format
@@ -1870,313 +1892,318 @@ msgid ""
 "Please request a new verification link from <a "
 "href=\"%(resend_url)s\">Resend verification</a>."
 msgstr ""
+"Solicita un nuevo enlace de verificación desde <a "
+"href=\"%(resend_url)s\">Reenviar verificación</a>."
 
 #: .\reroute_business\main\templates\account\email_confirm.html:36
-#, fuzzy
-#| msgid "Back to Settings"
 msgid "Back to Login"
-msgstr "Volver a Configuración"
+msgstr "Volver al inicio de sesión"
 
 #: .\reroute_business\main\templates\base.html:9
 #: .\reroute_business\main\templates\main\home.html:5
 msgid "ReRoute | Home"
-msgstr ""
+msgstr "ReRoute | Inicio"
 
 #: .\reroute_business\main\templates\base.html:21
 #: .\reroute_business\main\templates\base.html:110
 #: .\reroute_business\main\templates\base.html:163
 msgid "ReRoute Logo"
-msgstr ""
+msgstr "Logo de ReRoute"
 
 #: .\reroute_business\main\templates\base.html:28
 #: .\reroute_business\main\templates\base.html:121
 #: .\reroute_business\main\templates\base.html:186
 msgid "Home"
-msgstr ""
+msgstr "Inicio"
 
 #: .\reroute_business\main\templates\base.html:29
 #: .\reroute_business\main\templates\base.html:187
 msgid "About"
-msgstr ""
+msgstr "Nosotros"
 
 #: .\reroute_business\main\templates\base.html:31
 #: .\reroute_business\main\templates\base.html:119
 #: .\reroute_business\main\templates\base.html:189
 msgid "Journal"
-msgstr ""
+msgstr "Diario"
 
 #: .\reroute_business\main\templates\base.html:33
 #: .\reroute_business\main\templates\base.html:65
 #: .\reroute_business\main\templates\base.html:173
 #: .\reroute_business\main\templates\base.html:191
 msgid "Dashboard"
-msgstr ""
+msgstr "Panel"
 
 #: .\reroute_business\main\templates\base.html:35
 #: .\reroute_business\main\templates\base.html:174
 #: .\reroute_business\main\templates\base.html:193
 msgid "Jobs"
-msgstr ""
+msgstr "Empleos"
 
 #: .\reroute_business\main\templates\base.html:36
 #: .\reroute_business\main\templates\base.html:123
 #: .\reroute_business\main\templates\base.html:194
 msgid "Resources"
-msgstr ""
+msgstr "Recursos"
 
 #: .\reroute_business\main\templates\base.html:42
 msgid "Notifications"
-msgstr ""
+msgstr "Notificaciones"
 
 #: .\reroute_business\main\templates\base.html:53
 msgid "Admin"
-msgstr ""
+msgstr "Administrador"
 
 #: .\reroute_business\main\templates\base.html:64
 msgid "User menu"
-msgstr ""
+msgstr "Menú de usuario"
 
 #: .\reroute_business\main\templates\base.html:66
 msgid "View Profile"
-msgstr ""
+msgstr "Ver Perfil"
 
 #: .\reroute_business\main\templates\base.html:67
-#, fuzzy
-#| msgid "Back to Settings"
 msgid "Profile Settings"
-msgstr "Volver a Configuración"
+msgstr "Configuración del perfil"
 
 #: .\reroute_business\main\templates\base.html:68
 msgid "Report Issues"
-msgstr ""
+msgstr "Reportar problemas"
 
 #: .\reroute_business\main\templates\base.html:69
-#, fuzzy
-#| msgid "Back to Settings"
 msgid "Settings"
-msgstr "Volver a Configuración"
+msgstr "Configuración"
 
 #: .\reroute_business\main\templates\base.html:72
 #: .\reroute_business\main\templates\base.html:209
 msgid "Sign out"
-msgstr ""
+msgstr "Cerrar sesión"
 
 #: .\reroute_business\main\templates\base.html:78
 #: .\reroute_business\main\templates\base.html:179
 msgid "Sign In"
-msgstr ""
+msgstr "Iniciar sesión"
 
 #: .\reroute_business\main\templates\base.html:79
 #: .\reroute_business\main\templates\base.html:180
 msgid "Create Account"
-msgstr ""
+msgstr "Crear cuenta"
 
 #: .\reroute_business\main\templates\base.html:84
 msgid "Open menu"
-msgstr ""
+msgstr "Abrir menú"
 
 #: .\reroute_business\main\templates\base.html:112
 #: .\reroute_business\main\templates\main\home.html:25
 msgid "Rebuild. Reclaim. ReRoute."
-msgstr ""
+msgstr "Reconstruye. Recupera. ReRoute."
 
 #: .\reroute_business\main\templates\base.html:116
 msgid "Quick Links"
-msgstr ""
+msgstr "Enlaces rápidos"
 
 #: .\reroute_business\main\templates\base.html:118
 msgid "About Us"
-msgstr ""
+msgstr "Sobre Nosotros"
 
 #: .\reroute_business\main\templates\base.html:120
 msgid "Contact Us"
-msgstr ""
+msgstr "Contáctanos"
 
 #: .\reroute_business\main\templates\base.html:122
 msgid "Opportunities"
-msgstr ""
+msgstr "Oportunidades"
 
 #: .\reroute_business\main\templates\base.html:124
 #: .\reroute_business\main\templates\base.html:146
 msgid "FAQ"
-msgstr ""
+msgstr "Preguntas frecuentes"
 
 #: .\reroute_business\main\templates\base.html:129
 msgid "Contact"
-msgstr ""
+msgstr "Contacto"
 
 #: .\reroute_business\main\templates\base.html:130
 msgid "Email:"
-msgstr ""
+msgstr "Correo:"
 
 #: .\reroute_business\main\templates\base.html:131
 msgid "Philadelphia, PA"
-msgstr ""
+msgstr "Filadelfia, PA"
 
 #: .\reroute_business\main\templates\base.html:137
 #, python-format
 msgid "&copy; 2025 %(COMPANY_LEGAL_NAME)s. All rights reserved."
-msgstr ""
+msgstr "&copy; 2025 %(COMPANY_LEGAL_NAME)s. Todos los derechos reservados."
 
 #: .\reroute_business\main\templates\base.html:140
 msgid "Pricing"
-msgstr ""
+msgstr "Precios"
 
 #: .\reroute_business\main\templates\base.html:142
-#, fuzzy
-#| msgid "Privacy notice"
 msgid "Privacy Policy"
-msgstr "Aviso de privacidad"
+msgstr "Política de Privacidad"
 
 #: .\reroute_business\main\templates\base.html:144
 msgid "Terms of Use"
-msgstr ""
+msgstr "Términos de Uso"
 
 #: .\reroute_business\main\templates\base.html:165
 msgid "Close menu"
-msgstr ""
+msgstr "Cerrar menú"
 
 #: .\reroute_business\main\templates\base.html:168
 msgid "Main menu"
-msgstr ""
+msgstr "Menú principal"
 
 #: .\reroute_business\main\templates\base.html:171
 #: .\reroute_business\main\templates\base.html:177
 msgid "Quick actions"
-msgstr ""
+msgstr "Acciones rápidas"
 
 #: .\reroute_business\main\templates\base.html:184
 msgid "Explore"
-msgstr ""
+msgstr "Explorar"
 
 #: .\reroute_business\main\templates\base.html:199
 msgid "Go to your public profile"
-msgstr ""
+msgstr "Ir a tu perfil público"
 
 #: .\reroute_business\main\templates\base.html:215
 msgid "Guest"
-msgstr ""
+msgstr "Invitado"
 
 #: .\reroute_business\main\templates\base.html:217
 msgid "Sign in"
-msgstr ""
+msgstr "Iniciar sesión"
 
 #: .\reroute_business\main\templates\base.html:218
 msgid "Create account"
-msgstr ""
+msgstr "Crear cuenta"
 
 #: .\reroute_business\main\templates\main\home.html:12
 msgid "Second chance"
-msgstr ""
+msgstr "Segunda oportunidad"
 
 #: .\reroute_business\main\templates\main\home.html:13
 msgid "New direction"
-msgstr ""
+msgstr "Nueva dirección"
 
 #: .\reroute_business\main\templates\main\home.html:14
 msgid "Change perspective"
-msgstr ""
+msgstr "Cambiar perspectiva"
 
 #: .\reroute_business\main\templates\main\home.html:15
 msgid "Opportunity"
-msgstr ""
+msgstr "Oportunidad"
 
 #: .\reroute_business\main\templates\main\home.html:16
 msgid "Steady progress"
-msgstr ""
+msgstr "Progreso constante"
 
 #: .\reroute_business\main\templates\main\home.html:17
 msgid "Fresh start"
-msgstr ""
+msgstr "Nuevo comienzo"
 
 #: .\reroute_business\main\templates\main\home.html:18
 msgid "Rebuild trust"
-msgstr ""
+msgstr "Reconstruir confianza"
 
 #: .\reroute_business\main\templates\main\home.html:22
 msgid "Your pathway to"
-msgstr ""
+msgstr "Tu camino hacia"
 
 #: .\reroute_business\main\templates\main\home.html:23
 msgid "support, stability, and opportunity."
-msgstr ""
+msgstr "apoyo, estabilidad y oportunidad."
 
 #: .\reroute_business\main\templates\main\home.html:26
 msgid ""
 "ReRoute connects justice-impacted Philadelphians to trusted organizations, "
 "workforce programs, and fair-chance employers - all in one place."
 msgstr ""
+"ReRoute conecta a personas de Filadelfia impactadas por la justicia con "
+"organizaciones confiables, programas de empleo y empleadores de segunda "
+"oportunidad, todo en un solo lugar."
 
 #: .\reroute_business\main\templates\main\home.html:27
 msgid ""
 "Employers are onboarding now. Early profiles get priority access when jobs "
 "launch."
 msgstr ""
+"Los empleadores se están incorporando ahora. Los perfiles tempranos reciben "
+"acceso prioritario cuando se publiquen empleos."
 
 #: .\reroute_business\main\templates\main\home.html:29
 msgid "Build Your Resume (Free)"
-msgstr ""
+msgstr "Crea tu currículum (Gratis)"
 
 #: .\reroute_business\main\templates\main\home.html:30
 #: .\reroute_business\main\templates\main\home.html:175
 msgid "Join Early Access"
-msgstr ""
+msgstr "Únete al acceso temprano"
 
 #: .\reroute_business\main\templates\main\home.html:38
 msgid "Getting Started with ReRoute"
-msgstr ""
+msgstr "Comenzando con ReRoute"
 
 #: .\reroute_business\main\templates\main\home.html:39
 msgid ""
 "Find the support you need, build your profile, and prepare for fair-chance "
 "opportunity."
 msgstr ""
+"Encuentra el apoyo que necesitas, crea tu perfil y prepárate para "
+"oportunidades de segunda oportunidad."
 
 #: .\reroute_business\main\templates\main\home.html:43
 msgid "Find Support That Fits"
-msgstr ""
+msgstr "Encuentra el apoyo adecuado"
 
 #: .\reroute_business\main\templates\main\home.html:44
 msgid ""
 "Answer a few questions and discover programs and resources tailored to you."
-msgstr ""
+msgstr "Responde algunas preguntas y descubre programas y recursos para ti."
 
 #: .\reroute_business\main\templates\main\home.html:47
 #: .\reroute_business\main\templates\main\home.html:113
 msgid "Build Your Profile"
-msgstr ""
+msgstr "Crea tu perfil"
 
 #: .\reroute_business\main\templates\main\home.html:48
 #: .\reroute_business\main\templates\main\home.html:114
 msgid "Create a clear, structured profile to track your progress."
-msgstr ""
+msgstr "Crea un perfil claro y estructurado para seguir tu progreso."
 
 #: .\reroute_business\main\templates\main\home.html:51
 msgid "Prepare for Opportunity"
-msgstr ""
+msgstr "Prepárate para la oportunidad"
 
 #: .\reroute_business\main\templates\main\home.html:52
 msgid "Build your resume and get early access to fair-chance employers."
-msgstr ""
+msgstr "Crea tu currículum y obtén acceso temprano a empleadores inclusivos."
 
 #: .\reroute_business\main\templates\main\home.html:55
 msgid ""
 "We're building alongside reentry organizations to expand access to support, "
 "training, and fair-chance employer connections as the platform grows."
 msgstr ""
+"Estamos construyendo junto a organizaciones de reingreso para ampliar el "
+"acceso a apoyo, capacitación y conexiones con empleadores inclusivos."
 
 #: .\reroute_business\main\templates\main\home.html:57
 msgid "Take the Quick Assessment"
-msgstr ""
+msgstr "Haz la evaluación rápida"
 
 #: .\reroute_business\main\templates\main\home.html:58
 msgid ""
 "As employer partnerships expand, early users will receive priority access."
 msgstr ""
+"A medida que crecen las alianzas con empleadores, los primeros usuarios "
+"recibirán acceso prioritario."
 
 #: .\reroute_business\main\templates\main\home.html:66
 msgid "Our Vision"
-msgstr ""
+msgstr "Nuestra visión"
 
 #: .\reroute_business\main\templates\main\home.html:67
 msgid ""
@@ -2184,6 +2211,9 @@ msgid ""
 "reducing the barriers that stand between justice-impacted individuals and "
 "real opportunity."
 msgstr ""
+"En ReRoute, nuestra visión es reducir la reincidencia eliminando el estigma "
+"y las barreras entre las personas impactadas por la justicia y las "
+"oportunidades reales."
 
 #: .\reroute_business\main\templates\main\home.html:68
 msgid ""
@@ -2192,6 +2222,10 @@ msgid ""
 "chance employment, we aim to simplify the journey from incarceration to long-"
 "term stability."
 msgstr ""
+"Creemos que el reingreso no debe significar navegar solo por un sistema "
+"fragmentado. Al organizar el acceso a apoyo confiable, capacitación laboral "
+"y empleo inclusivo, buscamos simplificar el camino de la cárcel a la "
+"estabilidad a largo plazo."
 
 #: .\reroute_business\main\templates\main\home.html:69
 msgid ""
@@ -2200,71 +2234,77 @@ msgid ""
 "committed to expanding coordinated pathways that make support easier to "
 "access and success easier to sustain."
 msgstr ""
+"ReRoute existe para restaurar la dignidad, reconstruir la confianza y "
+"transformar cómo se ofrece la oportunidad a quienes regresan a casa. A medida "
+"que crecemos, nos comprometemos a ampliar rutas coordinadas que hagan más "
+"fácil acceder al apoyo y sostener el éxito."
 
 #: .\reroute_business\main\templates\main\home.html:71
 msgid "Learn more about ReRoute"
-msgstr ""
+msgstr "Conoce más sobre ReRoute"
 
 #: .\reroute_business\main\templates\main\home.html:71
 #: .\reroute_business\resources\templates\resources\resource_list.html:64
 #: .\reroute_business\resources\templates\resources\resource_list.html:81
 #: .\reroute_business\resources\templates\resources\resource_list.html:98
 msgid "Learn More"
-msgstr ""
+msgstr "Más información"
 
 #: .\reroute_business\main\templates\main\home.html:81
 msgid "This platform doesn't disappear after signup."
-msgstr ""
+msgstr "Esta plataforma no desaparece después del registro."
 
 #: .\reroute_business\main\templates\main\home.html:82
 msgid ""
 "ReRoute offers ongoing support and resources because real change takes "
 "sustained effort."
 msgstr ""
+"ReRoute ofrece apoyo y recursos continuos porque el cambio real requiere "
+"esfuerzo sostenido."
 
 #: .\reroute_business\main\templates\main\home.html:85
 msgid "Explore Reentry Support Network"
-msgstr ""
+msgstr "Explorar Red de Apoyo para Reingreso"
 
 #: .\reroute_business\main\templates\main\home.html:93
 msgid "Reentry Support Network"
-msgstr ""
+msgstr "Red de Apoyo para Reingreso"
 
 #: .\reroute_business\main\templates\main\home.html:94
 msgid "Connect with trusted organizations and services."
-msgstr ""
+msgstr "Conéctate con organizaciones y servicios de confianza."
 
 #: .\reroute_business\main\templates\main\home.html:96
 msgid "Explore Benefit Finder"
-msgstr ""
+msgstr "Explorar Buscador de Beneficios"
 
 #: .\reroute_business\main\templates\main\home.html:104
 msgid "Find programs tailored to your needs."
-msgstr ""
+msgstr "Encuentra programas adaptados a tus necesidades."
 
 #: .\reroute_business\main\templates\main\home.html:106
 msgid "Explore Build Your Profile"
-msgstr ""
+msgstr "Explorar Crea tu perfil"
 
 #: .\reroute_business\main\templates\main\home.html:116
 msgid "Explore Resume Builder"
-msgstr ""
+msgstr "Explorar Creador de Currículum"
 
 #: .\reroute_business\main\templates\main\home.html:122
 msgid "Resume Builder"
-msgstr ""
+msgstr "Creador de Currículum"
 
 #: .\reroute_business\main\templates\main\home.html:123
 msgid "Build a strong resume and stay ready for new opportunities."
-msgstr ""
+msgstr "Crea un currículum sólido y mantente listo para nuevas oportunidades."
 
 #: .\reroute_business\main\templates\main\home.html:138
 msgid "Early Access Phase"
-msgstr ""
+msgstr "Fase de acceso temprano"
 
 #: .\reroute_business\main\templates\main\home.html:140
 msgid "Building carefully,<br>not quickly."
-msgstr ""
+msgstr "Construyendo con cuidado,<br>no con prisa."
 
 #: .\reroute_business\main\templates\main\home.html:142
 msgid ""
@@ -2272,44 +2312,50 @@ msgid ""
 "organizations, with employer access expanding as verification is completed. "
 "Early users receive priority access as opportunities launch."
 msgstr ""
+"ReRoute está incorporando usuarios tempranos y colaborando con "
+"organizaciones de reingreso. El acceso para empleadores se amplía conforme "
+"se completa la verificación. Las personas usuarias tempranas reciben acceso "
+"prioritario a medida que se lanzan oportunidades."
 
 #: .\reroute_business\main\templates\main\home.html:149
 msgid "Priority placement for early users"
-msgstr ""
+msgstr "Prioridad para usuarios tempranos"
 
 #: .\reroute_business\main\templates\main\home.html:155
 msgid "Vetted employers only"
-msgstr ""
+msgstr "Solo empleadores verificados"
 
 #: .\reroute_business\main\templates\main\home.html:161
 msgid "Quality over speed"
-msgstr ""
+msgstr "Calidad sobre velocidad"
 
 #: .\reroute_business\main\templates\main\home.html:167
 msgid "Updates as we grow"
-msgstr ""
+msgstr "Actualizaciones mientras crecemos"
 
 #: .\reroute_business\main\templates\main\home.html:173
 msgid "Your email address"
-msgstr ""
+msgstr "Tu correo electrónico"
 
 #: .\reroute_business\main\templates\main\home.html:183
 msgid "ReRoute is growing<br>with intention."
-msgstr ""
+msgstr "ReRoute está creciendo<br>con intención."
 
 #: .\reroute_business\main\templates\main\home.html:184
 msgid ""
 "Join now and help shape a platform designed to reduce barriers and expand "
 "opportunity."
 msgstr ""
+"Únete ahora y ayuda a dar forma a una plataforma diseñada para reducir "
+"barreras y ampliar oportunidades."
 
 #: .\reroute_business\main\templates\main\home.html:186
 msgid "Get Started as a Job Seeker"
-msgstr ""
+msgstr "Comienza como buscador de empleo"
 
 #: .\reroute_business\main\templates\main\home.html:187
 msgid "Explore Our Resources"
-msgstr ""
+msgstr "Explora nuestros recursos"
 
 #: .\reroute_business\main\templates\main\settings.html:67
 msgid "Open Accessibility & Experience settings"
@@ -2369,7 +2415,7 @@ msgstr "Tus preferencias se guardan solo en tu dispositivo. No te rastreamos."
 
 #: .\reroute_business\main\templates\main\settings.html:575
 msgid "Saving…"
-msgstr ""
+msgstr "Guardando…"
 
 #: .\reroute_business\main\templates\main\settings_accessibility.html:5
 msgid "ReRoute | Accessibility & Experience"
@@ -2392,10 +2438,8 @@ msgid "Preferred language"
 msgstr "Idioma preferido"
 
 #: .\reroute_business\main\templates\main\settings_accessibility.html:42
-#, fuzzy
-#| msgid "Language"
 msgid "Save language"
-msgstr "Idioma"
+msgstr "Guardar idioma"
 
 #: .\reroute_business\main\templates\main\settings_accessibility.html:69
 msgid "Save preferences"
@@ -2407,222 +2451,247 @@ msgstr "Se guardaron las preferencias de accesibilidad y experiencia."
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:5
 msgid "Resources Directory | ReRoute"
-msgstr ""
+msgstr "Directorio de Recursos | ReRoute"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:15
 #: .\reroute_business\resources\templates\resources\resource_list.html:24
 msgid "Resources Directory"
-msgstr ""
+msgstr "Directorio de Recursos"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:16
 msgid "Find trusted programs and services in Philadelphia."
-msgstr ""
+msgstr "Encuentra programas y servicios confiables en Filadelfia."
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:18
 #, python-format
 msgid "Showing results near %(zip)s"
-msgstr ""
+msgstr "Mostrando resultados cerca de %(zip)s"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:24
 msgid "Search resources"
-msgstr ""
+msgstr "Buscar recursos"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:29
 msgid "Search resources..."
-msgstr ""
+msgstr "Buscar recursos..."
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:35
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:43
 msgid "Filters"
-msgstr ""
+msgstr "Filtros"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:41
 msgid "Resource filters"
-msgstr ""
+msgstr "Filtros de recursos"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:45
 msgid "Clear all"
-msgstr ""
+msgstr "Limpiar todo"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:46
 msgid "Close filters"
-msgstr ""
+msgstr "Cerrar filtros"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:50
 msgid "Filter by category"
-msgstr ""
+msgstr "Filtrar por categoría"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:51
 msgid "Category"
-msgstr ""
+msgstr "Categoría"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:59
 msgid "Filter by feature"
-msgstr ""
+msgstr "Filtrar por característica"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:60
 msgid "Features"
-msgstr ""
+msgstr "Características"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:69
 #, python-format
 msgid "Showing %(count)s resources"
-msgstr ""
+msgstr "Mostrando %(count)s recursos"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:79
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:80
 #, python-format
 msgid "View details for %(name)s"
-msgstr ""
+msgstr "Ver detalles de %(name)s"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:117
 msgid "What to expect"
-msgstr ""
+msgstr "Qué esperar"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:126
 msgid "Resource directory pages"
-msgstr ""
+msgstr "Páginas del directorio de recursos"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:128
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:130
 msgid "Previous"
-msgstr ""
+msgstr "Anterior"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:133
 #, python-format
 msgid "Page %(number)s of %(total)s"
-msgstr ""
+msgstr "Página %(number)s de %(total)s"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:143
 msgid "No resources matched your search and selected filters."
-msgstr ""
+msgstr "Ningún recurso coincide con tu búsqueda y filtros seleccionados."
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:145
 msgid "Disclaimer"
-msgstr ""
+msgstr "Aviso"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:147
 msgid "If you notice incorrect information,"
-msgstr ""
+msgstr "Si notas información incorrecta,"
 
 #: .\reroute_business\resources\templates\resources\directory\directory_list.html:147
 msgid "please report it"
-msgstr ""
+msgstr "por favor repórtala"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:5
 msgid "ReRoute | Resources"
-msgstr ""
+msgstr "ReRoute | Recursos"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:15
 msgid "Your browser does not support the video tag."
-msgstr ""
+msgstr "Tu navegador no admite la etiqueta de video."
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:19
 msgid "ReRoute Resources"
-msgstr ""
+msgstr "Recursos ReRoute"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:20
 msgid "Resources to Get You Work-Ready in 60 Seconds"
-msgstr ""
+msgstr "Recursos para prepararte para trabajar en 60 segundos"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:21
 msgid ""
 "Explore curated tools, quick tips, and guidance from ReRoute to help you "
 "stand out in interviews, resumes, and at work."
 msgstr ""
+"Explora herramientas seleccionadas, consejos rápidos y orientación de "
+"ReRoute para destacar en entrevistas, currículums y en el trabajo."
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:23
 #: .\reroute_business\resources\templates\resources\resource_list.html:104
 msgid "View All Categories"
-msgstr ""
+msgstr "Ver Todas las Categorías"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:25
 msgid "Modules"
-msgstr ""
+msgstr "Módulos"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:26
 #: .\reroute_business\resources\templates\resources\resource_list.html:125
 msgid "Play video"
-msgstr ""
+msgstr "Reproducir video"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:35
 msgid "Hero video"
-msgstr ""
+msgstr "Video principal"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:36
 msgid "Close video"
-msgstr ""
+msgstr "Cerrar video"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:47
 msgid "Resources to Help You Succeed"
-msgstr ""
+msgstr "Recursos para Ayudarte a Triunfar"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:48
 msgid ""
 "Explore our curated collection of tools, courses, and support services "
 "designed to empower your journey."
 msgstr ""
+"Explora nuestra colección de herramientas, cursos y servicios de apoyo "
+"diseñados para impulsar tu camino."
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:61
 msgid "Job Tools"
-msgstr ""
+msgstr "Herramientas Laborales"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:62
 msgid ""
 "Templates, interview prep, and email guidance to help you present your best "
 "self."
 msgstr ""
+"Plantillas, preparación para entrevistas y guía por correo para ayudarte a "
+"mostrar tu mejor versión."
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:78
 msgid "Tech Courses"
-msgstr ""
+msgstr "Cursos de Tecnología"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:79
 msgid ""
 "Learn in-demand skills with beginner-friendly programs and free training "
 "resources."
 msgstr ""
+"Aprende habilidades en demanda con programas para principiantes y recursos "
+"gratuitos de capacitación."
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:95
 msgid "Reentry Help"
-msgstr ""
+msgstr "Apoyo para Reingreso"
+
+#: .\reroute_business\main\templates\base.html:47
+#: .\reroute_business\main\templates\base.html:108
+#: .\reroute_business\main\templates\base.html:220
+msgid "Switch language to Spanish"
+msgstr "Cambiar idioma a español"
+
+#: .\reroute_business\main\templates\base.html:57
+#: .\reroute_business\main\templates\base.html:118
+#: .\reroute_business\main\templates\base.html:230
+msgid "Switch language to English"
+msgstr "Cambiar idioma a inglés"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:96
 msgid ""
 "Access legal aid, housing options, and support services to help you move "
 "forward."
 msgstr ""
+"Accede a ayuda legal, opciones de vivienda y servicios de apoyo para "
+"ayudarte a avanzar."
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:114
 msgid "Quick Job-Ready Videos"
-msgstr ""
+msgstr "Videos rápidos para estar listo para trabajar"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:115
 msgid "Watch short, practical tips to build confidence and skills."
-msgstr ""
+msgstr "Mira consejos breves y prácticos para ganar confianza y habilidades."
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:131
 msgid "5 Things to Never Say in an Interview - 1 minute tip"
-msgstr ""
+msgstr "5 cosas que nunca debes decir en una entrevista - consejo de 1 minuto"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:132
 msgid "A fast breakdown of common interview mistakes and what to say instead."
 msgstr ""
+"Un resumen rápido de errores comunes en entrevistas y qué decir en su lugar."
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:138
 msgid "More Videos Coming Soon"
-msgstr ""
+msgstr "Más videos próximamente"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:147
 msgid ""
 "“Don't worry about what other people think of you. Just be sure you think "
 "correctly about yourself. - Jason Coffer”"
 msgstr ""
+"“No te preocupes por lo que otros piensen de ti. Solo asegúrate de pensar "
+"correctamente sobre ti mismo. - Jason Coffer”"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:151
 msgid "Can't find what you need?"
-msgstr ""
+msgstr "¿No encuentras lo que necesitas?"
 
 #: .\reroute_business\resources\templates\resources\resource_list.html:152
 msgid "Get in Touch"
-msgstr ""
+msgstr "Ponte en contacto"
