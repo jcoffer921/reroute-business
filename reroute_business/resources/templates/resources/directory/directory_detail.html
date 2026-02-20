@@ -10,7 +10,10 @@
 {% block content %}
 <section class="directory-page directory-page--detail">
   <div class="directory-shell directory-shell--detail">
-    <a href="{% url 'resource_directory' %}" class="detail-back-link">&larr; Back</a>
+    <a href="{% url 'resource_directory' %}" class="detail-back-link">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 6 9 12l6 6"></path></svg>
+      Back
+    </a>
 
     <header class="detail-header">
       <h1>{{ resource.name }}</h1>
@@ -26,19 +29,31 @@
 
     <section class="detail-info-grid">
       <article class="detail-info-card">
-        <h2>Address</h2>
+        <h2>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Zm0-8a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"></path></svg>
+          Address
+        </h2>
         <p>{{ resource.address_line }}</p>
         <p class="detail-muted">{{ resource.neighborhood }}</p>
       </article>
       <article class="detail-info-card">
-        <h2>Hours</h2>
+        <h2>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8"></circle><path d="M12 7v5l3 2"></path></svg>
+          Hours
+        </h2>
         <p>{{ resource.hours }}</p>
       </article>
     </section>
 
     <section class="detail-actions" aria-label="Contact options">
-      <a class="detail-action-btn detail-action-btn--primary" href="tel:{{ resource.phone_href }}">Call now</a>
-      <a class="detail-action-btn detail-action-btn--secondary" href="{{ resource.website }}" target="_blank" rel="noopener noreferrer">Visit website</a>
+      <a class="detail-action-btn detail-action-btn--primary" href="tel:{{ resource.phone_href }}">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4h3l2 5-2 1a13 13 0 0 0 4 4l1-2 5 2v3a2 2 0 0 1-2.3 2A16 16 0 0 1 5 6.3 2 2 0 0 1 7 4Z"></path></svg>
+        Call now
+      </a>
+      <a class="detail-action-btn detail-action-btn--secondary" href="{{ resource.website }}" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg>
+        Visit website
+      </a>
     </section>
 
     <article class="detail-section-card">
@@ -60,7 +75,10 @@
       <h2>What to bring</h2>
       <ul class="detail-list">
         {% for item in resource.what_to_bring %}
-        <li>{{ item }}</li>
+        <li>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 4h7l4 4v12H8z"></path><path d="M15 4v4h4M10 13h6M10 17h6"></path></svg>
+          <span>{{ item }}</span>
+        </li>
         {% endfor %}
       </ul>
     </article>
@@ -71,7 +89,10 @@
     </article>
 
     <article class="detail-section-card">
-      <h2>Getting there</h2>
+      <h2>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="4" width="14" height="14" rx="2"></rect><path d="M8 18v2M16 18v2M5 9h14M9 13h2M13 13h2"></path></svg>
+        Getting there
+      </h2>
       <p>{{ resource.getting_there }}</p>
     </article>
 
@@ -82,27 +103,48 @@
     </article>
     {% endif %}
 
-    <article class="detail-section-card">
-      <h2>Languages supported</h2>
-      <div class="directory-tag-row">
-        {% for language in resource.languages_supported %}
-        <span class="directory-tag">{{ language }}</span>
-        {% endfor %}
-      </div>
-    </article>
+    <section class="detail-pill-grid">
+      <article class="detail-section-card">
+        <h2>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v2M7 5l1.4 1.4M17 5l-1.4 1.4M4 10h2M18 10h2M7 19h10"></path><path d="M12 8v7M9.5 12h5"></path></svg>
+          Languages supported
+        </h2>
+        <div class="directory-tag-row">
+          {% for language in resource.languages_supported %}
+          <span class="directory-tag directory-tag--lang">{{ language }}</span>
+          {% endfor %}
+        </div>
+      </article>
 
-    {% if resource.cultural_competency %}
-    <article class="detail-section-card">
-      <h2>Cultural competency</h2>
-      <div class="directory-tag-row">
-        {% for item in resource.cultural_competency %}
-        <span class="directory-tag">{{ item }}</span>
-        {% endfor %}
-      </div>
-    </article>
-    {% endif %}
+      {% if resource.cultural_competency %}
+      <article class="detail-section-card">
+        <h2>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3 5 6v6c0 5 3.4 7.8 7 9 3.6-1.2 7-4 7-9V6Z"></path></svg>
+          Cultural competency
+        </h2>
+        <div class="directory-tag-row">
+          {% for item in resource.cultural_competency %}
+          {% if item == 'Trauma-Informed' %}
+          <span class="directory-tag directory-tag--culture-trauma">{{ item }}</span>
+          {% elif item == 'Justice-Impacted Staff' %}
+          <span class="directory-tag directory-tag--culture-justice">{{ item }}</span>
+          {% elif item == 'Culturally Specific' %}
+          <span class="directory-tag directory-tag--culture-specific">{{ item }}</span>
+          {% else %}
+          <span class="directory-tag directory-tag--culture-default">{{ item }}</span>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </article>
+      {% endif %}
+    </section>
 
-    <p class="detail-report-link"><a href="{% url 'contact' %}">Report an issue</a></p>
+    <p class="detail-report-link">
+      <a href="{% url 'contact' %}">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4M12 16h.01"></path></svg>
+        Report an issue
+      </a>
+    </p>
 
     <section class="directory-disclaimer" aria-label="Disclaimer">
       <p>{{ directory_disclaimer }}</p>

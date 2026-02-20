@@ -1240,7 +1240,7 @@ def dashboard_view(request):
     resume = Resume.objects.filter(user=request.user).first()
     applications = Application.objects.filter(applicant=request.user)
 
-    return render(request, 'user_dashboard.html', {
+    return render(request, 'dashboard/user_dashboard.html', {
         'profile': profile,
         'resume': resume,
         'applications': applications,

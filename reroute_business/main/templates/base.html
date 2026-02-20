@@ -23,18 +23,15 @@
             <div class="navbar-links-container">
                 <!-- ---------- Left-side navigation links ---------- -->
                 <div class="nav-links">
+                    <a href="{% url 'home' %}">Home</a>
                     <a href="{% url 'about_us' %}">About</a>
-                    <a href="{% url 'benefit_finder:start' %}" class="nav-link--cta {% if '/benefit-finder/' in request.path %}is-active{% endif %}">Benefit Finder</a>
-                    <a href="{% url 'blog_list' %}">Blog</a>
+                    <a href="{% url 'benefit_finder:start' %}">Benefit Finder</a>
+                    <a href="{% url 'blog_list' %}">Journal</a>
                     {% if user.is_authenticated %}
                         <a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a>
                     {% endif %}
                     <a href="{% url 'opportunities' %}">Jobs</a>
                     <a href="{% url 'resource_list' %}">Resources</a>
-                    <a href="{% url 'contact' %}">Support</a>
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'settings' %}">Settings</a>
-                    {% endif %}
                 </div>
 
                 <!-- ---------- Right-side profile menu ---------- -->
@@ -42,7 +39,9 @@
                 <div class="user-profile-right">
                     <a href="{% url 'dashboard:notifications' %}" class="notif-bell-link" aria-label="Notifications">
                         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                            <path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2Zm6-6V9a6 6 0 0 0-5-5.91V2h-2v1.09A6 6 0 0 0 6 9v7l-2 2v1h16v-1Z"></path>
+                            <path d="M6.5 9.8a5.5 5.5 0 1 1 11 0v3.5l1.5 2.6H5l1.5-2.6Z"></path>
+                            <path d="M10 18a2 2 0 0 0 4 0"></path>
+                            <path d="M12 4.3V3"></path>
                         </svg>
                         {% if UNREAD_NOTIFICATIONS %}
                           <span class="notif-bell-dot" aria-hidden="true"></span>
@@ -186,18 +185,15 @@
 
     <p class="mobile-nav-section-label">Explore</p>
     <ul class="mobile-nav-links">
+        <li><a href="{% url 'home' %}">Home</a></li>
         <li><a href="{% url 'about_us' %}">About</a></li>
         <li><a href="{% url 'benefit_finder:start' %}">Benefit Finder</a></li>
-        <li><a href="{% url 'blog_list' %}">Blog</a></li>
+        <li><a href="{% url 'blog_list' %}">Journal</a></li>
         {% if user.is_authenticated %}
         <li><a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a></li>
         {% endif %}
         <li><a href="{% url 'opportunities' %}">Jobs</a></li>
         <li><a href="{% url 'resource_list' %}">Resources</a></li>
-        <li><a href="{% url 'contact' %}">Support</a></li>
-        {% if user.is_authenticated %}
-        <li><a href="{% url 'settings' %}">Settings</a></li>
-        {% endif %}
     </ul>
 
     {# =================== MOBILE USER FOOTER =================== #}

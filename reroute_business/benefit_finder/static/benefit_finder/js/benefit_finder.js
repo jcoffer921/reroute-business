@@ -142,6 +142,7 @@
     lowDataMode: false,
     answers: {}
   };
+  var SAVE_BUTTON_HTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 3h9l4 4v14H6z"></path><path d="M15 3v5h4"></path><path d="M9 13h6M9 17h6"></path></svg>Save and finish later';
 
   loadSavedState();
   render();
@@ -175,7 +176,7 @@
     saveState();
     saveBtn.textContent = 'Saved';
     window.setTimeout(function () {
-      saveBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v10m0 0 4-4m-4 4-4-4M5 17h14"></path></svg>Save and finish later';
+      saveBtn.innerHTML = SAVE_BUTTON_HTML;
     }, 1200);
   });
 

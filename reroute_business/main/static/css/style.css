@@ -129,19 +129,6 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
   transition: color 0.3s;
 }
 .nav-links a:hover, .nav-links a:focus { outline: none; background: rgba(255,255,255,0.08); }
-.nav-links .nav-link--cta {
-  padding: 0.55rem 0.9rem;
-  border-radius: 999px;
-  background: #1d4f9f;
-  border: 1px solid #5b86ce;
-}
-.nav-links .nav-link--cta:hover,
-.nav-links .nav-link--cta:focus,
-.nav-links .nav-link--cta.is-active {
-  background: #2d6cdf;
-  border-color: #93b4eb;
-}
-
 /* Desktop hover dropdown for Opportunities */
 .nav-item.has-dropdown { position: relative; }
 .nav-item .nav-dropdown {
@@ -249,7 +236,11 @@ iframe { max-width: 100%; border: 0; }
 .notif-bell-link svg {
   width: 20px;
   height: 20px;
-  fill: currentColor;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .notif-bell-dot {

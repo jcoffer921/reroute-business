@@ -40,13 +40,17 @@
 
       <div class="bf-controls">
         <button type="button" class="bf-btn bf-btn--ghost" id="bfBackBtn">&larr; Back</button>
-        <button type="button" class="bf-save-link" id="bfSaveBtn">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M12 3v10m0 0 4-4m-4 4-4-4M5 17h14"></path>
-          </svg>
-          Save and finish later
-        </button>
-        <button type="button" class="bf-btn bf-btn--primary" id="bfNextBtn" disabled>Next &rarr;</button>
+        <div class="bf-controls-right">
+          <button type="button" class="bf-btn bf-btn--muted" id="bfSaveBtn">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M6 3h9l4 4v14H6z"></path>
+              <path d="M15 3v5h4"></path>
+              <path d="M9 13h6M9 17h6"></path>
+            </svg>
+            Save and finish later
+          </button>
+          <button type="button" class="bf-btn bf-btn--primary" id="bfNextBtn" disabled>Next &rarr;</button>
+        </div>
       </div>
       <p class="bf-disclaimer">ReRoute provides guidance only and does not determine eligibility.</p>
     </div>
