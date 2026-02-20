@@ -29,6 +29,29 @@
     if (panelParam) setActivePanel(panelParam, false);
 
     const form = document.getElementById('recoveryForm');
+    const accessibilityPanel = document.getElementById('panel-accessibility');
+    const accessibilityForm = accessibilityPanel ? accessibilityPanel.querySelector('form.ax-settings-form') : null;
+    if (accessibilityForm) {
+      const languageInput = accessibilityForm.querySelector('#axLanguage');
+      const lowDataInput = accessibilityForm.querySelector('#axLowData');
+      const savingIndicator = accessibilityForm.querySelector('[data-ax-saving]');
+      const autoSubmit = () => {
+        if (savingIndicator) savingIndicator.hidden = false;
+        if (typeof accessibilityForm.requestSubmit === 'function') {
+          accessibilityForm.requestSubmit();
+        } else {
+          accessibilityForm.submit();
+        }
+      };
+      if (languageInput) languageInput.addEventListener('change', autoSubmit);
+      if (lowDataInput) {
+        lowDataInput.addEventListener('change', () => {
+          document.body.classList.toggle('low-data-mode', !!lowDataInput.checked);
+          autoSubmit();
+        });
+      }
+    }
+
     if (!form) return;
     const phoneInput = form.querySelector('#id_backup_phone');
     if (phoneInput) {

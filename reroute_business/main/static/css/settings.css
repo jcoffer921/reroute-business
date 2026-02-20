@@ -121,6 +121,28 @@
 }
 .ax-settings-disclaimer p { margin: 0; font-size: .9rem; }
 
+.ax-saving {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  color: #475569;
+  font-size: .9rem;
+  font-weight: 600;
+}
+
+.ax-saving__spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: 2px solid #cbd5e1;
+  border-top-color: #2563eb;
+  animation: ax-saving-spin .7s linear infinite;
+}
+
+@keyframes ax-saving-spin {
+  to { transform: rotate(360deg); }
+}
+
 .toggle { position: relative; width: 46px; height: 26px; display: inline-block; }
 .toggle input { display: none; }
 .toggle .slider { position: absolute; inset: 0; background: #e5e7eb; border-radius: 999px; transition: background .2s ease; }
