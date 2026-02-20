@@ -24,45 +24,51 @@
       <a class="ax-back-link" href="{% url 'settings' %}">{% trans "Back to Settings" %}</a>
     </div>
 
-    <form method="post" id="axPreferencesForm" class="ax-stack">
-      {% csrf_token %}
-
+    <div class="ax-stack">
       <article class="ax-card">
         <div class="ax-copy">
           <h3>{% trans "Language" %}</h3>
           <p>{% trans "Choose your preferred language" %}</p>
         </div>
         <div class="ax-control">
-          <label class="sr-only" for="axLanguage">{% trans "Preferred language" %}</label>
-          <select id="axLanguage" name="language">
-            <option value="en" {% if selected_language == 'en' %}selected{% endif %}>{% trans "English" %}</option>
-            <option value="es" {% if selected_language == 'es' %}selected{% endif %}>{% trans "Español" %}</option>
-          </select>
+          <form method="post" action="{% url 'set_language' %}" id="axLanguageForm">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <label class="sr-only" for="axLanguage">{% trans "Preferred language" %}</label>
+            <select id="axLanguage" name="language">
+              <option value="en" {% if selected_language == 'en' %}selected{% endif %}>{% trans "English" %}</option>
+              <option value="es" {% if selected_language == 'es' %}selected{% endif %}>{% trans "Español" %}</option>
+            </select>
+            <button type="submit" class="sr-only">{% trans "Save language" %}</button>
+          </form>
         </div>
       </article>
 
-      <article class="ax-card">
-        <div class="ax-copy">
-          <h3>{% trans "Low data mode" %}</h3>
-          <p>{% trans "Reduces images and animations to save data" %}</p>
-        </div>
-        <div class="ax-control">
-          <label class="ax-toggle" for="axLowData">
-            <input id="axLowData" name="low_data_mode" type="checkbox" role="switch" aria-label="{% trans 'Enable low data mode' %}" {% if low_data_mode_enabled %}checked{% endif %}>
-            <span class="ax-toggle__slider" aria-hidden="true"></span>
-          </label>
-        </div>
-      </article>
+      <form method="post" id="axPreferencesForm">
+        {% csrf_token %}
+        <article class="ax-card">
+          <div class="ax-copy">
+            <h3>{% trans "Low data mode" %}</h3>
+            <p>{% trans "Reduces images and animations to save data" %}</p>
+          </div>
+          <div class="ax-control">
+            <label class="ax-toggle" for="axLowData">
+              <input id="axLowData" name="low_data_mode" type="checkbox" role="switch" aria-label="{% trans 'Enable low data mode' %}" {% if low_data_mode_enabled %}checked{% endif %}>
+              <span class="ax-toggle__slider" aria-hidden="true"></span>
+            </label>
+          </div>
+        </article>
 
-      <aside class="ax-disclaimer" aria-label="{% trans 'Privacy notice' %}">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M12 3 5 6v6c0 5 3.4 7.8 7 9 3.6-1.2 7-4 7-9V6Z"></path>
-        </svg>
-        <p>{% trans "Your preferences are stored on your device only. We do not track you." %}</p>
-      </aside>
+        <aside class="ax-disclaimer" aria-label="{% trans 'Privacy notice' %}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 3 5 6v6c0 5 3.4 7.8 7 9 3.6-1.2 7-4 7-9V6Z"></path>
+          </svg>
+          <p>{% trans "Your preferences are stored on your device only. We do not track you." %}</p>
+        </aside>
 
-      <button type="submit" class="sr-only">{% trans "Save preferences" %}</button>
-    </form>
+        <button type="submit" class="sr-only">{% trans "Save preferences" %}</button>
+      </form>
+    </div>
   </div>
 </section>
 {% endblock %}

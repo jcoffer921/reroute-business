@@ -1,18 +1,30 @@
 (function () {
   document.addEventListener("DOMContentLoaded", function () {
-    var form = document.getElementById("axPreferencesForm");
+    var languageForm = document.getElementById("axLanguageForm");
+    var preferencesForm = document.getElementById("axPreferencesForm");
     var language = document.getElementById("axLanguage");
     var lowData = document.getElementById("axLowData");
 
-    if (!form || !language || !lowData) {
+    if (!language || !lowData) {
       return;
     }
 
-    function submitPreferences() {
-      form.requestSubmit();
+    function submitForm(formEl) {
+      if (!formEl) {
+        return;
+      }
+      if (typeof formEl.requestSubmit === "function") {
+        formEl.requestSubmit();
+      } else {
+        formEl.submit();
+      }
     }
 
-    language.addEventListener("change", submitPreferences);
-    lowData.addEventListener("change", submitPreferences);
+    language.addEventListener("change", function () {
+      submitForm(languageForm);
+    });
+    lowData.addEventListener("change", function () {
+      submitForm(preferencesForm);
+    });
   });
 })();

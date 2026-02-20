@@ -223,10 +223,10 @@ if _HTTPS_ENFORCED:
 
 
 # ---------- i18n ----------
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
 LANGUAGES = [
     ('en', _('English')),
-    ('es', _('Spanish')),
+    ('es', _('Español')),
 ]
 LOCALE_PATHS = [
     BASE_DIR / 'locale',

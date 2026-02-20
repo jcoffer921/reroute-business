@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Benefit Finder | ReRoute{% endblock %}
+{% block title %}{% trans "Benefit Finder | ReRoute" %}{% endblock %}
 {% block body_class %}benefit-finder-page{% endblock %}
 
 {% block extra_css %}
@@ -12,19 +13,19 @@
 <section class="benefit-finder" id="benefitFinderApp" aria-live="polite">
   <div class="benefit-finder__container">
     <header class="benefit-finder__header">
-      <p class="benefit-finder__kicker">Benefit Finder</p>
-      <h1>Benefit Finder</h1>
-      <p>Answer a few questions to find programs and benefits you may qualify for.</p>
+      <p class="benefit-finder__kicker">{% trans "Benefit Finder" %}</p>
+      <h1>{% trans "Benefit Finder" %}</h1>
+      <p>{% trans "Answer a few questions to find programs and benefits you may qualify for." %}</p>
     </header>
 
     <div class="benefit-finder__quiz" id="bfQuiz">
       <div class="bf-progress-row">
-        <p class="bf-progress-copy" id="bfProgressCopy">Question 1 of 10</p>
+        <p class="bf-progress-copy" id="bfProgressCopy">{% trans "Question 1 of 10" %}</p>
         <button type="button" class="bf-low-data-toggle" id="bfLowDataToggle" aria-pressed="false">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M13 2L4 14h6l-1 8 9-12h-6l1-8Z"></path>
           </svg>
-          Low data mode
+          {% trans "Low data mode" %}
         </button>
       </div>
       <div class="bf-progress-track" role="progressbar" aria-valuemin="1" aria-valuemax="10" aria-valuenow="1" id="bfProgressBar">
@@ -39,7 +40,7 @@
       </div>
 
       <div class="bf-controls">
-        <button type="button" class="bf-btn bf-btn--ghost" id="bfBackBtn">&larr; Back</button>
+        <button type="button" class="bf-btn bf-btn--ghost" id="bfBackBtn">&larr; {% trans "Back" %}</button>
         <div class="bf-controls-right">
           <button type="button" class="bf-btn bf-btn--muted" id="bfSaveBtn">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -47,12 +48,12 @@
               <path d="M15 3v5h4"></path>
               <path d="M9 13h6M9 17h6"></path>
             </svg>
-            Save and finish later
+            {% trans "Save and finish later" %}
           </button>
-          <button type="button" class="bf-btn bf-btn--primary" id="bfNextBtn" disabled>Next &rarr;</button>
+          <button type="button" class="bf-btn bf-btn--primary" id="bfNextBtn" disabled>{% trans "Next" %} &rarr;</button>
         </div>
       </div>
-      <p class="bf-disclaimer">ReRoute provides guidance only and does not determine eligibility.</p>
+      <p class="bf-disclaimer">{% trans "ReRoute provides guidance only and does not determine eligibility." %}</p>
     </div>
 
     <section class="benefit-finder__results" id="bfResults" hidden>
@@ -62,42 +63,42 @@
             <path d="M12 21s-7-4.6-9.5-8.2C.8 10.4 1.1 7 3.6 5.3c2.5-1.7 5.4-.8 7.1 1.2 1.7-2 4.6-2.9 7.1-1.2 2.5 1.7 2.8 5.1 1.1 7.5C19 16.4 12 21 12 21Z"></path>
           </svg>
         </div>
-        <p>Getting support is a strength. These programs exist to help you stabilize and move forward.</p>
+        <p>{% trans "Getting support is a strength. These programs exist to help you stabilize and move forward." %}</p>
       </div>
 
       <header class="bf-results-header">
-        <h2>Your ReRoute Action Plan</h2>
-        <p>Based on your answers, here are programs and next steps that may help you.</p>
+        <h2>{% trans "Your ReRoute Action Plan" %}</h2>
+        <p>{% trans "Based on your answers, here are programs and next steps that may help you." %}</p>
       </header>
 
       <section class="bf-results-section">
-        <h3>Personalized Checklist</h3>
+        <h3>{% trans "Personalized Checklist" %}</h3>
         <ul class="bf-checklist" id="bfChecklist"></ul>
       </section>
 
       <section class="bf-results-section">
-        <h3>Recommended For You</h3>
+        <h3>{% trans "Recommended For You" %}</h3>
         <div class="bf-card-grid" id="bfCategoryGrid"></div>
       </section>
 
       <section class="bf-results-section bf-actions">
         <button type="button" class="bf-btn bf-btn--primary" id="bfDownloadPrintBtn">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 18h14"></path></svg>
-          Download / Print My Plan
+          {% trans "Download / Print My Plan" %}
         </button>
         <a href="{% url 'resource_directory' %}" class="bf-btn bf-btn--outline" id="bfResourcesLink">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"></circle><path d="m16.5 16.5 4 4"></path></svg>
-          Browse Resources Near Me
+          {% trans "Browse Resources Near Me" %}
         </a>
         <a href="{% url 'reentry_org:organization_catalog' %}" class="bf-btn bf-btn--outline" id="bfOrgLink">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4ZM8 13a3 3 0 1 0-3-3 3 3 0 0 0 3 3Z"></path><path d="M3 20a5 5 0 0 1 10 0M11 20a5 5 0 0 1 10 0"></path></svg>
-          Get Help From a Reentry Org
+          {% trans "Get Help From a Reentry Org" %}
         </a>
       </section>
 
       <section class="bf-results-section bf-sources">
-        <h3>Sources &amp; Information</h3>
-        <p>Information compiled from Philadelphia city resources, 211 database, and verified partner organizations.</p>
+        <h3>{% trans "Sources & Information" %}</h3>
+        <p>{% trans "Information compiled from Philadelphia city resources, 211 database, and verified partner organizations." %}</p>
         <ul>
           <li><a href="https://www.phila.gov/services/mental-physical-health/find-free-food-or-meals/" target="_blank" rel="noopener noreferrer">Philadelphia 211</a></li>
           <li><a href="https://www.phila.gov/services/" target="_blank" rel="noopener noreferrer">City of Philadelphia – Benefits &amp; Services</a></li>
@@ -106,7 +107,7 @@
         </ul>
       </section>
 
-      <p class="bf-disclaimer">ReRoute provides guidance only and does not determine eligibility.</p>
+      <p class="bf-disclaimer">{% trans "ReRoute provides guidance only and does not determine eligibility." %}</p>
     </section>
   </div>
 </section>

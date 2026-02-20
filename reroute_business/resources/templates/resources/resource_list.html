@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% load static resources_extras %}
+{% load i18n %}
 
-{% block title %}ReRoute | Resources{% endblock %}
+{% block title %}{% trans "ReRoute | Resources" %}{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'resources/css/resources.css' %}">
@@ -11,18 +12,18 @@
   <video id="hero2BgVideo" class="hero2-video" autoplay muted loop playsinline preload="metadata"
          poster="{% static 'images/dont_say_interview.png' %}">
     <source src="/static/resources/videos/dontSayInInterview.mp4" type="video/mp4">
-    Your browser does not support the video tag.
+    {% trans "Your browser does not support the video tag." %}
   </video>
   <div class="hero2-overlay"></div>
   <div class="hero2-content">
-    <span class="hero2-label">ReRoute Resources</span>
-    <h2 class="hero2-title">Resources to Get You Work-Ready in 60 Seconds</h2>
-    <p class="hero2-subtext">Explore curated tools, quick tips, and guidance from ReRoute to help you stand out in interviews, resumes, and at work.</p>
+    <span class="hero2-label">{% trans "ReRoute Resources" %}</span>
+    <h2 class="hero2-title">{% trans "Resources to Get You Work-Ready in 60 Seconds" %}</h2>
+    <p class="hero2-subtext">{% trans "Explore curated tools, quick tips, and guidance from ReRoute to help you stand out in interviews, resumes, and at work." %}</p>
     <div class="hero2-actions">
-      <a href="#resource-categories" class="hero2-cta">View All Categories</a>
-      <a href="{% url 'resource_directory' %}" class="hero2-cta alt">Resources Directory</a>
-      <a href="{% url 'video_gallery' %}" class="hero2-cta alt">Modules</a>
-      <button id="hero2Play" class="hero2-play-button" aria-label="Play video">
+      <a href="#resource-categories" class="hero2-cta">{% trans "View All Categories" %}</a>
+      <a href="{% url 'resource_directory' %}" class="hero2-cta alt">{% trans "Resources Directory" %}</a>
+      <a href="{% url 'video_gallery' %}" class="hero2-cta alt">{% trans "Modules" %}</a>
+      <button id="hero2Play" class="hero2-play-button" aria-label="{% trans 'Play video' %}">
         <span class="hero2-play-icon">▶</span>
       </button>
     </div>
@@ -31,8 +32,8 @@
   <!-- Fullscreen Modal for Video Playback with Sound -->
   <div id="hero2Modal" class="hero2-modal" hidden>
     <div class="hero2-modal-backdrop" data-hero2-close></div>
-    <div class="hero2-modal-dialog" role="dialog" aria-modal="true" aria-label="Hero video">
-      <button id="hero2Close" class="hero2-modal-close" aria-label="Close video">✕</button>
+    <div class="hero2-modal-dialog" role="dialog" aria-modal="true" aria-label="{% trans 'Hero video' %}">
+      <button id="hero2Close" class="hero2-modal-close" aria-label="{% trans 'Close video' %}">✕</button>
       <video id="hero2ModalVideo" class="hero2-modal-video" controls preload="metadata">
         <source src="/static/resources/videos/dontSayInInterview.mp4" type="video/mp4">
         </video>
@@ -43,8 +44,8 @@
 <!-- Categories Section (cards) -->
 <section id="resource-categories" class="resource-categories-section">
   <div class="resource-section">
-    <h2>Resources to Help You Succeed</h2>
-    <p class="section-subtext">Explore our curated collection of tools, courses, and support services designed to empower your journey.</p>
+    <h2>{% trans "Resources to Help You Succeed" %}</h2>
+    <p class="section-subtext">{% trans "Explore our curated collection of tools, courses, and support services designed to empower your journey." %}</p>
 
     <div class="resource-cards">
       <!-- Job Tools Card -->
@@ -57,10 +58,10 @@
             <path d="M8 9h8M8 12h8M8 15h5" stroke="#6495ED" stroke-width="1.5"/>
           </svg>
         </div>
-        <h3>Job Tools</h3>
-        <p>Templates, interview prep, and email guidance to help you present your best self.</p>
+        <h3>{% trans "Job Tools" %}</h3>
+        <p>{% trans "Templates, interview prep, and email guidance to help you present your best self." %}</p>
         <div class="card-actions">
-          <a href="{% url 'job_tools_index' %}" class="learn-more-btn">Learn More →</a>
+          <a href="{% url 'job_tools_index' %}" class="learn-more-btn">{% trans "Learn More" %} →</a>
         </div>
       </div>
 
@@ -74,10 +75,10 @@
             <path d="M10 9l-2 3 2 3M14 15l2-3-2-3" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
-        <h3>Tech Courses</h3>
-        <p>Learn in-demand skills with beginner-friendly programs and free training resources.</p>
+        <h3>{% trans "Tech Courses" %}</h3>
+        <p>{% trans "Learn in-demand skills with beginner-friendly programs and free training resources." %}</p>
         <div class="card-actions">
-          <a href="{% url 'tech_courses' %}" class="learn-more-btn">Learn More →</a>
+          <a href="{% url 'tech_courses' %}" class="learn-more-btn">{% trans "Learn More" %} →</a>
         </div>
       </div>
 
@@ -91,16 +92,16 @@
             <circle cx="12" cy="16.5" r=".75" fill="#6495ED"/>
           </svg>
         </div>
-        <h3>Reentry Help</h3>
-        <p>Access legal aid, housing options, and support services to help you move forward.</p>
+        <h3>{% trans "Reentry Help" %}</h3>
+        <p>{% trans "Access legal aid, housing options, and support services to help you move forward." %}</p>
         <div class="card-actions">
-          <a href="{% url 'reentry_help_index' %}" class="learn-more-btn">Learn More →</a>
+          <a href="{% url 'reentry_help_index' %}" class="learn-more-btn">{% trans "Learn More" %} →</a>
         </div>
       </div>
     </div>
 
     <div class="categories-footer-cta">
-      <a href="#resource-categories" class="btn-secondary outline">View All Categories</a>
+      <a href="#resource-categories" class="btn-secondary outline">{% trans "View All Categories" %}</a>
     </div>
   </div>
 </section>
@@ -110,8 +111,8 @@
   <!-- Quick Job-Ready Videos -->
   <section id="resource-library" class="quick-videos-section">
     <div class="quick-videos-container">
-      <h2 class="quick-videos-title">Quick Job-Ready Videos</h2>
-      <p class="quick-videos-subtitle">Watch short, practical tips to build confidence and skills.</p>
+      <h2 class="quick-videos-title">{% trans "Quick Job-Ready Videos" %}</h2>
+      <p class="quick-videos-subtitle">{% trans "Watch short, practical tips to build confidence and skills." %}</p>
 
       <div class="quick-videos-grid">
         <!-- Single featured video card (expandable to grid later) -->
@@ -121,20 +122,20 @@
                    poster="{% static 'images/dont_say_interview.png' %}">
               <source src="/static/resources/videos/dontSayInInterview.mp4" type="video/mp4">
             </video>
-            <button class="video-play-overlay" aria-label="Play video"
+            <button class="video-play-overlay" aria-label="{% trans 'Play video' %}"
                     data-video-open data-video-src="/static/resources/videos/dontSayInInterview.mp4">
               <span>▶</span>
             </button>
           </div>
           <div class="video-info">
-            <h3>5 Things to Never Say in an Interview - 1 minute tip</h3>
-            <p class="video-desc">A fast breakdown of common interview mistakes and what to say instead.</p>
+            <h3>{% trans "5 Things to Never Say in an Interview - 1 minute tip" %}</h3>
+            <p class="video-desc">{% trans "A fast breakdown of common interview mistakes and what to say instead." %}</p>
           </div>
         </article>
       </div>
 
       <div class="videos-footer-cta">
-        <button class="btn-secondary outline" disabled>More Videos Coming Soon</button>
+        <button class="btn-secondary outline" disabled>{% trans "More Videos Coming Soon" %}</button>
       </div>
     </div>
   </section>
@@ -143,12 +144,12 @@
   {# Learning Modules section removed by request #}
 
   <div class="resource-quote">
-    <blockquote>“Don't worry about what other people think of you. Just be sure you think correctly about yourself. - Jason Coffer”</blockquote>
+    <blockquote>{% trans "“Don't worry about what other people think of you. Just be sure you think correctly about yourself. - Jason Coffer”" %}</blockquote>
   </div>
 
   <div class="resource-footer-cta">
-    <p>Can't find what you need?</p>
-    <a href="{% url 'contact' %}" class="btn-secondary">Get in Touch</a>
+    <p>{% trans "Can't find what you need?" %}</p>
+    <a href="{% url 'contact' %}" class="btn-secondary">{% trans "Get in Touch" %}</a>
   </div>
 
 {% endblock %}

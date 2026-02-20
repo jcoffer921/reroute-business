@@ -45,7 +45,7 @@ from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.utils import translation
+from django.utils.translation import gettext as _
 
 from reroute_business.job_list.models import Application
 from reroute_business.main.forms import UserSignupForm
@@ -98,7 +98,6 @@ import logging
 from django.apps import apps
 
 logger = logging.getLogger(__name__)
-LANGUAGE_SESSION_KEY = "django_language"
 
 # Allauth helpers for email verification (guarded import)
 try:
@@ -1235,7 +1234,39 @@ def dashboard(request):
 
 @require_http_methods(["GET", "POST"])
 def accessibility_settings_view(request):
-    return redirect(f"{reverse('settings')}?panel=accessibility")
+    if not request.user.is_authenticated:
+        return redirect("login")
+
+    profile, _created = UserProfile.objects.get_or_create(user=request.user)
+    allowed_languages = {"en", "es"}
+    selected_language = (getattr(request, "LANGUAGE_CODE", "en") or "en").split("-")[0].lower()
+    if selected_language not in allowed_languages:
+        selected_language = "en"
+
+    low_data_mode_enabled = bool(request.session.get("low_data_mode", getattr(profile, "low_data_mode", False)))
+    request.session["low_data_mode"] = low_data_mode_enabled
+
+    if request.method == "POST":
+        low_data_mode_enabled = request.POST.get("low_data_mode") == "on"
+        request.session["low_data_mode"] = low_data_mode_enabled
+        profile.low_data_mode = low_data_mode_enabled
+        # Keep preferred language in profile synchronized with active language.
+        profile.preferred_language = selected_language
+        try:
+            profile.save(update_fields=["preferred_language", "low_data_mode"])
+        except Exception:
+            profile.save()
+        messages.success(request, _("Accessibility & experience preferences saved."))
+        return redirect("settings_accessibility")
+
+    return render(
+        request,
+        "main/settings_accessibility.html",
+        {
+            "selected_language": selected_language,
+            "low_data_mode_enabled": low_data_mode_enabled,
+        },
+    )
 
 
 @login_required
@@ -1296,11 +1327,9 @@ def settings_view(request):
     }
     recovery_form = RecoveryOptionsForm(user=request.user, initial=recovery_initial)
     allowed_languages = {"en", "es"}
-    selected_language = (request.session.get(LANGUAGE_SESSION_KEY) or "").strip().lower()
-    profile_language = (getattr(profile, "preferred_language", "") or "").strip().lower()
+    selected_language = (getattr(request, "LANGUAGE_CODE", "en") or "en").split("-")[0].lower()
     if selected_language not in allowed_languages:
-        selected_language = profile_language if profile_language in allowed_languages else "en"
-        request.session[LANGUAGE_SESSION_KEY] = selected_language
+        selected_language = "en"
     low_data_mode_enabled = bool(request.session.get("low_data_mode", getattr(profile, "low_data_mode", False)))
     request.session["low_data_mode"] = low_data_mode_enabled
 
@@ -1478,15 +1507,13 @@ def settings_view(request):
 
         # Accessibility & experience preferences
         elif 'update_accessibility' in request.POST:
-            selected_language = (request.POST.get('language') or 'en').strip().lower()
-            if selected_language not in allowed_languages:
-                selected_language = 'en'
             low_data_mode_enabled = request.POST.get('low_data_mode') == 'on'
 
-            request.session[LANGUAGE_SESSION_KEY] = selected_language
             request.session["low_data_mode"] = low_data_mode_enabled
-            translation.activate(selected_language)
 
+            selected_language = (getattr(request, "LANGUAGE_CODE", "en") or "en").split("-")[0].lower()
+            if selected_language not in allowed_languages:
+                selected_language = "en"
             profile.preferred_language = selected_language
             profile.low_data_mode = low_data_mode_enabled
             try:

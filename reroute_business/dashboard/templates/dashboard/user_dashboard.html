@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}User Dashboard{% endblock %}
+{% block title %}{% trans "User Dashboard" %}{% endblock %}
 {% block body_class %}dashboard-page{% endblock %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'dashboard/css/user_dashboard.css' %}">
@@ -10,10 +11,10 @@
 {% block content %}
 <section class="dashboard-hero">
   <div class="dashboard-hero-inner">
-    <div class="hero-pill">EARLY ACCESS</div>
-    <h1>Welcome back, {{ request.user.first_name|default:request.user.username }}</h1>
-    <p class="hero-subhead">You're making real progress</p>
-    <p class="hero-support">Employers are onboarding now. Keep going, you're building something that matters.</p>
+    <div class="hero-pill">{% trans "EARLY ACCESS" %}</div>
+    <h1>{% blocktrans with name=request.user.first_name|default:request.user.username %}Welcome back, {{ name }}{% endblocktrans %}</h1>
+    <p class="hero-subhead">{% trans "You're making real progress" %}</p>
+    <p class="hero-support">{% trans "Employers are onboarding now. Keep going, you're building something that matters." %}</p>
     <div class="hero-actions">
       <a class="btn-primary" href="{{ hero_cta_url }}">{{ hero_cta_label }} <span aria-hidden="true">→</span></a>
     </div>
@@ -31,15 +32,15 @@
               <path d="M12 4v8l6 3" />
             </svg>
           </span>
-          <h2>Your Progress</h2>
+          <h2>{% trans "Your Progress" %}</h2>
         </div>
-        <span class="section-pill">Every step forward counts. You're building momentum.</span>
+        <span class="section-pill">{% trans "Every step forward counts. You're building momentum." %}</span>
       </div>
       <div class="progress-body">
         <div class="progress-ring" data-progress="70">
           <div class="progress-ring-inner">
             <span class="progress-value">70%</span>
-            <span class="progress-label">Profile</span>
+            <span class="progress-label">{% trans "Profile" %}</span>
           </div>
         </div>
         <div class="progress-list">
@@ -74,15 +75,15 @@
             </svg>
           </span>
           <div>
-            <p class="eyebrow">A THOUGHT FOR TODAY</p>
+            <p class="eyebrow">{% trans "A THOUGHT FOR TODAY" %}</p>
             <p class="thought-pagination" data-thought-pagination>1/5</p>
           </div>
         </div>
       </div>
       <div class="thought-body" data-thought-body>
-        <h3 data-thought-title>Start with what you know</h3>
-        <p data-thought-text>Your life experience is valuable. Skills like communication, leadership, and problem-solving come from many places — not just previous jobs.</p>
-        <button class="text-link" type="button" data-thought-next>Next thought →</button>
+        <h3 data-thought-title>{% trans "Start with what you know" %}</h3>
+        <p data-thought-text>{% trans "Your life experience is valuable. Skills like communication, leadership, and problem-solving come from many places — not just previous jobs." %}</p>
+        <button class="text-link" type="button" data-thought-next>{% trans "Next thought" %} →</button>
       </div>
     </section>
   </div>
@@ -96,7 +97,7 @@
             <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
           </svg>
         </span>
-        <h2>Job Opportunities</h2>
+        <h2>{% trans "Job Opportunities" %}</h2>
       </div>
     </div>
 
@@ -108,42 +109,42 @@
           <path d="M12 7v5l3 2" />
         </svg>
       </div>
-      <h3>Jobs are launching soon</h3>
-      <p>Fair-chance employers are getting ready to post roles. The preparation you're doing now puts you ahead — when opportunities go live, you'll be among the first to see them.</p>
+      <h3>{% trans "Jobs are launching soon" %}</h3>
+      <p>{% trans "Fair-chance employers are getting ready to post roles. The preparation you're doing now puts you ahead — when opportunities go live, you'll be among the first to see them." %}</p>
       <form method="post" action="{% url 'dashboard:toggle_job_notifications' %}">
         {% csrf_token %}
         <input type="hidden" name="pref" value="jobs_live">
         <button class="btn-outline" type="submit">
-          {% if notify_jobs_live %}You're on the list{% else %}Notify me when jobs are live{% endif %}
+          {% if notify_jobs_live %}{% trans "You're on the list" %}{% else %}{% trans "Notify me when jobs are live" %}{% endif %}
         </button>
       </form>
     </div>
     {% else %}
     <div class="jobs-carousel" data-slider data-slider-step="320">
       <div class="carousel-header">
-        <p class="muted">Hand-picked opportunities based on your profile</p>
+        <p class="muted">{% trans "Hand-picked opportunities based on your profile" %}</p>
         <div class="carousel-actions">
-          <button type="button" class="carousel-btn" data-slider-prev aria-label="Scroll jobs left">‹</button>
-          <button type="button" class="carousel-btn" data-slider-next aria-label="Scroll jobs right">›</button>
+          <button type="button" class="carousel-btn" data-slider-prev aria-label="{% trans 'Scroll jobs left' %}">‹</button>
+          <button type="button" class="carousel-btn" data-slider-next aria-label="{% trans 'Scroll jobs right' %}">›</button>
         </div>
       </div>
       <div class="carousel-track" data-slider-track>
         {% for item in suggested_cards %}
           <article class="job-card">
             {% if item.source == 'invited' %}
-              <span class="job-badge job-badge--invited">Invited to Apply</span>
+              <span class="job-badge job-badge--invited">{% trans "Invited to Apply" %}</span>
             {% else %}
-              <span class="job-badge">Matched</span>
+              <span class="job-badge">{% trans "Matched" %}</span>
             {% endif %}
             <div>
-              <p class="job-location">{{ item.job.location|default:"Location flexible" }}</p>
+              <p class="job-location">{% if item.job.location %}{{ item.job.location }}{% else %}{% trans "Location flexible" %}{% endif %}</p>
               <h3>{{ item.job.title }}</h3>
               <p class="muted">{{ item.job.employer.username }}</p>
             </div>
-            <a class="text-link" href="{% url 'job_detail' item.job.id %}">View job →</a>
+            <a class="text-link" href="{% url 'job_detail' item.job.id %}">{% trans "View job" %} →</a>
           </article>
         {% empty %}
-          <div class="jobs-empty">More roles are on the way. Check back soon.</div>
+          <div class="jobs-empty">{% trans "More roles are on the way. Check back soon." %}</div>
         {% endfor %}
       </div>
       <div class="jobs-footer">
@@ -151,26 +152,26 @@
           {% csrf_token %}
           <input type="hidden" name="pref" value="job_matches">
           <button class="btn-outline" type="submit">
-            {% if notify_job_matches %}Notifications on{% else %}Notify me when matched with jobs{% endif %}
+            {% if notify_job_matches %}{% trans "Notifications on" %}{% else %}{% trans "Notify me when matched with jobs" %}{% endif %}
           </button>
         </form>
-        <a class="text-link" href="{% url 'opportunities' %}">View all jobs →</a>
+        <a class="text-link" href="{% url 'opportunities' %}">{% trans "View all jobs" %} →</a>
       </div>
     </div>
     {% endif %}
 
     <div class="mini-stats">
       <div class="mini-card">
-        <p>Applications</p>
-        <span>Coming soon</span>
+        <p>{% trans "Applications" %}</p>
+        <span>{% trans "Coming soon" %}</span>
       </div>
       <div class="mini-card">
-        <p>Interviews</p>
-        <span>Coming soon</span>
+        <p>{% trans "Interviews" %}</p>
+        <span>{% trans "Coming soon" %}</span>
       </div>
       <div class="mini-card">
-        <p>Matches</p>
-        <span>Coming soon</span>
+        <p>{% trans "Matches" %}</p>
+        <span>{% trans "Coming soon" %}</span>
       </div>
     </div>
   </section>
@@ -184,7 +185,7 @@
             <path d="M13 3v6h6" />
           </svg>
         </span>
-        <h2>Organizations Near You</h2>
+        <h2>{% trans "Organizations Near You" %}</h2>
       </div>
     </div>
 
@@ -202,15 +203,15 @@
           <span class="org-link" aria-hidden="true">↗</span>
         </div>
         <h3>{{ org.name }}</h3>
-        <p class="muted">{% if org.city or org.state %}{{ org.city }}{% if org.city and org.state %}, {% endif %}{{ org.state }}{% else %}Multiple locations{% endif %}</p>
-        <span class="org-pill">{{ org.get_category_display|default:"Support" }}</span>
+        <p class="muted">{% if org.city or org.state %}{{ org.city }}{% if org.city and org.state %}, {% endif %}{{ org.state }}{% else %}{% trans "Multiple locations" %}{% endif %}</p>
+        <span class="org-pill">{% if org.get_category_display %}{{ org.get_category_display }}{% else %}{% trans "Support" %}{% endif %}</span>
       </article>
       {% endfor %}
     </div>
     {% else %}
     <div class="org-placeholder">
-      <p>We're working to onboard reentry organizations in your area. Recommendations will be based on your ZIP or city.</p>
-      <a class="btn-outline" href="{% url 'reentry_org:organization_catalog' %}">Browse organizations</a>
+      <p>{% trans "We're working to onboard reentry organizations in your area. Recommendations will be based on your ZIP or city." %}</p>
+      <a class="btn-outline" href="{% url 'reentry_org:organization_catalog' %}">{% trans "Browse organizations" %}</a>
     </div>
     {% endif %}
   </section>
@@ -225,7 +226,7 @@
             <path d="M8 6h8" />
           </svg>
         </span>
-        <h2>Recommended Modules</h2>
+        <h2>{% trans "Recommended Modules" %}</h2>
       </div>
     </div>
     <div class="module-card-grid">
@@ -239,14 +240,20 @@
         </span>
         <div class="module-reco-copy">
           <h3>{{ mod.title }}</h3>
-          <p class="muted">{{ mod.description|default:"Keep building your skills with this module."|truncatechars:120 }}</p>
+          <p class="muted">
+            {% if mod.description %}
+              {{ mod.description|truncatechars:120 }}
+            {% else %}
+              {% trans "Keep building your skills with this module." %}
+            {% endif %}
+          </p>
         </div>
-        <a class="text-link" href="{% url 'module_detail' mod.pk %}">Open module →</a>
+        <a class="text-link" href="{% url 'module_detail' mod.pk %}">{% trans "Open module" %} →</a>
       </article>
       {% empty %}
       <div class="org-placeholder">
-        <p>Learning recommendations will appear here once modules are available.</p>
-        <a class="btn-outline" href="{% url 'resource_list' %}">Browse modules</a>
+        <p>{% trans "Learning recommendations will appear here once modules are available." %}</p>
+        <a class="btn-outline" href="{% url 'resource_list' %}">{% trans "Browse modules" %}</a>
       </div>
       {% endfor %}
     </div>

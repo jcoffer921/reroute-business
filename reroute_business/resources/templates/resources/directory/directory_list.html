@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Resources Directory | ReRoute{% endblock %}
+{% block title %}{% trans "Resources Directory | ReRoute" %}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'resources/css/directory.css' %}">
@@ -11,43 +12,43 @@
 <section class="directory-page" id="directoryApp">
   <div class="directory-shell">
     <header class="directory-header">
-      <h1>Resources Directory</h1>
-      <p>Find trusted programs and services in Philadelphia.</p>
+      <h1>{% trans "Resources Directory" %}</h1>
+      <p>{% trans "Find trusted programs and services in Philadelphia." %}</p>
       {% if selected_zip %}
-      <p class="directory-zip-banner">Showing results near {{ selected_zip }}</p>
+      <p class="directory-zip-banner">{% blocktrans with zip=selected_zip %}Showing results near {{ zip }}{% endblocktrans %}</p>
       {% endif %}
     </header>
 
     <div class="directory-controls">
       <label class="directory-search" for="directorySearchInput">
-        <span class="sr-only">Search resources</span>
+        <span class="sr-only">{% trans "Search resources" %}</span>
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <circle cx="11" cy="11" r="7"></circle>
           <path d="m16.5 16.5 4 4"></path>
         </svg>
-        <input id="directorySearchInput" type="search" placeholder="Search resources..." autocomplete="off">
+        <input id="directorySearchInput" type="search" placeholder="{% trans 'Search resources...' %}" autocomplete="off">
       </label>
       <button class="directory-filter-toggle" id="directoryFilterToggle" type="button" aria-controls="directoryFiltersPanel" aria-expanded="false">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path d="M4 7h16M7 12h10M10 17h4"></path>
         </svg>
-        Filters
+        {% trans "Filters" %}
       </button>
     </div>
 
     <div class="directory-filter-backdrop" id="directoryFilterBackdrop" hidden></div>
 
-    <section class="directory-filters" id="directoryFiltersPanel" aria-label="Resource filters">
+    <section class="directory-filters" id="directoryFiltersPanel" aria-label="{% trans 'Resource filters' %}">
       <div class="directory-filters-header">
-        <h2>Filters</h2>
+        <h2>{% trans "Filters" %}</h2>
         <div class="directory-filters-header-actions">
-          <button type="button" id="directoryClearFilters" class="directory-clear-btn">Clear all</button>
-          <button type="button" id="directoryCloseFilters" class="directory-close-btn" aria-label="Close filters">✕</button>
+          <button type="button" id="directoryClearFilters" class="directory-clear-btn">{% trans "Clear all" %}</button>
+          <button type="button" id="directoryCloseFilters" class="directory-close-btn" aria-label="{% trans 'Close filters' %}">✕</button>
         </div>
       </div>
 
-      <div class="directory-filter-group" role="group" aria-label="Filter by category">
-        <h3>Category</h3>
+      <div class="directory-filter-group" role="group" aria-label="{% trans 'Filter by category' %}">
+        <h3>{% trans "Category" %}</h3>
         <div class="directory-chip-wrap">
           {% for category in filter_categories %}
           <button type="button" class="directory-chip" data-filter-kind="category" data-filter-value="{{ category }}" aria-pressed="false">{{ category }}</button>
@@ -55,8 +56,8 @@
         </div>
       </div>
 
-      <div class="directory-filter-group" role="group" aria-label="Filter by feature">
-        <h3>Features</h3>
+      <div class="directory-filter-group" role="group" aria-label="{% trans 'Filter by feature' %}">
+        <h3>{% trans "Features" %}</h3>
         <div class="directory-chip-wrap">
           {% for feature in filter_features %}
           <button type="button" class="directory-chip" data-filter-kind="feature" data-filter-value="{{ feature }}" aria-pressed="false">{{ feature }}</button>
@@ -65,7 +66,7 @@
       </div>
     </section>
 
-    <p id="directoryResultsMeta" class="directory-results-meta" aria-live="polite">Showing {{ resources|length }} resources</p>
+    <p id="directoryResultsMeta" class="directory-results-meta" aria-live="polite">{% blocktrans with count=resources|length %}Showing {{ count }} resources{% endblocktrans %}</p>
 
     <div class="directory-grid" id="directoryGrid">
       {% for resource in resources %}
@@ -75,8 +76,8 @@
         data-features="{{ resource.features|join:'||' }}"
         data-card-url="{% url 'resource_directory_detail' resource.slug %}"
         data-search="{{ resource.name }} {{ resource.overview }} {{ resource.address_line }} {{ resource.neighborhood }} {{ resource.categories|join:' ' }} {{ resource.features|join:' ' }} {{ resource.hours }} {{ resource.phone }}">
-        <a class="directory-card-overlay-link" href="{% url 'resource_directory_detail' resource.slug %}" aria-label="View details for {{ resource.name }}">
-          <span class="sr-only">View details for {{ resource.name }}</span>
+        <a class="directory-card-overlay-link" href="{% url 'resource_directory_detail' resource.slug %}" aria-label="{% blocktrans with name=resource.name %}View details for {{ name }}{% endblocktrans %}">
+          <span class="sr-only">{% blocktrans with name=resource.name %}View details for {{ name }}{% endblocktrans %}</span>
         </a>
 
         <div class="directory-card-content">
@@ -113,7 +114,7 @@
           </ul>
 
           <section class="directory-expectation">
-            <h3>What to expect</h3>
+            <h3>{% trans "What to expect" %}</h3>
             <p>{{ resource.what_to_expect }}</p>
           </section>
         </div>
@@ -122,28 +123,28 @@
     </div>
 
     {% if page_obj and page_obj.paginator.num_pages > 1 %}
-    <nav class="directory-pagination" aria-label="Resource directory pages">
+    <nav class="directory-pagination" aria-label="{% trans 'Resource directory pages' %}">
       {% if page_obj.has_previous %}
-      <a class="directory-page-link" href="?page={{ page_obj.previous_page_number }}{% if pagination_query %}&{{ pagination_query }}{% endif %}">Previous</a>
+      <a class="directory-page-link" href="?page={{ page_obj.previous_page_number }}{% if pagination_query %}&{{ pagination_query }}{% endif %}">{% trans "Previous" %}</a>
       {% else %}
-      <span class="directory-page-link directory-page-link--disabled" aria-disabled="true">Previous</span>
+      <span class="directory-page-link directory-page-link--disabled" aria-disabled="true">{% trans "Previous" %}</span>
       {% endif %}
 
-      <span class="directory-page-status">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+      <span class="directory-page-status">{% blocktrans with number=page_obj.number total=page_obj.paginator.num_pages %}Page {{ number }} of {{ total }}{% endblocktrans %}</span>
 
       {% if page_obj.has_next %}
-      <a class="directory-page-link" href="?page={{ page_obj.next_page_number }}{% if pagination_query %}&{{ pagination_query }}{% endif %}">Next</a>
+      <a class="directory-page-link" href="?page={{ page_obj.next_page_number }}{% if pagination_query %}&{{ pagination_query }}{% endif %}">{% trans "Next" %}</a>
       {% else %}
-      <span class="directory-page-link directory-page-link--disabled" aria-disabled="true">Next</span>
+      <span class="directory-page-link directory-page-link--disabled" aria-disabled="true">{% trans "Next" %}</span>
       {% endif %}
     </nav>
     {% endif %}
 
-    <p id="directoryNoResults" class="directory-no-results" hidden>No resources matched your search and selected filters.</p>
+    <p id="directoryNoResults" class="directory-no-results" hidden>{% trans "No resources matched your search and selected filters." %}</p>
 
-    <section class="directory-disclaimer" aria-label="Disclaimer">
+    <section class="directory-disclaimer" aria-label="{% trans 'Disclaimer' %}">
       <p>{{ directory_disclaimer }}</p>
-      <p>If you notice incorrect information, <a href="{% url 'contact' %}">please report it</a>.</p>
+      <p>{% trans "If you notice incorrect information," %} <a href="{% url 'contact' %}">{% trans "please report it" %}</a>.</p>
     </section>
   </div>
 </section>

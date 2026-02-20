@@ -9,8 +9,6 @@
 from django.urls import reverse
 from django.conf import settings
 
-LANGUAGE_SESSION_KEY = "django_language"
-
 def _is_employer_user(user, request=None):
     """
     Centralized 'is employer?' logic.
@@ -95,7 +93,7 @@ def role_flags(request):
     else:
         public_profile_url = reverse("login")
 
-    session_language = request.session.get(LANGUAGE_SESSION_KEY, "en")
+    session_language = (getattr(request, "LANGUAGE_CODE", "en") or "en").split("-")[0].lower()
     if session_language not in {"en", "es"}:
         session_language = "en"
 
