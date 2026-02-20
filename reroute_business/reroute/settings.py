@@ -134,7 +134,7 @@ SITE_ID = 1
 # ---------- MIDDLEWARE ----------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',   # ✅ must be right after SecurityMiddleware
+    'whitenoise.middleware.WhiteNoiseMiddleware',   # must be right after SecurityMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -201,14 +201,17 @@ CONTACT_RECEIVER_EMAIL = 'support@reroutejobs.com'
 
 
 # ---------- SECURITY ----------
-SESSION_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SECURE = not DEBUG
+# Only enforce HTTPS security controls in deployed environments.
+_HTTPS_ENFORCED = (not DEBUG) and RENDER
+
+SESSION_COOKIE_SECURE = _HTTPS_ENFORCED
+CSRF_COOKIE_SECURE = _HTTPS_ENFORCED
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
-SECURE_SSL_REDIRECT = not DEBUG
+SECURE_SSL_REDIRECT = _HTTPS_ENFORCED
 SECURE_REFERRER_POLICY = os.getenv("SECURE_REFERRER_POLICY", "strict-origin-when-cross-origin")
 
-if not DEBUG:
+if _HTTPS_ENFORCED:
     SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "31536000"))
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
@@ -242,8 +245,8 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 
 SOCIALACCOUNT_ADAPTER = 'reroute_business.main.adapters.CustomSocialAccountAdapter'
 SOCIALACCOUNT_QUERY_EMAIL = True

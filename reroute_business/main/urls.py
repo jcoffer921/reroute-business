@@ -1,5 +1,5 @@
 # main/urls.py
-from django.urls import path, include
+from django.urls import path
 from django.shortcuts import redirect
 from . import views
 from reroute_business.job_list.user import views as user_views
@@ -37,12 +37,6 @@ urlpatterns = [
     # Legacy employer dashboard path → redirect to dashboard app
     path('employer/dashboard/', lambda request: redirect('dashboard:employer'), name='employer_dashboard'),
     path('accounts/role-redirect/', views.oauth_role_redirect, name='oauth_role_redirect'),
-
-    # ================ Apps ================
-    path('blog/', include('reroute_business.blog.urls')),
-    path('resumes/', include('reroute_business.resumes.urls')),
-    path('profile/', include('reroute_business.profiles.urls')),     # includes user_profile route
-    path('dashboard/', include(('reroute_business.dashboard.urls', 'dashboard'), namespace='dashboard')),
 
     # ================ User-side Job Board (prefixed) ================
     path('opportunities/', user_views.opportunities_view, name='opportunities'),

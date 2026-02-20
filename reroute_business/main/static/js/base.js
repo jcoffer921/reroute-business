@@ -35,6 +35,27 @@
   }
 
   let lastFocusedBeforeOpen = null;
+  let savedScrollY = 0;
+
+  function lockBodyScroll() {
+    savedScrollY = window.scrollY || 0;
+    document.body.classList.add('no-scroll');
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${savedScrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+  }
+
+  function unlockBodyScroll() {
+    document.body.classList.remove('no-scroll');
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    window.scrollTo(0, savedScrollY);
+  }
 
   function openMobileMenu() {
     if (!mobileMenu) return;
@@ -45,8 +66,9 @@
     // Show drawer
     mobileMenu.classList.add('show');            // your CSS uses .mobile-menu.show { left: 0; }
     mobileMenu.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('no-scroll');    // prevent background scroll
+    lockBodyScroll();
     hamburgerBtn?.setAttribute('aria-expanded', 'true');
+    hamburgerBtn?.setAttribute('aria-label', 'Close menu');
 
     // Show backdrop
     if (backdrop) { backdrop.classList.add('show'); backdrop.removeAttribute('hidden'); }
@@ -61,8 +83,9 @@
 
     mobileMenu.classList.remove('show');
     mobileMenu.setAttribute('aria-hidden', 'true');
-    document.body.classList.remove('no-scroll');
+    unlockBodyScroll();
     hamburgerBtn?.setAttribute('aria-expanded', 'false');
+    hamburgerBtn?.setAttribute('aria-label', 'Open menu');
 
     if (backdrop) { backdrop.classList.remove('show'); backdrop.setAttribute('hidden', ''); }
 
@@ -75,8 +98,14 @@
   }
 
   // Keep your inline HTML working too if you still call toggleMobileMenu()
-  window.toggleMobileMenu = function toggleMobileMenu() {
+  window.closeMobileMenu = closeMobileMenu;
+  window.toggleMobileMenu = function toggleMobileMenu(forceOpen) {
     if (!mobileMenu) return;
+    if (typeof forceOpen === 'boolean') {
+      if (forceOpen) openMobileMenu();
+      else closeMobileMenu();
+      return;
+    }
     mobileMenu.classList.contains('show') ? closeMobileMenu() : openMobileMenu();
   };
 

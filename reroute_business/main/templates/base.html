@@ -176,22 +176,42 @@
 
     <h2 id="mobileMenuTitle" class="sr-only">Main menu</h2>
 
+    {% if user.is_authenticated %}
+    <div class="mobile-quick-actions" role="group" aria-label="Quick actions">
+        <a href="{% url 'dashboard:my_dashboard' %}" class="mobile-quick-action mobile-quick-action--primary">Dashboard</a>
+        <a href="{% url 'opportunities' %}" class="mobile-quick-action">Find Jobs</a>
+        <a href="{% url 'dashboard:notifications' %}" class="mobile-quick-action">Notifications</a>
+    </div>
+    {% else %}
+    <div class="mobile-quick-actions" role="group" aria-label="Quick actions">
+        <a href="{% url 'signup' %}" class="mobile-quick-action mobile-quick-action--primary">Create Account</a>
+        <a href="{% url 'login' %}" class="mobile-quick-action">Sign In</a>
+        <a href="{% url 'opportunities' %}" class="mobile-quick-action">Browse Jobs</a>
+    </div>
+    {% endif %}
+
+    <p class="mobile-nav-section-label">Explore</p>
     <ul class="mobile-nav-links">
+        <li><a href="{% url 'home' %}">Home</a></li>
         <li><a href="{% url 'about_us' %}">About Us</a></li>
         <li><a href="{% url 'blog_list' %}">Blog</a></li>
-        <li><a href="{% url 'home' %}">Home</a></li>
         <li><a href="{% url 'opportunities' %}">Opportunities</a></li>
         <li><a href="{% url 'reentry_org:organization_catalog' %}">Reentry Organizations</a></li>
-        <li><a href="{% url 'pricing' %}">Pricing</a></li>
         <li><a href="{% url 'resource_list' %}">Resources</a></li>
+        <li><a href="{% url 'pricing' %}">Pricing</a></li>
         <li><a href="{% url 'faq' %}">FAQ</a></li>
-        {% if user.is_authenticated %}
-        <li><a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a></li>
-        {% else %}
-        <li><a href="{% url 'login' %}">Login</a></li>
-        <li><a href="{% url 'signup' %}">Get Started</a></li>
-        {% endif %}
     </ul>
+
+    {% if user.is_authenticated %}
+    <p class="mobile-nav-section-label">Account</p>
+    <ul class="mobile-nav-links mobile-nav-links--account">
+        <li><a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'dashboard:notifications' %}">Notifications</a></li>
+        <li><a href="{{ PUBLIC_PROFILE_URL }}">View Profile</a></li>
+        <li><a href="{{ PROFILE_URL }}">Profile Settings</a></li>
+        <li><a href="{% url 'settings' %}">Settings</a></li>
+    </ul>
+    {% endif %}
 
     {# =================== MOBILE USER FOOTER =================== #}
     {% if user.is_authenticated %}

@@ -19,6 +19,7 @@
   /* NEW: Navbar dimensions */
   --nav-h: 72px;     /* desktop navbar height */
   --nav-h-sm: 60px;  /* mobile navbar height */
+  --mobile-safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* ========== RESET ========== */
@@ -145,6 +146,24 @@ iframe { max-width: 100%; border: 0; }
 
 /* Common layout blocks collapse padding on mobile for better fit */
 @media (max-width: 768px) {
+  /* iOS zoom prevention and better tap sizing */
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea { font-size: 16px; }
+
+  button,
+  .button,
+  [role="button"] { min-height: 44px; }
+
+  /* Horizontal overflow safety for data-heavy pages */
+  table { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Keep common container wrappers readable on narrow screens */
+  .container,
+  .flash-messages,
+  .signup-container,
+  .resume-form-panel { max-width: 100%; }
+
   /* Hero typography scaling */
   .home-hero .hero-content h1 { font-size: 2rem; }
   .home-hero .hero-content p { font-size: 1rem; }
@@ -371,42 +390,109 @@ iframe { max-width: 100%; border: 0; }
   /* Sliding mobile drawer */
   .mobile-menu {
     position: fixed; top: 0; left: -100%; width: 88%; max-width: 420px; height: 100vh; max-height: 100dvh;
-    background: #fff; z-index: 2000; padding: 1.25rem; display: flex; flex-direction: column;
-    justify-content: space-between; transition: left .3s ease-in-out; box-shadow: 6px 0 20px rgba(0,0,0,.2);
+    background: #fff; z-index: 2000; padding: 1rem 1rem calc(1rem + var(--mobile-safe-bottom)); display: flex; flex-direction: column;
+    justify-content: flex-start; transition: left .26s ease-in-out; box-shadow: 12px 0 26px rgba(0,0,0,.2);
     overflow-y: auto;                 /* allow inside scrolling when content is tall */
     -webkit-overflow-scrolling: touch;/* smooth momentum scroll on iOS */
     overscroll-behavior: contain;     /* prevent background scroll chaining */
   }
   .mobile-menu.show { left: 0; }
 
-  .mobile-menu-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .mobile-menu-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: .9rem; }
   .mobile-logo img { height: 36px; }
+  .mobile-menu .close-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    color: #0f172a;
+  }
 
-  .mobile-nav-links { list-style: none; padding: 0; margin: .5rem 0 1rem; }
-  .mobile-nav-links li { margin: .25rem 0; }
+  .mobile-quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .6rem;
+    margin: .2rem 0 .95rem;
+  }
+  .mobile-quick-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    border-radius: 10px;
+    border: 1px solid #dbe3ec;
+    color: #0f172a;
+    background: #f8fafc;
+    text-decoration: none;
+    font-size: .95rem;
+    font-weight: 700;
+    padding: 0 .7rem;
+  }
+  .mobile-quick-action--primary {
+    color: #fff;
+    background: var(--primary-blue);
+    border-color: var(--primary-blue);
+  }
+  .mobile-nav-section-label {
+    margin: .9rem 0 .3rem;
+    font-size: .74rem;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: #64748b;
+  }
+
+  .mobile-nav-links { list-style: none; padding: 0; margin: 0 0 .4rem; }
+  .mobile-nav-links li { margin: .15rem 0; }
   .mobile-nav-links a {
-    display: block; padding: .9rem .25rem; font-size: 1.05rem; font-weight: 600; color: #111; text-decoration: none;
+    display: block;
+    padding: .76rem .6rem;
+    font-size: 1.02rem;
+    font-weight: 600;
+    color: #111;
+    text-decoration: none;
+    border-radius: 10px;
+    border: 1px solid transparent;
   }
   .mobile-nav-links a:active { background: #f2f2f2; }
+  .mobile-nav-links a:hover,
+  .mobile-nav-links a:focus-visible {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    outline: none;
+  }
+  .mobile-nav-links--account a {
+    font-size: .97rem;
+    padding: .68rem .6rem;
+  }
 
-  .mobile-user-footer { display: flex; flex-direction: column; align-items: center; padding-top: 1rem; border-top: 1px solid #eee; }
+  .mobile-user-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: auto;
+    padding-top: .9rem;
+    border-top: 1px solid #eee;
+  }
   .mobile-user-footer.guest { justify-content: space-between; }
   .user-initials-circle {
     background: var(--accent-cyan); color: #fff; font-weight: 700; border-radius: 50%;
-    width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; margin-bottom: .5rem;
+    width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; margin-bottom: .5rem;
   }
-  .user-initials-circle.disabled { opacity: .5; pointer-events: none; }
-  .mobile-user-name { font-weight:600; text-decoration:none; color: inherit; }
-  .logout-form { margin-left:auto; }
+  .user-initials-circle.disabled { opacity: .5; pointer-events: none; background: #94a3b8; }
+  .mobile-user-name { font-weight: 700; text-decoration: none; color: #0f172a; margin-bottom: .45rem; }
+  .logout-form { margin: 0; }
   .logout-btn, .login-btn, .signup-btn {
-    background:#3b82f6; color:#fff; border:none; padding:.5rem .9rem; border-radius:6px; text-decoration:none; display:inline-block;
+    background:#3b82f6; color:#fff; border:none; padding:.6rem .95rem; border-radius:8px; text-decoration:none; display:inline-block;
   }
-  .mobile-menu .logout-btn { background: #ffecec; color: #b20000; border: none; padding: 10px 16px; font-weight: 700; border-radius: 6px; cursor: pointer; }
+  .mobile-menu .logout-btn { background: #ffecec; color: #b20000; border: 1px solid #ffd1d1; padding: 10px 16px; font-weight: 700; border-radius: 8px; cursor: pointer; }
+  .mobile-user-footer.guest .login-btn,
+  .mobile-user-footer.guest .signup-btn { width: 100%; text-align: center; margin-top: .35rem; }
   .signup-btn { background:#10b981; }
 
 
   /* Optional: prevent page scroll when menu open (toggle .no-scroll on <body> in JS) */
-  body.no-scroll { overflow: hidden; }
+  body.no-scroll { overflow: hidden; touch-action: none; }
 }
 
 
