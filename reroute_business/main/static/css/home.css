@@ -15,12 +15,15 @@
 @media (max-width: 900px){ .support-grid { grid-template-columns: 1fr; } }
 
 .support-card {
+  display: block;
   background: #fff;
   border: 1px solid #eef2f7;
   border-radius: 18px;
   padding: 1.75rem;
   box-shadow: 0 12px 30px rgba(10, 34, 80, 0.08);
   position: relative;
+  text-decoration: none;
+  transition: box-shadow 0.18s ease, border-color 0.18s ease;
 }
 .support-card::after {
   content: "";
@@ -31,10 +34,27 @@
   height: 8px;
   border-top: 2px solid rgba(148, 163, 184, 0.7);
   border-right: 2px solid rgba(148, 163, 184, 0.7);
-  transform: rotate(45deg);
+  transform: rotate(45deg) translateX(0);
+  transition: transform 0.18s ease;
 }
 .support-card h3 { margin: .75rem 0 .45rem; font-size: 1.25rem; font-weight: 800; color: #0F172A; }
 .support-card p { margin: 0; color: #64748b; line-height: 1.6; }
+.support-card:hover {
+  cursor: pointer;
+  border-color: #e1e8f2;
+  box-shadow: 0 18px 34px rgba(10, 34, 80, 0.12);
+}
+.support-card:hover::after {
+  transform: rotate(45deg) translateX(4px);
+}
+.support-card:focus-visible {
+  outline: 2px solid #1d4ed8;
+  outline-offset: 2px;
+  border-color: #d8e3f6;
+}
+.support-card:focus-visible::after {
+  transform: rotate(45deg) translateX(4px);
+}
 
 .support-icon {
   width: 54px;

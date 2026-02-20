@@ -21,11 +21,11 @@
     </div>
     <div class="hero-content">
         <h1 class="hero-message">
-            <span class="hero-message-line hero-message-line--dark">Fair-chance hiring,</span>
-            <span class="hero-message-line hero-message-line--accent">done right.</span>
+            <span class="hero-message-line hero-message-line--dark">Your pathway to</span>
+            <span class="hero-message-line hero-message-line--accent">support, stability, and opportunity.</span>
         </h1>
         <p class="hero-tagline">Rebuild. Reclaim. ReRoute.</p>
-        <p class="hero-subheadline">Prepare your profile today and be first in line when fair-chance opportunities open.</p>
+        <p class="hero-subheadline">ReRoute connects justice-impacted Philadelphians to trusted organizations, workforce programs, and fair-chance employers - all in one place.</p>
         <p class="hero-microcopy">Employers are onboarding now. Early profiles get priority access when jobs launch.</p>
         <div class="hero-ctas">
             <a href="{% url 'early_access_cta' %}" class="cta-button cta-seekers">Build Your Resume (Free)</a>
@@ -38,26 +38,26 @@
   <div class="prep-inner">
     <div class="prep-header reveal">
       <h2>Getting Started with ReRoute</h2>
-      <p class="prep-sub">Prepare your profile, build your resume, and get early access to fair-chance employers.</p>
+      <p class="prep-sub">Find the support you need, build your profile, and prepare for fair-chance opportunity.</p>
     </div>
     <div class="prep-steps reveal-group">
       <article class="prep-step reveal-item">
-        <h3>Create Your Profile</h3>
-        <p>Tell us about your skills, experience, and goals.</p>
+        <h3>Find Support That Fits</h3>
+        <p>Answer a few questions and discover programs and resources tailored to you.</p>
       </article>
       <article class="prep-step reveal-item">
-        <h3>Build Your Resume</h3>
-        <p>Create or upload a resume you can use anywhere.</p>
+        <h3>Build Your Profile</h3>
+        <p>Create a clear, structured profile to track your progress.</p>
       </article>
       <article class="prep-step reveal-item">
-        <h3>Get Early Access</h3>
-        <p>Employers are onboarding. Completed profiles get priority access when jobs launch.</p>
+        <h3>Prepare for Opportunity</h3>
+        <p>Build your resume and get early access to fair-chance employers.</p>
       </article>
     </div>
-    <p class="prep-note reveal">We're in conversations with reentry organizations to expand access to support, training, and employer connections as the platform grows.</p>
+    <p class="prep-note reveal">We're building alongside reentry organizations to expand access to support, training, and fair-chance employer connections as the platform grows.</p>
     <div class="prep-cta reveal">
-      <a href="{% url 'early_access_cta' %}" class="cta-button cta-seekers">Build Your Resume (Free)</a>
-      <p class="prep-microcopy">Early users get priority access when employers launch.</p>
+      <a href="{% url 'benefit_finder:start' %}" class="cta-button cta-seekers">Take the Quick Assessment</a>
+      <p class="prep-microcopy">As employer partnerships expand, early users will receive priority access.</p>
     </div>
   </div>
 </section>
@@ -66,9 +66,9 @@
   <div class="vision-inner vision-theme-primary">
     <div class="vision-left reveal">
       <h2>Our Vision</h2>
-      <p>At ReRoute, our vision is to break down the stigma surrounding men and women navigating the reentry process. We are building a community that embraces second chances, a space where individuals once shut out by society are supported, not judged.</p>
-      <p>ReRoute exists to rebuild trust, restore dignity, and reshape how we view justice-involved individuals. We believe it takes a village not only to raise a child, but to uplift our mothers, fathers, siblings, and neighbors who deserve another shot at life.</p>
-      <p>As we grow, we aspire to expand our support through access to technology, education, trade certifications, therapy and personal development, paving new pathways to purpose and opportunity.</p>
+      <p>At ReRoute, our vision is to reduce recidivism by removing stigma and reducing the barriers that stand between justice-impacted individuals and real opportunity.</p>
+      <p>We believe that reentry should not require navigating a fragmented system alone. By organizing access to trusted support, workforce training, and fair-chance employment, we aim to simplify the journey from incarceration to long-term stability.</p>
+      <p>ReRoute exists to restore dignity, rebuild trust, and reshape how opportunity is extended to those returning home. As we grow, we are committed to expanding coordinated pathways that make support easier to access and success easier to sustain.</p>
       <div class="vision-actions">
         <a href="{% url 'about_us' %}" class="vision-btn" aria-label="Learn more about ReRoute">Learn More</a>
       </div>
@@ -82,10 +82,10 @@
   <div class="support-inner">
     <div class="support-header reveal">
       <h2>This platform doesn't disappear after signup.</h2>
-      <p>ReRoute offers ongoing resources for job seekers and employers — because real change takes sustained support.</p>
+      <p>ReRoute offers ongoing support and resources because real change takes sustained effort.</p>
     </div>
-    <div class="support-grid reveal-group">
-      <article class="support-card reveal-item">
+    <div class="support-grid reveal-group" data-user-logged-in="{% if user.is_authenticated %}true{% else %}false{% endif %}">
+      <a class="support-card reveal-item" href="{% url 'resource_list' %}" aria-label="Explore Reentry Support Network" data-card-name="Reentry Support Network">
         <div class="support-icon support-icon--purple" aria-hidden="true">
           <svg viewBox="0 0 24 24">
             <path d="M12 3v10" />
@@ -93,38 +93,38 @@
             <rect x="5" y="14" width="14" height="7" rx="3" />
           </svg>
         </div>
-        <h3>Interview preparation</h3>
-        <p>Practice common questions, build confidence, and learn what fair-chance employers look for.</p>
-      </article>
-      <a class="support-card reveal-item" href="{% url 'resumes:resume_landing' %}">
+        <h3>Reentry Support Network</h3>
+        <p>Connect with trusted organizations and services.</p>
+      </a>
+      <a class="support-card reveal-item" href="{% url 'benefit_finder:start' %}" aria-label="Explore Benefit Finder" data-card-name="Benefit Finder">
         <div class="support-icon support-icon--blue" aria-hidden="true">
           <svg viewBox="0 0 24 24">
             <rect x="5" y="3" width="14" height="18" rx="2" />
             <path d="M8 7h6M8 11h6M8 15h4" />
           </svg>
         </div>
-        <h3>Resume guidance</h3>
-        <p>Create a resume that highlights your skills and readiness — structured for fair-chance roles.</p>
+        <h3>Benefit Finder</h3>
+        <p>Find programs tailored to your needs.</p>
       </a>
-      <article class="support-card reveal-item">
+      <a class="support-card reveal-item" href="{% url 'dashboard:my_dashboard' %}" aria-label="Explore Build Your Profile" data-card-name="Build Your Profile">
         <div class="support-icon support-icon--green" aria-hidden="true">
           <svg viewBox="0 0 24 24">
             <rect x="4" y="3" width="16" height="18" rx="2" />
             <path d="M8 7h8M8 11h8M8 15h4" />
           </svg>
         </div>
-        <h3>Fair-chance hiring guides</h3>
-        <p>For employers: step-by-step resources to build a compliant, effective fair-chance program.</p>
-      </article>
-      <article class="support-card reveal-item">
+        <h3>Build Your Profile</h3>
+        <p>Create a clear, structured profile to track your progress.</p>
+      </a>
+      <a class="support-card reveal-item" href="{% url 'resumes:resume_landing' %}" aria-label="Explore Resume Builder" data-card-name="Resume Builder">
         <div class="support-icon support-icon--orange" aria-hidden="true">
           <svg viewBox="0 0 24 24">
             <path d="M12 21s-6-4.4-8.5-7C1.5 11.5 2.4 8 5.8 8c2 0 3.2 1.1 4.2 2.3C11 9.1 12.2 8 14.2 8c3.4 0 4.3 3.5 2.3 6-2.5 2.6-8.5 7-8.5 7z" />
           </svg>
         </div>
-        <h3>Reentry support network</h3>
-        <p>Connect with organizations and services that support successful reentry and career building.</p>
-      </article>
+        <h3>Resume Builder</h3>
+        <p>Build a strong resume and stay ready for new opportunities.</p>
+      </a>
     </div>
   </div>
 </section>
@@ -142,7 +142,8 @@
     </div>
     <h2>Building carefully,<br>not quickly.</h2>
     <p class="early-access-copy">
-      ReRoute is currently onboarding job seekers, employers, and reentry organizations. Roles and resources will appear as partners complete verification. Early users receive priority access as opportunities launch.
+      ReRoute is currently onboarding early users and partnering with reentry organizations, with employer access expanding as verification is 
+      completed. Early users receive priority access as opportunities launch.
     </p>
     <div class="early-access-grid">
       <div class="early-access-card">
@@ -171,11 +172,11 @@
       </div>
     </div>
     <div class="early-access-actions">
-      <a href="{% url 'early_access_cta' %}" class="early-access-btn">Join Early Access</a>
       <form class="early-access-form" action="{% url 'early_access_cta' %}" method="get">
         <label class="visually-hidden" for="earlyAccessEmail">Email address</label>
         <input type="email" id="earlyAccessEmail" name="email" placeholder="Your email address" />
       </form>
+      <a href="{% url 'early_access_cta' %}" class="early-access-btn">Join Early Access</a>
     </div>
   </div>
 </section>
@@ -184,10 +185,10 @@
   <div class="join-intent-inner">
     <div class="join-intent-line"></div>
     <h2>ReRoute is growing<br>with intention.</h2>
-    <p>Join now, and be part of a platform built to last.</p>
+    <p>Join now and help shape a platform designed to reduce barriers and expand opportunity.</p>
     <div class="join-intent-actions">
       <a href="{% url 'early_access_cta' %}" class="join-intent-primary">Get Started as a Job Seeker</a>
-      <a href="{% url 'employer_signup' %}" class="join-intent-secondary">Partner as an Employer</a>
+      <a href="{% url 'resource_list' %}" class="join-intent-secondary">Explore Our Resources</a>
     </div>
   </div>
 </section>

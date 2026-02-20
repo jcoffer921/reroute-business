@@ -273,9 +273,6 @@
       var button = document.createElement('button');
       button.type = 'button';
       button.className = 'bf-choice';
-      if (option.length > 18 || option === 'Prefer not to say') {
-        button.classList.add('bf-choice--full');
-      }
 
       var label = document.createElement('span');
       label.textContent = option;

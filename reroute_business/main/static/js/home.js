@@ -158,3 +158,37 @@
 
   revealItems.forEach(el => observer.observe(el));
 })();
+
+// Track homepage "Ongoing Support" card engagement
+(function () {
+  const cards = document.querySelectorAll('.support-card[data-card-name]');
+  if (!cards.length) return;
+
+  const supportGrid = document.querySelector('.support-grid[data-user-logged-in]');
+  const isLoggedIn = supportGrid && supportGrid.getAttribute('data-user-logged-in') === 'true';
+
+  cards.forEach((card) => {
+    card.addEventListener('click', () => {
+      const payload = {
+        event: 'homepage_card_click',
+        card_name: card.getAttribute('data-card-name') || '',
+        user_logged_in: !!isLoggedIn,
+        timestamp: new Date().toISOString(),
+      };
+
+      if (Array.isArray(window.dataLayer)) {
+        window.dataLayer.push(payload);
+      }
+
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'homepage_card_click', {
+          card_name: payload.card_name,
+          user_logged_in: payload.user_logged_in,
+          timestamp: payload.timestamp,
+        });
+      }
+
+      window.dispatchEvent(new CustomEvent('homepage_card_click', { detail: payload }));
+    });
+  });
+})();
