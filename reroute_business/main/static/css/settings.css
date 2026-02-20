@@ -66,6 +66,61 @@
 .notify-help { margin: 0; font-size: .9rem; color: #6b7280; }
 .notify-actions { display: flex; justify-content: flex-end; margin-top: .5rem; }
 
+.ax-settings-form { display: grid; gap: .9rem; }
+.ax-settings-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: .75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #f3f4f6;
+  padding: 1rem;
+}
+.ax-settings-copy { min-width: 0; }
+.ax-settings-title {
+  margin: 0;
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 1rem;
+}
+.ax-settings-sub {
+  margin: .25rem 0 0;
+  color: #64748b;
+  font-size: .9rem;
+}
+.ax-settings-control select {
+  min-width: 165px;
+  border-radius: 12px;
+  border: 1px solid #d2d6de;
+  background: #f5f6f8;
+  color: #0f172a;
+  min-height: 42px;
+  padding: 0.45rem 2rem 0.45rem 0.8rem;
+  font-size: .95rem;
+}
+.ax-settings-disclaimer {
+  border: 1px solid #d6e8ee;
+  background: #d8e6eb;
+  color: #47627f;
+  border-radius: 10px;
+  padding: .85rem 1rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: .65rem;
+  align-items: center;
+}
+.ax-settings-disclaimer svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  fill: none;
+  stroke: #00a7de;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ax-settings-disclaimer p { margin: 0; font-size: .9rem; }
+
 .toggle { position: relative; width: 46px; height: 26px; display: inline-block; }
 .toggle input { display: none; }
 .toggle .slider { position: absolute; inset: 0; background: #e5e7eb; border-radius: 999px; transition: background .2s ease; }
@@ -194,6 +249,7 @@ input[type="password"]:focus {
   .kv__row { grid-template-columns: 1fr !important; gap: 4px; }
   .settings-card { padding: 16px; }
   .notify-row { grid-template-columns: 1fr; align-items: start; }
+  .ax-settings-card { grid-template-columns: 1fr; align-items: start; }
 }
 
 /* Optional: better focus style */
@@ -871,7 +927,7 @@ body.modal-open { overflow: hidden; }
 }
 
 .skills-card .settings-card__title {
-  font-size: clamp(1.7rem, 2.6vw, 2.1rem);
+  font-size: 1.2rem;
   font-weight: 800;
   color: #0b1734;
   letter-spacing: -0.01em;
@@ -885,7 +941,7 @@ body.modal-open { overflow: hidden; }
 
 .skills-card .skills-column h4 {
   margin: 0 0 0.6rem;
-  font-size: clamp(1.2rem, 1.8vw, 1.45rem);
+  font-size: 1rem;
   font-weight: 760;
   color: #0f172a;
 }
@@ -921,7 +977,7 @@ body.modal-open { overflow: hidden; }
   background: #f5f6f8;
   color: #111827;
   padding: 0;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   line-height: 1;
   font-weight: 500;
 }
@@ -979,7 +1035,7 @@ body.modal-open { overflow: hidden; }
 }
 
 .skills-card .muted {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: #64748b;
 }
 
@@ -990,11 +1046,11 @@ body.modal-open { overflow: hidden; }
   }
 
   .skills-card .settings-card__title {
-    font-size: 2rem;
+    font-size: 1.2rem;
   }
 
   .skills-card .skills-column h4 {
-    font-size: 1.55rem;
+    font-size: 1rem;
   }
 
   .skills-card .pill-input-row {
@@ -1009,7 +1065,7 @@ body.modal-open { overflow: hidden; }
     width: 64px;
     min-width: 64px;
     height: 64px;
-    font-size: 1.95rem;
+    font-size: 1.25rem;
   }
 }
 
@@ -1028,7 +1084,7 @@ body.modal-open { overflow: hidden; }
     width: 56px;
     min-width: 56px;
     height: 56px;
-    font-size: 1.7rem;
+    font-size: 1.2rem;
   }
 
   .skills-card [data-skill-section="core"] .pill-chip--editable,
@@ -1048,7 +1104,7 @@ body.modal-open { overflow: hidden; }
 }
 
 .experience-card .settings-card__title {
-  font-size: clamp(1.5rem, 2.2vw, 1.8rem);
+  font-size: 1.2rem;
 }
 
 .experience-add-btn {
@@ -1058,7 +1114,7 @@ body.modal-open { overflow: hidden; }
   border: 1px solid #d9dee5;
   background: #ffffff;
   color: #0b1734;
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 700;
   line-height: 1;
   padding: 0 0.8rem;
@@ -1230,7 +1286,7 @@ body.modal-open { overflow: hidden; }
 }
 
 .privacy-card .settings-card__title {
-  font-size: clamp(1.4rem, 2.1vw, 1.7rem);
+  font-size: 1.2rem;
   font-weight: 800;
   color: #0b1734;
 }
@@ -1254,14 +1310,14 @@ body.modal-open { overflow: hidden; }
 
 .privacy-option-title {
   margin: 0;
-  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  font-size: 1rem;
   font-weight: 760;
   color: #0b1734;
 }
 
 .privacy-option-subtitle {
   color: #516b8a;
-  font-size: clamp(0.88rem, 1.1vw, 1rem);
+  font-size: 0.9rem;
   line-height: 1.35;
 }
 
@@ -1395,7 +1451,7 @@ body.modal-open { overflow: hidden; }
   .experience-add-btn {
     min-height: 50px;
     min-width: 120px;
-    font-size: 1.75rem;
+    font-size: 0.95rem;
   }
 
   .experience-block {
@@ -1439,7 +1495,7 @@ body.modal-open { overflow: hidden; }
   .experience-add-btn {
     min-height: 46px;
     min-width: 108px;
-    font-size: 1.55rem;
+    font-size: 0.95rem;
   }
 
   .experience-block .form-row-2 {

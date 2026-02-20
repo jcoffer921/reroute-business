@@ -64,7 +64,7 @@
       <span class="nav-sub">Subscription &amp; plans</span>
     </button>
 
-    <a class="nav-card" href="{% url 'settings_accessibility' %}" aria-label="{% trans 'Open Accessibility & Experience settings' %}">
+    <button class="nav-card" data-panel="accessibility" aria-label="{% trans 'Open Accessibility & Experience settings' %}">
       <span class="nav-icon" aria-hidden="true">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 3l7 4v5c0 4.5-3.1 8.1-7 9-3.9-.9-7-4.5-7-9V7l7-4z" stroke="#006da0" stroke-width="1.6"/>
@@ -73,7 +73,7 @@
       </span>
       <span class="nav-title">{% trans "Accessibility & Experience" %}</span>
       <span class="nav-sub">{% trans "Language & low data mode" %}</span>
-    </a>
+    </button>
 
     <button class="nav-card" data-panel="notifications">
       <span class="nav-icon" aria-hidden="true">
@@ -528,6 +528,54 @@
 
           <div class="notify-actions">
             <button type="button" class="btn btn-secondary btn-pill btn-sm" disabled>Save Preferences</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Accessibility Panel -->
+    <section class="panel" id="panel-accessibility" aria-labelledby="tab-accessibility">
+      <div class="settings-section">
+        <h2>{% trans "Accessibility & Experience" %}</h2>
+        <form method="POST" class="ax-settings-form">
+          {% csrf_token %}
+          <input type="hidden" name="update_accessibility" value="1">
+
+          <div class="ax-settings-card">
+            <div class="ax-settings-copy">
+              <label for="axLanguage" class="ax-settings-title">{% trans "Language" %}</label>
+              <p class="ax-settings-sub">{% trans "Choose your preferred language" %}</p>
+            </div>
+            <div class="ax-settings-control">
+              <select id="axLanguage" name="language">
+                <option value="en" {% if selected_language == 'en' %}selected{% endif %}>{% trans "English" %}</option>
+                <option value="es" {% if selected_language == 'es' %}selected{% endif %}>{% trans "Español" %}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="ax-settings-card">
+            <div class="ax-settings-copy">
+              <label for="axLowData" class="ax-settings-title">{% trans "Low data mode" %}</label>
+              <p class="ax-settings-sub">{% trans "Reduces images and animations to save data" %}</p>
+            </div>
+            <div class="ax-settings-control">
+              <label class="toggle" for="axLowData">
+                <input id="axLowData" name="low_data_mode" type="checkbox" role="switch" aria-label="{% trans 'Enable low data mode' %}" {% if low_data_mode_enabled %}checked{% endif %}>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <aside class="ax-settings-disclaimer" aria-label="{% trans 'Privacy notice' %}">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 3 5 6v6c0 5 3.4 7.8 7 9 3.6-1.2 7-4 7-9V6Z"></path>
+            </svg>
+            <p>{% trans "Your preferences are stored on your device only. We do not track you." %}</p>
+          </aside>
+
+          <div class="notify-actions">
+            <button type="submit" class="btn btn-secondary btn-pill btn-sm">{% trans "Save Preferences" %}</button>
           </div>
         </form>
       </div>
