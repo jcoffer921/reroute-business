@@ -81,9 +81,18 @@
       </section>
 
       <section class="bf-results-section bf-actions">
-        <button type="button" class="bf-btn bf-btn--primary" id="bfDownloadPrintBtn">Download / Print My Plan</button>
-        <a href="{% url 'resource_directory' %}" class="bf-btn bf-btn--outline" id="bfResourcesLink">Browse Resources Near Me</a>
-        <a href="{% url 'reentry_org:organization_catalog' %}" class="bf-btn bf-btn--outline" id="bfOrgLink">Get Help From a Reentry Org</a>
+        <button type="button" class="bf-btn bf-btn--primary" id="bfDownloadPrintBtn">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 18h14"></path></svg>
+          Download / Print My Plan
+        </button>
+        <a href="{% url 'resource_directory' %}" class="bf-btn bf-btn--outline" id="bfResourcesLink">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"></circle><path d="m16.5 16.5 4 4"></path></svg>
+          Browse Resources Near Me
+        </a>
+        <a href="{% url 'reentry_org:organization_catalog' %}" class="bf-btn bf-btn--outline" id="bfOrgLink">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4ZM8 13a3 3 0 1 0-3-3 3 3 0 0 0 3 3Z"></path><path d="M3 20a5 5 0 0 1 10 0M11 20a5 5 0 0 1 10 0"></path></svg>
+          Get Help From a Reentry Org
+        </a>
       </section>
 
       <section class="bf-results-section bf-sources">

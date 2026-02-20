@@ -1,6 +1,6 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-{% load static %}
 <head>
     <meta charset="UTF-8">
     {# NOTE: no custom template tags needed; context processor provides IS_EMPLOYER + DASHBOARD_URL #}
@@ -63,7 +63,7 @@
                         </span>
                         <span class="user-menu-name">{{ user.first_name|default:user.username }}</span>
                     </button>
-                    <div class="user-dropdown" id="userDropdown" role="menu" aria-labelledby="userMenuButton">
+                    <div class="user-dropdown" id="userDropdown" aria-label="User menu">
                         <a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a>
                         <a href="{{ PUBLIC_PROFILE_URL }}">View Profile</a>
                         <a href="{{ PROFILE_URL }}">Profile Settings</a>
@@ -118,7 +118,7 @@
                     <h4>Quick Links</h4>
                     <ul>
                         <li><a href="{% url 'about_us' %}">About Us</a></li>
-                        <li><a href="{% url 'blog_list' %}">Blog</a></li>
+                        <li><a href="{% url 'blog_list' %}">Journal</a></li>
                         <li><a href="{% url 'contact' %}">Contact Us</a></li>
                         <li><a href="{% url 'home' %}">Home</a></li>
                         <li><a href="{% url 'opportunities' %}">Opportunities</a></li>

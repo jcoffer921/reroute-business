@@ -379,22 +379,46 @@
 }
 
 .bf-category-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  text-decoration: none;
+  color: inherit;
   border: 1px solid #d4def3;
   border-radius: 14px;
   background: #fff;
-  padding: 0.9rem;
+  padding: 0.9rem 1rem;
+  transition: border-color 0.2s ease;
 }
 
 .bf-category-card h4 {
   margin: 0;
-  color: #1d4f9f;
+  color: #0f172a;
   font-size: 1rem;
 }
 
-.bf-category-card p {
-  margin: 0.4rem 0 0;
-  color: #475569;
-  font-size: 0.92rem;
+.bf-category-card:hover,
+.bf-category-card:focus-visible {
+  border-color: #2d6cdf;
+  outline: none;
+}
+
+.bf-category-card__arrow {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: #b5bfcc;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+  transition: stroke 0.2s ease;
+}
+
+.bf-category-card:hover .bf-category-card__arrow,
+.bf-category-card:focus-visible .bf-category-card__arrow {
+  stroke: #2d6cdf;
 }
 
 .bf-actions {
@@ -413,8 +437,13 @@
 }
 
 .bf-sources p {
-  color: #64748b;
+  color: #98a3b5;
   font-size: 0.92rem;
+}
+
+.bf-sources h3,
+.bf-sources li {
+  color: #98a3b5;
 }
 
 .bf-sources ul {
@@ -427,7 +456,25 @@
 }
 
 .bf-sources a {
-  color: #1d4f9f;
+  color: #98a3b5;
+}
+
+.bf-actions .bf-btn {
+  min-height: 44px;
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.bf-actions .bf-btn svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  margin-right: 0.45rem;
+  flex-shrink: 0;
 }
 
 .benefit-finder.low-data-mode {

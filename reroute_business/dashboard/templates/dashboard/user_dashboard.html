@@ -225,37 +225,28 @@
             <path d="M8 6h8" />
           </svg>
         </span>
-        <h2>Recommended Learning</h2>
+        <h2>Recommended Modules</h2>
       </div>
     </div>
-    <div class="learning-list">
-      {% for mod in recommended_modules|slice:':2' %}
-      <a class="learning-item" href="{% url 'resource_list' %}#modules">
+    <div class="module-card-grid">
+      {% for mod in recommended_modules|slice:':3' %}
+      <article class="module-reco-card">
         <span class="learning-icon">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M4 4h16v16H4z" />
             <path d="M8 4v16" />
           </svg>
         </span>
-        <div class="learning-copy">
-          <div class="learning-title">
-            <h3>{{ mod.title }}</h3>
-            <span class="learning-time">10 min</span>
-          </div>
-          <p class="muted">{{ mod.description|default:"Keep building your skills with this module."|truncatechars:90 }}</p>
-          {% if forloop.first %}
-          <div class="learning-progress">
-            <div class="learning-bar" style="width:30%"></div>
-            <span>30%</span>
-          </div>
-          {% endif %}
+        <div class="module-reco-copy">
+          <h3>{{ mod.title }}</h3>
+          <p class="muted">{{ mod.description|default:"Keep building your skills with this module."|truncatechars:120 }}</p>
         </div>
-        <span class="progress-arrow" aria-hidden="true">›</span>
-      </a>
+        <a class="text-link" href="{% url 'module_detail' mod.pk %}">Open module →</a>
+      </article>
       {% empty %}
       <div class="org-placeholder">
         <p>Learning recommendations will appear here once modules are available.</p>
-        <a class="btn-outline" href="{% url 'resource_list' %}#modules">Browse modules</a>
+        <a class="btn-outline" href="{% url 'resource_list' %}">Browse modules</a>
       </div>
       {% endfor %}
     </div>

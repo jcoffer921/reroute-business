@@ -480,6 +480,32 @@
   gap: 16px;
 }
 
+.module-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.module-reco-card {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  padding: 16px;
+  border: 1px solid #dfe8f2;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.module-reco-copy h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--rr-ink);
+}
+
+.module-reco-copy p {
+  margin: 8px 0 0;
+}
+
 .learning-item {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -545,6 +571,7 @@
   .section-grid { grid-template-columns: 1fr; }
   .progress-body { grid-template-columns: 1fr; }
   .org-grid { grid-template-columns: repeat(2, 1fr); }
+  .module-card-grid { grid-template-columns: 1fr 1fr; }
   .mini-stats { grid-template-columns: 1fr 1fr; }
 }
 
@@ -553,6 +580,7 @@
   .dashboard-container { padding: 0 16px; }
   .dashboard-hero-inner { padding: 0 16px; }
   .org-grid { grid-template-columns: 1fr; }
+  .module-card-grid { grid-template-columns: 1fr; }
   .mini-stats { grid-template-columns: 1fr; }
   .jobs-footer { flex-direction: column; align-items: flex-start; }
 }

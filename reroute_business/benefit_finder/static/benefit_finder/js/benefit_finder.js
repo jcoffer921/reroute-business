@@ -89,27 +89,27 @@
   var CATEGORY_META = {
     healthcare: {
       title: 'Healthcare',
-      copy: 'Find clinics and medical support services available in Philadelphia.'
+      url: '/resources/reentry-help/counseling/'
     },
     mental_health: {
       title: 'Mental Health',
-      copy: 'Get counseling and emotional wellness support options with trusted providers.'
+      url: '/resources/reentry-help/counseling/'
     },
     job_training: {
       title: 'Job Training',
-      copy: 'Explore workforce programs, resume support, and CareerLink opportunities.'
+      url: '/resources/job-tools/'
     },
     legal_aid: {
       title: 'Legal Aid',
-      copy: 'Connect with legal teams that help with records, housing rights, and documentation.'
+      url: '/resources/reentry-help/legal-aid/'
     },
     reentry_programs: {
       title: 'Reentry Programs',
-      copy: 'Coordinate with reentry organizations for navigation, stabilization, and case support.'
+      url: '/organizations/catalog/'
     },
     benefits_essentials: {
       title: 'Benefits & Essentials',
-      copy: 'Locate food, housing, ID, and essentials support while you stabilize.'
+      url: '/resources/directory'
     }
   };
 
@@ -410,17 +410,25 @@
       if (!meta) {
         return;
       }
-      var card = document.createElement('article');
+      var card = document.createElement('a');
       card.className = 'bf-category-card';
+      card.href = meta.url || '/resources/directory';
 
       var title = document.createElement('h4');
       title.textContent = meta.title;
 
-      var copy = document.createElement('p');
-      copy.textContent = meta.copy;
-
       card.appendChild(title);
-      card.appendChild(copy);
+
+      var arrow = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      arrow.setAttribute('viewBox', '0 0 24 24');
+      arrow.setAttribute('aria-hidden', 'true');
+      arrow.setAttribute('focusable', 'false');
+      arrow.setAttribute('class', 'bf-category-card__arrow');
+      var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', 'M6 12h12m-5-5 5 5-5 5');
+      arrow.appendChild(path);
+      card.appendChild(arrow);
+
       categoryGridEl.appendChild(card);
     });
 

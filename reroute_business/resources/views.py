@@ -4,6 +4,7 @@ from datetime import datetime
 from urllib.parse import quote
 
 from django.conf import settings
+from django.core.paginator import Paginator
 from django.http import JsonResponse, Http404
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET, require_POST
@@ -191,11 +192,33 @@ def resources_directory(request):
     if not zip_code.isdigit() or len(zip_code) != 5:
         zip_code = ''
 
+    prepared_resources = []
+    for resource in RESOURCE_DIRECTORY:
+        categories = list(resource.get('categories') or [])
+        features = list(resource.get('features') or [])
+        combined_tags = categories + features
+        visible_tags = combined_tags[:5]
+        hidden_tag_count = max(0, len(combined_tags) - len(visible_tags))
+
+        prepared_resource = dict(resource)
+        prepared_resource['card_tags'] = visible_tags
+        prepared_resource['hidden_tag_count'] = hidden_tag_count
+        prepared_resources.append(prepared_resource)
+
+    paginator = Paginator(prepared_resources, 12)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    page_params = request.GET.copy()
+    page_params.pop('page', None)
+    pagination_query = page_params.urlencode()
+
     return render(request, 'resources/directory/directory_list.html', {
-        'resources': RESOURCE_DIRECTORY,
+        'resources': page_obj.object_list,
+        'page_obj': page_obj,
         'filter_categories': DIRECTORY_CATEGORIES,
         'filter_features': DIRECTORY_FEATURES,
         'selected_zip': zip_code,
+        'pagination_query': pagination_query,
         'directory_disclaimer': DIRECTORY_DISCLAIMER,
     })
 

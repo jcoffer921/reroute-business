@@ -77,6 +77,25 @@
     backdrop.addEventListener('click', closeFilterPanel);
   }
 
+  cards.forEach(function (card) {
+    card.addEventListener('click', function (event) {
+      if (event.defaultPrevented) {
+        return;
+      }
+      if (event.target.closest('a, button, input, select, textarea, label')) {
+        return;
+      }
+      var selection = window.getSelection ? window.getSelection().toString() : '';
+      if (selection) {
+        return;
+      }
+      var cardUrl = card.getAttribute('data-card-url');
+      if (cardUrl) {
+        window.location.href = cardUrl;
+      }
+    });
+  });
+
   window.addEventListener('resize', function () {
     if (!isMobileViewport()) {
       if (backdrop) {
