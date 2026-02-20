@@ -40,7 +40,7 @@
 /* Left: Category Cards */
 .settings-nav { display: grid; grid-template-columns: 1fr; gap: 1rem; align-content: start; }
 .nav-group-label { margin: .5rem 0 .25rem; font-size: .9rem; font-weight: 900; text-transform: uppercase; letter-spacing: .4px; color: #64748b; }
-.nav-card { display: grid; grid-template-columns: 40px 1fr; grid-template-rows: auto auto; column-gap: .75rem; row-gap: 2px; align-items: center; padding: 1rem; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 6px 16px rgba(10,34,80,0.06); cursor: pointer; text-align: left; }
+.nav-card { display: grid; grid-template-columns: 40px 1fr; grid-template-rows: auto auto; column-gap: .75rem; row-gap: 2px; align-items: center; padding: 1rem; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 6px 16px rgba(10,34,80,0.06); cursor: pointer; text-align: left; text-decoration: none; color: inherit; }
 .nav-card .nav-icon { grid-row: 1 / span 2; width: 40px; height: 40px; display: grid; place-items: center; background: #f0f6ff; border-radius: 10px; }
 .nav-card .nav-title { font-weight: 800; color: #0f172a; }
 .nav-card .nav-sub { color: #6b7280; font-size: .9rem; }

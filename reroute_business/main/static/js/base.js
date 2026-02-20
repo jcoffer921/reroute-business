@@ -13,6 +13,19 @@
   const qs  = (sel, root = document) => root.querySelector(sel);
   const on  = (el, ev, fn, opts) => el && el.addEventListener(ev, fn, opts);
 
+  /* -------------------------- LOW DATA MODE -------------------------- */
+  if (document.body.classList.contains('low-data-mode')) {
+    document.querySelectorAll('img:not([data-low-data-critical])').forEach((img) => {
+      if (!img.getAttribute('loading')) img.setAttribute('loading', 'lazy');
+      img.setAttribute('decoding', 'async');
+    });
+
+    document.querySelectorAll('video[autoplay]').forEach((video) => {
+      video.removeAttribute('autoplay');
+      try { video.pause(); } catch (_) { }
+    });
+  }
+
   /* -------------------------- MOBILE DRAWER -------------------------- */
   const mobileMenu   = qs('#mobileMenu');        // <div id="mobileMenu" class="mobile-menu">
   const hamburgerBtn = qs('.hamburger');         // <button class="hamburger">☰</button>

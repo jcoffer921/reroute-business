@@ -9,6 +9,8 @@
 from django.urls import reverse
 from django.conf import settings
 
+LANGUAGE_SESSION_KEY = "django_language"
+
 def _is_employer_user(user, request=None):
     """
     Centralized 'is employer?' logic.
@@ -93,11 +95,28 @@ def role_flags(request):
     else:
         public_profile_url = reverse("login")
 
+    session_language = request.session.get(LANGUAGE_SESSION_KEY, "en")
+    if session_language not in {"en", "es"}:
+        session_language = "en"
+
+    low_data_mode = False
+    try:
+        if "low_data_mode" in request.session:
+            low_data_mode = bool(request.session.get("low_data_mode"))
+        elif is_auth:
+            profile = getattr(user, "profile", None) or getattr(user, "userprofile", None)
+            low_data_mode = bool(getattr(profile, "low_data_mode", False)) if profile else False
+            request.session["low_data_mode"] = low_data_mode
+    except Exception:
+        low_data_mode = False
+
     return {
         "IS_EMPLOYER": is_employer,
         "DASHBOARD_URL": dashboard_url,
         "PROFILE_URL": profile_url,
         "PUBLIC_PROFILE_URL": public_profile_url,
+        "LOW_DATA_MODE": low_data_mode,
+        "SITE_LANGUAGE": session_language,
         "COMPANY_LEGAL_NAME": getattr(settings, 'COMPANY_LEGAL_NAME', 'ReRoute Jobs, LLC'),
     }
 

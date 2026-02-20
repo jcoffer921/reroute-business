@@ -1,16 +1,17 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+{% load static %}
 <head>
     <meta charset="UTF-8">
     {# NOTE: no custom template tags needed; context processor provides IS_EMPLOYER + DASHBOARD_URL #}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}ReRoute | Home{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/low_data_mode.css' %}">
     <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
     {% block extra_css %}{% endblock %}
 </head>
-<body class="{% block body_class %}{% endblock %}">
+<body class="{% block body_class %}{% endblock %}{% if LOW_DATA_MODE %} low-data-mode{% endif %}">
     <div class="page-wrapper">
         <!-- =================== NAVBAR (fixed) =================== -->
         <nav class="navbar navbar--auto-hide" data-navbar>

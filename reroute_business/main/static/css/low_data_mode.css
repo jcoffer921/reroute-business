@@ -1,0 +1,34 @@
+body.low-data-mode .hero-ambient,
+body.low-data-mode .ambient-word,
+body.low-data-mode .reveal,
+body.low-data-mode .reveal-item {
+  animation: none !important;
+}
+
+body.low-data-mode .home-hero,
+body.low-data-mode .vision-right,
+body.low-data-mode .profile-hero {
+  background-image: linear-gradient(135deg, #dbeafe, #f8fafc) !important;
+}
+
+body.low-data-mode .vision-right::after,
+body.low-data-mode .profile-hero::after {
+  display: none !important;
+}
+
+body.low-data-mode * {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+/* Preserve essential form and toggle feedback transitions */
+body.low-data-mode input,
+body.low-data-mode select,
+body.low-data-mode textarea,
+body.low-data-mode .toggle .slider,
+body.low-data-mode .toggle .slider::before,
+body.low-data-mode .ax-toggle__slider,
+body.low-data-mode .ax-toggle__slider::before {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, transform 0.15s ease !important;
+}

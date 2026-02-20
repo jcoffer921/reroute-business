@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "ReRoute | Accessibility & Experience" %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+<link rel="stylesheet" href="{% static 'css/accessibility_settings.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="settings-hero">
+  <div class="settings-hero-content">
+    <h1>{% trans "Accessibility & Experience" %}</h1>
+    <p>{% trans "Control language and data-saving behavior across ReRoute." %}</p>
+  </div>
+</section>
+
+<section class="ax-page" aria-labelledby="axHeading">
+  <div class="ax-wrap">
+    <div class="ax-header">
+      <h2 id="axHeading">{% trans "Preferences" %}</h2>
+      <a class="ax-back-link" href="{% url 'settings' %}">{% trans "Back to Settings" %}</a>
+    </div>
+
+    <form method="post" id="axPreferencesForm" class="ax-stack">
+      {% csrf_token %}
+
+      <article class="ax-card">
+        <div class="ax-copy">
+          <h3>{% trans "Language" %}</h3>
+          <p>{% trans "Choose your preferred language" %}</p>
+        </div>
+        <div class="ax-control">
+          <label class="sr-only" for="axLanguage">{% trans "Preferred language" %}</label>
+          <select id="axLanguage" name="language">
+            <option value="en" {% if selected_language == 'en' %}selected{% endif %}>{% trans "English" %}</option>
+            <option value="es" {% if selected_language == 'es' %}selected{% endif %}>{% trans "Español" %}</option>
+          </select>
+        </div>
+      </article>
+
+      <article class="ax-card">
+        <div class="ax-copy">
+          <h3>{% trans "Low data mode" %}</h3>
+          <p>{% trans "Reduces images and animations to save data" %}</p>
+        </div>
+        <div class="ax-control">
+          <label class="ax-toggle" for="axLowData">
+            <input id="axLowData" name="low_data_mode" type="checkbox" role="switch" aria-label="{% trans 'Enable low data mode' %}" {% if low_data_mode_enabled %}checked{% endif %}>
+            <span class="ax-toggle__slider" aria-hidden="true"></span>
+          </label>
+        </div>
+      </article>
+
+      <aside class="ax-disclaimer" aria-label="{% trans 'Privacy notice' %}">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 3 5 6v6c0 5 3.4 7.8 7 9 3.6-1.2 7-4 7-9V6Z"></path>
+        </svg>
+        <p>{% trans "Your preferences are stored on your device only. We do not track you." %}</p>
+      </aside>
+
+      <button type="submit" class="sr-only">{% trans "Save preferences" %}</button>
+    </form>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/accessibility_settings.js' %}" defer></script>
+{% endblock %}

@@ -99,6 +99,15 @@ class UserProfile(models.Model):
         default=False,
         help_text="User-controlled toggle for employers to see readiness to discuss background.",
     )
+    preferred_language = models.CharField(
+        max_length=8,
+        default="en",
+        help_text="Preferred UI language code (e.g. en, es).",
+    )
+    low_data_mode = models.BooleanField(
+        default=False,
+        help_text="Reduce heavy media and animations for lower data usage.",
+    )
 
     # --- Onboarding (early access) ---
     ONBOARDING_STEP_CHOICES = [

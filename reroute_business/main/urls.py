@@ -21,6 +21,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('contact/', views.contact_view, name='contact'),
     path('settings/', views.settings_view, name='settings'),
+    path('settings/accessibility/', views.accessibility_settings_view, name='settings_accessibility'),
     path('resources/', views.resources_view, name='resources'),
     path('pricing/', views.pricing, name='pricing'),
     path('pricing/checkout/', views.pricing_checkout, name='checkout'),

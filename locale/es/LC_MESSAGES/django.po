@@ -1,0 +1,69 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: reroute-business\n"
+"POT-Creation-Date: 2026-02-20 00:00+0000\n"
+"PO-Revision-Date: 2026-02-20 00:00+0000\n"
+"Last-Translator: ReRoute Team\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Open Accessibility & Experience settings"
+msgstr "Abrir configuración de Accesibilidad y Experiencia"
+
+msgid "Accessibility & Experience"
+msgstr "Accesibilidad y Experiencia"
+
+msgid "Language & low data mode"
+msgstr "Idioma y modo de bajo consumo de datos"
+
+msgid "ReRoute | Accessibility & Experience"
+msgstr "ReRoute | Accesibilidad y Experiencia"
+
+msgid "Control language and data-saving behavior across ReRoute."
+msgstr "Controla el idioma y el ahorro de datos en todo ReRoute."
+
+msgid "Preferences"
+msgstr "Preferencias"
+
+msgid "Back to Settings"
+msgstr "Volver a Configuración"
+
+msgid "Language"
+msgstr "Idioma"
+
+msgid "Choose your preferred language"
+msgstr "Elige tu idioma preferido"
+
+msgid "Preferred language"
+msgstr "Idioma preferido"
+
+msgid "English"
+msgstr "Inglés"
+
+msgid "Español"
+msgstr "Español"
+
+msgid "Low data mode"
+msgstr "Modo de bajo consumo de datos"
+
+msgid "Reduces images and animations to save data"
+msgstr "Reduce imágenes y animaciones para ahorrar datos"
+
+msgid "Enable low data mode"
+msgstr "Activar modo de bajo consumo de datos"
+
+msgid "Privacy notice"
+msgstr "Aviso de privacidad"
+
+msgid "Your preferences are stored on your device only. We do not track you."
+msgstr "Tus preferencias se guardan solo en tu dispositivo. No te rastreamos."
+
+msgid "Save preferences"
+msgstr "Guardar preferencias"
+
+msgid "Accessibility & experience preferences saved."
+msgstr "Se guardaron las preferencias de accesibilidad y experiencia."

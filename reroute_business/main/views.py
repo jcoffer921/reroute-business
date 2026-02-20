@@ -45,6 +45,8 @@ from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils import translation
+from django.utils.translation import gettext as _
 
 from reroute_business.job_list.models import Application
 from reroute_business.main.forms import UserSignupForm
@@ -97,6 +99,7 @@ import logging
 from django.apps import apps
 
 logger = logging.getLogger(__name__)
+LANGUAGE_SESSION_KEY = "django_language"
 
 # Allauth helpers for email verification (guarded import)
 try:
@@ -1229,6 +1232,58 @@ def dashboard(request):
     Template: dashboard/user_dashboard.html
     """
     return render(request, 'dashboard/user_dashboard.html')
+
+
+@require_http_methods(["GET", "POST"])
+def accessibility_settings_view(request):
+    allowed_languages = {"en", "es"}
+    current_language = request.session.get(LANGUAGE_SESSION_KEY)
+    current_low_data_mode = bool(request.session.get("low_data_mode", False))
+
+    if request.user.is_authenticated:
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        if current_language not in allowed_languages:
+            profile_lang = (getattr(profile, "preferred_language", "") or "en").strip().lower()
+            current_language = profile_lang if profile_lang in allowed_languages else "en"
+            request.session[LANGUAGE_SESSION_KEY] = current_language
+        if "low_data_mode" not in request.session:
+            current_low_data_mode = bool(getattr(profile, "low_data_mode", False))
+            request.session["low_data_mode"] = current_low_data_mode
+    else:
+        profile = None
+        if current_language not in allowed_languages:
+            current_language = "en"
+            request.session[LANGUAGE_SESSION_KEY] = current_language
+
+    if request.method == "POST":
+        selected_language = (request.POST.get("language") or "en").strip().lower()
+        if selected_language not in allowed_languages:
+            selected_language = "en"
+        selected_low_data_mode = request.POST.get("low_data_mode") == "on"
+
+        request.session[LANGUAGE_SESSION_KEY] = selected_language
+        request.session["low_data_mode"] = selected_low_data_mode
+        translation.activate(selected_language)
+
+        if profile is not None:
+            profile.preferred_language = selected_language
+            profile.low_data_mode = selected_low_data_mode
+            try:
+                profile.save(update_fields=["preferred_language", "low_data_mode"])
+            except Exception:
+                profile.save()
+
+        messages.success(request, _("Accessibility & experience preferences saved."))
+        return redirect("settings_accessibility")
+
+    return render(
+        request,
+        "main/settings_accessibility.html",
+        {
+            "selected_language": current_language if current_language in allowed_languages else "en",
+            "low_data_mode_enabled": current_low_data_mode,
+        },
+    )
 
 
 @login_required
