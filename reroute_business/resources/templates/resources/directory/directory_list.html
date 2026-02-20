@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Resources Directory | ReRoute{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'resources/css/directory.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="directory-page" id="directoryApp">
+  <div class="directory-shell">
+    <header class="directory-header">
+      <h1>Resources Directory</h1>
+      <p>Find trusted programs and services in Philadelphia.</p>
+      {% if selected_zip %}
+      <p class="directory-zip-banner">Showing results near {{ selected_zip }}</p>
+      {% endif %}
+    </header>
+
+    <div class="directory-controls">
+      <label class="directory-search" for="directorySearchInput">
+        <span class="sr-only">Search resources</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m16.5 16.5 4 4"></path>
+        </svg>
+        <input id="directorySearchInput" type="search" placeholder="Search resources..." autocomplete="off">
+      </label>
+      <button class="directory-filter-toggle" id="directoryFilterToggle" type="button" aria-controls="directoryFiltersPanel" aria-expanded="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4 7h16M7 12h10M10 17h4"></path>
+        </svg>
+        Filters
+      </button>
+    </div>
+
+    <div class="directory-filter-backdrop" id="directoryFilterBackdrop" hidden></div>
+
+    <section class="directory-filters" id="directoryFiltersPanel" aria-label="Resource filters">
+      <div class="directory-filters-header">
+        <h2>Filters</h2>
+        <div class="directory-filters-header-actions">
+          <button type="button" id="directoryClearFilters" class="directory-clear-btn">Clear all</button>
+          <button type="button" id="directoryCloseFilters" class="directory-close-btn" aria-label="Close filters">✕</button>
+        </div>
+      </div>
+
+      <div class="directory-filter-group" role="group" aria-label="Filter by category">
+        <h3>Category</h3>
+        <div class="directory-chip-wrap">
+          {% for category in filter_categories %}
+          <button type="button" class="directory-chip" data-filter-kind="category" data-filter-value="{{ category }}" aria-pressed="false">{{ category }}</button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="directory-filter-group" role="group" aria-label="Filter by feature">
+        <h3>Features</h3>
+        <div class="directory-chip-wrap">
+          {% for feature in filter_features %}
+          <button type="button" class="directory-chip" data-filter-kind="feature" data-filter-value="{{ feature }}" aria-pressed="false">{{ feature }}</button>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <p id="directoryResultsMeta" class="directory-results-meta" aria-live="polite">Showing {{ resources|length }} resources</p>
+
+    <div class="directory-grid" id="directoryGrid">
+      {% for resource in resources %}
+      <article class="directory-card"
+        data-directory-card
+        data-categories="{{ resource.categories|join:'||' }}"
+        data-features="{{ resource.features|join:'||' }}"
+        data-search="{{ resource.name }} {{ resource.overview }} {{ resource.address_line }} {{ resource.neighborhood }} {{ resource.categories|join:' ' }} {{ resource.features|join:' ' }} {{ resource.hours }} {{ resource.phone }}">
+
+        <h2><a href="{% url 'resource_directory_detail' resource.slug %}">{{ resource.name }}</a></h2>
+
+        <div class="directory-tag-row">
+          {% for category in resource.categories %}
+          <span class="directory-tag directory-tag--category">{{ category }}</span>
+          {% endfor %}
+          {% for feature in resource.features %}
+          <span class="directory-tag">{{ feature }}</span>
+          {% endfor %}
+        </div>
+
+        <p class="directory-overview">{{ resource.overview }}</p>
+
+        <ul class="directory-meta">
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Zm0-8a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"></path></svg>
+            <span>{{ resource.address_line }} · {{ resource.neighborhood }}</span>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8"></circle><path d="M12 7v5l3 2"></path></svg>
+            <span>{{ resource.hours }}</span>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4h3l2 5-2 1a13 13 0 0 0 4 4l1-2 5 2v3a2 2 0 0 1-2.3 2A16 16 0 0 1 5 6.3 2 2 0 0 1 7 4Z"></path></svg>
+            <a class="directory-phone-link" href="tel:{{ resource.phone_href }}">{{ resource.phone }}</a>
+          </li>
+        </ul>
+
+        <section class="directory-expectation">
+          <h3>What to expect</h3>
+          <p>{{ resource.what_to_expect }}</p>
+        </section>
+
+        <a href="{% url 'resource_directory_detail' resource.slug %}" class="directory-detail-link">View details</a>
+      </article>
+      {% endfor %}
+    </div>
+
+    <p id="directoryNoResults" class="directory-no-results" hidden>No resources matched your search and selected filters.</p>
+
+    <section class="directory-disclaimer" aria-label="Disclaimer">
+      <p>{{ directory_disclaimer }}</p>
+      <p>If you notice incorrect information, <a href="{% url 'contact' %}">please report it</a>.</p>
+    </section>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'resources/js/directory.js' %}" defer></script>
+{% endblock %}

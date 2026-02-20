@@ -97,6 +97,7 @@ USE_X_FORWARDED_HOST = True
 INSTALLED_APPS = [
     # local apps
     'reroute_business.main',
+    'reroute_business.benefit_finder',
     'reroute_business.resumes',
     'reroute_business.dashboard',
     'reroute_business.blog',

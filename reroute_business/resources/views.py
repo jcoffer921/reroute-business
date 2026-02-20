@@ -21,6 +21,101 @@ from .models import (
     LessonProgress,
 )
 
+DIRECTORY_CATEGORIES = [
+    'Housing',
+    'ID/Documents',
+    'Food',
+    'Job Training',
+    'Legal Aid',
+    'Healthcare',
+    'Mental Health',
+    'Reentry Orgs',
+    'Benefits',
+    'Childcare',
+]
+
+DIRECTORY_FEATURES = [
+    'Spanish Available',
+    'Bilingual Staff',
+    'Trauma-Informed',
+    'Justice-Impacted Staff',
+    'Culturally Specific',
+    'Remote Services',
+    'Near Public Transit',
+    'Childcare Support',
+    'No Appointment Needed',
+]
+
+RESOURCE_DIRECTORY = [
+    {
+        'slug': 'penndot-id-center',
+        'name': 'PennDOT ID Center',
+        'categories': ['ID/Documents'],
+        'features': ['Near Public Transit', 'No Appointment Needed'],
+        'address_line': '801 Arch St, Philadelphia, PA 19107',
+        'neighborhood': 'Old City',
+        'zip_code': '19107',
+        'hours': 'Mon–Fri 8:30am–4:15pm',
+        'phone': '(717) 412-5300',
+        'phone_href': '+17174125300',
+        'website': 'https://www.dmv.pa.gov/Driver-Services/Photo-ID2/Pages/Get%20An%20ID.aspx',
+        'overview': "Get a Pennsylvania state ID card or driver's license. Discounted IDs available for recently released individuals.",
+        'what_to_expect': 'Take a number when you arrive. Wait times can be long—arrive early. Staff will guide you through the process.',
+        'who_can_use_this': 'Open to all Pennsylvania residents. Reduced fee for people released from prison within 1 year.',
+        'what_to_bring': [
+            'Social Security card',
+            'Birth certificate or passport',
+            'Two proofs of residency',
+            'Release papers (for discounted ID)',
+        ],
+        'how_to_apply': 'Walk in during business hours. Bring all required documents.',
+        'getting_there': 'Take MFL to 8th Street, walk 1 block north.',
+        'languages_supported': ['English'],
+        'cultural_competency': [],
+        'childcare_support': '',
+    },
+    {
+        'slug': 'congreso-de-latinos-unidos',
+        'name': 'Congreso de Latinos Unidos',
+        'categories': ['Job Training'],
+        'features': [
+            'Spanish Available',
+            'Bilingual Staff',
+            'Culturally Specific',
+            'Trauma-Informed',
+            'Near Public Transit',
+            'Childcare Support',
+        ],
+        'address_line': '216 W Somerset St, Philadelphia, PA 19133',
+        'neighborhood': 'Fairhill / North Philadelphia',
+        'zip_code': '19133',
+        'hours': 'Mon–Fri 8:30am–5pm',
+        'phone': '(215) 763-8870',
+        'phone_href': '+12157638870',
+        'website': 'https://www.congreso.net/',
+        'overview': "Bilingual workforce development and social services for Philadelphia's Latino community. Offers job training, ESL, GED, and family services.",
+        'what_to_expect': 'All services available in Spanish and English. Very welcoming environment. Staff understands the challenges faced by Latino families.',
+        'who_can_use_this': 'Open to all. Designed primarily for Latino community but serves everyone.',
+        'what_to_bring': [
+            'Photo ID (if available)',
+            'Any work or education documents',
+        ],
+        'how_to_apply': 'Call or walk in during office hours.',
+        'getting_there': 'SEPTA Bus 39 stops at Somerset & 2nd St.',
+        'languages_supported': ['English', 'Spanish'],
+        'cultural_competency': ['Trauma-Informed', 'Culturally Specific'],
+        'childcare_support': 'Childcare available on-site during some programs. Call ahead to confirm.',
+    },
+]
+
+RESOURCE_DIRECTORY_BY_SLUG = {item['slug']: item for item in RESOURCE_DIRECTORY}
+
+DIRECTORY_DISCLAIMER = (
+    'ReRoute is an independent platform. Resource information is compiled from publicly available sources and may change. '
+    'ReRoute does not imply partnership or endorsement unless a listing is marked with a Verified Partner badge. '
+    'Verified badges will appear only for organizations that have formally partnered with ReRoute.'
+)
+
 
 def _inline_quiz_questions(module):
     """
@@ -85,6 +180,33 @@ def resource_list(request):
     return render(request, 'resources/resource_list.html', {
         'modules': modules,
         'lessons': lessons,
+    })
+
+
+@require_GET
+def resources_directory(request):
+    zip_code = (request.GET.get('zip') or '').strip()
+    if not zip_code.isdigit() or len(zip_code) != 5:
+        zip_code = ''
+
+    return render(request, 'resources/directory/directory_list.html', {
+        'resources': RESOURCE_DIRECTORY,
+        'filter_categories': DIRECTORY_CATEGORIES,
+        'filter_features': DIRECTORY_FEATURES,
+        'selected_zip': zip_code,
+        'directory_disclaimer': DIRECTORY_DISCLAIMER,
+    })
+
+
+@require_GET
+def resource_directory_detail(request, slug):
+    resource = RESOURCE_DIRECTORY_BY_SLUG.get(slug)
+    if not resource:
+        raise Http404('Resource not found')
+
+    return render(request, 'resources/directory/directory_detail.html', {
+        'resource': resource,
+        'directory_disclaimer': DIRECTORY_DISCLAIMER,
     })
 
 

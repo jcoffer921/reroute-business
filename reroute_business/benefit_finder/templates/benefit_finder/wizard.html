@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Benefit Finder | ReRoute{% endblock %}
+{% block body_class %}benefit-finder-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'benefit_finder/css/benefit_finder.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="benefit-finder" id="benefitFinderApp" aria-live="polite">
+  <div class="benefit-finder__container">
+    <header class="benefit-finder__header">
+      <p class="benefit-finder__kicker">Benefit Finder</p>
+      <h1>Benefit Finder</h1>
+      <p>Answer a few questions to find programs and benefits you may qualify for.</p>
+    </header>
+
+    <div class="benefit-finder__quiz" id="bfQuiz">
+      <div class="bf-progress-row">
+        <p class="bf-progress-copy" id="bfProgressCopy">Question 1 of 10</p>
+        <button type="button" class="bf-low-data-toggle" id="bfLowDataToggle" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M13 2L4 14h6l-1 8 9-12h-6l1-8Z"></path>
+          </svg>
+          Low data mode
+        </button>
+      </div>
+      <div class="bf-progress-track" role="progressbar" aria-valuemin="1" aria-valuemax="10" aria-valuenow="1" id="bfProgressBar">
+        <div class="bf-progress-fill" id="bfProgressFill"></div>
+      </div>
+
+      <div class="bf-question-block">
+        <h2 id="bfQuestionPrompt"></h2>
+        <p class="bf-help-text" id="bfHelpText"></p>
+        <div id="bfAnswerRegion"></div>
+        <p class="bf-validation" id="bfValidation" role="alert" hidden></p>
+      </div>
+
+      <div class="bf-controls">
+        <button type="button" class="bf-btn bf-btn--ghost" id="bfBackBtn">&larr; Back</button>
+        <button type="button" class="bf-save-link" id="bfSaveBtn">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 3v10m0 0 4-4m-4 4-4-4M5 17h14"></path>
+          </svg>
+          Save and finish later
+        </button>
+        <button type="button" class="bf-btn bf-btn--primary" id="bfNextBtn" disabled>Next &rarr;</button>
+      </div>
+      <p class="bf-disclaimer">ReRoute provides guidance only and does not determine eligibility.</p>
+    </div>
+
+    <section class="benefit-finder__results" id="bfResults" hidden>
+      <div class="bf-banner">
+        <div class="bf-banner-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M12 21s-7-4.6-9.5-8.2C.8 10.4 1.1 7 3.6 5.3c2.5-1.7 5.4-.8 7.1 1.2 1.7-2 4.6-2.9 7.1-1.2 2.5 1.7 2.8 5.1 1.1 7.5C19 16.4 12 21 12 21Z"></path>
+          </svg>
+        </div>
+        <p>Getting support is a strength. These programs exist to help you stabilize and move forward.</p>
+      </div>
+
+      <header class="bf-results-header">
+        <h2>Your ReRoute Action Plan</h2>
+        <p>Based on your answers, here are programs and next steps that may help you.</p>
+      </header>
+
+      <section class="bf-results-section">
+        <h3>Personalized Checklist</h3>
+        <ul class="bf-checklist" id="bfChecklist"></ul>
+      </section>
+
+      <section class="bf-results-section">
+        <h3>Recommended For You</h3>
+        <div class="bf-card-grid" id="bfCategoryGrid"></div>
+      </section>
+
+      <section class="bf-results-section bf-actions">
+        <button type="button" class="bf-btn bf-btn--primary" id="bfDownloadPrintBtn">Download / Print My Plan</button>
+        <a href="{% url 'resource_directory' %}" class="bf-btn bf-btn--outline" id="bfResourcesLink">Browse Resources Near Me</a>
+        <a href="{% url 'reentry_org:organization_catalog' %}" class="bf-btn bf-btn--outline" id="bfOrgLink">Get Help From a Reentry Org</a>
+      </section>
+
+      <section class="bf-results-section bf-sources">
+        <h3>Sources &amp; Information</h3>
+        <p>Information compiled from Philadelphia city resources, 211 database, and verified partner organizations.</p>
+        <ul>
+          <li><a href="https://www.phila.gov/services/mental-physical-health/find-free-food-or-meals/" target="_blank" rel="noopener noreferrer">Philadelphia 211</a></li>
+          <li><a href="https://www.phila.gov/services/" target="_blank" rel="noopener noreferrer">City of Philadelphia – Benefits &amp; Services</a></li>
+          <li><a href="https://www.pa.gov/agencies/cor/resources/reentry-services.html" target="_blank" rel="noopener noreferrer">PA Department of Corrections Reentry Resources</a></li>
+          <li><a href="https://www.phillyreentrycoalition.org/" target="_blank" rel="noopener noreferrer">Philadelphia Reentry Coalition</a></li>
+        </ul>
+      </section>
+
+      <p class="bf-disclaimer">ReRoute provides guidance only and does not determine eligibility.</p>
+    </section>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'benefit_finder/js/benefit_finder.js' %}" defer></script>
+{% endblock %}

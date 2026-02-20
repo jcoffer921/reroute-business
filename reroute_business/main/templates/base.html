@@ -23,28 +23,17 @@
             <div class="navbar-links-container">
                 <!-- ---------- Left-side navigation links ---------- -->
                 <div class="nav-links">
-                    <a href="{% url 'about_us' %}">About Us</a>
-                    <a href="{% url 'home' %}">Home</a>
-                    <div class="nav-item has-dropdown">
-                        <a href="#" class="no-nav" aria-haspopup="true" aria-expanded="false">Opportunities</a>
-                        <div class="nav-dropdown" role="menu" aria-label="Opportunities submenu">
-                            <a href="{% url 'opportunities' %}">Jobs</a>
-                                <a href="{% url 'reentry_org:organization_catalog' %}">Reentry Organizations</a>
-                        </div>
-                    </div>
-                    <a href="{% url 'pricing' %}">Pricing</a>
-                    <a href="{% url 'resource_list' %}">Resources</a>
-
+                    <a href="{% url 'about_us' %}">About</a>
+                    <a href="{% url 'benefit_finder:start' %}" class="nav-link--cta {% if '/benefit-finder/' in request.path %}is-active{% endif %}">Benefit Finder</a>
+                    <a href="{% url 'blog_list' %}">Blog</a>
                     {% if user.is_authenticated %}
-                        {# ✅ Role-aware: always points to the correct dashboard #}
                         <a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a>
-                    {% else %}
-                        {% if request.path != '/login/' %}
-                            <a href="{% url 'login' %}">Login</a>
-                        {% endif %}
-                        {% if request.path != '/signup/' and request.path != '/' %}
-                            <a href="{% url 'signup' %}">Get Started</a>
-                        {% endif %}
+                    {% endif %}
+                    <a href="{% url 'opportunities' %}">Jobs</a>
+                    <a href="{% url 'resource_list' %}">Resources</a>
+                    <a href="{% url 'contact' %}">Support</a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'settings' %}">Settings</a>
                     {% endif %}
                 </div>
 
@@ -87,6 +76,11 @@
                         </form>
                     </div>
                     </div>
+                {% else %}
+                <div class="guest-auth-links">
+                    <a href="{% url 'login' %}">Sign In</a>
+                    <a href="{% url 'signup' %}" class="guest-auth-links__primary">Create Account</a>
+                </div>
                 {% endif %}
 
                 <!-- ---------- Mobile hamburger ---------- -->
@@ -178,40 +172,33 @@
 
     {% if user.is_authenticated %}
     <div class="mobile-quick-actions" role="group" aria-label="Quick actions">
-        <a href="{% url 'dashboard:my_dashboard' %}" class="mobile-quick-action mobile-quick-action--primary">Dashboard</a>
-        <a href="{% url 'opportunities' %}" class="mobile-quick-action">Find Jobs</a>
-        <a href="{% url 'dashboard:notifications' %}" class="mobile-quick-action">Notifications</a>
+        <a href="{% url 'benefit_finder:start' %}" class="mobile-quick-action mobile-quick-action--primary">Benefit Finder</a>
+        <a href="{% url 'dashboard:my_dashboard' %}" class="mobile-quick-action">Dashboard</a>
+        <a href="{% url 'opportunities' %}" class="mobile-quick-action">Jobs</a>
     </div>
     {% else %}
     <div class="mobile-quick-actions" role="group" aria-label="Quick actions">
-        <a href="{% url 'signup' %}" class="mobile-quick-action mobile-quick-action--primary">Create Account</a>
+        <a href="{% url 'benefit_finder:start' %}" class="mobile-quick-action mobile-quick-action--primary">Benefit Finder</a>
         <a href="{% url 'login' %}" class="mobile-quick-action">Sign In</a>
-        <a href="{% url 'opportunities' %}" class="mobile-quick-action">Browse Jobs</a>
+        <a href="{% url 'signup' %}" class="mobile-quick-action">Create Account</a>
     </div>
     {% endif %}
 
     <p class="mobile-nav-section-label">Explore</p>
     <ul class="mobile-nav-links">
-        <li><a href="{% url 'home' %}">Home</a></li>
-        <li><a href="{% url 'about_us' %}">About Us</a></li>
+        <li><a href="{% url 'about_us' %}">About</a></li>
+        <li><a href="{% url 'benefit_finder:start' %}">Benefit Finder</a></li>
         <li><a href="{% url 'blog_list' %}">Blog</a></li>
-        <li><a href="{% url 'opportunities' %}">Opportunities</a></li>
-        <li><a href="{% url 'reentry_org:organization_catalog' %}">Reentry Organizations</a></li>
-        <li><a href="{% url 'resource_list' %}">Resources</a></li>
-        <li><a href="{% url 'pricing' %}">Pricing</a></li>
-        <li><a href="{% url 'faq' %}">FAQ</a></li>
-    </ul>
-
-    {% if user.is_authenticated %}
-    <p class="mobile-nav-section-label">Account</p>
-    <ul class="mobile-nav-links mobile-nav-links--account">
+        {% if user.is_authenticated %}
         <li><a href="{% url 'dashboard:my_dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'dashboard:notifications' %}">Notifications</a></li>
-        <li><a href="{{ PUBLIC_PROFILE_URL }}">View Profile</a></li>
-        <li><a href="{{ PROFILE_URL }}">Profile Settings</a></li>
+        {% endif %}
+        <li><a href="{% url 'opportunities' %}">Jobs</a></li>
+        <li><a href="{% url 'resource_list' %}">Resources</a></li>
+        <li><a href="{% url 'contact' %}">Support</a></li>
+        {% if user.is_authenticated %}
         <li><a href="{% url 'settings' %}">Settings</a></li>
+        {% endif %}
     </ul>
-    {% endif %}
 
     {# =================== MOBILE USER FOOTER =================== #}
     {% if user.is_authenticated %}
@@ -245,6 +232,7 @@
     </div>
     {% endif %}
 
+    </div>
 
     <!-- Base scripts -->
     <script src="{% static 'js/base.js' %}" defer></script>

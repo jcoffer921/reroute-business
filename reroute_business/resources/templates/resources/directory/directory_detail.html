@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ resource.name }} | Resources Directory{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'resources/css/directory.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="directory-page directory-page--detail">
+  <div class="directory-shell directory-shell--detail">
+    <a href="{% url 'resource_directory' %}" class="detail-back-link">&larr; Back</a>
+
+    <header class="detail-header">
+      <h1>{{ resource.name }}</h1>
+      <div class="directory-tag-row">
+        {% for category in resource.categories %}
+        <span class="directory-tag directory-tag--category">{{ category }}</span>
+        {% endfor %}
+        {% for feature in resource.features %}
+        <span class="directory-tag">{{ feature }}</span>
+        {% endfor %}
+      </div>
+    </header>
+
+    <section class="detail-info-grid">
+      <article class="detail-info-card">
+        <h2>Address</h2>
+        <p>{{ resource.address_line }}</p>
+        <p class="detail-muted">{{ resource.neighborhood }}</p>
+      </article>
+      <article class="detail-info-card">
+        <h2>Hours</h2>
+        <p>{{ resource.hours }}</p>
+      </article>
+    </section>
+
+    <section class="detail-actions" aria-label="Contact options">
+      <a class="detail-action-btn detail-action-btn--primary" href="tel:{{ resource.phone_href }}">Call now</a>
+      <a class="detail-action-btn detail-action-btn--secondary" href="{{ resource.website }}" target="_blank" rel="noopener noreferrer">Visit website</a>
+    </section>
+
+    <article class="detail-section-card">
+      <h2>Overview</h2>
+      <p>{{ resource.overview }}</p>
+    </article>
+
+    <article class="detail-section-card detail-section-card--highlight">
+      <h2>What to expect</h2>
+      <p>{{ resource.what_to_expect }}</p>
+    </article>
+
+    <article class="detail-section-card">
+      <h2>Who can use this</h2>
+      <p>{{ resource.who_can_use_this }}</p>
+    </article>
+
+    <article class="detail-section-card">
+      <h2>What to bring</h2>
+      <ul class="detail-list">
+        {% for item in resource.what_to_bring %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </article>
+
+    <article class="detail-section-card">
+      <h2>How to apply</h2>
+      <p>{{ resource.how_to_apply }}</p>
+    </article>
+
+    <article class="detail-section-card">
+      <h2>Getting there</h2>
+      <p>{{ resource.getting_there }}</p>
+    </article>
+
+    {% if resource.childcare_support %}
+    <article class="detail-section-card">
+      <h2>Childcare support</h2>
+      <p>{{ resource.childcare_support }}</p>
+    </article>
+    {% endif %}
+
+    <article class="detail-section-card">
+      <h2>Languages supported</h2>
+      <div class="directory-tag-row">
+        {% for language in resource.languages_supported %}
+        <span class="directory-tag">{{ language }}</span>
+        {% endfor %}
+      </div>
+    </article>
+
+    {% if resource.cultural_competency %}
+    <article class="detail-section-card">
+      <h2>Cultural competency</h2>
+      <div class="directory-tag-row">
+        {% for item in resource.cultural_competency %}
+        <span class="directory-tag">{{ item }}</span>
+        {% endfor %}
+      </div>
+    </article>
+    {% endif %}
+
+    <p class="detail-report-link"><a href="{% url 'contact' %}">Report an issue</a></p>
+
+    <section class="directory-disclaimer" aria-label="Disclaimer">
+      <p>{{ directory_disclaimer }}</p>
+      <p>If you notice incorrect information, <a href="{% url 'contact' %}">please report it</a>.</p>
+    </section>
+  </div>
+</section>
+{% endblock %}

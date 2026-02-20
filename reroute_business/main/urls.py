@@ -1,5 +1,5 @@
 # main/urls.py
-from django.urls import path
+from django.urls import include, path
 from django.shortcuts import redirect
 from . import views
 from reroute_business.job_list.user import views as user_views
@@ -25,6 +25,7 @@ urlpatterns = [
     path('pricing/', views.pricing, name='pricing'),
     path('pricing/checkout/', views.pricing_checkout, name='checkout'),
     path('faq/', views.faq_view, name='faq'),
+    path('benefit-finder/', include(('reroute_business.benefit_finder.urls', 'benefit_finder'), namespace='benefit_finder')),
 
     # ================ Email Verification Helpers ================
     path('verify-email/', views.verify_email_notice, name='verify_email_notice'),

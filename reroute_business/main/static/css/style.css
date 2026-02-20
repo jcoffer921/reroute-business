@@ -101,6 +101,26 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
   grid-column: 2;
 }
 .user-profile-right { justify-self: end; grid-column: 3; position: relative; display: inline-flex; align-items: center; }
+.guest-auth-links {
+  justify-self: end;
+  grid-column: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.guest-auth-links a {
+  text-decoration: none;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.88rem;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 999px;
+  padding: 0.5rem 0.8rem;
+}
+.guest-auth-links__primary {
+  background: var(--primary-blue);
+  border-color: #6aa0dd !important;
+}
 .hamburger { justify-self: end; grid-column: 3; }
 .nav-links a {
   color: #fff; text-decoration: none; font-weight: 600; line-height: 1;
@@ -109,6 +129,18 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
   transition: color 0.3s;
 }
 .nav-links a:hover, .nav-links a:focus { outline: none; background: rgba(255,255,255,0.08); }
+.nav-links .nav-link--cta {
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  background: #1d4f9f;
+  border: 1px solid #5b86ce;
+}
+.nav-links .nav-link--cta:hover,
+.nav-links .nav-link--cta:focus,
+.nav-links .nav-link--cta.is-active {
+  background: #2d6cdf;
+  border-color: #93b4eb;
+}
 
 /* Desktop hover dropdown for Opportunities */
 .nav-item.has-dropdown { position: relative; }
@@ -378,7 +410,7 @@ iframe { max-width: 100%; border: 0; }
   .brand-wordmark { font-size: 1rem; }
 
   /* Hide desktop nav + desktop profile controls */
-  .nav-links, .user-menu-container, .user-profile-right { display: none !important; }
+  .nav-links, .user-menu-container, .user-profile-right, .guest-auth-links { display: none !important; }
 
   /* Show burger */
   .hamburger {

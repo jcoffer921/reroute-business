@@ -4,6 +4,8 @@ from . import views
 
 urlpatterns = [
     path('', views.resource_list, name='resource_list'),
+    path('directory/', views.resources_directory, name='resource_directory'),
+    path('directory/<slug:slug>/', views.resource_directory_detail, name='resource_directory_detail'),
     path('module/<int:pk>/', views.module_detail, name='module_detail'),
     path('modules/<int:pk>/', views.module_detail),  # legacy alias
     path('module/<int:pk>/quiz/schema/', views.module_quiz_schema, name='module_quiz_schema'),
