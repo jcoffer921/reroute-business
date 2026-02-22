@@ -110,33 +110,39 @@
           Languages supported
         </h2>
         <div class="directory-tag-row">
-          {% for language in resource.languages_supported %}
-          <span class="directory-tag directory-tag--lang">{{ language }}</span>
-          {% endfor %}
+          {% if resource.languages_supported %}
+            {% for language in resource.languages_supported %}
+            <span class="directory-tag directory-tag--lang">{{ language }}</span>
+            {% endfor %}
+          {% else %}
+            <span class="directory-tag directory-tag--lang">Not specified</span>
+          {% endif %}
         </div>
       </article>
 
-      {% if resource.cultural_competency %}
       <article class="detail-section-card">
         <h2>
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3 5 6v6c0 5 3.4 7.8 7 9 3.6-1.2 7-4 7-9V6Z"></path></svg>
           Cultural competency
         </h2>
         <div class="directory-tag-row">
-          {% for item in resource.cultural_competency %}
-          {% if item == 'Trauma-Informed' %}
-          <span class="directory-tag directory-tag--culture-trauma">{{ item }}</span>
-          {% elif item == 'Justice-Impacted Staff' %}
-          <span class="directory-tag directory-tag--culture-justice">{{ item }}</span>
-          {% elif item == 'Culturally Specific' %}
-          <span class="directory-tag directory-tag--culture-specific">{{ item }}</span>
+          {% if resource.cultural_competency %}
+            {% for item in resource.cultural_competency %}
+            {% if item == 'Trauma-Informed' %}
+            <span class="directory-tag directory-tag--culture-trauma">{{ item }}</span>
+            {% elif item == 'Justice-Impacted Staff' %}
+            <span class="directory-tag directory-tag--culture-justice">{{ item }}</span>
+            {% elif item == 'Culturally Specific' %}
+            <span class="directory-tag directory-tag--culture-specific">{{ item }}</span>
+            {% else %}
+            <span class="directory-tag directory-tag--culture-default">{{ item }}</span>
+            {% endif %}
+            {% endfor %}
           {% else %}
-          <span class="directory-tag directory-tag--culture-default">{{ item }}</span>
+            <span class="directory-tag directory-tag--culture-default">Not specified</span>
           {% endif %}
-          {% endfor %}
         </div>
       </article>
-      {% endif %}
     </section>
 
     <p class="detail-report-link">
