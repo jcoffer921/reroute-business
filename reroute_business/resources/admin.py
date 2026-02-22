@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import (
+    ResourceOrganization,
     Module,
     QuizQuestion,
     QuizAnswer,
@@ -22,6 +23,14 @@ class QuizQuestionInline(admin.TabularInline):
     model = QuizQuestion
     extra = 0
     show_change_link = True
+
+
+@admin.register(ResourceOrganization)
+class ResourceOrganizationAdmin(admin.ModelAdmin):
+    list_display = ("name", "slug", "zip_code", "phone", "is_active", "updated_at")
+    list_filter = ("is_active",)
+    search_fields = ("name", "slug", "neighborhood", "zip_code", "categories", "features")
+    ordering = ("name",)
 
 
 @admin.register(Module)

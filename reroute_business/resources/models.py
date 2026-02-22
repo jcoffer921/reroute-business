@@ -22,6 +22,41 @@ class Resource(models.Model):
         return self.title
 
 
+class ResourceOrganization(models.Model):
+    slug = models.SlugField(max_length=200, unique=True)
+    name = models.CharField(max_length=255)
+    categories = models.JSONField(blank=True, default=list)
+    features = models.JSONField(blank=True, default=list)
+    address_line = models.CharField(max_length=255)
+    neighborhood = models.CharField(max_length=255, blank=True)
+    transit_line = models.CharField(max_length=255, blank=True)
+    zip_code = models.CharField(max_length=5, blank=True)
+    hours = models.CharField(max_length=255, blank=True)
+    phone = models.CharField(max_length=50, blank=True)
+    phone_href = models.CharField(max_length=50, blank=True)
+    website = models.URLField(blank=True)
+    overview = models.TextField(blank=True)
+    what_to_expect = models.TextField(blank=True)
+    who_can_use_this = models.TextField(blank=True)
+    what_to_bring = models.JSONField(blank=True, default=list)
+    how_to_apply = models.TextField(blank=True)
+    getting_there = models.TextField(blank=True)
+    languages_supported = models.JSONField(blank=True, default=list)
+    cultural_competency = models.JSONField(blank=True, default=list)
+    childcare_support = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("name",)
+        verbose_name = "Resource Organization"
+        verbose_name_plural = "Resource Organizations"
+
+    def __str__(self):
+        return self.name
+
+
 class Module(models.Model):
     """
     Module represents a structured learning video with an associated quiz.

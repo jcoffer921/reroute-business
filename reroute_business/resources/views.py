@@ -5,12 +5,13 @@ from urllib.parse import quote
 
 from django.conf import settings
 from django.core.paginator import Paginator
-from django.http import JsonResponse, Http404
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
 from reroute_business.blog.models import BlogPost
 from .models import (
+    ResourceOrganization,
     Module,
     ModuleQuizScore,
     ModuleQuizOpenResponse,
@@ -47,77 +48,52 @@ DIRECTORY_FEATURES = [
     'No Appointment Needed',
 ]
 
-RESOURCE_DIRECTORY = [
-    {
-        'slug': 'penndot-id-center',
-        'name': 'PennDOT ID Center',
-        'categories': ['ID/Documents'],
-        'features': ['Near Public Transit', 'No Appointment Needed'],
-        'address_line': '801 Arch St, Philadelphia, PA 19107',
-        'neighborhood': 'Old City',
-        'transit_line': 'Near 8th & Market (MFL)',
-        'zip_code': '19107',
-        'hours': 'Mon–Fri 8:30am–4:15pm',
-        'phone': '(717) 412-5300',
-        'phone_href': '+17174125300',
-        'website': 'https://www.dmv.pa.gov/Driver-Services/Photo-ID2/Pages/Get%20An%20ID.aspx',
-        'overview': "Get a Pennsylvania state ID card or driver's license. Discounted IDs available for recently released individuals.",
-        'what_to_expect': 'Take a number when you arrive. Wait times can be long—arrive early. Staff will guide you through the process.',
-        'who_can_use_this': 'Open to all Pennsylvania residents. Reduced fee for people released from prison within 1 year.',
-        'what_to_bring': [
-            'Social Security card',
-            'Birth certificate or passport',
-            'Two proofs of residency',
-            'Release papers (for discounted ID)',
-        ],
-        'how_to_apply': 'Walk in during business hours. Bring all required documents.',
-        'getting_there': 'Take MFL to 8th Street, walk 1 block north.',
-        'languages_supported': ['English'],
-        'cultural_competency': [],
-        'childcare_support': '',
-    },
-    {
-        'slug': 'congreso-de-latinos-unidos',
-        'name': 'Congreso de Latinos Unidos',
-        'categories': ['Job Training'],
-        'features': [
-            'Spanish Available',
-            'Bilingual Staff',
-            'Culturally Specific',
-            'Trauma-Informed',
-            'Near Public Transit',
-            'Childcare Support',
-        ],
-        'address_line': '216 W Somerset St, Philadelphia, PA 19133',
-        'neighborhood': 'Fairhill / North Philadelphia',
-        'transit_line': 'Near SEPTA Bus Routes 3, 39, 54',
-        'zip_code': '19133',
-        'hours': 'Mon–Fri 8:30am–5pm',
-        'phone': '(215) 763-8870',
-        'phone_href': '+12157638870',
-        'website': 'https://www.congreso.net/',
-        'overview': "Bilingual workforce development and social services for Philadelphia's Latino community. Offers job training, ESL, GED, and family services.",
-        'what_to_expect': 'All services available in Spanish and English. Very welcoming environment. Staff understands the challenges faced by Latino families.',
-        'who_can_use_this': 'Open to all. Designed primarily for Latino community but serves everyone.',
-        'what_to_bring': [
-            'Photo ID (if available)',
-            'Any work or education documents',
-        ],
-        'how_to_apply': 'Call or walk in during office hours.',
-        'getting_there': 'SEPTA Bus 39 stops at Somerset & 2nd St.',
-        'languages_supported': ['English', 'Spanish'],
-        'cultural_competency': ['Trauma-Informed', 'Culturally Specific'],
-        'childcare_support': 'Childcare available on-site during some programs. Call ahead to confirm.',
-    },
-]
-
-RESOURCE_DIRECTORY_BY_SLUG = {item['slug']: item for item in RESOURCE_DIRECTORY}
-
 DIRECTORY_DISCLAIMER = (
     'ReRoute is an independent platform. Resource information is compiled from publicly available sources and may change. '
     'ReRoute does not imply partnership or endorsement unless a listing is marked with a Verified Partner badge. '
     'Verified badges will appear only for organizations that have formally partnered with ReRoute.'
 )
+
+
+def _phone_href(raw_phone: str, explicit_href: str) -> str:
+    href = (explicit_href or "").strip()
+    if href:
+        return href
+    digits = "".join(ch for ch in (raw_phone or "") if ch.isdigit())
+    return f"+{digits}" if digits else ""
+
+
+def _resource_to_payload(resource: ResourceOrganization) -> dict:
+    categories = list(resource.categories or [])
+    features = list(resource.features or [])
+    combined_tags = categories + features
+    visible_tags = combined_tags[:5]
+    hidden_tag_count = max(0, len(combined_tags) - len(visible_tags))
+    return {
+        "slug": resource.slug,
+        "name": resource.name,
+        "categories": categories,
+        "features": features,
+        "address_line": resource.address_line,
+        "neighborhood": resource.neighborhood,
+        "transit_line": resource.transit_line,
+        "zip_code": resource.zip_code,
+        "hours": resource.hours,
+        "phone": resource.phone,
+        "phone_href": _phone_href(resource.phone, resource.phone_href),
+        "website": resource.website,
+        "overview": resource.overview,
+        "what_to_expect": resource.what_to_expect,
+        "who_can_use_this": resource.who_can_use_this,
+        "what_to_bring": list(resource.what_to_bring or []),
+        "how_to_apply": resource.how_to_apply,
+        "getting_there": resource.getting_there,
+        "languages_supported": list(resource.languages_supported or []),
+        "cultural_competency": list(resource.cultural_competency or []),
+        "childcare_support": resource.childcare_support,
+        "card_tags": visible_tags,
+        "hidden_tag_count": hidden_tag_count,
+    }
 
 
 def _inline_quiz_questions(module):
@@ -192,18 +168,8 @@ def resources_directory(request):
     if not zip_code.isdigit() or len(zip_code) != 5:
         zip_code = ''
 
-    prepared_resources = []
-    for resource in RESOURCE_DIRECTORY:
-        categories = list(resource.get('categories') or [])
-        features = list(resource.get('features') or [])
-        combined_tags = categories + features
-        visible_tags = combined_tags[:5]
-        hidden_tag_count = max(0, len(combined_tags) - len(visible_tags))
-
-        prepared_resource = dict(resource)
-        prepared_resource['card_tags'] = visible_tags
-        prepared_resource['hidden_tag_count'] = hidden_tag_count
-        prepared_resources.append(prepared_resource)
+    queryset = ResourceOrganization.objects.filter(is_active=True).order_by("name")
+    prepared_resources = [_resource_to_payload(resource) for resource in queryset]
 
     paginator = Paginator(prepared_resources, 12)
     page_obj = paginator.get_page(request.GET.get('page'))
@@ -225,9 +191,8 @@ def resources_directory(request):
 
 @require_GET
 def resource_directory_detail(request, slug):
-    resource = RESOURCE_DIRECTORY_BY_SLUG.get(slug)
-    if not resource:
-        raise Http404('Resource not found')
+    resource_obj = get_object_or_404(ResourceOrganization, slug=slug, is_active=True)
+    resource = _resource_to_payload(resource_obj)
 
     return render(request, 'resources/directory/directory_detail.html', {
         'resource': resource,
