@@ -18,10 +18,20 @@
 <!-- Cards -->
 <section class="rehelp-section">
   <div class="rehelp-inner">
+    <div class="rehelp-priority-banner" role="status" aria-live="polite">
+      <h3>I Need Help Today</h3>
+      <p>If your need is urgent, start with immediate housing, legal, and crisis support options first.</p>
+      <div class="rehelp-priority-actions">
+        <a href="{% url 'housing' %}" class="btn-pill">Urgent Housing</a>
+        <a href="{% url 'legal_aid' %}" class="btn-pill">Urgent Legal Help</a>
+        <a href="{% url 'counseling' %}" class="btn-pill">Crisis & Counseling</a>
+      </div>
+    </div>
+
     <h2>Support Services</h2>
     <p class="rehelp-section-subtext">Explore curated guides, links, and programs designed for returning citizens.</p>
 
-    <div class="rehelp-cards">
+    <div class="rehelp-cards rehelp-cards--expanded">
       <!-- Legal Aid -->
       <article class="rehelp-card">
         <div class="rehelp-card-icon" aria-hidden="true">
@@ -58,6 +68,70 @@
         <p>Access city services, crisis hotlines, and affordable counseling options.</p>
         <div class="rehelp-actions">
           <a href="{% url 'counseling' %}" class="btn-pill">Find Support</a>
+        </div>
+      </article>
+
+      <article class="rehelp-card">
+        <div class="rehelp-card-icon" aria-hidden="true">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="4" width="12" height="16" rx="2" stroke="#0F172A" stroke-width="1.6"/><path d="M9 9h6M9 13h6" stroke="#6495ED" stroke-width="1.6"/></svg>
+        </div>
+        <h3>ID & Documents</h3>
+        <p>Find help replacing ID, social security, and other required documents.</p>
+        <div class="rehelp-meta-list">
+          <span>What to bring</span>
+          <span>Eligibility basics</span>
+          <span>Step-by-step process</span>
+        </div>
+        <div class="rehelp-actions">
+          <a href="{% url 'resource_directory' %}?features=id-documents-support" class="btn-pill">Find ID Support</a>
+        </div>
+      </article>
+
+      <article class="rehelp-card">
+        <div class="rehelp-card-icon" aria-hidden="true">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v18M8 8a4 4 0 1 1 0 8m8-8a4 4 0 1 0 0 8" stroke="#0F172A" stroke-width="1.6"/></svg>
+        </div>
+        <h3>Benefits & Essentials</h3>
+        <p>Access SNAP, Medicaid, cash assistance, and local essentials support resources.</p>
+        <div class="rehelp-meta-list">
+          <span>Food assistance</span>
+          <span>Healthcare</span>
+          <span>Financial support</span>
+        </div>
+        <div class="rehelp-actions">
+          <a href="{% url 'benefit_finder:start' %}" class="btn-pill">Open Benefit Finder</a>
+        </div>
+      </article>
+
+      <article class="rehelp-card">
+        <div class="rehelp-card-icon" aria-hidden="true">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 7a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v5a4 4 0 0 1-4 4h-5l-4 4v-4H8a4 4 0 0 1-4-4V7z" stroke="#0F172A" stroke-width="1.6"/></svg>
+        </div>
+        <h3>Case Management</h3>
+        <p>Get one-on-one guidance, referrals, and accountability support for next steps.</p>
+        <div class="rehelp-meta-list">
+          <span>Care coordination</span>
+          <span>Referrals</span>
+          <span>Progress support</span>
+        </div>
+        <div class="rehelp-actions">
+          <a href="{% url 'contact' %}" class="btn-pill">Request Support</a>
+        </div>
+      </article>
+
+      <article class="rehelp-card">
+        <div class="rehelp-card-icon" aria-hidden="true">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l7 3v5c0 5.25-3.5 8.75-7 10-3.5-1.25-7-4.75-7-10V6l7-3z" stroke="#0F172A" stroke-width="1.6"/><path d="M8 12h8" stroke="#6495ED" stroke-width="1.6"/></svg>
+        </div>
+        <h3>Employment Rights</h3>
+        <p>Understand fair chance hiring rights and how to respond to background-check barriers.</p>
+        <div class="rehelp-meta-list">
+          <span>Fair chance</span>
+          <span>Background checks</span>
+          <span>Employer communication</span>
+        </div>
+        <div class="rehelp-actions">
+          <a href="{% url 'legal_aid' %}" class="btn-pill">Learn Your Rights</a>
         </div>
       </article>
     </div>

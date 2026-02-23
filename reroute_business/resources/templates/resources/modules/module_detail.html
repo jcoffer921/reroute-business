@@ -83,11 +83,11 @@
     <main class="module-main">
       <article class="module-card module-card--video">
         <div class="module-video-wrap" {% if video_poster %}style="background-image: url('{{ video_poster }}');"{% endif %}>
-          {% if yt_id %}
-            <iframe src="https://www.youtube-nocookie.com/embed/{{ yt_id }}?rel=0&modestbranding=1&playsinline=1"
+          {% if module_embed_url %}
+            <iframe src="{{ module_embed_url }}"
                     title="Module video" referrerpolicy="strict-origin-when-cross-origin"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-        {% elif module.video_url and module.video_url|endswith:'.mp4' %}
+        {% elif module_is_mp4 %}
             <video controls playsinline preload="metadata" {% if video_poster %}poster="{{ video_poster }}"{% endif %}>
               <source src="{{ module.video_url }}" type="video/mp4">
             </video>

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ entry.title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/journal.css' %}">
+{% endblock %}
+
+{% block content %}
+<article class="journal-shell journal-shell--narrow">
+  <header class="journal-header">
+    <h1>{{ entry.title }}</h1>
+    <p>{{ entry.created_at|date:"F j, Y" }}</p>
+  </header>
+
+  <section class="journal-detail-card">
+    <div class="journal-detail-body">{{ entry.content|linebreaks }}</div>
+  </section>
+
+  <div class="journal-form-actions">
+    <a href="{% url 'journal_edit' pk=entry.pk %}" class="journal-btn">Edit</a>
+    <a href="{% url 'journal_delete' pk=entry.pk %}" class="journal-btn journal-btn--danger">Delete</a>
+    <a href="{% url 'journal_home' %}" class="journal-btn journal-btn--muted">Back to Journal</a>
+  </div>
+</article>
+{% endblock %}

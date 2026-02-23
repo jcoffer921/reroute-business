@@ -24,14 +24,57 @@
 .rehelp-section h2 { text-align: center; margin: 0 0 .5rem; font-size: clamp(2rem, 4vw, 2.6rem); font-weight: 900; color: #0F172A; }
 .rehelp-section-subtext { text-align: center; color: #6b7280; margin: 0 0 2rem; }
 
+.rehelp-priority-banner {
+  margin: 0 0 1.3rem;
+  padding: 1rem;
+  border-radius: 14px;
+  border: 1px solid #bfdbfe;
+  background: linear-gradient(135deg, #eff6ff, #ffffff);
+}
+
+.rehelp-priority-banner h3 {
+  margin: 0 0 0.25rem;
+  color: #0F172A;
+  font-size: 1.2rem;
+}
+
+.rehelp-priority-banner p {
+  margin: 0 0 0.7rem;
+  color: #334155;
+}
+
+.rehelp-priority-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
 .rehelp-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; align-items: stretch; }
 @media (max-width: 900px){ .rehelp-cards { grid-template-columns: 1fr; } }
+.rehelp-cards--expanded { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 1100px){ .rehelp-cards--expanded { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px){ .rehelp-cards--expanded { grid-template-columns: 1fr; } }
 
 .rehelp-card { display: flex; flex-direction: column; background: #fff; border: 1px solid #e6ecfb; border-radius: 16px; padding: 1.25rem; box-shadow: 0 6px 18px rgba(10,34,80,.06); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
 .rehelp-card:hover { transform: translateY(-6px); border-color: rgba(100,149,237,.5); box-shadow: 0 16px 36px rgba(10,34,80,.12); }
 .rehelp-card-icon { margin-bottom: .5rem; width: 48px; height: 48px; border-radius: 12px; background: rgba(100,149,237,.12); display: inline-flex; align-items: center; justify-content: center; }
 .rehelp-card h3 { margin: .15rem 0 .25rem; font-size: 1.35rem; font-weight: 900; color: #0F172A; }
 .rehelp-card p { margin: 0 0 .9rem; color: #334155; }
+.rehelp-meta-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0 0 0.7rem;
+}
+.rehelp-meta-list span {
+  border-radius: 999px;
+  border: 1px solid #dbeafe;
+  background: #f8fbff;
+  color: #1e3a5f;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.18rem 0.52rem;
+}
 .rehelp-actions { margin-top: auto; }
 
 .btn-pill { display: inline-block; padding: .6rem 1.1rem; background: #6495ED; color: #fff; border-radius: 999px; text-decoration: none; font-weight: 800; box-shadow: 0 8px 22px rgba(100,149,237,.35); }
@@ -45,6 +88,8 @@
 @media (max-width: 640px){
   .rehelp-section { padding: 2.2rem 1rem; }
   .rehelp-card { padding: 1rem; }
+  .rehelp-priority-banner { padding: 0.85rem; }
+  .rehelp-priority-actions { flex-direction: column; }
   .rehelp-cta { padding: 2rem 1rem; }
   .btn-pill { width: 100%; text-align: center; }
 }

@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Your Journal{% endblock %}
+{% block body_class %}journal-page-body{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/journal.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="journal-shell">
+  <header class="journal-hero JournalHeader">
+    <div class="journal-hero__content">
+      <div>
+        <h1>Your Journal</h1>
+        <p class="journal-hero__lead">Track your progress. Reflect your growth.</p>
+        <p class="journal-hero__sub">Private reflections to support your journey toward fair-chance employment.</p>
+      </div>
+      <div class="journal-hero__actions">
+        <div class="journal-privacy-note" aria-label="Private entries notice">
+          <span class="journal-privacy-note__icon" aria-hidden="true"></span>
+          <span class="journal-privacy-note__text">Private — Only You Can See This</span>
+        </div>
+        <a class="journal-stories-link" href="{% url 'stories_list' %}">View public stories</a>
+      </div>
+    </div>
+  </header>
+
+  <p class="journal-privacy-inline">Your journal is private by default and only visible to you.</p>
+
+  <div class="journal-grid">
+    <section class="journal-list-card EntriesPanel">
+      <div class="journal-list-header">
+        <h2>
+          <svg class="journal-icon-book" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M3.5 6.8a2.3 2.3 0 0 1 2.3-2.3H11v14.2H5.8a2.3 2.3 0 0 1-2.3-2.3V6.8Z"/>
+            <path d="M20.5 6.8a2.3 2.3 0 0 0-2.3-2.3H13v14.2h5.2a2.3 2.3 0 0 0 2.3-2.3V6.8Z"/>
+            <path d="M12 4.5v14.2"/>
+          </svg>
+          Entries
+        </h2>
+        <a class="journal-btn journal-btn--strong" href="{% url 'journal_home' %}?mode=new">+ New Entry</a>
+      </div>
+
+      {% if entries %}
+        <ul class="journal-entry-list" role="list">
+          {% for entry in entries %}
+            <li class="EntryListItem {% if selected_entry and selected_entry.pk == entry.pk %}is-selected{% endif %}">
+              <a href="{% url 'journal_home' %}?entry={{ entry.pk }}">
+                <div class="journal-entry-meta">
+                  <h3>{{ entry.title }}</h3>
+                  {% if entry.journal_tag %}
+                    <span class="journal-entry-tag">{{ entry.get_journal_tag_display }}</span>
+                  {% endif %}
+                </div>
+                <small>{{ entry.created_at|date:"F j, Y" }}</small>
+                <p>{{ entry.content|truncatewords:20 }}</p>
+                <span class="journal-mood-placeholder" aria-hidden="true">Mood: --</span>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="journal-empty">
+          <p>No entries yet. Start with a few lines about your progress, goals, or job search confidence today.</p>
+        </div>
+      {% endif %}
+
+      <aside class="journal-prompts StarterPrompts">
+        <h3>
+          <svg class="journal-icon-bulb" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 3.8a5.5 5.5 0 0 0-3.5 9.8c.7.6 1.1 1.4 1.2 2.3h4.6c.1-.9.5-1.7 1.2-2.3A5.5 5.5 0 0 0 12 3.8Z"/>
+            <path d="M10 18.2h4M10.5 20.2h3"/>
+          </svg>
+          Starter prompts
+        </h3>
+        <ul>
+          <li>"What progress did I make this week?"</li>
+          <li>"What am I proud of?"</li>
+          <li>"What do I want to improve before my next interview?"</li>
+          <li>"What support do I need right now?"</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="journal-preview-card EntryViewerEditor">
+      {% if editor_mode == 'new' or editor_mode == 'edit' %}
+        <h2>{% if editor_mode == 'new' %}New Entry{% else %}Edit Entry{% endif %}</h2>
+        <form method="post" class="journal-form-card journal-form-card--inline">
+          {% csrf_token %}
+          <input type="hidden" name="entry_id" value="{% if selected_entry %}{{ selected_entry.pk }}{% endif %}">
+
+          <label for="{{ form.title.id_for_label }}">Title</label>
+          {{ form.title }}
+          {{ form.title.errors }}
+
+          <label for="{{ form.content.id_for_label }}">Body</label>
+          {{ form.content }}
+          {{ form.content.errors }}
+
+          <label for="{{ form.journal_tag.id_for_label }}">Tag</label>
+          {{ form.journal_tag }}
+          {{ form.journal_tag.errors }}
+
+          <div class="journal-form-actions journal-form-actions--right">
+            <button type="submit" class="journal-btn">Save</button>
+            <a href="{% url 'journal_home' %}" class="journal-btn journal-btn--muted">Cancel</a>
+          </div>
+        </form>
+      {% else %}
+        <div class="journal-preview-empty">
+          <h2>Select an entry to view</h2>
+          <p>Choose an entry from the list to read it on its own page. Keep notes focused on private reflections, goals, and support needs.</p>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+</section>
+{% endblock %}

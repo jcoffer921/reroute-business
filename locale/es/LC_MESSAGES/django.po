@@ -2695,3 +2695,120 @@ msgstr "¿No encuentras lo que necesitas?"
 #: .\reroute_business\resources\templates\resources\resource_list.html:152
 msgid "Get in Touch"
 msgstr "Ponte en contacto"
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:45
+#: .\reroute_business\resources\templates\resources\resource_list.html:63
+msgid "Resource Directory"
+msgstr "Directorio de Recursos"
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:57
+msgid ""
+"Find trusted programs near you — job training, reentry support, housing, "
+"legal help, and more."
+msgstr ""
+"Encuentra programas confiables cerca de ti: capacitación laboral, apoyo de "
+"reinserción, vivienda, ayuda legal y más."
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:64
+msgid ""
+"Browse local programs and services across Philadelphia. Filter by category, "
+"neighborhood, and accessibility features like Spanish support and public "
+"transit."
+msgstr ""
+"Explora programas y servicios locales en toda Filadelfia. Filtra por "
+"categoría, vecindario y funciones de accesibilidad como apoyo en español y "
+"transporte público."
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:70
+msgid "Search by neighborhood and category"
+msgstr "Busca por vecindario y categoría"
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:76
+msgid "Filter by accessibility features (Spanish, transit, walk-ins)"
+msgstr ""
+"Filtra por funciones de accesibilidad (español, transporte, atención sin "
+"cita)"
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:82
+msgid "Save resources for later"
+msgstr "Guarda recursos para después"
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:86
+msgid "Browse the Directory"
+msgstr "Explorar el Directorio"
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:87
+msgid "Learn how we verify partners"
+msgstr "Conoce cómo verificamos a nuestros socios"
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:92
+msgid "Directory preview card"
+msgstr "Tarjeta de vista previa del directorio"
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:93
+msgid "Listed Resource"
+msgstr "Recurso listado"
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:94
+msgid "Northwest Reentry Collective"
+msgstr "Colectivo de Reinserción del Noroeste"
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:96
+msgid "Germantown"
+msgstr "Germantown"
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:97
+msgid "Workforce Development"
+msgstr "Desarrollo Laboral"
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:100
+msgid "Spanish Available"
+msgstr "Español Disponible"
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:101
+msgid "Near Public Transit"
+msgstr "Cerca del Transporte Público"
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:102
+msgid "Appointment Required"
+msgstr "Se Requiere Cita"
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:103
+msgid "Walk-ins Accepted"
+msgstr "Atención sin Cita Aceptada"
+
+#: .\reroute_business\resources\templates\resources\resource_list.html:106
+msgid "View Details"
+msgstr "Ver Detalles"
+
+#: .\reroute_business\resources\templates\resources\verification.html:4
+msgid "Resource Verification | ReRoute"
+msgstr "Verificación de Recursos | ReRoute"
+
+#: .\reroute_business\resources\templates\resources\verification.html:19
+msgid "How ReRoute Verifies Partners"
+msgstr "Cómo ReRoute Verifica a sus Socios"
+
+#: .\reroute_business\resources\templates\resources\verification.html:20
+msgid ""
+"We review public information, update listings regularly, and clearly label "
+"any organization that is a formally verified ReRoute partner."
+msgstr ""
+"Revisamos información pública, actualizamos los listados con regularidad y "
+"etiquetamos claramente cualquier organización que sea un socio de ReRoute "
+"verificado formalmente."
+
+#: .\reroute_business\resources\templates\resources\verification.html:25
+msgid ""
+"Directory listings are intended to help you discover support quickly. "
+"Details can change, so we recommend contacting organizations directly to "
+"confirm hours, eligibility, and availability."
+msgstr ""
+"Los listados del directorio están diseñados para ayudarte a encontrar apoyo "
+"rápidamente. Los detalles pueden cambiar, por lo que recomendamos contactar "
+"directamente a las organizaciones para confirmar horarios, elegibilidad y "
+"disponibilidad."
+
+#: .\reroute_business\resources\templates\resources\verification.html:27
+msgid "Back to Directory"
+msgstr "Volver al Directorio"

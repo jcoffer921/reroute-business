@@ -1,15 +1,17 @@
 # resources/views.py
 import json
 from datetime import datetime
-from urllib.parse import quote
+from urllib.parse import quote, urlparse, parse_qs, urlencode, urlunparse
 
 from django.conf import settings
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
 from reroute_business.blog.models import BlogPost
+from .templatetags.resources_extras import youtube_embed_url
 from .models import (
     Feature,
     ResourceOrganization,
@@ -146,9 +148,12 @@ def resource_list(request):
     """
     modules = Module.objects.all().order_by('-created_at')
     lessons = Lesson.objects.filter(is_active=True).order_by('-created_at')
+    featured_resource_obj = ResourceOrganization.objects.filter(is_active=True).order_by("name").first()
+    featured_resource = _resource_to_payload(featured_resource_obj) if featured_resource_obj else None
     return render(request, 'resources/resource_list.html', {
         'modules': modules,
         'lessons': lessons,
+        'featured_resource': featured_resource,
     })
 
 
@@ -259,11 +264,47 @@ def _module_poster_url(module, yt_id: str) -> str:
     return _build_svg_poster(module.title)
 
 
+def _is_mp4_source(url: str) -> bool:
+    try:
+        parsed = urlparse(str(url or "").strip())
+        return (parsed.path or "").lower().endswith(".mp4")
+    except Exception:
+        return False
+
+
+def _append_query_defaults(url: str, defaults: dict) -> str:
+    try:
+        parsed = urlparse(url)
+        query = parse_qs(parsed.query or "")
+        for key, value in defaults.items():
+            if key not in query:
+                query[key] = [str(value)]
+        flat_query = urlencode({k: v[-1] if isinstance(v, list) else v for k, v in query.items()})
+        return urlunparse((parsed.scheme, parsed.netloc, parsed.path, parsed.params, flat_query, parsed.fragment))
+    except Exception:
+        return url
+
+
+def _module_embed_url(raw_video_url: str) -> str:
+    normalized = youtube_embed_url(raw_video_url or "").strip()
+    if not normalized:
+        return ""
+    if "youtube.com/embed/" not in normalized and "youtube-nocookie.com/embed/" not in normalized:
+        return ""
+    return _append_query_defaults(normalized, {
+        "rel": 0,
+        "modestbranding": 1,
+        "playsinline": 1,
+    })
+
+
 @ensure_csrf_cookie
 def module_detail(request, pk: int):
     module = get_object_or_404(Module, pk=pk)
-    yt_id = _extract_youtube_id_simple(module.video_url or '') if module.video_url else ''
+    module_embed_url = _module_embed_url(module.video_url or '')
+    yt_id = _extract_youtube_id_simple(module_embed_url or module.video_url or '') if module.video_url else ''
     poster_url = _module_poster_url(module, yt_id)
+    module_is_mp4 = _is_mp4_source(module.video_url)
     duration_label = getattr(module, 'duration_label', None) or 'Self-paced video'
     user_score = None
     if request.user.is_authenticated:
@@ -282,6 +323,8 @@ def module_detail(request, pk: int):
     return render(request, 'resources/modules/module_detail.html', {
         'module': module,
         'yt_id': yt_id,
+        'module_embed_url': module_embed_url,
+        'module_is_mp4': module_is_mp4,
         'video_poster': poster_url,
         'video_duration_label': duration_label,
         'estimated_minutes': estimated_minutes,
@@ -452,7 +495,7 @@ def email_guidance(request):
     return render(request, 'resources/job_tools/email_guidance.html')
 
 def legal_aid(request):
-    related_articles = BlogPost.objects.filter(category='legal', published=True).order_by('-created_at')[:3]
+    related_articles = BlogPost.objects.filter(visibility=BlogPost.VISIBILITY_PUBLIC, published=True).filter(Q(category=BlogPost.CATEGORY_REENTRY) | Q(category='legal')).order_by('-created_at')[:3]
     return render(request, 'resources/reentry_help/legal_aid.html', {
         'related_articles': related_articles
     })
@@ -471,6 +514,9 @@ def job_tools_index(request):
 
 def reentry_help_index(request):
     return render(request, 'resources/reentry_help/index.html')
+
+def resources_verification(request):
+    return render(request, 'resources/verification.html')
 
 
 # ------------------ Interactive Lessons ------------------

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Journal Entry{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/journal.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="journal-shell journal-shell--narrow">
+  <header class="journal-header">
+    <h1>Delete Journal Entry</h1>
+    <p>This action cannot be undone.</p>
+  </header>
+
+  <form method="post" class="journal-form-card">
+    {% csrf_token %}
+    <p>Are you sure you want to delete <strong>{{ entry.title }}</strong>?</p>
+    <div class="journal-form-actions">
+      <button type="submit" class="journal-btn journal-btn--danger">Delete</button>
+      <a href="{% url 'journal_detail' pk=entry.pk %}" class="journal-btn journal-btn--muted">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

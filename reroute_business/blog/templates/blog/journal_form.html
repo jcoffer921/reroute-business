@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ form_title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/journal.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="journal-shell journal-shell--narrow">
+  <header class="journal-header">
+    <h1>{{ form_title }}</h1>
+    <p>Private reflections for progress tracking and job search confidence.</p>
+  </header>
+
+  <form method="post" class="journal-form-card">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <label for="{{ form.title.id_for_label }}">Title</label>
+    {{ form.title }}
+    {{ form.title.errors }}
+
+    <label for="{{ form.content.id_for_label }}">Body</label>
+    {{ form.content }}
+    {{ form.content.errors }}
+
+    <div class="journal-form-actions">
+      <button type="submit" class="journal-btn">{{ submit_label }}</button>
+      <a href="{% url 'journal_home' %}" class="journal-btn journal-btn--muted">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

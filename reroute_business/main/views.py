@@ -20,6 +20,7 @@ import json
 import logging
 import re
 import traceback
+from urllib.parse import quote
 
 from django.conf import settings
 from django.contrib import messages
@@ -456,9 +457,37 @@ def login_view(request):
       - POST (form): username/email + password -> redirect or re-render with error
     """
 
+    def login_page_context(extra: dict | None = None):
+        ctx = {
+            "google_login_enabled": False,
+            "google_login_url": "",
+        }
+        try:
+            from allauth.socialaccount.models import SocialApp
+            apps_qs = SocialApp.objects.filter(provider="google")
+            try:
+                from django.contrib.sites.shortcuts import get_current_site
+                current_site = get_current_site(request)
+                apps_qs = apps_qs.filter(sites=current_site)
+            except Exception:
+                pass
+
+            if apps_qs.exists():
+                oauth_role_redirect_url = reverse("oauth_role_redirect")
+                google_next = f"{oauth_role_redirect_url}?role=user"
+                ctx["google_login_enabled"] = True
+                ctx["google_login_url"] = f"/accounts/google/login/?next={quote(google_next, safe='')}"
+        except Exception:
+            # Never block login if social config is missing/misconfigured
+            pass
+
+        if extra:
+            ctx.update(extra)
+        return ctx
+
     # ---------- GET: show page ----------
     if request.method == "GET":
-        return render(request, "main/login.html")
+        return render(request, "main/login.html", login_page_context())
 
     # ---------- Helper: auth by username OR email ----------
     def auth_user(identifier: str, password: str):
@@ -570,11 +599,11 @@ def login_view(request):
         user, err = auth_user(identifier, password)
         if err:
             # Re-render with inline error
-            return render(request, "main/login.html", {
+            return render(request, "main/login.html", login_page_context({
                 "error": err,
                 "prefill_identifier": identifier,
                 "next": requested_next,  # keep it if present
-            }, status=401 if err == "Invalid credentials" else 400)
+            }), status=401 if err == "Invalid credentials" else 400)
 
         # Require verified email before login (can be disabled via settings flag)
         from django.conf import settings as django_settings
@@ -591,6 +620,7 @@ def login_view(request):
                         except Exception:
                             logger.exception("Failed to resend verification email during login")
                     return render(request, "main/login.html", {
+                        **login_page_context(),
                         "error": "Please verify your email. We just sent a new link.",
                         "prefill_identifier": identifier,
                         "next": requested_next,
@@ -642,7 +672,7 @@ def video_gallery(request):
         host = (u.netloc or '').lower()
         path = u.path or ''
         qs = parse_qs(u.query or '')
-        if 'youtube.com/embed/' in (url or ''):
+        if 'youtube.com/embed/' in (url or '') or 'youtube-nocookie.com/embed/' in (url or ''):
             try:
                 return path.rstrip('/').split('/')[-1]
             except Exception:

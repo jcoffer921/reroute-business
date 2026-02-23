@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Stories & Insights{% endblock %}
+{% block body_class %}stories-page-body{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/stories.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="stories-hero-band">
+  <div class="stories-hero-band__pattern" aria-hidden="true"></div>
+  <div class="stories-hero-band__inner">
+    <div class="stories-hero-copy">
+      <a href="{% url 'journal_home' %}" class="stories-hero-back">&larr; Back to My Journal</a>
+      <h1>Stories &amp; Insights</h1>
+      <p class="stories-hero-subhead">Fair-chance hiring insights, employer guidance, and stories of resilience.</p>
+      <p class="stories-hero-support">We share practical strategies, success stories, and platform updates that move opportunity forward.</p>
+    </div>
+  </div>
+</section>
+
+<section class="stories-page">
+  <section class="stories-filter-shell">
+    <div class="stories-filter-top">
+      <div>
+        <h2>{{ stories_count }} stories</h2>
+        <p>Inspiring journeys from the ReRoute community</p>
+      </div>
+      <div class="stories-filter-actions">
+        <a href="{% url 'journal_home' %}" class="stories-btn">Share Your Story</a>
+      </div>
+    </div>
+
+    <div class="stories-filter-row">
+      <form method="get" class="stories-chip-search">
+        <input type="hidden" name="topic" value="{{ topic_filter }}">
+        <input type="hidden" name="sort" value="{{ sort }}">
+        <input id="search-stories" type="search" name="q" value="{{ query }}" placeholder="Search stories..." aria-label="Search stories">
+      </form>
+      <span class="stories-filter-icon" aria-hidden="true"></span>
+      <div class="stories-chip-row">
+        {% for value, label in topic_options %}
+          <a
+            class="stories-chip {% if topic_filter == value %}is-active{% endif %}"
+            href="{% url 'stories_list' %}?topic={{ value }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}{% if sort %}&amp;sort={{ sort }}{% endif %}"
+          >
+            {{ label }}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="stories-featured-wrap">
+    {% if featured_post %}
+      <article class="stories-featured-card">
+        <div class="stories-featured-media">
+          {% if featured_post.image %}
+            <img src="{{ featured_post.image.url }}" alt="{{ featured_post.title }}" loading="lazy" decoding="async">
+          {% else %}
+            <div class="stories-featured-fallback" aria-hidden="true"></div>
+          {% endif %}
+        </div>
+        <div class="stories-featured-copy">
+          <span class="stories-pill">{{ featured_post.get_category_display }}</span>
+          <h2>{{ featured_post.title }}</h2>
+          <p>{{ featured_post.content|truncatewords:55 }}</p>
+          <a href="{% url 'stories_detail' slug=featured_post.slug %}" class="stories-btn stories-btn--link">Read More</a>
+        </div>
+      </article>
+    {% else %}
+      <article class="stories-featured-card">
+        <div class="stories-featured-media">
+          <div class="stories-featured-fallback" aria-hidden="true"></div>
+        </div>
+        <div class="stories-featured-copy">
+          <span class="stories-pill">Stories</span>
+          <h2>Why We Built ReRoute</h2>
+          <p>ReRoute was built to expand access to fair-chance employment and remove barriers that keep qualified people out of the workforce. Our mission is to connect job seekers, employers, and support organizations through practical tools, transparent guidance, and real outcomes.</p>
+          <a href="{% url 'journal_home' %}" class="stories-btn stories-btn--link">Read More</a>
+        </div>
+      </article>
+    {% endif %}
+    <div class="stories-divider" aria-hidden="true"></div>
+  </section>
+
+  {% if posts %}
+    {% if grid_posts %}
+      <section class="stories-grid-wrap">
+        <div class="stories-grid">
+          {% for post in grid_posts %}
+            <article class="story-card">
+              <a href="{% url 'stories_detail' slug=post.slug %}" class="story-card-media-link" aria-label="{{ post.title }}">
+                <div class="story-card-media">
+                  {% if post.image %}
+                    <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy" decoding="async">
+                  {% else %}
+                    <div class="story-card-fallback" aria-hidden="true"></div>
+                  {% endif %}
+                  <span class="stories-pill story-card-pill">{{ post.get_category_display }}</span>
+                </div>
+              </a>
+              <div class="story-card-copy">
+                <h3><a href="{% url 'stories_detail' slug=post.slug %}">{{ post.title }}</a></h3>
+                <p>{{ post.content|truncatewords:26 }}</p>
+                <p class="story-card-meta">{{ post.read_minutes }} min read • {{ post.created_at|date:"M j" }}</p>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+  {% else %}
+    <section class="stories-empty">
+      <div class="stories-empty-icon" aria-hidden="true"></div>
+      <h2>Building the Knowledge Base.</h2>
+      <p>ReRoute will share insights on employer partnerships, fair-chance hiring, and community success stories here.</p>
+      <a href="{% url 'dashboard:my_dashboard' %}" class="stories-btn">Return to Dashboard</a>
+    </section>
+  {% endif %}
+</section>
+{% endblock %}

@@ -133,13 +133,13 @@
     <ul class="related-article-list">
       {% for article in related_articles %}
         <li>
-          <h4><a href="{% url 'blog_detail' slug=article.slug %}">{{ article.title }}</a></h4>
+          <h4><a href="{% url 'stories_detail' slug=article.slug %}">{{ article.title }}</a></h4>
           <p>{{ article.content|truncatewords:25 }}</p>
           <small>{{ article.created_at|date:"F j, Y" }}</small>
         </li>
       {% endfor %}
     </ul>
-      <a href="{% url 'blog_list' %}?category={{ post.category }}">View All Legal Articles →</a>
+      <a href="{% url 'stories_list' %}?category=reentry">View All Legal Articles →</a>
   </section>
 {% endif %}
 

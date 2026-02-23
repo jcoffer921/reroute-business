@@ -71,6 +71,77 @@
       </article>
     </div>
 
+    <section class="jobtools-section-block" aria-labelledby="coreJobToolsHeading">
+      <h3 id="coreJobToolsHeading">Core Job Tools</h3>
+      <p class="jobtools-block-subtext">Build a complete job-ready package, from resume quality to first-week workplace confidence.</p>
+      <div class="jobtools-mini-grid">
+        <article class="jobtools-mini-card">
+          <h4>Resume Builder</h4>
+          <p>ATS-friendly templates, stronger bullet examples, and role-specific resume language.</p>
+          <div class="jobtools-chip-row">
+            <span>ATS-friendly</span>
+            <span>Examples</span>
+            <span>Role-based</span>
+          </div>
+          <a href="{% url 'resumes:resume_start' %}" class="text-link">Open Resume Builder →</a>
+        </article>
+
+        <article class="jobtools-mini-card">
+          <h4>Interview Prep</h4>
+          <p>Common questions, STAR story structure, and reentry-safe answer framing.</p>
+          <div class="jobtools-chip-row">
+            <span>Questions</span>
+            <span>STAR format</span>
+            <span>Confidence tips</span>
+          </div>
+          <a href="{% url 'interview_prep' %}" class="text-link">Open Interview Prep →</a>
+        </article>
+
+        <article class="jobtools-mini-card">
+          <h4>Email & Messaging</h4>
+          <p>Professional email templates for follow-ups, outreach, and hiring-manager contact.</p>
+          <div class="jobtools-chip-row">
+            <span>Templates</span>
+            <span>Follow-ups</span>
+            <span>Outreach</span>
+          </div>
+          <a href="{% url 'email_guidance' %}" class="text-link">Open Email Guidance →</a>
+        </article>
+
+        <article class="jobtools-mini-card">
+          <h4>Job Search Tactics</h4>
+          <p>Application planning, weekly tracking habits, and better referral requests.</p>
+          <div class="jobtools-chip-row">
+            <span>Planning</span>
+            <span>Tracking</span>
+            <span>Referrals</span>
+          </div>
+          <a href="{% url 'opportunities' %}" class="text-link">Browse Opportunities →</a>
+        </article>
+
+        <article class="jobtools-mini-card">
+          <h4>Workplace Readiness</h4>
+          <p>First-30-days expectations, communication basics, and conflict handling guidance.</p>
+          <div class="jobtools-chip-row">
+            <span>First 30 days</span>
+            <span>Communication</span>
+            <span>Professional habits</span>
+          </div>
+          <a href="{% url 'resource_list' %}#resource-library" class="text-link">View Quick Videos →</a>
+        </article>
+
+        <article class="jobtools-mini-card">
+          <h4>Quick Wins (15 Minutes)</h4>
+          <p>Fast actions you can finish today to improve your application quality immediately.</p>
+          <ul class="quick-win-list">
+            <li>Tailor one resume summary</li>
+            <li>Practice one interview response</li>
+            <li>Send one professional follow-up</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
     <div class="jobtools-cta">
       <a href="{% url 'resource_list' %}" class="btn-pill">All Categories</a>
     </div>

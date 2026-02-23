@@ -23,6 +23,7 @@ urlpatterns = [
     path('reentry-help/legal-aid/', views.legal_aid, name='legal_aid'),
     path('reentry-help/housing/', views.housing, name='housing'),
     path('reentry-help/counseling/', views.counseling, name='counseling'),
+    path('verification/', views.resources_verification, name='resources_verification'),
 
     # Interactive lessons
     path('lessons/<slug:slug>/', views.lesson_detail, name='lesson_detail'),

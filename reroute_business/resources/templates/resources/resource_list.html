@@ -41,17 +41,116 @@
   </div>
 </section>
 
+<!-- Resource Directory Feature Section -->
+<section class="resource-directory-feature reveal-on-scroll" aria-labelledby="resourceDirectoryHeading">
+  <div class="resource-directory-shell">
+    <div class="resource-directory-intro">
+      <span class="resource-directory-icon-badge" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" focusable="false">
+          <path d="M12 21c3.2-3.6 5.5-6.3 5.5-9a5.5 5.5 0 1 0-11 0c0 2.7 2.3 5.4 5.5 9Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="12" cy="12" r="1.8" stroke="currentColor" stroke-width="1.6"/>
+          <path d="M19.5 6.5h2M19.5 10h2M19.5 13.5h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <div class="resource-directory-heading-wrap">
+        <h2 id="resourceDirectoryHeading">{% trans "Resource Directory" %}</h2>
+        <p class="resource-directory-subtitle">{% trans "Find trusted programs near you — job training, reentry support, housing, legal help, and more." %}</p>
+      </div>
+    </div>
+
+    <div class="resource-directory-grid">
+      <div class="resource-directory-copy">
+        <h3>{% trans "Resource Directory" %}</h3>
+        <p>{% trans "Browse local programs and services across Philadelphia. Filter by category, neighborhood, and accessibility features like Spanish support and public transit." %}</p>
+        <ul class="resource-directory-benefits">
+          <li>
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M5 10.25 8.25 13.5 15.5 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>{% trans "Search by neighborhood and category" %}</span>
+          </li>
+          <li>
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M5 10.25 8.25 13.5 15.5 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>{% trans "Filter by accessibility features (Spanish, transit, walk-ins)" %}</span>
+          </li>
+          <li>
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M5 10.25 8.25 13.5 15.5 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>{% trans "Save resources for later" %}</span>
+          </li>
+        </ul>
+        <div class="resource-directory-actions">
+          <a href="{% url 'resource_directory' %}" class="resource-directory-cta">{% trans "Browse the Directory" %}</a>
+          <a href="{% url 'resources_verification' %}" class="resource-directory-link">{% trans "Learn how we verify partners" %} <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+
+      <aside class="resource-directory-preview-wrap">
+        <article class="resource-directory-preview-card" aria-label="{% trans 'Directory preview card' %}">
+          <p class="resource-directory-preview-badge">{% trans "Listed Resource" %}</p>
+          <h3 class="resource-directory-preview-title">
+            {% if featured_resource %}
+              {{ featured_resource.name }}
+            {% else %}
+              {% trans "Northwest Reentry Collective" %}
+            {% endif %}
+          </h3>
+          <div class="resource-directory-preview-meta">
+            <span class="resource-directory-pill">
+              {% if featured_resource.neighborhood %}
+                {{ featured_resource.neighborhood }}
+              {% else %}
+                {% trans "Germantown" %}
+              {% endif %}
+            </span>
+            <span class="resource-directory-tag">
+              {% if featured_resource.categories %}
+                {{ featured_resource.categories.0 }}
+              {% else %}
+                {% trans "Workforce Development" %}
+              {% endif %}
+            </span>
+          </div>
+          <div class="resource-directory-chip-row">
+            {% if featured_resource.features %}
+              {% for feature in featured_resource.features|slice:":4" %}
+                <span>{{ feature }}</span>
+              {% endfor %}
+            {% else %}
+              <span>{% trans "Spanish Available" %}</span>
+              <span>{% trans "Near Public Transit" %}</span>
+              <span>{% trans "Appointment Required" %}</span>
+              <span>{% trans "Walk-ins Accepted" %}</span>
+            {% endif %}
+          </div>
+          <a class="resource-directory-preview-link" href="{% if featured_resource %}{% url 'resource_directory_detail' featured_resource.slug %}{% else %}{% url 'resource_directory' %}{% endif %}">
+            {% trans "View Details" %}
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M7.5 5.5 12 10l-4.5 4.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </article>
+      </aside>
+    </div>
+  </div>
+</section>
+
 <!-- Categories Section (cards) -->
 <section id="resource-categories" class="resource-categories-section">
   <div class="resource-section">
-    <h2>{% trans "Resources to Help You Succeed" %}</h2>
-    <p class="section-subtext">{% trans "Explore our curated collection of tools, courses, and support services designed to empower your journey." %}</p>
+    <div class="resource-categories-header">
+      <span class="resource-categories-eyebrow">{% trans "Choose Your Path" %}</span>
+      <h2>{% trans "Resources to Help You Succeed" %}</h2>
+      <p class="section-subtext">{% trans "Pick the track that matches what you need right now. Each section includes practical next steps, trusted links, and focused support." %}</p>
+      <p class="resource-categories-microcopy">{% trans "Most visitors find what they need in under 60 seconds." %}</p>
+    </div>
 
-    <div class="resource-cards">
-      <!-- Job Tools Card -->
-      <div class="resource-card">
+    <div class="resource-cards resource-path-grid">
+      <article class="resource-card resource-path-card" data-resource-path="job_tools">
         <div class="card-icon" aria-hidden="true">
-          <!-- Clipboard/Resume SVG icon -->
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M9 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2" stroke="#0F172A" stroke-width="1.5"/>
             <rect x="9" y="2" width="6" height="4" rx="1" stroke="#0F172A" stroke-width="1.5"/>
@@ -59,16 +158,27 @@
           </svg>
         </div>
         <h3>{% trans "Job Tools" %}</h3>
-        <p>{% trans "Templates, interview prep, and email guidance to help you present your best self." %}</p>
-        <div class="card-actions">
-          <a href="{% url 'job_tools_index' %}" class="learn-more-btn">{% trans "Learn More" %} →</a>
+        <p>{% trans "Build confidence for applications and interviews with templates, scripts, and practical communication tools." %}</p>
+        <div class="resource-path-tags" aria-label="{% trans 'Job Tools highlights' %}">
+          <span>{% trans "Interview prep" %}</span>
+          <span>{% trans "Email templates" %}</span>
+          <span>{% trans "Work-ready tips" %}</span>
         </div>
-      </div>
+        <div class="card-actions">
+          <a href="{% url 'job_tools_index' %}" class="learn-more-btn" data-resource-analytics="path_cta" data-resource-path="job_tools">{% trans "Explore Job Tools" %} →</a>
+        </div>
+        <div class="resource-path-links">
+          <h4>{% trans "Quick Links" %}</h4>
+          <ul>
+            <li><a href="{% url 'interview_prep' %}" data-resource-analytics="quick_link" data-resource-path="job_tools" data-resource-link="interview_prep">{% trans "Interview Prep" %}</a></li>
+            <li><a href="{% url 'email_guidance' %}" data-resource-analytics="quick_link" data-resource-path="job_tools" data-resource-link="email_guidance">{% trans "Email Guidance" %}</a></li>
+          </ul>
+        </div>
+        <p class="resource-path-meta">{% trans "Curated by ReRoute" %} · {% trans "Updated" %} {% now "F Y" %}</p>
+      </article>
 
-      <!-- Tech Courses Card -->
-      <div class="resource-card">
+      <article class="resource-card resource-path-card" data-resource-path="tech_courses">
         <div class="card-icon" aria-hidden="true">
-          <!-- Laptop/Code SVG icon -->
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="3" y="5" width="18" height="12" rx="2" stroke="#0F172A" stroke-width="1.5"/>
             <path d="M2 19h20" stroke="#6495ED" stroke-width="1.5"/>
@@ -76,16 +186,27 @@
           </svg>
         </div>
         <h3>{% trans "Tech Courses" %}</h3>
-        <p>{% trans "Learn in-demand skills with beginner-friendly programs and free training resources." %}</p>
-        <div class="card-actions">
-          <a href="{% url 'tech_courses' %}" class="learn-more-btn">{% trans "Learn More" %} →</a>
+        <p>{% trans "Start or restart your tech career with beginner-friendly foundations and certificate pathways." %}</p>
+        <div class="resource-path-tags" aria-label="{% trans 'Tech Courses highlights' %}">
+          <span>{% trans "Free foundations" %}</span>
+          <span>{% trans "Certificates" %}</span>
+          <span>{% trans "Self-paced" %}</span>
         </div>
-      </div>
+        <div class="card-actions">
+          <a href="{% url 'tech_courses' %}" class="learn-more-btn" data-resource-analytics="path_cta" data-resource-path="tech_courses">{% trans "Explore Tech Courses" %} →</a>
+        </div>
+        <div class="resource-path-links">
+          <h4>{% trans "Quick Links" %}</h4>
+          <ul>
+            <li><a href="{% url 'tech_courses' %}#foundations" data-resource-analytics="quick_link" data-resource-path="tech_courses" data-resource-link="foundations">{% trans "Foundations" %}</a></li>
+            <li><a href="{% url 'tech_courses' %}#certificates" data-resource-analytics="quick_link" data-resource-path="tech_courses" data-resource-link="certificates">{% trans "Certificates" %}</a></li>
+          </ul>
+        </div>
+        <p class="resource-path-meta">{% trans "Curated by ReRoute" %} · {% trans "Updated" %} {% now "F Y" %}</p>
+      </article>
 
-      <!-- Reentry Help Card -->
-      <div class="resource-card">
+      <article class="resource-card resource-path-card" data-resource-path="reentry_help">
         <div class="card-icon" aria-hidden="true">
-          <!-- Shield/Help SVG icon -->
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 3l7 3v5c0 5.25-3.5 8.75-7 10-3.5-1.25-7-4.75-7-10V6l7-3z" stroke="#0F172A" stroke-width="1.5"/>
             <path d="M12 9a3 3 0 0 1 3 3c0 1.5-1 2-2 2" stroke="#6495ED" stroke-width="1.5" stroke-linecap="round"/>
@@ -93,18 +214,95 @@
           </svg>
         </div>
         <h3>{% trans "Reentry Help" %}</h3>
-        <p>{% trans "Access legal aid, housing options, and support services to help you move forward." %}</p>
-        <div class="card-actions">
-          <a href="{% url 'reentry_help_index' %}" class="learn-more-btn">{% trans "Learn More" %} →</a>
+        <p>{% trans "Access legal, housing, and counseling support designed for returning citizens and families." %}</p>
+        <div class="resource-path-tags" aria-label="{% trans 'Reentry Help highlights' %}">
+          <span>{% trans "Legal aid" %}</span>
+          <span>{% trans "Housing support" %}</span>
+          <span>{% trans "Counseling" %}</span>
         </div>
-      </div>
+        <div class="card-actions">
+          <a href="{% url 'reentry_help_index' %}" class="learn-more-btn" data-resource-analytics="path_cta" data-resource-path="reentry_help">{% trans "Explore Reentry Help" %} →</a>
+        </div>
+        <div class="resource-path-links">
+          <h4>{% trans "Quick Links" %}</h4>
+          <ul>
+            <li><a href="{% url 'legal_aid' %}" data-resource-analytics="quick_link" data-resource-path="reentry_help" data-resource-link="legal_aid">{% trans "Legal Aid" %}</a></li>
+            <li><a href="{% url 'housing' %}" data-resource-analytics="quick_link" data-resource-path="reentry_help" data-resource-link="housing">{% trans "Housing" %}</a></li>
+            <li><a href="{% url 'counseling' %}" data-resource-analytics="quick_link" data-resource-path="reentry_help" data-resource-link="counseling">{% trans "Counseling" %}</a></li>
+          </ul>
+        </div>
+        <p class="resource-path-meta">{% trans "Curated by ReRoute" %} · {% trans "Updated" %} {% now "F Y" %}</p>
+      </article>
     </div>
 
-    <div class="categories-footer-cta">
-      <a href="#resource-categories" class="btn-secondary outline">{% trans "View All Categories" %}</a>
+    <div class="categories-footer-cta categories-footer-cta--guided">
+      <p>{% trans "Not sure where to start?" %}</p>
+      <button id="openGuidedPath" type="button" class="btn-secondary outline" data-resource-analytics="guided_path_open">{% trans "Take a 60-Second Guided Path" %}</button>
+      <noscript>
+        <p><a href="{% url 'contact' %}" class="btn-secondary outline">{% trans "Need help choosing? Contact Support" %}</a></p>
+      </noscript>
     </div>
   </div>
 </section>
+
+<div
+  id="guidedPathModal"
+  class="guided-path-modal"
+  hidden
+  data-job-url="{% url 'job_tools_index' %}"
+  data-tech-url="{% url 'tech_courses' %}"
+  data-reentry-url="{% url 'reentry_help_index' %}">
+  <div class="guided-path-backdrop" data-guided-close></div>
+  <div class="guided-path-dialog" role="dialog" aria-modal="true" aria-labelledby="guidedPathHeading">
+    <button id="guidedPathClose" class="guided-path-close" aria-label="{% trans 'Close guided path' %}">✕</button>
+    <div class="guided-path-content">
+      <p class="guided-path-label">{% trans "Guided Path" %}</p>
+      <h3 id="guidedPathHeading">{% trans "Find Your Best Starting Point" %}</h3>
+      <p class="guided-path-subtext">{% trans "Answer 3 quick questions and we will route you to the right resources." %}</p>
+
+      <p id="guidedPathProgress" class="guided-path-progress" aria-live="polite">{% trans "Question 1 of 3" %}</p>
+
+      <div class="guided-path-steps">
+        <section class="guided-path-step" data-guided-step data-step="1">
+          <h4>{% trans "What do you need most right now?" %}</h4>
+          <div class="guided-path-options">
+            <button type="button" class="guided-path-option" data-guided-option data-question="goal" data-option="job_now" data-score-job="3" data-score-tech="1">{% trans "Get job-ready quickly" %}</button>
+            <button type="button" class="guided-path-option" data-guided-option data-question="goal" data-option="learn_skills" data-score-tech="3" data-score-job="1">{% trans "Build tech skills" %}</button>
+            <button type="button" class="guided-path-option" data-guided-option data-question="goal" data-option="stability_support" data-score-reentry="3">{% trans "Find legal/housing/support help" %}</button>
+          </div>
+        </section>
+
+        <section class="guided-path-step" data-guided-step data-step="2" hidden>
+          <h4>{% trans "Which format works best for you?" %}</h4>
+          <div class="guided-path-options">
+            <button type="button" class="guided-path-option" data-guided-option data-question="format" data-option="quick_tools" data-score-job="2">{% trans "Quick templates and examples" %}</button>
+            <button type="button" class="guided-path-option" data-guided-option data-question="format" data-option="course_path" data-score-tech="2">{% trans "Structured learning path" %}</button>
+            <button type="button" class="guided-path-option" data-guided-option data-question="format" data-option="direct_services" data-score-reentry="2">{% trans "Direct support services" %}</button>
+          </div>
+        </section>
+
+        <section class="guided-path-step" data-guided-step data-step="3" hidden>
+          <h4>{% trans "How urgent is your need?" %}</h4>
+          <div class="guided-path-options">
+            <button type="button" class="guided-path-option" data-guided-option data-question="urgency" data-option="today" data-score-job="2" data-score-reentry="2">{% trans "I need help today" %}</button>
+            <button type="button" class="guided-path-option" data-guided-option data-question="urgency" data-option="this_week" data-score-job="1" data-score-tech="1" data-score-reentry="1">{% trans "I need a plan this week" %}</button>
+            <button type="button" class="guided-path-option" data-guided-option data-question="urgency" data-option="exploring" data-score-tech="2">{% trans "I am exploring options" %}</button>
+          </div>
+        </section>
+      </div>
+
+      <section id="guidedPathResult" class="guided-path-result" hidden>
+        <p class="guided-path-result-label">{% trans "Recommended Path" %}</p>
+        <h4 id="guidedPathResultTitle"></h4>
+        <p id="guidedPathResultReason" class="guided-path-result-reason"></p>
+        <div class="guided-path-result-actions">
+          <a id="guidedPathResultLink" href="#" class="learn-more-btn" data-resource-analytics="guided_path_result">{% trans "Open Recommended Path" %} →</a>
+          <button id="guidedPathRestart" type="button" class="btn-secondary outline">{% trans "Retake Quiz" %}</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
 
   {# Former Featured Video section removed and replaced by merged Hero above #}
 
@@ -115,21 +313,39 @@
       <p class="quick-videos-subtitle">{% trans "Watch short, practical tips to build confidence and skills." %}</p>
 
       <div class="quick-videos-grid">
-        <!-- Single featured video card (expandable to grid later) -->
         <article class="video-preview-card">
           <div class="video-preview">
-            <video class="video-thumb" autoplay muted loop playsinline preload="metadata"
-                   poster="{% static 'images/dont_say_interview.png' %}">
-              <source src="/static/resources/videos/dontSayInInterview.mp4" type="video/mp4">
-            </video>
-            <button class="video-play-overlay" aria-label="{% trans 'Play video' %}"
-                    data-video-open data-video-src="/static/resources/videos/dontSayInInterview.mp4">
-              <span>▶</span>
-            </button>
+            <iframe
+              class="video-thumb video-thumb--iframe"
+              src="https://www.youtube-nocookie.com/embed/ooiRvDM29qs?rel=0&modestbranding=1&playsinline=1"
+              title="ReRoute Module Video 1"
+              loading="lazy"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen>
+            </iframe>
           </div>
           <div class="video-info">
-            <h3>{% trans "5 Things to Never Say in an Interview - 1 minute tip" %}</h3>
-            <p class="video-desc">{% trans "A fast breakdown of common interview mistakes and what to say instead." %}</p>
+            <h3>ReRoute Module Video 1</h3>
+            <p class="video-desc">{% trans "Watch short, practical tips to build confidence and skills." %}</p>
+          </div>
+        </article>
+
+        <article class="video-preview-card">
+          <div class="video-preview">
+            <iframe
+              class="video-thumb video-thumb--iframe"
+              src="https://www.youtube-nocookie.com/embed/EaIVEgcOWT0?rel=0&modestbranding=1&playsinline=1"
+              title="ReRoute Module Video 2"
+              loading="lazy"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen>
+            </iframe>
+          </div>
+          <div class="video-info">
+            <h3>ReRoute Module Video 2</h3>
+            <p class="video-desc">{% trans "Watch short, practical tips to build confidence and skills." %}</p>
           </div>
         </article>
       </div>
@@ -156,4 +372,5 @@
 
 {% block extra_js %}
   <script src="{% static 'resources/js/resource.js' %}" defer></script>
+  <script src="{% static 'resources/js/guided_path.js' %}" defer></script>
 {% endblock %}

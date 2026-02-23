@@ -51,7 +51,8 @@
 
   // Hero play button opens modal with same hero video
   heroPlayBtn && heroPlayBtn.addEventListener('click', () => {
-    const src = (bgVideo && bgVideo.currentSrc) || (bgVideo && bgVideo.querySelector('source')?.src) || '';
+    var sourceEl = bgVideo ? bgVideo.querySelector('source') : null;
+    const src = (bgVideo && bgVideo.currentSrc) || (sourceEl && sourceEl.src) || '';
     openModalWithSrc(src);
   });
 
@@ -89,6 +90,30 @@
       if (bgVideo && bgVideo.paused) playBg();
     }
   });
+})();
+
+// Scroll reveal for feature sections
+(function(){
+  var revealTargets = document.querySelectorAll('.reveal-on-scroll');
+  if (!revealTargets.length) return;
+
+  if (!('IntersectionObserver' in window)) {
+    revealTargets.forEach(function(el){ el.classList.add('is-visible'); });
+    return;
+  }
+
+  var observer = new IntersectionObserver(function(entries, obs){
+    entries.forEach(function(entry){
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-visible');
+      obs.unobserve(entry.target);
+    });
+  }, {
+    threshold: 0.15,
+    rootMargin: '0px 0px -8% 0px'
+  });
+
+  revealTargets.forEach(function(el){ observer.observe(el); });
 })();
 
 // Module completion handlers (HTML5 and YouTube) – CSP-safe

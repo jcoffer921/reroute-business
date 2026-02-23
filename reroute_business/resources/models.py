@@ -353,7 +353,7 @@ class ResourceOrganization(models.Model):
     neighborhood = models.CharField(max_length=255, blank=True)
     transit_line = models.CharField(max_length=255, blank=True)
     zip_code = models.CharField(max_length=5, blank=True)
-    hours = models.CharField(max_length=255, blank=True)
+    hours = models.TextField(blank=True)
     phone = models.CharField(max_length=50, blank=True)
     phone_href = models.CharField(max_length=50, blank=True)
     website = models.URLField(blank=True)
