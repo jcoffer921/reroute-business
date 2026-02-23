@@ -1416,4 +1416,4 @@ def upload_profile_picture(request):
             # NOTE: adjust field name if your model uses something other than 'profile_picture'
             profile.profile_picture.save(image_file.name, image_file)
             profile.save()
-    return redirect('dashboard')
+    return redirect('dashboard:my_dashboard')

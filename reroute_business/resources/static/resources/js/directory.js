@@ -1,5 +1,9 @@
 (function () {
   var searchInput = document.getElementById('directorySearchInput');
+  var zipForm = document.getElementById('directoryZipForm');
+  var zipInput = document.getElementById('directoryZipInput');
+  var zipApplyBtn = document.getElementById('directoryZipApply');
+  var zipClearBtn = document.getElementById('directoryZipClear');
   var cards = Array.prototype.slice.call(document.querySelectorAll('[data-directory-card]'));
   var chipButtons = Array.prototype.slice.call(document.querySelectorAll('.directory-chip'));
   var resultMeta = document.getElementById('directoryResultsMeta');
@@ -18,7 +22,6 @@
 
   var selectedCategories = new Set();
   var selectedFeatures = new Set();
-
   chipButtons.forEach(function (button) {
     var initialKind = button.getAttribute('data-filter-kind');
     var initialValue = button.getAttribute('data-filter-value');
@@ -57,6 +60,44 @@
 
   if (searchInput) {
     searchInput.addEventListener('input', applyFilters);
+  }
+
+  if (zipInput) {
+    zipInput.addEventListener('input', function () {
+      zipInput.value = (zipInput.value || '').replace(/\D+/g, '').slice(0, 5);
+    });
+  }
+
+  if (zipForm) {
+    zipForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+      var value = zipInput ? (zipInput.value || '').trim() : '';
+      if (!value) {
+        applyZipSearch('');
+        return;
+      }
+      if (value.length !== 5) {
+        return;
+      }
+      applyZipSearch(value);
+    });
+  }
+
+  if (zipApplyBtn) {
+    zipApplyBtn.addEventListener('click', function () {
+      if (zipForm) {
+        zipForm.requestSubmit();
+      }
+    });
+  }
+
+  if (zipClearBtn) {
+    zipClearBtn.addEventListener('click', function () {
+      if (zipInput) {
+        zipInput.value = '';
+      }
+      applyZipSearch('');
+    });
   }
 
   applyFilters();
@@ -212,6 +253,23 @@
     url.searchParams.delete('features');
     url.searchParams.delete('page');
     window.history.replaceState({}, '', url.pathname + (url.search ? url.search : '') + url.hash);
+  }
+
+  function applyZipSearch(zip) {
+    var url = new URL(window.location.href);
+    var currentZip = (url.searchParams.get('zip') || '').trim();
+    if (zip) {
+      url.searchParams.set('zip', zip);
+    } else {
+      url.searchParams.delete('zip');
+    }
+    url.searchParams.delete('page');
+
+    var nextUrl = url.pathname + (url.search ? url.search : '') + url.hash;
+    if (currentZip === zip) {
+      return;
+    }
+    window.location.assign(nextUrl);
   }
 
   function splitValues(raw) {

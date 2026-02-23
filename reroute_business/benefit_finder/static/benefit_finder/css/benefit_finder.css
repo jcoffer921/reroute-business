@@ -349,6 +349,56 @@
   font-size: 1.1rem;
 }
 
+.bf-checklist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.bf-checklist-header h3 {
+  margin: 0;
+}
+
+.bf-checklist-reset {
+  border: 1px solid #d4def3;
+  background: #fff;
+  color: #35599a;
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bf-checklist-progress {
+  margin-bottom: 0.65rem;
+}
+
+.bf-checklist-progress p {
+  margin: 0 0 0.35rem;
+  color: var(--bf-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.bf-checklist-progress-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: #e6ebf4;
+  overflow: hidden;
+}
+
+.bf-checklist-progress-fill {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2d6cdf, #0ea5e9);
+  transition: width 0.2s ease;
+}
+
 .bf-checklist {
   list-style: none;
   margin: 0;
@@ -370,6 +420,20 @@
 .bf-checklist input[type='checkbox'] {
   width: 1rem;
   height: 1rem;
+}
+
+.bf-checklist-label {
+  color: #0f172a;
+}
+
+.bf-checklist li.is-complete {
+  border-color: #b7d8c3;
+  background: #f4fbf6;
+}
+
+.bf-checklist li.is-complete .bf-checklist-label {
+  color: #436b4f;
+  text-decoration: line-through;
 }
 
 .bf-card-grid {

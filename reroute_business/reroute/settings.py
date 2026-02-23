@@ -1,5 +1,6 @@
 # settings.py
 import os
+import ctypes.util
 from pathlib import Path
 from django.utils.translation import gettext_lazy as _
 
@@ -9,18 +10,43 @@ load_dotenv()
 import dj_database_url
 
 
+def _first_existing_path(paths):
+    for p in paths:
+        if p and os.path.exists(p):
+            return p
+    return None
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+# GeoDjango native library discovery (Windows-friendly).
+# Prefer explicit env vars, then common install locations.
+GDAL_LIBRARY_PATH = os.getenv("GDAL_LIBRARY_PATH") or _first_existing_path([
+    r"C:\Users\jcoff\AppData\Local\Programs\OSGeo4W\bin\gdal312.dll",
+    r"C:\OSGeo4W\bin\gdal312.dll",
+    r"C:\OSGeo4W\bin\gdal311.dll",
+    r"C:\OSGeo4W\bin\gdal310.dll",
+    ctypes.util.find_library("gdal"),
+])
+
+GEOS_LIBRARY_PATH = os.getenv("GEOS_LIBRARY_PATH") or _first_existing_path([
+    r"C:\Users\jcoff\AppData\Local\Programs\OSGeo4W\bin\geos_c.dll",
+    r"C:\OSGeo4W\bin\geos_c.dll",
+    ctypes.util.find_library("geos_c"),
+])
 SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-dev-secret")
 
 # ---------- DATABASES ----------
 # Use Postgres when DATABASE_URL is present (Render/production).
 # Original behavior: no SQLite fallback here.
+_db_config = dj_database_url.config(
+    default=os.getenv("DATABASE_URL"),
+    conn_max_age=600,
+)
+_db_config["ENGINE"] = "django.contrib.gis.db.backends.postgis"
+
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv("DATABASE_URL"),
-        conn_max_age=600,
-    )
+    'default': _db_config
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -117,6 +143,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
 
     # third-party apps
     'widget_tweaks',

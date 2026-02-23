@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.urls import reverse
 from django.contrib.auth.models import User
 from reroute_business.resumes.models import Resume
 from reroute_business.job_list.models import Job
@@ -81,4 +82,45 @@ class JobMatchingTest(TestCase):
 
         matched_jobs = match_jobs_for_user(self.user)
         self.assertEqual(matched_jobs, [job3, self.job1, self.job2])
+
+
+class MatchedJobsViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="seeker_no_geo", password="pass")
+        self.employer = User.objects.create_user(username="emp_remote", password="pass")
+        self.client.login(username="seeker_no_geo", password="pass")
+
+    def test_user_without_location_gets_remote_jobs_and_prompt(self):
+        Job.objects.create(
+            title="Remote Support",
+            description="desc",
+            requirements="req",
+            location="Remote",
+            zip_code="",
+            employer=self.employer,
+            tags="support",
+            is_remote=True,
+            is_active=True,
+        )
+        Job.objects.create(
+            title="Onsite Support",
+            description="desc",
+            requirements="req",
+            location="Philadelphia, PA",
+            zip_code="19104",
+            employer=self.employer,
+            tags="support",
+            is_remote=False,
+            is_active=True,
+        )
+
+        response = self.client.get(reverse("dashboard:matched_jobs"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["nearby_prompt"],
+            "Add your ZIP code to see jobs near you.",
+        )
+        titles = [item["job"].title for item in response.context["items"]]
+        self.assertIn("Remote Support", titles)
+        self.assertNotIn("Onsite Support", titles)
 

@@ -179,7 +179,8 @@ def about_us(request):
 
 def resources_view(request):
     """Public Resources index page."""
-    return render(request, 'resources/resource_list.html')
+    from reroute_business.resources.views import resource_list as resources_landing
+    return resources_landing(request)
 
 
 @require_GET
@@ -1708,7 +1709,7 @@ def dev_auto_login_user(request):
     user = authenticate(username='testuser', password='TestPass123!')
     if user:
         login(request, user)
-        return redirect('dashboard')
+        return redirect('dashboard:my_dashboard')
     return redirect('login')
 
 

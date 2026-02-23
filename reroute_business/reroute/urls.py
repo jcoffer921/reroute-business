@@ -4,7 +4,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 # project urls.py (add these imports)
-from reroute_business.main import views as main_views                   # for dashboard view
 from reroute_business.profiles.views import (
     user_profile_view,            # owner profile (redirects to settings)
     employer_profile_view,        # employer profile alias
@@ -24,8 +23,6 @@ urlpatterns = [
     path('profile/employer/view/<str:username>/', employer_public_profile_view, name='employer_public_profile'),
     # --- EXACT-PATH ALIASES (these create the names your templates use) ---
     path('profile/',   user_profile_view,         name='my_profile'),  # /profile/ resolves by name
-    path('dashboard/', main_views.dashboard_view, name='dashboard'),   # /dashboard/ resolves by name
-
     # --- APP INCLUDES (handle deeper paths under same prefixes) ---
     # Include profiles with namespace so templates can use `profiles:...`
     path('profile/',   include(('reroute_business.profiles.urls', 'profiles'), namespace='profiles')),  # /profile/update/... /profile/view/<username>/

@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.gis.db import models as gis_models
+from django.contrib.postgres.indexes import GistIndex
 from django.conf import settings
 
 
@@ -27,6 +29,7 @@ class ReentryOrganization(models.Model):
     city = models.CharField(max_length=128, blank=True)
     state = models.CharField(max_length=64, blank=True)
     zip_code = models.CharField(max_length=20, blank=True)
+    geo_point = gis_models.PointField(geography=True, srid=4326, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -36,6 +39,7 @@ class ReentryOrganization(models.Model):
         indexes = [
             # Short index name to satisfy backends with 30-char identifier limits (e.g., Oracle)
             models.Index(fields=["is_verified", "category"], name="reorg_vrf_cat_idx"),
+            GistIndex(fields=["geo_point"]),
         ]
 
     def __str__(self) -> str:

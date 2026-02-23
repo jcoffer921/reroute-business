@@ -1,0 +1,241 @@
+{% extends "admin_portal/base.html" %}
+{% load static %}
+
+{% block admin_content %}
+<section class="analytics-page">
+  <nav class="analytics-pill-nav" aria-label="Analytics tabs">
+    {% for tab in tab_items %}
+    <a class="analytics-pill {% if active_tab == tab.slug %}is-active{% endif %}" href="{% url 'admin_portal:analytics' %}?tab={{ tab.slug }}">
+      <span class="pill-icon" aria-hidden="true">
+        {% if tab.icon_key == 'map' %}
+        <svg viewBox="0 0 24 24"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15"/><path d="M15 6v15"/></svg>
+        {% elif tab.icon_key == 'distribution' %}
+        <svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M10 19V10"/><path d="M16 19V7"/><path d="M22 19V13"/></svg>
+        {% elif tab.icon_key == 'target' %}
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="2"/></svg>
+        {% elif tab.icon_key == 'growth' %}
+        <svg viewBox="0 0 24 24"><path d="M4 18V6"/><path d="M4 18h16"/><path d="M7 14l4-4 3 3 4-6"/></svg>
+        {% else %}
+        <svg viewBox="0 0 24 24"><path d="M12 3l9 16H3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+        {% endif %}
+      </span>
+      <span>{{ tab.label }}</span>
+    </a>
+    {% endfor %}
+  </nav>
+
+  <header class="analytics-header">
+    <div class="analytics-header-left">
+      <span class="analytics-title-icon" aria-hidden="true">
+        {% if icon_key == 'map' %}
+        <svg viewBox="0 0 24 24"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15"/><path d="M15 6v15"/></svg>
+        {% elif icon_key == 'distribution' %}
+        <svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M10 19V10"/><path d="M16 19V7"/><path d="M22 19V13"/></svg>
+        {% elif icon_key == 'target' %}
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="2"/></svg>
+        {% elif icon_key == 'growth' %}
+        <svg viewBox="0 0 24 24"><path d="M4 18V6"/><path d="M4 18h16"/><path d="M7 14l4-4 3 3 4-6"/></svg>
+        {% else %}
+        <svg viewBox="0 0 24 24"><path d="M12 3l9 16H3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+        {% endif %}
+      </span>
+      <div>
+        <h1>{{ title }}</h1>
+        <p>{{ subtitle }}</p>
+      </div>
+    </div>
+    {% if active_tab == 'coverage-gaps' %}
+    <a class="admin-btn primary" href="{% url 'admin_portal:analytics_export' %}?tab=coverage-gaps">Export CSV</a>
+    {% endif %}
+  </header>
+
+  <section class="analytics-metrics analytics-metrics--{% if kpi_cards|length == 3 %}three{% else %}four{% endif %}">
+    {% for card in kpi_cards %}
+      {% include "admin_portal/analytics/partials/metric_card.html" with card=card %}
+    {% endfor %}
+  </section>
+
+  {% if active_tab == 'user-location' %}
+  <section class="analytics-grid-two">
+    {% include "admin_portal/analytics/partials/chart_card.html" with title="USERS BY ZIP CODE" data=chart_payloads.users_by_zip.data labels=chart_payloads.users_by_zip.labels max_value=chart_payloads.users_by_zip.max_value legend=chart_payloads.users_by_zip.legend %}
+  </section>
+  {% include "admin_portal/analytics/partials/callout_card.html" with tone="yellow" heading="Geographic Insight" text="Location-based gap analysis will sharpen as more users complete their profiles with ZIP codes." %}
+  {% endif %}
+
+  {% if active_tab == 'distribution' %}
+  <section class="analytics-grid-two">
+    {% include "admin_portal/analytics/partials/chart_card.html" with title="JOBS BY ZIP" data=chart_payloads.jobs_by_zip.data labels=chart_payloads.jobs_by_zip.labels max_value=chart_payloads.jobs_by_zip.max_value %}
+    {% include "admin_portal/analytics/partials/chart_card.html" with title="EMPLOYERS BY ZIP" data=chart_payloads.employers_by_zip.data labels=chart_payloads.employers_by_zip.labels max_value=chart_payloads.employers_by_zip.max_value %}
+  </section>
+
+  <section class="analytics-chart-card">
+    <header class="analytics-chart-header">
+      <h3>FAIR-CHANCE EMPLOYER COVERAGE</h3>
+      <p>ZIP codes with highest concentration of approved, compliant employers</p>
+    </header>
+    <div class="coverage-rank-list">
+      {% for zip_item, count in chart_payloads.coverage_ranked %}
+      <div class="coverage-rank-row">
+        <span>{{ zip_item }}</span>
+        <progress class="coverage-rank-progress" value="{{ count }}" max="{{ chart_payloads.coverage_rank_max }}"></progress>
+        <strong>{{ count }}</strong>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if active_tab == 'match-quality' %}
+  <section class="analytics-grid-two">
+    {% include "admin_portal/analytics/partials/chart_card.html" with title="CLICK-THROUGH RATE BY DISTANCE" subtitle="How distance affects job listing engagement" data=chart_payloads.ctr_by_distance.data labels=chart_payloads.ctr_by_distance.labels max_value=chart_payloads.ctr_by_distance.max_value %}
+    {% include "admin_portal/analytics/partials/chart_card.html" with title="APPLICATION RATE BY DISTANCE" subtitle="Drop-off in applications as distance increases" data=chart_payloads.apply_by_distance.data labels=chart_payloads.apply_by_distance.labels max_value=chart_payloads.apply_by_distance.max_value %}
+  </section>
+
+  <section class="analytics-chart-card">
+    <header class="analytics-chart-header">
+      <h3>APPLICATION STATUS BREAKDOWN</h3>
+    </header>
+    <div class="mini-stat-grid">
+      {% for item in status_breakdown %}
+        {% include "admin_portal/analytics/partials/mini_stat_block.html" with item=item %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if active_tab == 'growth-signals' %}
+  <section class="analytics-chart-card">
+    <header class="analytics-chart-header">
+      <h3>WEEKLY ACTIVITY (LAST 8 WEEKS)</h3>
+      <p>New users, jobs posted, and applications submitted</p>
+    </header>
+    <div class="weekly-line-wrap">
+      <canvas
+        id="weeklyActivityChart"
+        class="weekly-line-canvas"
+        data-labels="{{ chart_payloads.weekly_activity.labels|join:',' }}"
+        data-users="{{ chart_payloads.weekly_activity.new_users|join:',' }}"
+        data-jobs="{{ chart_payloads.weekly_activity.jobs_posted|join:',' }}"
+        data-applications="{{ chart_payloads.weekly_activity.applications|join:',' }}"
+        data-max="{{ chart_payloads.weekly_activity.max_value }}"
+        aria-label="Weekly activity line chart"
+        role="img"
+      ></canvas>
+    </div>
+    <div class="chart-legend chart-legend--center">
+      <span class="chart-legend-item chart-legend-item--users"><i class="legend-dot legend-dot--users"></i>New Users</span>
+      <span class="chart-legend-item chart-legend-item--jobs"><i class="legend-dot legend-dot--jobs"></i>Jobs Posted</span>
+      <span class="chart-legend-item chart-legend-item--applications"><i class="legend-dot legend-dot--applications"></i>Applications</span>
+    </div>
+  </section>
+
+  <section class="analytics-grid-two">
+    <article class="analytics-chart-card">
+      <header class="analytics-chart-header">
+        <h3>EMPLOYER APPROVAL PIPELINE</h3>
+      </header>
+      <div class="pipeline-list">
+        {% for item in approval_pipeline %}
+        <div class="pipeline-row">
+          <span class="pipeline-dot pipeline-dot--{{ item.tone }}"></span>
+          <span>{{ item.label }}</span>
+          <strong>{{ item.count }}</strong>
+        </div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="analytics-chart-card">
+      <header class="analytics-chart-header">
+        <h3>CONTENT LIBRARY</h3>
+      </header>
+      <p class="analytics-note">Navigate to the Learning tab for content metrics.</p>
+      <div class="hook-list">
+        <div>Directory Query Volume by ZIP: -</div>
+        <div>Radius Selection Patterns: -</div>
+      </div>
+    </article>
+  </section>
+  {% endif %}
+
+  {% if active_tab == 'coverage-gaps' %}
+  <section class="analytics-chart-card">
+    <header class="analytics-chart-header">
+      <h3>TOP ZIPS BY USER DENSITY VS. SUPPLY</h3>
+      <p>Gaps between user demand and job/resource supply identify partner recruitment opportunities</p>
+    </header>
+    <div class="multi-series-bars">
+      {% for row in chart_payloads.density_vs_supply.segmented_rows %}
+      <div class="series-row">
+        <small>{{ row.zip_area }}</small>
+        <div class="series-segment-group">
+          <div class="series-segment-track series-segment-track--users" aria-label="Users: {{ row.users }}">
+            {% for idx in row.segment_range %}
+            <span class="series-segment {% if idx < row.users_units %}is-on{% endif %}"></span>
+            {% endfor %}
+          </div>
+          <div class="series-segment-track series-segment-track--jobs" aria-label="Jobs: {{ row.jobs }}">
+            {% for idx in row.segment_range %}
+            <span class="series-segment {% if idx < row.jobs_units %}is-on{% endif %}"></span>
+            {% endfor %}
+          </div>
+          <div class="series-segment-track series-segment-track--resources" aria-label="Org Resources: {{ row.resources }}">
+            {% for idx in row.segment_range %}
+            <span class="series-segment {% if idx < row.resources_units %}is-on{% endif %}"></span>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="chart-legend">
+      <span><i class="legend-dot legend-dot--users-strong"></i>Users</span>
+      <span><i class="legend-dot legend-dot--jobs-strong"></i>Jobs</span>
+      <span><i class="legend-dot legend-dot--resources-strong"></i>Org Resources</span>
+    </div>
+  </section>
+
+  <section class="analytics-chart-card">
+    <header class="analytics-chart-header">
+      <h3>ZIP-LEVEL COVERAGE SCORE TABLE</h3>
+    </header>
+    <div class="table-responsive">
+      <table class="admin-table coverage-table">
+        <thead>
+          <tr>
+            <th>ZIP / Area</th>
+            <th>Users</th>
+            <th>Jobs</th>
+            <th>Resources</th>
+            <th>Coverage Score</th>
+            <th>Gap Signal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in coverage_rows %}
+          <tr>
+            <td>{{ row.zip_area }}</td>
+            <td>{{ row.users }}</td>
+            <td>{{ row.jobs }}</td>
+            <td>{{ row.resources }}</td>
+            <td>{{ row.coverage_score }}</td>
+            <td>{% include "admin_portal/analytics/partials/status_badge.html" with status_key=row.gap_signal_key label=row.gap_signal %}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6">No coverage rows available yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {% include "admin_portal/analytics/partials/callout_card.html" with tone="rose" heading="Founder Intelligence Note" text="ZIPs with high users and low jobs/resources become the employer recruitment roadmap. Coverage Score becomes a unique data asset and will expand with resources within 10 miles per user." %}
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'admin_portal/vendor/chart.umd.min.js' %}"></script>
+{% endblock %}

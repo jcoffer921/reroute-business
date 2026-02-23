@@ -1,0 +1,23 @@
+<article class="analytics-chart-card">
+  <header class="analytics-chart-header">
+    <h3>{{ title }}</h3>
+    {% if subtitle %}<p>{{ subtitle }}</p>{% endif %}
+  </header>
+  <div class="chart-placeholder" role="img" aria-label="{{ title }}">
+    <div class="chart-bars">
+      {% for value in data %}
+      <div class="chart-bar-wrap">
+        <progress class="chart-progress" value="{{ value }}" max="{{ max_value }}"></progress>
+        <small>{{ forloop.counter }}</small>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% if legend %}
+  <div class="chart-legend">
+    {% for item in legend %}
+    <span><i class="legend-dot legend-dot--{{ item.key|default:'default' }}"></i>{{ item.label }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+</article>

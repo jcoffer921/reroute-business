@@ -9,6 +9,10 @@
 <div class="matched-jobs-wrapper">
   <h2>Matched Jobs Based on Your Skills</h2>
 
+  {% if nearby_prompt %}
+    <div class="empty-state">{{ nearby_prompt }}</div>
+  {% endif %}
+
   <!-- Filters: ZIP + Radius -->
   <form method="get" action="{% url 'dashboard:matched_jobs' %}" class="match-filter-form">
     <div class="field">

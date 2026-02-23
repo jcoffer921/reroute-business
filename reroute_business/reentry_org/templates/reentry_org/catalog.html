@@ -15,6 +15,7 @@
   <form method="get" class="search-form" action="">
     <div class="search-row">
       <input class="search-input" type="text" name="q" placeholder="Search by name or keyword" value="{{ q }}" aria-label="Search organizations">
+      <input class="search-input" type="text" name="zip" inputmode="numeric" maxlength="5" placeholder="ZIP (e.g., 19104)" value="{{ selected_zip }}" aria-label="Filter by zip code">
       <select class="category-select" name="category" aria-label="Filter by category">
         <option value="">All categories</option>
         {% for key,label in categories %}
@@ -41,6 +42,9 @@
           <div class="org-info">
             <h3 class="org-name">{{ org.name }}</h3>
             <span class="org-category">{% for key,label in categories %}{% if org.category == key %}{{ label }}{% endif %}{% endfor %}</span>
+            {% if org.distance %}
+              <p class="org-distance">{{ org.distance.mi|floatformat:1 }} mi away</p>
+            {% endif %}
           </div>
           <div class="overlay">
             <span class="overlay-btn" role="button">View More</span>
@@ -52,11 +56,11 @@
     {% if orgs.paginator.num_pages > 1 %}
     <div class="pagination">
       {% if orgs.has_previous %}
-        <a class="page-link" href="?page={{ orgs.previous_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if active_category %}&category={{ active_category }}{% endif %}">Previous</a>
+        <a class="page-link" href="?page={{ orgs.previous_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if active_category %}&category={{ active_category }}{% endif %}{% if selected_zip %}&zip={{ selected_zip }}{% endif %}">Previous</a>
       {% endif %}
       <span class="page-status">Page {{ orgs.number }} of {{ orgs.paginator.num_pages }}</span>
       {% if orgs.has_next %}
-        <a class="page-link" href="?page={{ orgs.next_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if active_category %}&category={{ active_category }}{% endif %}">Next</a>
+        <a class="page-link" href="?page={{ orgs.next_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if active_category %}&category={{ active_category }}{% endif %}{% if selected_zip %}&zip={{ selected_zip }}{% endif %}">Next</a>
       {% endif %}
     </div>
     {% endif %}

@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.gis.db import models as gis_models
+from django.contrib.postgres.indexes import GistIndex
 from django.contrib.auth.models import User
 from reroute_business.core.models import Skill
 
@@ -31,6 +33,13 @@ class Job(models.Model):
     requirements = models.TextField()
     location = models.CharField(max_length=100)
     zip_code = models.CharField(max_length=10, blank=True)
+    is_remote = models.BooleanField(default=False)
+    geo_point = gis_models.PointField(
+        geography=True,
+        srid=4326,
+        null=True,
+        blank=True,
+    )
     employer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posted_jobs')
     employer_image = models.ImageField(upload_to='employer_logos/', blank=True, null=True)  # ✅ NEW
     tags = models.CharField(max_length=200)
@@ -80,6 +89,27 @@ class Job(models.Model):
       if self.employer:
           return f"{self.title} at {self.employer.username}"
       return self.title
+
+    class Meta:
+        indexes = [
+            GistIndex(fields=["geo_point"]),
+        ]
+
+
+class ZipCentroid(models.Model):
+    zip_code = models.CharField(max_length=10, unique=True)
+    geo_point = gis_models.PointField(
+        geography=True,
+        srid=4326,
+    )
+
+    class Meta:
+        indexes = [
+            GistIndex(fields=["geo_point"]),
+        ]
+
+    def __str__(self):
+        return self.zip_code
 
 
 class SavedJob(models.Model):

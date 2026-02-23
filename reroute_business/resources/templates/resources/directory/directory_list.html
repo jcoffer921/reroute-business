@@ -14,10 +14,42 @@
     <header class="directory-header">
       <h1>{% trans "Resources Directory" %}</h1>
       <p>{% trans "Find trusted programs and services in Philadelphia." %}</p>
-      {% if selected_zip %}
-      <p class="directory-zip-banner">{% blocktrans with zip=selected_zip %}Showing results near {{ zip }}{% endblocktrans %}</p>
-      {% endif %}
     </header>
+
+    <form method="get" class="directory-zip-search" id="directoryZipForm">
+      {% for feature in selected_features %}
+        <input type="hidden" name="features" value="{{ feature }}">
+      {% endfor %}
+      <label class="sr-only" for="directoryZipInput">{% trans "ZIP code" %}</label>
+      <div class="directory-zip-input-wrap">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Zm0-8a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"></path>
+        </svg>
+        <input
+          id="directoryZipInput"
+          name="zip"
+          type="text"
+          inputmode="numeric"
+          maxlength="5"
+          value="{{ selected_zip }}"
+          placeholder="{% trans 'Enter Philadelphia ZIP (e.g., 19104)' %}">
+      </div>
+      <button type="submit" id="directoryZipApply" class="directory-zip-apply">{% trans "Find Near Me" %}</button>
+      <button type="button" id="directoryZipClear" class="directory-zip-clear" aria-label="{% trans 'Clear ZIP' %}">×</button>
+    </form>
+
+    {% if selected_zip %}
+    <p class="directory-zip-banner">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Zm0-8a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"></path>
+      </svg>
+      {% if selected_zip_area %}
+        {% blocktrans with area=selected_zip_area %}Showing results near {{ area }}{% endblocktrans %}
+      {% else %}
+        {% blocktrans with zip=selected_zip %}Showing results near ZIP {{ zip }}{% endblocktrans %}
+      {% endif %}
+    </p>
+    {% endif %}
 
     <div class="directory-controls">
       <label class="directory-search" for="directorySearchInput">
@@ -89,7 +121,17 @@
         </a>
 
         <div class="directory-card-content">
-          <h2 class="directory-card-title">{{ resource.name }}</h2>
+          <div class="directory-card-title-row">
+            <h2 class="directory-card-title">{{ resource.name }}</h2>
+            {% if resource.distance_miles is not None %}
+            <span class="directory-distance-pill">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Zm0-8a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"></path>
+              </svg>
+              {% blocktrans with miles=resource.distance_miles %}{{ miles }} mi{% endblocktrans %}
+            </span>
+            {% endif %}
+          </div>
 
           <div class="directory-tag-row">
             {% for tag in resource.card_tags %}

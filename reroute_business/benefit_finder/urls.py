@@ -6,4 +6,5 @@ app_name = 'benefit_finder'
 
 urlpatterns = [
     path('', views.wizard, name='start'),
+    path('complete/', views.mark_complete, name='complete'),
 ]

@@ -506,6 +506,30 @@
   margin: 8px 0 0;
 }
 
+.module-reco-meta {
+  margin: 0.35rem 0 0;
+  color: #7d8e9f;
+  font-size: 0.82rem;
+}
+
+.action-plan-card {
+  display: grid;
+  gap: 12px;
+}
+
+.action-plan-body p {
+  margin: 0;
+  max-width: 760px;
+}
+
+.action-plan-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 .learning-item {
   display: grid;
   grid-template-columns: auto 1fr auto;

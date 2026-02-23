@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block content %}
-<section class="benefit-finder" id="benefitFinderApp" aria-live="polite">
+<section class="benefit-finder" id="benefitFinderApp" aria-live="polite" data-complete-url="{% url 'benefit_finder:complete' %}">
   <div class="benefit-finder__container">
     <header class="benefit-finder__header">
       <p class="benefit-finder__kicker">{% trans "Benefit Finder" %}</p>
@@ -72,7 +72,16 @@
       </header>
 
       <section class="bf-results-section">
-        <h3>{% trans "Personalized Checklist" %}</h3>
+        <div class="bf-checklist-header">
+          <h3>{% trans "Personalized Checklist" %}</h3>
+          <button type="button" class="bf-checklist-reset" id="bfChecklistResetBtn">{% trans "Reset" %}</button>
+        </div>
+        <div class="bf-checklist-progress" aria-live="polite">
+          <p id="bfChecklistProgressCopy">{% trans "0 of 0 complete" %}</p>
+          <div class="bf-checklist-progress-track">
+            <div class="bf-checklist-progress-fill" id="bfChecklistProgressFill"></div>
+          </div>
+        </div>
         <ul class="bf-checklist" id="bfChecklist"></ul>
       </section>
 
@@ -114,5 +123,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'benefit_finder/js/benefit_finder.js' %}" defer></script>
+<script src="{% static 'benefit_finder/js/benefit_finder.js' %}?v=20260223-1" defer></script>
 {% endblock %}

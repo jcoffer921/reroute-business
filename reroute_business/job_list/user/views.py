@@ -13,6 +13,7 @@ from django.http import JsonResponse, HttpResponse
 
 from reroute_business.job_list.models import Job, Application, SavedJob
 from reroute_business.job_list.utils.geo import is_within_radius  # expects (origin_zip, target_zip, radius_mi)
+from reroute_business.job_list.services.matching import get_nearby_jobs
 from reroute_business.resumes.models import Resume
 from django.contrib.auth.models import User
 
@@ -228,20 +229,52 @@ def match_jobs(request, seeker_id):
     if not getattr(settings, "JOBS_LIVE", False):
         messages.info(request, "Jobs are launching soon. We’ll notify you when postings go live.")
         return redirect('opportunities')
-    """Delegate to the shared matching module and render the matches page."""
-    from reroute_business.job_list.matching import match_jobs_for_user
+    """Render nearby matches for the selected seeker."""
 
     user = get_object_or_404(User, id=seeker_id)
 
-    origin_zip = (request.GET.get('zip') or '').strip() or None
     radius = request.GET.get('radius')
     try:
         radius = int(radius) if radius not in (None, '') else 25
     except ValueError:
         radius = 25
 
-    ordered_jobs = match_jobs_for_user(user, origin_zip=origin_zip, radius=radius)
-    # Reuse the dashboard template that already renders a list of jobs
+    profile = getattr(user, "profile", None)
+    selected_zip = (getattr(profile, "zip_code", "") or "").strip()
+    nearby_prompt = ""
+
+    if profile and getattr(profile, "geo_point", None):
+        ordered_jobs = list(
+            get_nearby_jobs(profile, miles=radius)
+            .select_related("employer")
+            .prefetch_related("skills_required")
+        )
+    else:
+        if any(f.name == "is_remote" for f in Job._meta.get_fields()):
+            ordered_jobs = list(
+                Job.objects.filter(is_active=True, is_remote=True)
+                .select_related("employer")
+                .prefetch_related("skills_required")
+                .order_by("-created_at")
+            )
+        else:
+            ordered_jobs = []
+        nearby_prompt = "Add your ZIP code to see jobs near you."
+
+    resume = Resume.objects.filter(user=user).order_by("-created_at").first()
+    overlap_by_job = {}
+    if resume and resume.skills.exists():
+        user_skills = {s.name.strip().lower(): s.name for s in resume.skills.all()}
+        for job in ordered_jobs:
+            job_skills = {s.name.strip().lower(): s.name for s in job.skills_required.all()}
+            overlap_keys = set(user_skills.keys()) & set(job_skills.keys())
+            overlap_by_job[job.id] = [job_skills[k] for k in overlap_keys]
+
+    items = [{"job": job, "overlap": overlap_by_job.get(job.id, [])} for job in ordered_jobs]
+
     return render(request, 'dashboard/matched_jobs.html', {
-        'matches': ordered_jobs,
+        'items': items,
+        'selected_zip': selected_zip,
+        'selected_radius': radius,
+        'nearby_prompt': nearby_prompt,
     })

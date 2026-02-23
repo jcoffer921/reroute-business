@@ -132,6 +132,9 @@
   var saveBtn = document.getElementById('bfSaveBtn');
   var lowDataBtn = document.getElementById('bfLowDataToggle');
   var checklistEl = document.getElementById('bfChecklist');
+  var checklistProgressCopyEl = document.getElementById('bfChecklistProgressCopy');
+  var checklistProgressFillEl = document.getElementById('bfChecklistProgressFill');
+  var checklistResetBtn = document.getElementById('bfChecklistResetBtn');
   var categoryGridEl = document.getElementById('bfCategoryGrid');
   var downloadPrintBtn = document.getElementById('bfDownloadPrintBtn');
   var nearMeLink = document.getElementById('bfResourcesLink');
@@ -140,12 +143,24 @@
   var state = {
     step: 0,
     lowDataMode: false,
-    answers: {}
+    answers: {},
+    checklistState: {}
   };
   var SAVE_BUTTON_HTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 3h9l4 4v14H6z"></path><path d="M15 3v5h4"></path><path d="M9 13h6M9 17h6"></path></svg>Save and finish later';
+  var completeUrl = app.getAttribute('data-complete-url') || '';
+
+  if (!quizEl || !resultsEl || !progressCopyEl || !progressFillEl || !progressBarEl ||
+      !promptEl || !helpEl || !answerEl || !validationEl || !backBtn || !nextBtn ||
+      !saveBtn || !lowDataBtn || !checklistEl || !categoryGridEl || !nearMeLink || !orgLink) {
+    return;
+  }
 
   loadSavedState();
-  render();
+  if (window.location.search.indexOf('view=plan') > -1 && hasMinimumAnswers()) {
+    showResults();
+  } else {
+    render();
+  }
 
   backBtn.addEventListener('click', function () {
     if (state.step > 0) {
@@ -187,24 +202,36 @@
     saveState();
   });
 
-  downloadPrintBtn.addEventListener('click', function () {
-    var plan = buildPlan(state.answers);
-    var text = 'ReRoute Benefit Finder Action Plan\n\n' +
-      plan.checklist.join('\n') + '\n\n' +
-      'Categories: ' + plan.categories.map(function (key) { return CATEGORY_META[key].title; }).join(', ') + '\n\n' +
-      'ReRoute provides guidance only and does not determine eligibility.';
+  if (checklistResetBtn) {
+    checklistResetBtn.addEventListener('click', function () {
+      state.checklistState = {};
+      saveState();
+      if (!resultsEl.hidden) {
+        showResults();
+      }
+    });
+  }
 
-    var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-    var url = URL.createObjectURL(blob);
-    var link = document.createElement('a');
-    link.href = url;
-    link.download = 'reroute-benefit-plan.txt';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    window.print();
-  });
+  if (downloadPrintBtn) {
+    downloadPrintBtn.addEventListener('click', function () {
+      var plan = buildPlan(state.answers);
+      var text = 'ReRoute Benefit Finder Action Plan\n\n' +
+        plan.checklist.join('\n') + '\n\n' +
+        'Categories: ' + plan.categories.map(function (key) { return CATEGORY_META[key].title; }).join(', ') + '\n\n' +
+        'ReRoute provides guidance only and does not determine eligibility.';
+
+      var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement('a');
+      link.href = url;
+      link.download = 'reroute-benefit-plan.txt';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      window.print();
+    });
+  }
 
   function render() {
     if (state.step < 0) {
@@ -387,19 +414,36 @@
 
   function showResults() {
     var plan = buildPlan(state.answers);
+    var zip = state.answers.zip_code || '';
+    var lang = state.answers.language_preference || '';
 
     checklistEl.innerHTML = '';
     plan.checklist.forEach(function (item) {
+      var key = checklistKey(item);
+      var isDone = Boolean(state.checklistState && state.checklistState[key]);
       var li = document.createElement('li');
+      li.className = isDone ? 'is-complete' : '';
       var checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.setAttribute('aria-label', item);
+      checkbox.checked = isDone;
       var label = document.createElement('span');
+      label.className = 'bf-checklist-label';
       label.textContent = item;
+      checkbox.addEventListener('change', function () {
+        if (!state.checklistState || typeof state.checklistState !== 'object') {
+          state.checklistState = {};
+        }
+        state.checklistState[key] = checkbox.checked;
+        li.classList.toggle('is-complete', checkbox.checked);
+        updateChecklistProgress(plan.checklist);
+        saveState();
+      });
       li.appendChild(checkbox);
       li.appendChild(label);
       checklistEl.appendChild(li);
     });
+    updateChecklistProgress(plan.checklist);
 
     categoryGridEl.innerHTML = '';
     plan.categories.forEach(function (categoryKey) {
@@ -409,7 +453,7 @@
       }
       var card = document.createElement('a');
       card.className = 'bf-category-card';
-      card.href = meta.url || '/resources/directory';
+      card.href = buildCategoryUrl(meta.url || '/resources/directory', zip, lang);
 
       var title = document.createElement('h4');
       title.textContent = meta.title;
@@ -429,14 +473,75 @@
       categoryGridEl.appendChild(card);
     });
 
-    var zip = state.answers.zip_code || '';
-    var lang = state.answers.language_preference || '';
     nearMeLink.href = zip ? '/resources/directory?zip=' + encodeURIComponent(zip) : '/resources/directory';
     orgLink.href = '/organizations/catalog/?zip=' + encodeURIComponent(zip) + '&language=' + encodeURIComponent(lang);
 
     quizEl.hidden = true;
     resultsEl.hidden = false;
     resultsEl.scrollIntoView({ behavior: state.lowDataMode ? 'auto' : 'smooth', block: 'start' });
+    persistCompletion();
+  }
+
+  function checklistKey(item) {
+    return String(item || '').toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  }
+
+  function updateChecklistProgress(items) {
+    var total = Array.isArray(items) ? items.length : 0;
+    var completed = 0;
+    if (total && state.checklistState) {
+      items.forEach(function (item) {
+        if (state.checklistState[checklistKey(item)]) {
+          completed += 1;
+        }
+      });
+    }
+
+    if (checklistProgressCopyEl) {
+      checklistProgressCopyEl.textContent = completed + ' of ' + total + ' complete';
+    }
+    if (checklistProgressFillEl) {
+      checklistProgressFillEl.style.width = total ? String((completed / total) * 100) + '%' : '0%';
+    }
+  }
+
+  function hasMinimumAnswers() {
+    return Object.keys(state.answers || {}).length > 0;
+  }
+
+  function persistCompletion() {
+    if (!completeUrl || !window.fetch) {
+      return;
+    }
+
+    var csrftoken = getCookie('csrftoken');
+    if (!csrftoken) {
+      return;
+    }
+
+    window.fetch(completeUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({ from_results: true })
+    }).catch(function () {
+      // Keep UX resilient if request fails.
+    });
+  }
+
+  function getCookie(name) {
+    var cookies = document.cookie ? document.cookie.split('; ') : [];
+    for (var i = 0; i < cookies.length; i++) {
+      var parts = cookies[i].split('=');
+      var key = parts[0];
+      if (key === name) {
+        return decodeURIComponent(parts.slice(1).join('='));
+      }
+    }
+    return '';
   }
 
   function buildPlan(answers) {
@@ -609,6 +714,23 @@
     return categories;
   }
 
+  function buildCategoryUrl(baseUrl, zip, language) {
+    if (!zip) {
+      return baseUrl;
+    }
+
+    if (baseUrl.indexOf('/resources/directory') === 0) {
+      return baseUrl + (baseUrl.indexOf('?') > -1 ? '&' : '?') + 'zip=' + encodeURIComponent(zip);
+    }
+
+    if (baseUrl.indexOf('/organizations/catalog/') === 0) {
+      return baseUrl + (baseUrl.indexOf('?') > -1 ? '&' : '?') +
+        'zip=' + encodeURIComponent(zip) + '&language=' + encodeURIComponent(language || '');
+    }
+
+    return baseUrl;
+  }
+
   function saveState() {
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -632,6 +754,9 @@
       }
       if (parsed.answers && typeof parsed.answers === 'object') {
         state.answers = parsed.answers;
+      }
+      if (parsed.checklistState && typeof parsed.checklistState === 'object') {
+        state.checklistState = parsed.checklistState;
       }
       if (typeof parsed.lowDataMode === 'boolean') {
         state.lowDataMode = parsed.lowDataMode;

@@ -7,3 +7,5 @@ class ReentryOrgConfig(AppConfig):
     label = "reentry_org"
     verbose_name = "Reentry Organizations"
 
+    def ready(self):
+        import reroute_business.reentry_org.signals  # noqa: F401

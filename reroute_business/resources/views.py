@@ -5,12 +5,15 @@ from urllib.parse import quote, urlparse, parse_qs, urlencode, urlunparse
 
 from django.conf import settings
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import F, Q
+from django.contrib.gis.db.models.functions import Distance
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
+from django.utils.translation import gettext as _
 from reroute_business.blog.models import BlogPost
+from reroute_business.job_list.utils.location import zip_to_point
 from .templatetags.resources_extras import youtube_embed_url
 from .models import (
     Feature,
@@ -32,6 +35,52 @@ DIRECTORY_DISCLAIMER = (
     'Verified badges will appear only for organizations that have formally partnered with ReRoute.'
 )
 
+PHILADELPHIA_ZIP_AREAS = {
+    "19102": "Center City",
+    "19103": "Center City West / Rittenhouse",
+    "19104": "West Philly / University City",
+    "19106": "Old City / Society Hill",
+    "19107": "Washington Square West / Chinatown",
+    "19111": "Northeast Philly",
+    "19114": "Northeast Philly",
+    "19115": "Somerton",
+    "19116": "Northeast Philly",
+    "19119": "Northwest Philly / Mt. Airy",
+    "19120": "Olney / Logan",
+    "19121": "North Philly",
+    "19122": "North Philly / Temple Area",
+    "19123": "Northern Liberties / Fishtown",
+    "19124": "Frankford",
+    "19125": "Fishtown / Kensington",
+    "19126": "East Oak Lane",
+    "19127": "Manayunk",
+    "19128": "Roxborough / Manayunk",
+    "19130": "Fairmount / Art Museum",
+    "19131": "West Park / Wynnefield",
+    "19132": "North Philly",
+    "19133": "Kensington / Fairhill",
+    "19134": "Port Richmond / Kensington",
+    "19135": "Tacony / Holmesburg",
+    "19136": "Northeast Philly",
+    "19137": "Bridesburg",
+    "19138": "West Oak Lane",
+    "19139": "West Philly",
+    "19140": "Hunting Park / Nicetown",
+    "19141": "Logan / Fern Rock",
+    "19142": "Southwest Philly",
+    "19143": "Southwest / West Philly",
+    "19144": "Germantown",
+    "19145": "South Philly",
+    "19146": "South Philly / Graduate Hospital",
+    "19147": "South Philly / Queen Village",
+    "19148": "South Philly",
+    "19149": "Northeast Philly",
+    "19150": "Cedarbrook",
+    "19151": "West Philly",
+    "19152": "Rhawnhurst / Northeast",
+    "19153": "Eastwick / Southwest Philly",
+}
+
 
 def _phone_href(raw_phone: str, explicit_href: str) -> str:
     href = (explicit_href or "").strip()
@@ -39,6 +88,42 @@ def _phone_href(raw_phone: str, explicit_href: str) -> str:
         return href
     digits = "".join(ch for ch in (raw_phone or "") if ch.isdigit())
     return f"+{digits}" if digits else ""
+
+
+def _zip_area_label(zip_code: str) -> str:
+    normalized = (zip_code or "").strip()
+    if not normalized:
+        return ""
+    area = PHILADELPHIA_ZIP_AREAS.get(normalized)
+    if area:
+        return area
+    return _("Philadelphia")
+
+
+def _hydrate_missing_resource_geo_points():
+    missing_zip_rows = (
+        ResourceOrganization.objects.filter(is_active=True, geo_point__isnull=True)
+        .exclude(zip_code__exact="")
+        .values_list("zip_code", flat=True)
+        .distinct()
+    )
+
+    point_by_zip = {}
+    for raw_zip in missing_zip_rows:
+        point = zip_to_point(raw_zip)
+        if point:
+            normalized = (raw_zip or "").split("-")[0][:5]
+            point_by_zip[normalized] = point
+
+    if not point_by_zip:
+        return
+
+    for normalized_zip, point in point_by_zip.items():
+        ResourceOrganization.objects.filter(
+            is_active=True,
+            geo_point__isnull=True,
+            zip_code=normalized_zip,
+        ).update(geo_point=point)
 
 
 def _resource_to_payload(resource: ResourceOrganization) -> dict:
@@ -59,6 +144,14 @@ def _resource_to_payload(resource: ResourceOrganization) -> dict:
     languages_supported = list(resource.languages_supported or [])
     cultural_competency = list(resource.cultural_competency or [])
     what_to_bring = list(resource.what_to_bring or [])
+
+    distance_miles = None
+    distance_obj = getattr(resource, "distance", None)
+    if distance_obj is not None:
+        try:
+            distance_miles = round(float(distance_obj.mi), 1)
+        except Exception:
+            distance_miles = None
 
     return {
         "slug": resource.slug,
@@ -85,6 +178,7 @@ def _resource_to_payload(resource: ResourceOrganization) -> dict:
         "childcare_support": resource.childcare_support,
         "card_tags": visible_tags,
         "hidden_tag_count": hidden_tag_count,
+        "distance_miles": distance_miles,
     }
 
 
@@ -165,9 +259,21 @@ def resources_directory(request):
 
     selected_features = [slug for slug in request.GET.getlist("features") if slug]
 
-    queryset = ResourceOrganization.objects.filter(is_active=True).order_by("name")
+    if zip_code:
+        _hydrate_missing_resource_geo_points()
+
+    queryset = ResourceOrganization.objects.filter(is_active=True)
     if selected_features:
         queryset = queryset.filter(features__slug__in=selected_features).distinct()
+
+    user_point = zip_to_point(zip_code) if zip_code else None
+    if user_point:
+        queryset = queryset.annotate(distance=Distance("geo_point", user_point)).order_by(
+            F("distance").asc(nulls_last=True),
+            "name",
+        )
+    else:
+        queryset = queryset.order_by("name")
 
     prepared_resources = [_resource_to_payload(resource) for resource in queryset]
 
@@ -188,6 +294,7 @@ def resources_directory(request):
         'filter_features': filter_features,
         'selected_features': selected_features,
         'selected_zip': zip_code,
+        'selected_zip_area': _zip_area_label(zip_code) if zip_code else "",
         'pagination_query': pagination_query,
         'directory_disclaimer': DIRECTORY_DISCLAIMER,
     })

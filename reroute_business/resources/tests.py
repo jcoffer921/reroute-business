@@ -2,7 +2,10 @@ import json
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-from .models import Module, QuizQuestion, QuizAnswer, ModuleQuizScore
+from django.contrib.gis.geos import Point
+
+from reroute_business.job_list.models import ZipCentroid
+from .models import Module, QuizQuestion, QuizAnswer, ModuleQuizScore, ResourceOrganization, Feature
 
 
 class ModuleQuizTests(TestCase):
@@ -125,3 +128,56 @@ class ModuleQuizTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["score"], 1)
+
+
+class ResourceDirectoryZipMatchingTests(TestCase):
+    def setUp(self):
+        self.directory_url = reverse("resource_directory")
+        ZipCentroid.objects.create(zip_code="19104", geo_point=Point(-75.1900, 39.9600, srid=4326))
+        ZipCentroid.objects.create(zip_code="19147", geo_point=Point(-75.1540, 39.9330, srid=4326))
+
+    def _create_resource(self, name, zip_code):
+        return ResourceOrganization.objects.create(
+            name=name,
+            category=ResourceOrganization.CATEGORY_BENEFITS,
+            address_line="123 Main St",
+            neighborhood="Philadelphia",
+            zip_code=zip_code,
+            hours="Mon-Fri",
+            phone="5551234567",
+            overview="Support services",
+            what_to_expect="Expect intake",
+            who_can_use_this="Adults",
+            how_to_apply="Walk in",
+            is_active=True,
+        )
+
+    def test_directory_orders_by_distance_when_zip_is_provided(self):
+        near = self._create_resource("Near Resource", "19104")
+        far = self._create_resource("Far Resource", "19147")
+        near.refresh_from_db()
+        far.refresh_from_db()
+        self.assertIsNotNone(near.geo_point)
+        self.assertIsNotNone(far.geo_point)
+
+        response = self.client.get(self.directory_url, {"zip": "19104"})
+        self.assertEqual(response.status_code, 200)
+        resources = response.context["resources"]
+        names = [item["name"] for item in resources]
+        self.assertEqual(names[0], "Near Resource")
+        self.assertIn("distance_miles", resources[0])
+
+    def test_zip_sorting_stacks_with_feature_filters(self):
+        reentry_feature = Feature.objects.create(slug="reentry", label="Reentry")
+        near = self._create_resource("Near Filtered Resource", "19104")
+        far = self._create_resource("Far Filtered Resource", "19147")
+        near.features.add(reentry_feature)
+        far.features.add(reentry_feature)
+
+        response = self.client.get(self.directory_url, {"zip": "19104", "features": ["reentry"]})
+        self.assertEqual(response.status_code, 200)
+        resources = response.context["resources"]
+        names = [item["name"] for item in resources]
+        self.assertEqual(names[0], "Near Filtered Resource")
+        self.assertIn("selected_zip_area", response.context)
+        self.assertEqual(response.context["selected_zip_area"], "West Philly / University City")

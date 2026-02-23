@@ -1,6 +1,7 @@
 # dashboard/views.py
 
 from datetime import timedelta
+from urllib.parse import parse_qs, urlparse
 
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -23,6 +24,7 @@ from reroute_business.job_list.models import Job, SavedJob, Application
 from reroute_business.job_list.models import ArchivedJob
 from django.db.utils import ProgrammingError
 from reroute_business.job_list.matching import match_jobs_for_user
+from reroute_business.job_list.services.matching import get_nearby_jobs
 
 # Profiles & resumes
 from reroute_business.profiles.models import UserProfile, Language
@@ -33,6 +35,7 @@ from reroute_business.resumes.models import Education, Experience, Resume  # you
 from PIL import Image, UnidentifiedImageError
 from reroute_business.resources.models import Module
 from reroute_business.reentry_org.models import ReentryOrganization, SavedOrganization
+from reroute_business.main.models import YouTubeVideo
 
 
 # =========================
@@ -89,6 +92,35 @@ def _reports_flags_count():
         return Job.objects.filter(is_flagged=True).count()
     except Exception:
         return 0
+
+
+def _extract_youtube_id(url: str) -> str:
+    raw = (url or "").strip()
+    if not raw:
+        return ""
+
+    if "youtube.com/embed/" in raw or "youtube-nocookie.com/embed/" in raw:
+        return raw.rstrip("/").split("/")[-1].split("?")[0]
+
+    try:
+        parsed = urlparse(raw)
+    except Exception:
+        return ""
+
+    host = (parsed.netloc or "").lower()
+    path = (parsed.path or "").strip("/")
+    query = parse_qs(parsed.query or "")
+
+    if host.endswith("youtu.be"):
+        return path.split("/")[0]
+
+    if "youtube.com" in host:
+        if path == "watch":
+            return (query.get("v") or [""])[0]
+        if path.startswith("shorts/"):
+            return path.split("/", 1)[1]
+
+    return ""
 
 
 # =========================
@@ -257,13 +289,82 @@ def user_dashboard(request):
     except Exception:
         upcoming_interviews = []
 
-    # Learning modules (lightweight surface for dashboard cards)
+    # Learning modules + recent video-to-module recommendations.
     try:
-        recommended_modules = list(Module.objects.order_by('-created_at')[:4])
+        module_qs = Module.objects.annotate(quiz_count=Count("questions")).order_by('-created_at')
+        recommended_modules = list(module_qs[:6])
         recent_module = recommended_modules[0] if recommended_modules else None
+
+        module_by_youtube_id = {}
+        for module in module_qs:
+            vid = _extract_youtube_id(getattr(module, "video_url", "") or "")
+            if vid:
+                module_by_youtube_id[vid] = module
+
+        recent_window = timezone.now() - timedelta(days=2)
+        video_candidates = list(
+            YouTubeVideo.objects.filter(created_at__gte=recent_window).order_by("-created_at")[:20]
+        )
+        if not video_candidates:
+            video_candidates = list(YouTubeVideo.objects.order_by("-created_at")[:20])
+
+        recommended_learning_items = []
+        seen_module_ids = set()
+
+        # Prefer newest videos that map to modules with quiz questions.
+        for video in video_candidates:
+            yid = _extract_youtube_id(getattr(video, "video_url", "") or "")
+            mapped_module = module_by_youtube_id.get(yid)
+            if not mapped_module or mapped_module.quiz_count <= 0 or mapped_module.id in seen_module_ids:
+                continue
+
+            seen_module_ids.add(mapped_module.id)
+            recommended_learning_items.append(
+                {
+                    "title": mapped_module.title,
+                    "description": mapped_module.description or video.description,
+                    "url": reverse("module_detail", args=[mapped_module.pk]),
+                    "cta_label": "Open module + quiz",
+                    "meta": "From recent video uploads",
+                }
+            )
+            if len(recommended_learning_items) >= 4:
+                break
+
+        # Fill remaining spots with existing quiz-enabled modules.
+        if len(recommended_learning_items) < 4:
+            for module in module_qs:
+                if module.quiz_count <= 0 or module.id in seen_module_ids:
+                    continue
+                seen_module_ids.add(module.id)
+                recommended_learning_items.append(
+                    {
+                        "title": module.title,
+                        "description": module.description,
+                        "url": reverse("module_detail", args=[module.pk]),
+                        "cta_label": "Open module + quiz",
+                        "meta": "Recommended module",
+                    }
+                )
+                if len(recommended_learning_items) >= 4:
+                    break
+
+        # Final fallback: show recent videos if no quiz-backed modules were found.
+        if not recommended_learning_items:
+            for video in video_candidates[:4]:
+                recommended_learning_items.append(
+                    {
+                        "title": video.title,
+                        "description": video.description,
+                        "url": reverse("video_watch", args=[video.pk]),
+                        "cta_label": "Watch video",
+                        "meta": "Video recommendation",
+                    }
+                )
     except Exception:
         recommended_modules = []
         recent_module = None
+        recommended_learning_items = []
 
     # Reentry organizations catalog picks (verified only)
     try:
@@ -321,6 +422,7 @@ def user_dashboard(request):
 
     notify_jobs_live = bool(request.session.get("notify_jobs_live", False))
     notify_job_matches = bool(request.session.get("notify_job_matches", False))
+    benefit_finder_completed = bool(request.session.get("benefit_finder_completed", False))
 
     progress_items = [
         {
@@ -373,6 +475,7 @@ def user_dashboard(request):
         'upcoming_interviews': upcoming_interviews,
         'recommended_modules': recommended_modules,
         'recent_module': recent_module,
+        'recommended_learning_items': recommended_learning_items,
         'recommended_orgs': recommended_orgs,
         'modules_completed': modules_completed,
         'modules_completed_percent': modules_completed_percent,
@@ -390,6 +493,7 @@ def user_dashboard(request):
         'resume_complete': resume_complete,
         'notify_jobs_live': notify_jobs_live,
         'notify_job_matches': notify_job_matches,
+        'benefit_finder_completed': benefit_finder_completed,
     })
 
 
@@ -494,14 +598,33 @@ def unarchive_job(request):
 
 @login_required
 def matched_jobs_view(request):
-    """Render matched jobs with optional ZIP/radius filters and overlap badges."""
-    origin_zip = (request.GET.get('zip') or '').strip() or None
+    """Render nearby jobs with skill-overlap badges when available."""
     try:
         radius = int(request.GET.get('radius') or 25)
     except ValueError:
         radius = 25
 
-    matched_jobs = match_jobs_for_user(request.user, origin_zip=origin_zip, radius=radius)
+    profile = getattr(request.user, "profile", None)
+    selected_zip = (getattr(profile, "zip_code", "") or "").strip()
+    nearby_prompt = ""
+
+    if profile and getattr(profile, "geo_point", None):
+        matched_jobs = list(
+            get_nearby_jobs(profile, miles=radius)
+            .select_related("employer")
+            .prefetch_related("skills_required")
+        )
+    else:
+        if any(f.name == "is_remote" for f in Job._meta.get_fields()):
+            matched_jobs = list(
+                Job.objects.filter(is_active=True, is_remote=True)
+                .select_related("employer")
+                .prefetch_related("skills_required")
+                .order_by("-created_at")
+            )
+        else:
+            matched_jobs = []
+        nearby_prompt = "Add your ZIP code to see jobs near you."
 
     # Compute skill-overlap badges per job
     resume = Resume.objects.filter(user=request.user).order_by('-created_at').first()
@@ -520,8 +643,9 @@ def matched_jobs_view(request):
 
     return render(request, 'dashboard/matched_jobs.html', {
         'items': items,
-        'selected_zip': origin_zip or '',
+        'selected_zip': selected_zip,
         'selected_radius': radius,
+        'nearby_prompt': nearby_prompt,
     })
 
 

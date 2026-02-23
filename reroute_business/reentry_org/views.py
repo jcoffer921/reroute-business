@@ -1,23 +1,36 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.db.utils import ProgrammingError, OperationalError
-from django.db.models import Q
+from django.db.models import F, Q
+from django.contrib.gis.db.models.functions import Distance
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 
+from reroute_business.job_list.utils.location import zip_to_point
 from .models import ReentryOrganization, SavedOrganization
 
 
 def organization_catalog(request):
     q = (request.GET.get('q') or '').strip()
     category = (request.GET.get('category') or '').strip()
+    zip_code = (request.GET.get('zip') or '').strip()
+    if not zip_code.isdigit() or len(zip_code) != 5:
+        zip_code = ''
 
     queryset = ReentryOrganization.objects.filter(is_verified=True)
     if q:
         queryset = queryset.filter(Q(name__icontains=q) | Q(description__icontains=q))
     if category:
         queryset = queryset.filter(category=category)
+    user_point = zip_to_point(zip_code) if zip_code else None
+    if user_point:
+        queryset = queryset.annotate(distance=Distance("geo_point", user_point)).order_by(
+            F("distance").asc(nulls_last=True),
+            "name",
+        )
+    else:
+        queryset = queryset.order_by("name")
 
     page = request.GET.get('page', 1)
     try:
@@ -31,6 +44,7 @@ def organization_catalog(request):
         'orgs': orgs,
         'q': q,
         'active_category': category,
+        'selected_zip': zip_code,
         'categories': ReentryOrganization.CATEGORIES,
     }
     return render(request, 'reentry_org/catalog.html', context)

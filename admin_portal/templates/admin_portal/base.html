@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static admin_portal_nav %}
 
 {% block title %}Admin Portal{% endblock %}
 {% block body_class %}admin-portal{% endblock %}
@@ -17,11 +17,18 @@
     </div>
     <nav class="admin-nav">
       {% with active=request.resolver_match.url_name %}
+      {% reports_flags_count as reports_flags_count %}
       <a class="admin-nav-link {% if active == 'dashboard' or active == 'dashboard_alt' %}active{% endif %}" href="{% url 'admin_portal:dashboard' %}">
         <span class="nav-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg>
         </span>
         Dashboard
+      </a>
+      <a class="admin-nav-link {% if active == 'analytics' or active == 'analytics_export' %}active{% endif %}" href="{% url 'admin_portal:analytics' %}">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M10 19V10"/><path d="M16 19V7"/><path d="M22 19V13"/></svg>
+        </span>
+        Analytics
       </a>
       <a class="admin-nav-link {% if active == 'user_list' or active == 'user_detail' or active == 'user_toggle' or active == 'user_note' %}active{% endif %}" href="{% url 'admin_portal:user_list' %}">
         <span class="nav-icon" aria-hidden="true">
@@ -64,6 +71,9 @@
           <svg viewBox="0 0 24 24"><path d="M12 3l9 16H3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
         </span>
         Reports &amp; Flags
+        {% if reports_flags_count %}
+          <span class="admin-badge">{{ reports_flags_count }}</span>
+        {% endif %}
       </a>
       <a class="admin-nav-link {% if active == 'audit_log' or active == 'audit_log_export' %}active{% endif %}" href="{% url 'admin_portal:audit_log' %}">
         <span class="nav-icon" aria-hidden="true">
@@ -99,5 +109,6 @@
   <button type="button" class="rr-modal__backdrop" aria-label="Close"></button>
 </div>
 
+{% block extra_js %}{% endblock %}
 <script src="{% static 'admin_portal/js/admin_portal.js' %}"></script>
 {% endblock %}
