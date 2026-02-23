@@ -37,10 +37,10 @@ def organization_catalog(request):
 
     page = request.GET.get('page', 1)
     try:
-        paginator = Paginator(queryset, 12)
+        paginator = Paginator(queryset, 10)
         orgs = paginator.get_page(page)
     except (ProgrammingError, OperationalError):
-        paginator = Paginator(ReentryOrganization.objects.none(), 12)
+        paginator = Paginator(ReentryOrganization.objects.none(), 10)
         orgs = paginator.get_page(1)
 
     context = {

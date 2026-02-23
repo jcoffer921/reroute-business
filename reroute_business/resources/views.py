@@ -281,7 +281,7 @@ def resources_directory(request):
 
     prepared_resources = [_resource_to_payload(resource) for resource in queryset]
 
-    paginator = Paginator(prepared_resources, 12)
+    paginator = Paginator(prepared_resources, 10)
     page_obj = paginator.get_page(request.GET.get('page'))
 
     page_params = request.GET.copy()
