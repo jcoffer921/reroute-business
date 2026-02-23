@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
+from reroute_business.core.models import AnalyticsEvent
+
 
 class BenefitFinderCompletionTests(TestCase):
     def setUp(self):
@@ -53,3 +55,57 @@ class BenefitFinderCompletionTests(TestCase):
         self.assertTrue(session.get("benefit_finder_completed"))
         self.assertTrue(session.get("benefit_finder_completed_at"))
         self.assertIsNone(session.get("benefit_finder_last_source"))
+
+    def test_complete_endpoint_logs_benefit_finder_event(self):
+        self.client.force_login(self.user)
+        self.client.post(
+            self.complete_url,
+            data=json.dumps({"from_results": True}),
+            content_type="application/json",
+        )
+
+        event = AnalyticsEvent.objects.filter(
+            event_type="benefit_finder_event",
+            metadata__name="bf_completed",
+        ).first()
+        self.assertIsNotNone(event)
+        self.assertEqual(event.user, self.user)
+
+
+class BenefitFinderAnalyticsEndpointTests(TestCase):
+    def setUp(self):
+        self.analytics_url = reverse("benefit_finder:analytics")
+
+    def test_analytics_endpoint_accepts_allowed_event(self):
+        response = self.client.post(
+            self.analytics_url,
+            data=json.dumps(
+                {
+                    "name": "bf_question_answered",
+                    "question_id": "employment_status",
+                    "question_type": "single",
+                    "step": 4,
+                    "selected_count": 1,
+                }
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {"ok": True})
+        self.assertTrue(
+            AnalyticsEvent.objects.filter(
+                event_type="benefit_finder_event",
+                metadata__name="bf_question_answered",
+                metadata__question_id="employment_status",
+            ).exists()
+        )
+
+    def test_analytics_endpoint_rejects_unknown_event(self):
+        response = self.client.post(
+            self.analytics_url,
+            data=json.dumps({"name": "unknown_event"}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(response.content, {"ok": False, "error": "invalid_event"})

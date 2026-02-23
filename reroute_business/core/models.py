@@ -32,6 +32,7 @@ class AnalyticsEvent(models.Model):
 
     EVENT_TYPES = (
         ("page_view", "Page View"),
+        ("benefit_finder_event", "Benefit Finder Event"),
         ("profile_view", "Profile View"),
         ("profile_created", "Profile Created"),
         ("profile_updated", "Profile Updated"),

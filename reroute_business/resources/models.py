@@ -1,9 +1,11 @@
 # resources/models.py
 from django.db import models
-from django.contrib.gis.db import models as gis_models
 from django.contrib.postgres.indexes import GistIndex
 from django.conf import settings
 from django.utils.text import slugify
+
+if settings.USE_GIS:
+    from django.contrib.gis.db import models as gis_models
 
 
 class Resource(models.Model):
@@ -355,7 +357,8 @@ class ResourceOrganization(models.Model):
     neighborhood = models.CharField(max_length=255, blank=True)
     transit_line = models.CharField(max_length=255, blank=True)
     zip_code = models.CharField(max_length=5, blank=True)
-    geo_point = gis_models.PointField(geography=True, srid=4326, null=True, blank=True)
+    if settings.USE_GIS:
+        geo_point = gis_models.PointField(geography=True, srid=4326, null=True, blank=True)
     hours = models.TextField(blank=True)
     phone = models.CharField(max_length=50, blank=True)
     phone_href = models.CharField(max_length=50, blank=True)
@@ -383,6 +386,4 @@ class ResourceOrganization(models.Model):
     
     class Meta:
         ordering = ("name",)
-        indexes = [
-            GistIndex(fields=["geo_point"]),
-        ]
+        indexes = [GistIndex(fields=["geo_point"])] if settings.USE_GIS else []

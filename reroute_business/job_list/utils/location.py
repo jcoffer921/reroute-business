@@ -1,8 +1,10 @@
-from django.contrib.gis.geos import Point
+from django.conf import settings
 
 from reroute_business.job_list.models import ZipCentroid
 from reroute_business.job_list.utils.geo import zip_to_latlon
 
+if settings.USE_GIS:
+    from django.contrib.gis.geos import Point
 
 def _normalize_zip(zip_code: str) -> str:
     raw = (zip_code or "").strip()
@@ -13,6 +15,8 @@ def _normalize_zip(zip_code: str) -> str:
 
 
 def ensure_zip_centroid(zip_code: str):
+    if not settings.USE_GIS:
+        return None
     normalized = _normalize_zip(zip_code)
     if not normalized:
         return None

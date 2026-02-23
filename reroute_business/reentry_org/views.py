@@ -2,13 +2,16 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.db.utils import ProgrammingError, OperationalError
 from django.db.models import F, Q
-from django.contrib.gis.db.models.functions import Distance
+from django.conf import settings
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 
 from reroute_business.job_list.utils.location import zip_to_point
 from .models import ReentryOrganization, SavedOrganization
+
+if settings.USE_GIS:
+    from django.contrib.gis.db.models.functions import Distance
 
 
 def organization_catalog(request):
@@ -23,8 +26,8 @@ def organization_catalog(request):
         queryset = queryset.filter(Q(name__icontains=q) | Q(description__icontains=q))
     if category:
         queryset = queryset.filter(category=category)
-    user_point = zip_to_point(zip_code) if zip_code else None
-    if user_point:
+    user_point = zip_to_point(zip_code) if (settings.USE_GIS and zip_code) else None
+    if settings.USE_GIS and user_point:
         queryset = queryset.annotate(distance=Distance("geo_point", user_point)).order_by(
             F("distance").asc(nulls_last=True),
             "name",

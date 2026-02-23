@@ -6,13 +6,16 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 from django.db import models, transaction
-from django.contrib.gis.db import models as gis_models
 from django.contrib.auth.models import User
+from django.conf import settings
 from django.db.models import JSONField
 
 # NOTE: If these imports live under a different app, update imports accordingly
 from reroute_business.profiles.constants import USER_STATUS_CHOICES, YES_NO
 from reroute_business.core.models import Skill
+
+if settings.USE_GIS:
+    from django.contrib.gis.db import models as gis_models
 
 
 class Language(models.Model):
@@ -49,12 +52,13 @@ class UserProfile(models.Model):
     city = models.CharField(max_length=100, blank=True)
     state = models.CharField(max_length=100, blank=True)
     zip_code = models.CharField(max_length=10, blank=True, null=True)
-    geo_point = gis_models.PointField(
-        geography=True,
-        srid=4326,
-        null=True,
-        blank=True,
-    )
+    if settings.USE_GIS:
+        geo_point = gis_models.PointField(
+            geography=True,
+            srid=4326,
+            null=True,
+            blank=True,
+        )
     bio = models.TextField(blank=True)
     headline = models.CharField(max_length=160, blank=True)
     location = models.CharField(max_length=160, blank=True)

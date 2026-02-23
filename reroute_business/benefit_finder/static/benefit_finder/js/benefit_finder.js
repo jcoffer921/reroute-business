@@ -148,6 +148,9 @@
   };
   var SAVE_BUTTON_HTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 3h9l4 4v14H6z"></path><path d="M15 3v5h4"></path><path d="M9 13h6M9 17h6"></path></svg>Save and finish later';
   var completeUrl = app.getAttribute('data-complete-url') || '';
+  var analyticsUrl = app.getAttribute('data-analytics-url') || '';
+  var hasTrackedPlanView = false;
+  var hasTrackedStart = false;
 
   if (!quizEl || !resultsEl || !progressCopyEl || !progressFillEl || !progressBarEl ||
       !promptEl || !helpEl || !answerEl || !validationEl || !backBtn || !nextBtn ||
@@ -156,6 +159,7 @@
   }
 
   loadSavedState();
+  trackInitialState();
   if (window.location.search.indexOf('view=plan') > -1 && hasMinimumAnswers()) {
     showResults();
   } else {
@@ -164,8 +168,14 @@
 
   backBtn.addEventListener('click', function () {
     if (state.step > 0) {
+      var fromStep = state.step + 1;
       state.step -= 1;
       hideValidation();
+      emitAnalytics('bf_step_back', {
+        from_step: fromStep,
+        to_step: state.step + 1,
+        total_steps: QUESTIONS.length
+      });
       render();
     }
   });
@@ -176,19 +186,31 @@
     }
 
     if (state.step < QUESTIONS.length - 1) {
+      var question = QUESTIONS[state.step];
+      emitAnalytics('bf_question_answered', questionAnalyticsPayload(question));
       state.step += 1;
       hideValidation();
       saveState();
+      emitAnalytics('bf_step_next', {
+        from_step: state.step,
+        to_step: state.step + 1,
+        total_steps: QUESTIONS.length
+      });
       render();
       return;
     }
 
+    emitAnalytics('bf_question_answered', questionAnalyticsPayload(QUESTIONS[state.step]));
     saveState();
     showResults();
   });
 
   saveBtn.addEventListener('click', function () {
     saveState();
+    emitAnalytics('bf_saved', {
+      step: state.step + 1,
+      total_steps: QUESTIONS.length
+    });
     saveBtn.textContent = 'Saved';
     window.setTimeout(function () {
       saveBtn.innerHTML = SAVE_BUTTON_HTML;
@@ -200,12 +222,17 @@
     lowDataBtn.setAttribute('aria-pressed', String(state.lowDataMode));
     app.classList.toggle('low-data-mode', state.lowDataMode);
     saveState();
+    emitAnalytics('bf_low_data_toggled', {
+      low_data_mode: state.lowDataMode,
+      step: state.step + 1
+    });
   });
 
   if (checklistResetBtn) {
     checklistResetBtn.addEventListener('click', function () {
       state.checklistState = {};
       saveState();
+      emitAnalytics('bf_checklist_reset');
       if (!resultsEl.hidden) {
         showResults();
       }
@@ -215,6 +242,10 @@
   if (downloadPrintBtn) {
     downloadPrintBtn.addEventListener('click', function () {
       var plan = buildPlan(state.answers);
+      emitAnalytics('bf_download_print', {
+        checklist_total: Array.isArray(plan.checklist) ? plan.checklist.length : 0,
+        categories_count: Array.isArray(plan.categories) ? plan.categories.length : 0
+      });
       var text = 'ReRoute Benefit Finder Action Plan\n\n' +
         plan.checklist.join('\n') + '\n\n' +
         'Categories: ' + plan.categories.map(function (key) { return CATEGORY_META[key].title; }).join(', ') + '\n\n' +
@@ -380,6 +411,12 @@
     if (question.type === 'zip') {
       var zip = (state.answers[question.id] || '').trim();
       if (!/^\d{5}$/.test(zip)) {
+        emitAnalytics('bf_validation_error', {
+          step: state.step + 1,
+          question_id: question.id,
+          question_type: question.type,
+          is_valid: false
+        });
         showValidation('Enter a valid 5-digit Philadelphia zip code to continue.');
         return false;
       }
@@ -388,12 +425,24 @@
     if (question.type === 'multi') {
       var multi = state.answers[question.id];
       if (!Array.isArray(multi) || multi.length === 0) {
+        emitAnalytics('bf_validation_error', {
+          step: state.step + 1,
+          question_id: question.id,
+          question_type: question.type,
+          is_valid: false
+        });
         showValidation('Select at least one option to continue.');
         return false;
       }
     }
 
     if (question.type === 'single' && !state.answers[question.id]) {
+      emitAnalytics('bf_validation_error', {
+        step: state.step + 1,
+        question_id: question.id,
+        question_type: question.type,
+        is_valid: false
+      });
       showValidation('Select an option to continue.');
       return false;
     }
@@ -437,6 +486,10 @@
         state.checklistState[key] = checkbox.checked;
         li.classList.toggle('is-complete', checkbox.checked);
         updateChecklistProgress(plan.checklist);
+        emitAnalytics('bf_checklist_item_toggled', {
+          checklist_completed: countCompletedChecklistItems(plan.checklist),
+          checklist_total: Array.isArray(plan.checklist) ? plan.checklist.length : 0
+        });
         saveState();
       });
       li.appendChild(checkbox);
@@ -469,15 +522,39 @@
       path.setAttribute('d', 'M6 12h12m-5-5 5 5-5 5');
       arrow.appendChild(path);
       card.appendChild(arrow);
+      card.addEventListener('click', function () {
+        emitAnalytics('bf_category_opened', {
+          category: categoryKey,
+          has_zip: Boolean(zip),
+          has_language: Boolean(lang)
+        });
+      });
 
       categoryGridEl.appendChild(card);
     });
 
     nearMeLink.href = zip ? '/resources/directory?zip=' + encodeURIComponent(zip) : '/resources/directory';
     orgLink.href = '/organizations/catalog/?zip=' + encodeURIComponent(zip) + '&language=' + encodeURIComponent(lang);
+    nearMeLink.onclick = function () {
+      emitAnalytics('bf_resources_near_me_opened', { has_zip: Boolean(zip) });
+    };
+    orgLink.onclick = function () {
+      emitAnalytics('bf_reentry_org_opened', {
+        has_zip: Boolean(zip),
+        has_language: Boolean(lang)
+      });
+    };
 
     quizEl.hidden = true;
     resultsEl.hidden = false;
+    if (!hasTrackedPlanView) {
+      hasTrackedPlanView = true;
+      emitAnalytics('bf_plan_viewed', {
+        source: window.location.search.indexOf('view=plan') > -1 ? 'query' : 'flow',
+        categories_count: Array.isArray(plan.categories) ? plan.categories.length : 0,
+        checklist_total: Array.isArray(plan.checklist) ? plan.checklist.length : 0
+      });
+    }
     resultsEl.scrollIntoView({ behavior: state.lowDataMode ? 'auto' : 'smooth', block: 'start' });
     persistCompletion();
   }
@@ -509,6 +586,50 @@
     return Object.keys(state.answers || {}).length > 0;
   }
 
+  function trackInitialState() {
+    if (hasTrackedStart) {
+      return;
+    }
+    hasTrackedStart = true;
+    emitAnalytics(hasMinimumAnswers() ? 'bf_resumed' : 'bf_started', {
+      step: state.step + 1,
+      total_steps: QUESTIONS.length,
+      source: window.location.search.indexOf('view=plan') > -1 ? 'query' : 'direct'
+    });
+  }
+
+  function questionAnalyticsPayload(question) {
+    var answer = state.answers[question.id];
+    var payload = {
+      step: state.step + 1,
+      total_steps: QUESTIONS.length,
+      question_id: question.id,
+      question_type: question.type
+    };
+    if (question.type === 'multi') {
+      payload.selected_count = Array.isArray(answer) ? answer.length : 0;
+    } else if (question.type === 'zip') {
+      payload.has_zip = /^\d{5}$/.test((answer || '').trim());
+    } else {
+      payload.selected_count = answer ? 1 : 0;
+    }
+    return payload;
+  }
+
+  function countCompletedChecklistItems(items) {
+    var total = Array.isArray(items) ? items.length : 0;
+    var completed = 0;
+    if (!total || !state.checklistState) {
+      return completed;
+    }
+    items.forEach(function (item) {
+      if (state.checklistState[checklistKey(item)]) {
+        completed += 1;
+      }
+    });
+    return completed;
+  }
+
   function persistCompletion() {
     if (!completeUrl || !window.fetch) {
       return;
@@ -529,6 +650,33 @@
       body: JSON.stringify({ from_results: true })
     }).catch(function () {
       // Keep UX resilient if request fails.
+    });
+  }
+
+  function emitAnalytics(name, payload) {
+    if (!analyticsUrl || !window.fetch || !name) {
+      return;
+    }
+    var csrftoken = getCookie('csrftoken');
+    if (!csrftoken) {
+      return;
+    }
+    var body = { name: name };
+    if (payload && typeof payload === 'object') {
+      Object.keys(payload).forEach(function (key) {
+        body[key] = payload[key];
+      });
+    }
+    window.fetch(analyticsUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify(body)
+    }).catch(function () {
+      // Keep UX resilient if analytics request fails.
     });
   }
 

@@ -6,7 +6,6 @@ from urllib.parse import quote, urlparse, parse_qs, urlencode, urlunparse
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.db.models import F, Q
-from django.contrib.gis.db.models.functions import Distance
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET, require_POST
@@ -28,6 +27,9 @@ from .models import (
     LessonAttempt,
     LessonProgress,
 )
+
+if settings.USE_GIS:
+    from django.contrib.gis.db.models.functions import Distance
 
 DIRECTORY_DISCLAIMER = (
     'ReRoute is an independent platform. Resource information is compiled from publicly available sources and may change. '
@@ -101,6 +103,8 @@ def _zip_area_label(zip_code: str) -> str:
 
 
 def _hydrate_missing_resource_geo_points():
+    if not settings.USE_GIS:
+        return
     missing_zip_rows = (
         ResourceOrganization.objects.filter(is_active=True, geo_point__isnull=True)
         .exclude(zip_code__exact="")
@@ -266,8 +270,8 @@ def resources_directory(request):
     if selected_features:
         queryset = queryset.filter(features__slug__in=selected_features).distinct()
 
-    user_point = zip_to_point(zip_code) if zip_code else None
-    if user_point:
+    user_point = zip_to_point(zip_code) if (settings.USE_GIS and zip_code) else None
+    if settings.USE_GIS and user_point:
         queryset = queryset.annotate(distance=Distance("geo_point", user_point)).order_by(
             F("distance").asc(nulls_last=True),
             "name",

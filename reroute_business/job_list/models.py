@@ -1,8 +1,11 @@
 from django.db import models
-from django.contrib.gis.db import models as gis_models
 from django.contrib.postgres.indexes import GistIndex
 from django.contrib.auth.models import User
+from django.conf import settings
 from reroute_business.core.models import Skill
+
+if settings.USE_GIS:
+    from django.contrib.gis.db import models as gis_models
 
 EXPERIENCE_LEVELS = [
     ('entry', 'Entry-level'),
@@ -34,12 +37,13 @@ class Job(models.Model):
     location = models.CharField(max_length=100)
     zip_code = models.CharField(max_length=10, blank=True)
     is_remote = models.BooleanField(default=False)
-    geo_point = gis_models.PointField(
-        geography=True,
-        srid=4326,
-        null=True,
-        blank=True,
-    )
+    if settings.USE_GIS:
+        geo_point = gis_models.PointField(
+            geography=True,
+            srid=4326,
+            null=True,
+            blank=True,
+        )
     employer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posted_jobs')
     employer_image = models.ImageField(upload_to='employer_logos/', blank=True, null=True)  # ✅ NEW
     tags = models.CharField(max_length=200)
@@ -91,22 +95,19 @@ class Job(models.Model):
       return self.title
 
     class Meta:
-        indexes = [
-            GistIndex(fields=["geo_point"]),
-        ]
+        indexes = [GistIndex(fields=["geo_point"])] if settings.USE_GIS else []
 
 
 class ZipCentroid(models.Model):
     zip_code = models.CharField(max_length=10, unique=True)
-    geo_point = gis_models.PointField(
-        geography=True,
-        srid=4326,
-    )
+    if settings.USE_GIS:
+        geo_point = gis_models.PointField(
+            geography=True,
+            srid=4326,
+        )
 
     class Meta:
-        indexes = [
-            GistIndex(fields=["geo_point"]),
-        ]
+        indexes = [GistIndex(fields=["geo_point"])] if settings.USE_GIS else []
 
     def __str__(self):
         return self.zip_code

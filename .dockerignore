@@ -1,0 +1,14 @@
+.git
+.gitignore
+.venv
+env
+**/__pycache__
+**/*.pyc
+**/*.pyo
+*.sqlite3
+reroute_business/db.sqlite3
+media
+staticfiles
+tmp_*.py
+runserver.pid
+runserver_*.log

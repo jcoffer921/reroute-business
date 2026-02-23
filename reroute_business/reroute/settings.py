@@ -19,35 +19,53 @@ def _first_existing_path(paths):
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# GeoDjango native library discovery (Windows-friendly).
-# Prefer explicit env vars, then common install locations.
-GDAL_LIBRARY_PATH = os.getenv("GDAL_LIBRARY_PATH") or _first_existing_path([
-    r"C:\Users\jcoff\AppData\Local\Programs\OSGeo4W\bin\gdal312.dll",
-    r"C:\OSGeo4W\bin\gdal312.dll",
-    r"C:\OSGeo4W\bin\gdal311.dll",
-    r"C:\OSGeo4W\bin\gdal310.dll",
-    ctypes.util.find_library("gdal"),
-])
+# Temporary production-safe GIS toggle.
+# Keep GIS enabled by default for local/dev.
+USE_GIS = os.environ.get("DISABLE_GIS") != "1"
 
-GEOS_LIBRARY_PATH = os.getenv("GEOS_LIBRARY_PATH") or _first_existing_path([
-    r"C:\Users\jcoff\AppData\Local\Programs\OSGeo4W\bin\geos_c.dll",
-    r"C:\OSGeo4W\bin\geos_c.dll",
-    ctypes.util.find_library("geos_c"),
-])
+# GeoDjango native library discovery (only when GIS is enabled).
+if USE_GIS:
+    # On Windows, prefer explicit env vars then known OSGeo4W paths.
+    # On Linux/macOS (e.g., Render), rely on env vars or system discovery.
+    if os.name == "nt":
+        GDAL_LIBRARY_PATH = os.getenv("GDAL_LIBRARY_PATH") or _first_existing_path([
+            r"C:\Users\jcoff\AppData\Local\Programs\OSGeo4W\bin\gdal312.dll",
+            r"C:\OSGeo4W\bin\gdal312.dll",
+            r"C:\OSGeo4W\bin\gdal311.dll",
+            r"C:\OSGeo4W\bin\gdal310.dll",
+            ctypes.util.find_library("gdal"),
+        ])
+
+        GEOS_LIBRARY_PATH = os.getenv("GEOS_LIBRARY_PATH") or _first_existing_path([
+            r"C:\Users\jcoff\AppData\Local\Programs\OSGeo4W\bin\geos_c.dll",
+            r"C:\OSGeo4W\bin\geos_c.dll",
+            ctypes.util.find_library("geos_c"),
+        ])
+    else:
+        GDAL_LIBRARY_PATH = os.getenv("GDAL_LIBRARY_PATH") or ctypes.util.find_library("gdal")
+        GEOS_LIBRARY_PATH = os.getenv("GEOS_LIBRARY_PATH") or ctypes.util.find_library("geos_c")
 SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-dev-secret")
 
 # ---------- DATABASES ----------
-# Use Postgres when DATABASE_URL is present (Render/production).
-# Original behavior: no SQLite fallback here.
-_db_config = dj_database_url.config(
-    default=os.getenv("DATABASE_URL"),
-    conn_max_age=600,
-)
-_db_config["ENGINE"] = "django.contrib.gis.db.backends.postgis"
-
-DATABASES = {
-    'default': _db_config
-}
+DB_ENGINE = "django.contrib.gis.db.backends.postgis" if USE_GIS else "django.db.backends.postgresql"
+if os.getenv("DATABASE_URL"):
+    _db_config = dj_database_url.config(
+        default=os.getenv("DATABASE_URL"),
+        conn_max_age=600,
+    )
+    _db_config["ENGINE"] = DB_ENGINE
+    DATABASES = {"default": _db_config}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": DB_ENGINE,
+            "NAME": os.environ.get("DB_NAME"),
+            "USER": os.environ.get("DB_USER"),
+            "PASSWORD": os.environ.get("DB_PASSWORD"),
+            "HOST": os.environ.get("DB_HOST"),
+            "PORT": os.environ.get("DB_PORT", "5432"),
+        }
+    }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -122,6 +140,24 @@ USE_X_FORWARDED_HOST = True
 
 # ---------- APPS ----------
 INSTALLED_APPS = [
+    # default Django apps
+    'django.contrib.admin',
+    'django.contrib.sites',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    # third-party apps
+    'widget_tweaks',
+    'crispy_forms',
+    'crispy_bootstrap4',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+
     # local apps
     'reroute_business.main',
     'reroute_business.benefit_finder',
@@ -134,26 +170,10 @@ INSTALLED_APPS = [
     'reroute_business.resources',
     'reroute_business.reentry_org',
     'admin_portal',
-
-    # default Django apps
-    'django.contrib.admin',
-    'django.contrib.sites',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.gis',
-
-    # third-party apps
-    'widget_tweaks',
-    'crispy_forms',
-    'crispy_bootstrap4',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
 ]
+
+if USE_GIS:
+    INSTALLED_APPS.append('django.contrib.gis')
 
 # ---------- SITES FRAMEWORK ----------
 SITE_ID = 1

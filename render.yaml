@@ -66,6 +66,8 @@ services:
           property: connectionString
       - key: RENDER
         value: "true"
+      - key: DISABLE_GIS
+        value: "1"
 
 databases:
   - name: reroute-postgres

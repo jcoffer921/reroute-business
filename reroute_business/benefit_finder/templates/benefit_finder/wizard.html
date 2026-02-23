@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block content %}
-<section class="benefit-finder" id="benefitFinderApp" aria-live="polite" data-complete-url="{% url 'benefit_finder:complete' %}">
+<section class="benefit-finder" id="benefitFinderApp" aria-live="polite" data-complete-url="{% url 'benefit_finder:complete' %}" data-analytics-url="{% url 'benefit_finder:analytics' %}">
   <div class="benefit-finder__container">
     <header class="benefit-finder__header">
       <p class="benefit-finder__kicker">{% trans "Benefit Finder" %}</p>
@@ -123,5 +123,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'benefit_finder/js/benefit_finder.js' %}?v=20260223-1" defer></script>
+<script src="{% static 'benefit_finder/js/benefit_finder.js' %}?v=20260223-2" defer></script>
 {% endblock %}
