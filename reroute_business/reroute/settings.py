@@ -5,7 +5,9 @@ from pathlib import Path
 from django.utils.translation import gettext_lazy as _
 
 from dotenv import load_dotenv
-load_dotenv()
+# Do not load local .env on Render; it may contain Windows-only GIS paths.
+if os.getenv("RENDER", "").lower() not in {"true", "1"}:
+    load_dotenv()
 
 import dj_database_url
 
@@ -23,27 +25,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # Keep GIS enabled by default for local/dev.
 USE_GIS = os.environ.get("DISABLE_GIS") != "1"
 
-# GeoDjango native library discovery (only when GIS is enabled).
-if USE_GIS:
-    # On Windows, prefer explicit env vars then known OSGeo4W paths.
-    # On Linux/macOS (e.g., Render), rely on env vars or system discovery.
-    if os.name == "nt":
-        GDAL_LIBRARY_PATH = os.getenv("GDAL_LIBRARY_PATH") or _first_existing_path([
-            r"C:\Users\jcoff\AppData\Local\Programs\OSGeo4W\bin\gdal312.dll",
-            r"C:\OSGeo4W\bin\gdal312.dll",
-            r"C:\OSGeo4W\bin\gdal311.dll",
-            r"C:\OSGeo4W\bin\gdal310.dll",
-            ctypes.util.find_library("gdal"),
-        ])
-
-        GEOS_LIBRARY_PATH = os.getenv("GEOS_LIBRARY_PATH") or _first_existing_path([
-            r"C:\Users\jcoff\AppData\Local\Programs\OSGeo4W\bin\geos_c.dll",
-            r"C:\OSGeo4W\bin\geos_c.dll",
-            ctypes.util.find_library("geos_c"),
-        ])
-    else:
-        GDAL_LIBRARY_PATH = os.getenv("GDAL_LIBRARY_PATH") or ctypes.util.find_library("gdal")
-        GEOS_LIBRARY_PATH = os.getenv("GEOS_LIBRARY_PATH") or ctypes.util.find_library("geos_c")
 SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-dev-secret")
 
 # ---------- DATABASES ----------
