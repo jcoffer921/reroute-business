@@ -11,6 +11,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
 from reroute_business.blog.models import BlogPost
 from .models import (
+    Feature,
     ResourceOrganization,
     Module,
     ModuleQuizScore,
@@ -22,31 +23,6 @@ from .models import (
     LessonAttempt,
     LessonProgress,
 )
-
-DIRECTORY_CATEGORIES = [
-    'Housing',
-    'ID/Documents',
-    'Food',
-    'Job Training',
-    'Legal Aid',
-    'Healthcare',
-    'Mental Health',
-    'Reentry Orgs',
-    'Benefits',
-    'Childcare',
-]
-
-DIRECTORY_FEATURES = [
-    'Spanish Available',
-    'Bilingual Staff',
-    'Trauma-Informed',
-    'Justice-Impacted Staff',
-    'Culturally Specific',
-    'Remote Services',
-    'Near Public Transit',
-    'Childcare Support',
-    'No Appointment Needed',
-]
 
 DIRECTORY_DISCLAIMER = (
     'ReRoute is an independent platform. Resource information is compiled from publicly available sources and may change. '
@@ -64,16 +40,30 @@ def _phone_href(raw_phone: str, explicit_href: str) -> str:
 
 
 def _resource_to_payload(resource: ResourceOrganization) -> dict:
-    categories = list(resource.categories or [])
-    features = list(resource.features or [])
-    combined_tags = categories + features
+    category_label = resource.get_category_display() if resource.category else ""
+    categories = [category_label] if category_label else []
+    feature_qs = resource.features.filter(is_active=True).order_by("label")
+    feature_labels = [feature.label for feature in feature_qs]
+    feature_slugs = [feature.slug for feature in feature_qs]
+
+    if not feature_labels and resource.legacy_features:
+        feature_labels = [str(value).replace("_", " ").title() for value in resource.legacy_features]
+        feature_slugs = [str(value) for value in resource.legacy_features]
+
+    combined_tags = categories + feature_labels
     visible_tags = combined_tags[:5]
     hidden_tag_count = max(0, len(combined_tags) - len(visible_tags))
+
+    languages_supported = list(resource.languages_supported or [])
+    cultural_competency = list(resource.cultural_competency or [])
+    what_to_bring = list(resource.what_to_bring or [])
+
     return {
         "slug": resource.slug,
         "name": resource.name,
         "categories": categories,
-        "features": features,
+        "features": feature_labels,
+        "feature_slugs": feature_slugs,
         "address_line": resource.address_line,
         "neighborhood": resource.neighborhood,
         "transit_line": resource.transit_line,
@@ -85,11 +75,11 @@ def _resource_to_payload(resource: ResourceOrganization) -> dict:
         "overview": resource.overview,
         "what_to_expect": resource.what_to_expect,
         "who_can_use_this": resource.who_can_use_this,
-        "what_to_bring": list(resource.what_to_bring or []),
+        "what_to_bring": what_to_bring,
         "how_to_apply": resource.how_to_apply,
-        "getting_there": resource.getting_there,
-        "languages_supported": list(resource.languages_supported or []),
-        "cultural_competency": list(resource.cultural_competency or []),
+        "getting_there": resource.getting_there or resource.transit_line,
+        "languages_supported": languages_supported,
+        "cultural_competency": cultural_competency,
         "childcare_support": resource.childcare_support,
         "card_tags": visible_tags,
         "hidden_tag_count": hidden_tag_count,
@@ -168,7 +158,12 @@ def resources_directory(request):
     if not zip_code.isdigit() or len(zip_code) != 5:
         zip_code = ''
 
+    selected_features = [slug for slug in request.GET.getlist("features") if slug]
+
     queryset = ResourceOrganization.objects.filter(is_active=True).order_by("name")
+    if selected_features:
+        queryset = queryset.filter(features__slug__in=selected_features).distinct()
+
     prepared_resources = [_resource_to_payload(resource) for resource in queryset]
 
     paginator = Paginator(prepared_resources, 12)
@@ -178,11 +173,15 @@ def resources_directory(request):
     page_params.pop('page', None)
     pagination_query = page_params.urlencode()
 
+    filter_features = list(Feature.objects.filter(is_active=True).order_by("label"))
+    filter_categories = [label for _, label in ResourceOrganization.CATEGORY_CHOICES]
+
     return render(request, 'resources/directory/directory_list.html', {
         'resources': page_obj.object_list,
         'page_obj': page_obj,
-        'filter_categories': DIRECTORY_CATEGORIES,
-        'filter_features': DIRECTORY_FEATURES,
+        'filter_categories': filter_categories,
+        'filter_features': filter_features,
+        'selected_features': selected_features,
         'selected_zip': zip_code,
         'pagination_query': pagination_query,
         'directory_disclaimer': DIRECTORY_DISCLAIMER,

@@ -101,6 +101,28 @@
   justify-content: center;
   font-weight: 700;
   cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+.directory-filter-toggle[aria-expanded='true'] {
+  border-color: #2d6cdf;
+  background: #eef4ff;
+  color: #123f86;
+}
+
+.directory-filter-count {
+  min-width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 999px;
+  background: #2d6cdf;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 0 0.32rem;
 }
 
 .directory-filters {
@@ -179,6 +201,13 @@
   font-size: 0.86rem;
   font-weight: 600;
   cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.directory-chip:hover {
+  border-color: #7ea1df;
+  color: #174690;
 }
 
 .directory-filters.is-open .directory-chip {
@@ -188,9 +217,16 @@
 }
 
 .directory-chip[aria-pressed='true'] {
-  background: #d9eeff;
-  border-color: #2d6cdf;
-  color: #0f4fa8;
+  background: #dbe9ff;
+  border-color: #1f5fc8;
+  color: #0f3f86;
+  box-shadow: inset 0 0 0 1px #1f5fc8;
+}
+
+.directory-chip.is-selected::before {
+  content: "✓";
+  margin-right: 0.38rem;
+  font-weight: 800;
 }
 
 .directory-results-meta {

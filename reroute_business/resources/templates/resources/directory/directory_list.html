@@ -32,7 +32,8 @@
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path d="M4 7h16M7 12h10M10 17h4"></path>
         </svg>
-        {% trans "Filters" %}
+        <span id="directoryFilterToggleLabel">{% trans "Filters" %}</span>
+        <span class="directory-filter-count" id="directoryFilterCount" hidden>0</span>
       </button>
     </div>
 
@@ -60,7 +61,14 @@
         <h3>{% trans "Features" %}</h3>
         <div class="directory-chip-wrap">
           {% for feature in filter_features %}
-          <button type="button" class="directory-chip" data-filter-kind="feature" data-filter-value="{{ feature }}" aria-pressed="false">{{ feature }}</button>
+          <a
+            href="?features={{ feature.slug }}"
+            class="directory-chip"
+            data-filter-kind="feature"
+            data-filter-value="{{ feature.slug }}"
+            aria-pressed="{% if feature.slug in selected_features %}true{% else %}false{% endif %}">
+            {{ feature.label }}
+          </a>
           {% endfor %}
         </div>
       </div>
@@ -73,7 +81,7 @@
       <article class="directory-card"
         data-directory-card
         data-categories="{{ resource.categories|join:'||' }}"
-        data-features="{{ resource.features|join:'||' }}"
+        data-features="{{ resource.feature_slugs|join:'||' }}"
         data-card-url="{% url 'resource_directory_detail' resource.slug %}"
         data-search="{{ resource.name }} {{ resource.overview }} {{ resource.address_line }} {{ resource.neighborhood }} {{ resource.categories|join:' ' }} {{ resource.features|join:' ' }} {{ resource.hours }} {{ resource.phone }}">
         <a class="directory-card-overlay-link" href="{% url 'resource_directory_detail' resource.slug %}" aria-label="{% blocktrans with name=resource.name %}View details for {{ name }}{% endblocktrans %}">

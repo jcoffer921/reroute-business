@@ -1,6 +1,7 @@
 # resources/models.py
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
 
 
 class Resource(models.Model):
@@ -20,41 +21,6 @@ class Resource(models.Model):
 
     def __str__(self):
         return self.title
-
-
-class ResourceOrganization(models.Model):
-    slug = models.SlugField(max_length=200, unique=True)
-    name = models.CharField(max_length=255)
-    categories = models.JSONField(blank=True, default=list)
-    features = models.JSONField(blank=True, default=list)
-    address_line = models.CharField(max_length=255)
-    neighborhood = models.CharField(max_length=255, blank=True)
-    transit_line = models.CharField(max_length=255, blank=True)
-    zip_code = models.CharField(max_length=5, blank=True)
-    hours = models.CharField(max_length=255, blank=True)
-    phone = models.CharField(max_length=50, blank=True)
-    phone_href = models.CharField(max_length=50, blank=True)
-    website = models.URLField(blank=True)
-    overview = models.TextField(blank=True)
-    what_to_expect = models.TextField(blank=True)
-    who_can_use_this = models.TextField(blank=True)
-    what_to_bring = models.JSONField(blank=True, default=list)
-    how_to_apply = models.TextField(blank=True)
-    getting_there = models.TextField(blank=True)
-    languages_supported = models.JSONField(blank=True, default=list)
-    cultural_competency = models.JSONField(blank=True, default=list)
-    childcare_support = models.TextField(blank=True)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ("name",)
-        verbose_name = "Resource Organization"
-        verbose_name_plural = "Resource Organizations"
-
-    def __str__(self):
-        return self.name
 
 
 class Module(models.Model):
@@ -302,3 +268,115 @@ class LessonProgress(models.Model):
     def __str__(self):
         who = self.user.username if self.user_id else (self.session_key or "guest")
         return f"{self.lesson.slug} progress for {who}"
+
+
+class Feature(models.Model):
+    slug = models.SlugField(unique=True)
+    label = models.CharField(max_length=80)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["label"]
+
+    def save(self, *args, **kwargs):
+        if not self.slug and self.label:
+            self.slug = slugify(self.label)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.label
+
+
+class ResourceOrganization(models.Model):
+    CATEGORY_HOUSING = "housing"
+    CATEGORY_FOOD = "food"
+    CATEGORY_ID_DOCUMENTS = "id_documents"
+    CATEGORY_FINANCIAL_ASSISTANCE = "financial_assistance"
+    CATEGORY_BENEFITS = "benefits"
+    CATEGORY_CHILDCARE = "childcare"
+
+    CATEGORY_HEALTHCARE = "healthcare"
+    CATEGORY_MENTAL_HEALTH = "mental_health"
+    CATEGORY_SUBSTANCE_USE = "substance_use"
+    CATEGORY_WELLNESS = "wellness"
+
+    CATEGORY_LEGAL = "legal"
+    CATEGORY_REENTRY_ORGS = "reentry_orgs"
+    CATEGORY_CASE_MANAGEMENT = "case_management"
+    CATEGORY_MULTI_SERVICE = "multi_service"
+    CATEGORY_GOVT_AGENCIES = "govt_agencies"
+
+    CATEGORY_EDUCATION = "education"
+    CATEGORY_CAREER_SERVICES = "career_services"
+    CATEGORY_JOB_TRAINING = "job_training"
+    CATEGORY_WORKFORCE_DEV = "workforce_dev"
+
+    CATEGORY_OTHER = "other"
+
+    CATEGORY_CHOICES = [
+        (CATEGORY_HOUSING, "Housing"),
+        (CATEGORY_FOOD, "Food"),
+        (CATEGORY_ID_DOCUMENTS, "ID/Documents"),
+        (CATEGORY_FINANCIAL_ASSISTANCE, "Financial Assistance"),
+        (CATEGORY_BENEFITS, "Benefits"),
+        (CATEGORY_CHILDCARE, "Childcare"),
+
+        (CATEGORY_HEALTHCARE, "Healthcare (Medical)"),
+        (CATEGORY_MENTAL_HEALTH, "Mental Health"),
+        (CATEGORY_SUBSTANCE_USE, "Substance Use Treatment"),
+        (CATEGORY_WELLNESS, "Health & Wellness"),
+
+        (CATEGORY_LEGAL, "Legal Aid"),
+        (CATEGORY_REENTRY_ORGS, "Reentry Organizations"),
+        (CATEGORY_CASE_MANAGEMENT, "Case Management / Navigation"),
+        (CATEGORY_MULTI_SERVICE, "Multi-Service Agency"),
+        (CATEGORY_GOVT_AGENCIES, "Government Agencies"),
+
+        (CATEGORY_EDUCATION, "Education & Literacy"),
+        (CATEGORY_CAREER_SERVICES, "Career Services"),
+        (CATEGORY_JOB_TRAINING, "Job Training"),
+        (CATEGORY_WORKFORCE_DEV, "Workforce Development"),
+
+        (CATEGORY_OTHER, "Other"),
+    ]
+
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=200, unique=True, blank=True)
+    category = models.CharField(max_length=40, choices=CATEGORY_CHOICES, default=CATEGORY_OTHER)
+    legacy_features = models.JSONField(default=list, blank=True)
+    features = models.ManyToManyField(
+        Feature,
+        blank=True,
+        related_name="resources",
+    )
+    address_line = models.CharField(max_length=255)
+    neighborhood = models.CharField(max_length=255, blank=True)
+    transit_line = models.CharField(max_length=255, blank=True)
+    zip_code = models.CharField(max_length=5, blank=True)
+    hours = models.CharField(max_length=255, blank=True)
+    phone = models.CharField(max_length=50, blank=True)
+    phone_href = models.CharField(max_length=50, blank=True)
+    website = models.URLField(blank=True)
+    overview = models.TextField(blank=True)
+    what_to_expect = models.TextField(blank=True)
+    who_can_use_this = models.TextField(blank=True)
+    what_to_bring = models.JSONField(blank=True, default=list)
+    how_to_apply = models.TextField(blank=True)
+    getting_there = models.TextField(blank=True)
+    languages_supported = models.JSONField(blank=True, default=list)
+    cultural_competency = models.JSONField(blank=True, default=list)
+    childcare_support = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)[:220]
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        ordering = ("name",)

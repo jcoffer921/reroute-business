@@ -5,6 +5,7 @@
   var resultMeta = document.getElementById('directoryResultsMeta');
   var noResultsEl = document.getElementById('directoryNoResults');
   var clearBtn = document.getElementById('directoryClearFilters');
+  var filterCount = document.getElementById('directoryFilterCount');
 
   var toggleBtn = document.getElementById('directoryFilterToggle');
   var panel = document.getElementById('directoryFiltersPanel');
@@ -19,7 +20,23 @@
   var selectedFeatures = new Set();
 
   chipButtons.forEach(function (button) {
-    button.addEventListener('click', function () {
+    var initialKind = button.getAttribute('data-filter-kind');
+    var initialValue = button.getAttribute('data-filter-value');
+    if (button.getAttribute('aria-pressed') === 'true' && initialValue) {
+      if (initialKind === 'feature') {
+        selectedFeatures.add(initialValue);
+      } else {
+        selectedCategories.add(initialValue);
+      }
+      button.classList.add('is-selected');
+    }
+
+    button.addEventListener('click', function (event) {
+      var tag = button.tagName ? button.tagName.toLowerCase() : '';
+      if (tag === 'a') {
+        event.preventDefault();
+        button.blur();
+      }
       var kind = button.getAttribute('data-filter-kind');
       var value = button.getAttribute('data-filter-value');
       var targetSet = kind === 'feature' ? selectedFeatures : selectedCategories;
@@ -27,9 +44,11 @@
       if (targetSet.has(value)) {
         targetSet.delete(value);
         button.setAttribute('aria-pressed', 'false');
+        button.classList.remove('is-selected');
       } else {
         targetSet.add(value);
         button.setAttribute('aria-pressed', 'true');
+        button.classList.add('is-selected');
       }
 
       applyFilters();
@@ -40,13 +59,17 @@
     searchInput.addEventListener('input', applyFilters);
   }
 
+  applyFilters();
+
   if (clearBtn) {
-    clearBtn.addEventListener('click', function () {
+    clearBtn.addEventListener('click', function (event) {
+      event.preventDefault();
       selectedCategories.clear();
       selectedFeatures.clear();
 
       chipButtons.forEach(function (chip) {
         chip.setAttribute('aria-pressed', 'false');
+        chip.classList.remove('is-selected');
       });
 
       if (searchInput) {
@@ -54,6 +77,7 @@
       }
 
       applyFilters();
+      clearFeatureParamsFromUrl();
     });
   }
 
@@ -167,6 +191,27 @@
     if (noResultsEl) {
       noResultsEl.hidden = shownCount > 0;
     }
+
+    updateSelectedCount();
+  }
+
+  function updateSelectedCount() {
+    if (!filterCount) {
+      return;
+    }
+    var totalSelected = selectedCategories.size + selectedFeatures.size;
+    filterCount.textContent = String(totalSelected);
+    filterCount.hidden = totalSelected === 0;
+  }
+
+  function clearFeatureParamsFromUrl() {
+    if (!window.history || !window.history.replaceState) {
+      return;
+    }
+    var url = new URL(window.location.href);
+    url.searchParams.delete('features');
+    url.searchParams.delete('page');
+    window.history.replaceState({}, '', url.pathname + (url.search ? url.search : '') + url.hash);
   }
 
   function splitValues(raw) {
