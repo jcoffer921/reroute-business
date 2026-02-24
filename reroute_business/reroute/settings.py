@@ -21,9 +21,9 @@ def _first_existing_path(paths):
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# Temporary production-safe GIS toggle.
-# Keep GIS enabled by default for local/dev.
-USE_GIS = os.environ.get("DISABLE_GIS") != "1"
+# GIS is opt-in so local/dev does not require GDAL/PostGIS installed.
+# Set ENABLE_GIS=1 only in environments that have full GIS dependencies.
+USE_GIS = os.environ.get("ENABLE_GIS") == "1"
 
 SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-dev-secret")
 

@@ -1,134 +1,125 @@
 {% extends "base.html" %}
 {% load static %}
-{% load profile_extras %}
 
 {% block title %}Job Opportunities{% endblock %}
+{% block body_class %}dashboard-page opportunities-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'dashboard/css/user_dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'user/css/job_list.css' %}">
+{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'user/css/job_list.css' %}">
-
-<div class="opportunities-page{% if jobs_live and not jobs %} overlay-active{% endif %}">
-  {% if jobs_live and not jobs %}
-  <!-- Cover the entire page content area (not navbar/footer) -->
-  <div class="jobs-overlay" role="status" aria-live="polite">
-    <div class="jobs-overlay-card">
-      <h2>Jobs Coming Soon</h2>
-      <p>In the meantime check out our resources to be best prepared when they arrive.</p>
-      <a href="{% url 'resource_list' %}" class="btn btn-primary">Explore Resources</a>
-      <div class="subtle">We’ll notify users as postings go live.</div>
-    </div>
+<section class="dashboard-hero jobs-hero">
+  <div class="dashboard-hero-inner">
+    <div class="hero-pill">JOB BOARD</div>
+    <h1>Find Fair-Chance Jobs Near You</h1>
+    <p class="hero-subhead">Built for justice-impacted job seekers in Philadelphia.</p>
+    <form method="get" action="{% url 'opportunities' %}" id="jobFilterForm" class="jobs-search-row" novalidate>
+      <label class="jobs-field jobs-field-keyword">
+        <span>Keyword</span>
+        <input type="text" name="q" placeholder="Job title or keyword" value="{{ q }}" aria-label="Keyword search">
+      </label>
+      <label class="jobs-field jobs-field-zip">
+        <span>ZIP</span>
+        <input type="text" name="zip" placeholder="19104" value="{{ user_zip }}" aria-label="ZIP code">
+      </label>
+      <label class="jobs-field jobs-field-radius">
+        <span>Radius</span>
+        <select name="radius" aria-label="Search radius">
+          <option value="5" {% if radius == 5 %}selected{% endif %}>5 miles</option>
+          <option value="10" {% if radius == 10 %}selected{% endif %}>10 miles</option>
+          <option value="25" {% if radius == 25 %}selected{% endif %}>25 miles</option>
+        </select>
+      </label>
+      <button type="submit" class="btn-primary jobs-find-btn">Find Jobs</button>
+      <button type="button" class="btn-outline mobile-filter-toggle">Filters</button>
+    </form>
   </div>
-  {% endif %}
+</section>
 
-  {% if jobs_live %}
-    <!-- Full-width hero (outside the form) with primary search inside -->
-    <section class="opportunities-hero">
-      <div class="opportunities-hero-content">
-        <h1>Explore Job Opportunities</h1>
-        <p class="hero-sub">Discover full-time, part-time, and second-chance hiring opportunities near you.</p>
-        <form method="get" action="{% url 'opportunities' %}" id="jobFilterForm" class="search-filter-form">
-          <div class="search-bar search-bar--inline">
-            <input type="text" name="q" placeholder="Job title, keywords" value="{{ q }}" aria-label="Job title or keywords">
-            <input type="text" name="zip" placeholder="Location (ZIP)" value="{{ user_zip }}" aria-label="Location by ZIP">
-            <button type="submit" class="btn btn-primary">Search</button>
-            <button type="button" class="mobile-filter-toggle">Filters</button>
-          </div>
-        </form>
-      </div>
-    </section>
-  {% else %}
-    <section class="opportunities-hero">
-      <div class="opportunities-hero-content">
-        <h1>Jobs Launching Soon</h1>
-        <p class="hero-sub">ReRoute is in early access. Completed profiles get priority access when jobs launch.</p>
-      </div>
-    </section>
-  {% endif %}
+<div id="filtersBackdrop" class="filters-backdrop" hidden></div>
 
-  {% if jobs_live %}
-  <!-- Filters + Results -->
-  <div id="filtersBackdrop" class="filters-backdrop" hidden></div>
-  <div class="opportunities-wrapper">
-  <div class="container">
-    <div class="container">
-      <!-- Filters + Job List -->
-      <div class="layout-grid">
-        <!-- Filters Sidebar -->
-        <aside class="filters-sidebar" id="filtersSidebar" aria-label="Job filters" aria-hidden="true">
-          <div class="filters-card">
-            <button type="button" class="filters-close" aria-label="Close filters">✕ Close</button>
-            <h3 class="filters-title">Job Type</h3>
-            <div class="pill-group">
-              <label class="pill">
-                <input type="checkbox" name="type" value="full_time" {% if 'full_time' in selected_job_types %}checked{% endif %}>
-                <span>Full-Time</span>
-              </label>
-              <label class="pill">
-                <input type="checkbox" name="type" value="part_time" {% if 'part_time' in selected_job_types %}checked{% endif %}>
-                <span>Part-Time</span>
-              </label>
-              <label class="pill">
-                <input type="checkbox" name="type" value="internship" {% if 'internship' in selected_job_types %}checked{% endif %}>
-                <span>Internship</span>
-              </label>
-              <label class="pill">
-                <input type="checkbox" name="type" value="contract" {% if 'contract' in selected_job_types %}checked{% endif %}>
-                <span>Contract</span>
-              </label>
-            </div>
-            <hr>
-
-            <h3 class="filters-title">Location</h3>
-            <div class="radio-group">
-              <label class="radio-pill">
-                <input type="radio" name="preset_zip" value="" {% if not selected_preset_zip %}checked{% endif %}>
-                <span>Any</span>
-              </label>
-              <label class="radio-pill">
-                <input type="radio" name="preset_zip" value="19104" {% if selected_preset_zip == '19104' %}checked{% endif %}>
-                <span>Philadelphia</span>
-              </label>
-              <label class="radio-pill">
-                <input type="radio" name="preset_zip" value="00000" {% if selected_preset_zip == '00000' %}checked{% endif %}>
-                <span>Remote</span>
-              </label>
-            </div>
-            <hr>
-
-            <h3 class="filters-title">Radius</h3>
-            <select name="radius" class="radius-select">
-              <option value="10" {% if radius == 10 %}selected{% endif %}>10 miles</option>
-              <option value="25" {% if radius == 25 %}selected{% endif %}>25 miles</option>
-              <option value="50" {% if radius == 50 %}selected{% endif %}>50 miles</option>
-            </select>
-
-            <!-- Future filters (disabled for now) -->
-            <hr>
-            <h3 class="filters-title">More Filters</h3>
-            <label class="filters-title filters-subtitle">Salary Range (Coming Soon)</label>
-            <input type="range" min="0" max="200" value="100" disabled>
-            <div class="pill-group" aria-disabled="true">
-              <label class="pill"><input type="checkbox" disabled><span>Entry</span></label>
-              <label class="pill"><input type="checkbox" disabled><span>Mid</span></label>
-              <label class="pill"><input type="checkbox" disabled><span>Senior</span></label>
-            </div>
-          </div>
-        </aside>
-
-        <!-- Job Listings -->
-        <div class="job-list" id="jobResults">
-          {% include 'job_list/user/_jobs_list.html' %}
+<div class="dashboard-container jobs-board-container">
+  <div class="jobs-board-grid">
+    <aside class="card jobs-filters" id="filtersSidebar" aria-label="Job filters" aria-hidden="true">
+      <button type="button" class="filters-close" aria-label="Close filters">Close</button>
+      <div class="section-header jobs-filter-header">
+        <div class="section-title">
+          <span class="section-icon green" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+          </span>
+          <h2>Filters</h2>
         </div>
       </div>
-    </div>
-  </div>
-  <!-- end .opportunities-wrapper -->
-  </div>
-  {% endif %}
 
+      <div class="jobs-filter-group">
+        <label class="jobs-filter-label" for="filter-distance">Distance</label>
+        <select id="filter-distance" name="radius">
+          <option value="5" {% if radius == 5 %}selected{% endif %}>Within 5 miles</option>
+          <option value="10" {% if radius == 10 %}selected{% endif %}>Within 10 miles</option>
+          <option value="25" {% if radius == 25 %}selected{% endif %}>Within 25 miles</option>
+        </select>
+      </div>
+
+      <div class="jobs-filter-group">
+        <p class="jobs-filter-label">Job Type</p>
+        <div class="jobs-chip-list">
+          <label class="jobs-chip"><input type="checkbox" name="type" value="full_time" {% if 'full_time' in selected_job_types %}checked{% endif %}><span>Full-Time</span></label>
+          <label class="jobs-chip"><input type="checkbox" name="type" value="part_time" {% if 'part_time' in selected_job_types %}checked{% endif %}><span>Part-Time</span></label>
+          <label class="jobs-chip"><input type="checkbox" name="type" value="contract" {% if 'contract' in selected_job_types %}checked{% endif %}><span>Contract</span></label>
+        </div>
+      </div>
+
+      <div class="jobs-filter-group">
+        <label class="jobs-filter-label" for="filter-industry">Industry</label>
+        <select id="filter-industry" aria-label="Industry">
+          <option selected>All industries</option>
+          <option>Hospitality</option>
+          <option>Construction</option>
+          <option>Transportation</option>
+        </select>
+      </div>
+
+      <div class="jobs-filter-group">
+        <label class="jobs-filter-label" for="filter-pay">Pay Range (placeholder)</label>
+        <input id="filter-pay" type="range" min="0" max="100" value="55" aria-label="Pay range placeholder">
+      </div>
+
+      <div class="jobs-filter-group">
+        <p class="jobs-filter-label">Preferences</p>
+        <label class="jobs-toggle"><input type="checkbox"><span>Remote eligible</span></label>
+        <label class="jobs-toggle"><input type="checkbox"><span>Fair Chance Employer</span></label>
+        <label class="jobs-toggle"><input type="checkbox"><span>Spanish-friendly</span></label>
+        <label class="jobs-toggle"><input type="checkbox"><span>Near public transit</span></label>
+      </div>
+    </aside>
+
+    <section class="jobs-results" id="jobResults" aria-live="polite">
+      {% include 'job_list/user/_jobs_list.html' %}
+    </section>
   </div>
+</div>
+
+<div class="jobs-phase-modal" id="jobsPhaseModal" aria-hidden="false">
+  <div class="jobs-phase-backdrop" data-phase-close onclick="document.getElementById('jobsPhaseModal').setAttribute('aria-hidden','true');document.body.classList.remove('no-scroll');"></div>
+  <section class="jobs-phase-dialog" role="dialog" aria-modal="true" aria-labelledby="jobsPhaseTitle">
+    <button type="button" class="jobs-phase-close" aria-label="Close update" data-phase-close onclick="document.getElementById('jobsPhaseModal').setAttribute('aria-hidden','true');document.body.classList.remove('no-scroll');">&times;</button>
+    <p class="jobs-phase-pill">Platform Update</p>
+    <h2 id="jobsPhaseTitle">
+      {% if jobs_live %}We are in public beta.{% else %}We are in employer onboarding phase.{% endif %}
+    </h2>
+    <p>
+      {% if jobs_live %}
+      The jobs experience is live and improving weekly as we onboard more fair-chance partners.
+      {% else %}
+      ReRoute is onboarding employers and validating listings. Jobs will open in waves as verified partners launch.
+      {% endif %}
+    </p>
+    <button type="button" class="btn-primary jobs-phase-cta" data-phase-close onclick="document.getElementById('jobsPhaseModal').setAttribute('aria-hidden','true');document.body.classList.remove('no-scroll');">Got it</button>
+  </section>
+</div>
 
 <div id="jobListBoot" data-toggle-save-url="{% url 'toggle_saved_job' %}"></div>
 <script src="{% static 'user/js/job_list.js' %}"></script>
-
 {% endblock %}

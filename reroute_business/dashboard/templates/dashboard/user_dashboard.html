@@ -176,6 +176,113 @@
     </div>
   </section>
 
+  <section class="section-grid jobs-tracker-grid">
+    <section class="card">
+      <div class="section-header">
+        <div class="section-title">
+          <span class="section-icon green">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M5 4h14v16H5z" />
+              <path d="M8 8h8M8 12h8M8 16h5" />
+            </svg>
+          </span>
+          <h2>{% trans "Saved Jobs" %}</h2>
+        </div>
+      </div>
+      {% if saved_jobs_count %}
+      <div class="jobs-placeholder jobs-placeholder--left">
+        <h3>{% blocktrans with count=saved_jobs_count %}You have {{ count }} saved job{{ count|pluralize }}.{% endblocktrans %}</h3>
+        <p>{% trans "Review and manage your saved list from your jobs workspace." %}</p>
+        <a class="btn-outline" href="{% url 'dashboard:saved_jobs' %}?tab=saved">{% trans "View Saved Jobs" %}</a>
+      </div>
+      {% else %}
+      <div class="jobs-placeholder jobs-placeholder--left">
+        <h3>{% trans "No saved jobs yet." %}</h3>
+        <p>{% trans "Save opportunities to compare and apply later." %}</p>
+      </div>
+      {% endif %}
+    </section>
+
+    <section class="card">
+      <div class="section-header">
+        <div class="section-title">
+          <span class="section-icon amber">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <rect x="4" y="4" width="16" height="16" rx="2" />
+              <path d="M8 9h8M8 13h6" />
+            </svg>
+          </span>
+          <h2>{% trans "Applied Jobs" %}</h2>
+        </div>
+      </div>
+      {% if applications %}
+      <div class="applied-job-list">
+        {% for app in applications|slice:":4" %}
+        <article class="applied-job-item">
+          <div>
+            <h3>{{ app.job.title }}</h3>
+            <p class="muted">{{ app.job.employer.username }}</p>
+          </div>
+          <span class="job-badge">
+            {% if app.status == 'pending' %}{% trans "Pending" %}
+            {% elif app.status == 'reviewed' %}{% trans "Reviewed" %}
+            {% elif app.status == 'interview' %}{% trans "Interview" %}
+            {% elif app.status == 'accepted' %}{% trans "Accepted" %}
+            {% else %}{% trans "Closed" %}{% endif %}
+          </span>
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="jobs-placeholder jobs-placeholder--left">
+        <h3>{% trans "No applications yet." %}</h3>
+        <p>{% trans "When you apply to roles, your status updates will appear here." %}</p>
+      </div>
+      {% endif %}
+    </section>
+  </section>
+
+  <section class="card">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="section-icon green">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M3 7h18v13H3z" />
+            <path d="M8 7V5h8v2" />
+          </svg>
+        </span>
+        <h2>{% trans "Suggested Jobs (Coming Soon)" %}</h2>
+      </div>
+      <span class="section-pill">{% trans "Preview" %}</span>
+    </div>
+    <p class="muted">{% trans "Will be personalized by ZIP and skills." %}</p>
+    <div class="module-card-grid">
+      {% for item in suggested_cards|slice:":3" %}
+      <article class="module-reco-card">
+        <h3>{{ item.job.title }}</h3>
+        <p class="muted">{{ item.job.employer.username }} · {{ item.job.location|default:"Location flexible" }}</p>
+        <span class="org-pill">{% trans "Suggestion" %}</span>
+      </article>
+      {% empty %}
+      <article class="module-reco-card">
+        <h3>{% trans "Warehouse Associate" %}</h3>
+        <p class="muted">{% trans "Philadelphia · Placeholder role" %}</p>
+        <span class="org-pill">{% trans "Suggestion" %}</span>
+      </article>
+      <article class="module-reco-card">
+        <h3>{% trans "Driver Helper" %}</h3>
+        <p class="muted">{% trans "West Philly · Placeholder role" %}</p>
+        <span class="org-pill">{% trans "Suggestion" %}</span>
+      </article>
+      <article class="module-reco-card">
+        <h3>{% trans "Facilities Support" %}</h3>
+        <p class="muted">{% trans "Center City · Placeholder role" %}</p>
+        <span class="org-pill">{% trans "Suggestion" %}</span>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
   <section class="card orgs-card">
     <div class="section-header">
       <div class="section-title">

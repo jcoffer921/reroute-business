@@ -1,9 +1,124 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}ReRoute | Job Matches{% endblock %}
+{% block title %}ReRoute | Job Board{% endblock %}
+{% block body_class %}dashboard-page opportunities-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'dashboard/css/user_dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'user/css/job_list.css' %}">
+{% endblock %}
+
 {% block content %}
-  <div class="container">
-    <h2>Job Board Coming Soon</h2>
-    <p>This is where job listings will appear.</p>
+<section class="dashboard-hero jobs-hero">
+  <div class="dashboard-hero-inner">
+    <div class="hero-pill">JOB BOARD</div>
+    <h1>Find Fair-Chance Jobs Near You</h1>
+    <p class="hero-subhead">Built for justice-impacted job seekers in Philadelphia.</p>
+    <form class="jobs-search-row" action="#" method="get">
+      <label class="jobs-field jobs-field-keyword">
+        <span>Keyword</span>
+        <input type="text" name="keyword" placeholder="Job title or keyword">
+      </label>
+      <label class="jobs-field jobs-field-zip">
+        <span>ZIP</span>
+        <input type="text" name="zip" placeholder="19104">
+      </label>
+      <label class="jobs-field jobs-field-radius">
+        <span>Radius</span>
+        <select name="radius">
+          <option>5 miles</option>
+          <option>10 miles</option>
+          <option selected>25 miles</option>
+        </select>
+      </label>
+      <button type="submit" class="btn-primary jobs-find-btn">Find Jobs</button>
+      <button type="button" class="btn-outline mobile-filter-toggle">Filters</button>
+    </form>
   </div>
+</section>
+
+<div id="filtersBackdrop" class="filters-backdrop" hidden></div>
+
+<div class="dashboard-container jobs-board-container">
+  <div class="jobs-board-grid">
+    <aside class="card jobs-filters" id="filtersSidebar" aria-hidden="true">
+      <button type="button" class="filters-close">Close</button>
+      <div class="section-header jobs-filter-header">
+        <div class="section-title"><h2>Filters</h2></div>
+      </div>
+      <div class="jobs-filter-group">
+        <label class="jobs-filter-label">Distance</label>
+        <select><option>Within 5 miles</option><option>Within 10 miles</option><option selected>Within 25 miles</option></select>
+      </div>
+      <div class="jobs-filter-group">
+        <label class="jobs-filter-label">Job Type</label>
+        <select><option>Any</option><option>Full-Time</option><option>Part-Time</option><option>Contract</option></select>
+      </div>
+      <div class="jobs-filter-group">
+        <label class="jobs-filter-label">Industry</label>
+        <select><option>All industries</option><option>Hospitality</option><option>Construction</option></select>
+      </div>
+      <div class="jobs-filter-group">
+        <label class="jobs-filter-label">Pay Range (placeholder)</label>
+        <input type="range" min="0" max="100" value="55">
+      </div>
+      <div class="jobs-filter-group">
+        <p class="jobs-filter-label">Preferences</p>
+        <label class="jobs-toggle"><input type="checkbox"><span>Remote eligible</span></label>
+        <label class="jobs-toggle"><input type="checkbox"><span>Fair Chance Employer</span></label>
+        <label class="jobs-toggle"><input type="checkbox"><span>Spanish-friendly</span></label>
+        <label class="jobs-toggle"><input type="checkbox"><span>Near public transit</span></label>
+      </div>
+    </aside>
+
+    <section class="jobs-results">
+      {% if jobs %}
+        {% for job in jobs %}
+        <article class="card rr-job-card">
+          <div class="rr-job-top">
+            <div>
+              <h3 class="rr-job-title">{{ job.title }}</h3>
+              <p class="rr-job-meta">{{ job.employer }} · {{ job.location }}</p>
+            </div>
+            <div class="rr-job-badges">
+              <span class="rr-badge rr-badge-muted">Verified Employer</span>
+              <span class="rr-badge rr-badge-accent">Fair Chance Employer</span>
+            </div>
+          </div>
+          <div class="rr-job-tags" data-job-tags data-tags="{{ job.tags|default:'' }}"></div>
+          <p class="rr-job-description">{{ job.description|truncatechars:150 }}</p>
+          <div class="rr-match" data-job-score data-job-id="{{ job.id }}" data-tags="{{ job.tags|default:'' }}">
+            <div class="rr-match-head"><span>Match Score: <strong data-job-score-label>72%</strong></span></div>
+            <div class="rr-match-track"><span class="rr-match-fill" data-job-score-fill style="width:72%"></span></div>
+          </div>
+          <div class="rr-job-actions">
+            <button type="button" class="btn-primary">Quick Apply</button>
+            <button type="button" class="btn-outline">Save</button>
+          </div>
+          <div class="rr-accordion">
+            <button type="button" class="text-link rr-accordion-toggle" aria-expanded="false">Why You Match</button>
+            <div class="rr-accordion-panel" hidden>
+              <ul>
+                <li>Matches your listed skills</li>
+                <li>Near your ZIP</li>
+                <li>No degree required</li>
+                <li>Fair chance friendly</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+        {% endfor %}
+      {% else %}
+      <section class="card rr-empty-state">
+        <h3>No jobs posted yet.</h3>
+        <p>We’re onboarding employers now.</p>
+        <button type="button" class="btn-primary">Get Notified</button>
+      </section>
+      {% endif %}
+    </section>
+  </div>
+</div>
+
+<script src="{% static 'user/js/job_list.js' %}"></script>
 {% endblock %}

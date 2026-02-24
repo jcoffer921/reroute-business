@@ -40,7 +40,12 @@
             {% endif %}
           </div>
           <div class="org-info">
-            <h3 class="org-name">{{ org.name }}</h3>
+            <h3 class="org-name">
+              {{ org.name }}
+              {% if org.is_verified %}
+              <span class="verified-pill">Verified</span>
+              {% endif %}
+            </h3>
             <span class="org-category">{% for key,label in categories %}{% if org.category == key %}{{ label }}{% endif %}{% endfor %}</span>
             {% if org.distance %}
               <p class="org-distance">{{ org.distance.mi|floatformat:1 }} mi away</p>

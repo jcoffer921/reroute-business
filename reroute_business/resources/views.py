@@ -157,6 +157,8 @@ def _resource_to_payload(resource: ResourceOrganization) -> dict:
         except Exception:
             distance_miles = None
 
+    is_verified_partner = bool(getattr(resource, "is_verified", False))
+
     return {
         "slug": resource.slug,
         "name": resource.name,
@@ -183,6 +185,7 @@ def _resource_to_payload(resource: ResourceOrganization) -> dict:
         "card_tags": visible_tags,
         "hidden_tag_count": hidden_tag_count,
         "distance_miles": distance_miles,
+        "is_verified_partner": is_verified_partner,
     }
 
 
@@ -273,11 +276,12 @@ def resources_directory(request):
     user_point = zip_to_point(zip_code) if (settings.USE_GIS and zip_code) else None
     if settings.USE_GIS and user_point:
         queryset = queryset.annotate(distance=Distance("geo_point", user_point)).order_by(
+            F("is_verified").desc(),
             F("distance").asc(nulls_last=True),
             "name",
         )
     else:
-        queryset = queryset.order_by("name")
+        queryset = queryset.order_by("-is_verified", "name")
 
     prepared_resources = [_resource_to_payload(resource) for resource in queryset]
 

@@ -344,6 +344,20 @@
   transition: color 0.2s ease;
 }
 
+.directory-verified-pill {
+  display: inline-flex;
+  margin-left: 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #e7f9ee;
+  border: 1px solid #9ee0b4;
+  color: #0f7a33;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  vertical-align: middle;
+}
+
 .directory-card-title-row {
   display: flex;
   align-items: center;

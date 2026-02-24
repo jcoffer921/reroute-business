@@ -89,6 +89,20 @@
 .org-name { margin: 0 0 6px; font-weight: 600; }
 .org-category { display: inline-block; font-size: 12px; color: #3d4a5c; background: #eef3ff; padding: 4px 8px; border-radius: 999px; }
 
+.verified-pill {
+  display: inline-flex;
+  margin-left: 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #e7f9ee;
+  border: 1px solid #9ee0b4;
+  color: #0f7a33;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.1;
+  vertical-align: middle;
+}
+
 .overlay {
   position: absolute;
   inset: 0;

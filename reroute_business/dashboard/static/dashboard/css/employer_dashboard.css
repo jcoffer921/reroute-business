@@ -403,6 +403,11 @@ body.employer-dashboard {
   gap: 20px;
 }
 
+.employer-launch-grid .btn-outline[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .applicant-list {
   display: grid;
   gap: 16px;

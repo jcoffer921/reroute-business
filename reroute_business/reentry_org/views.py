@@ -21,7 +21,7 @@ def organization_catalog(request):
     if not zip_code.isdigit() or len(zip_code) != 5:
         zip_code = ''
 
-    queryset = ReentryOrganization.objects.filter(is_verified=True)
+    queryset = ReentryOrganization.objects.all()
     if q:
         queryset = queryset.filter(Q(name__icontains=q) | Q(description__icontains=q))
     if category:
@@ -29,11 +29,12 @@ def organization_catalog(request):
     user_point = zip_to_point(zip_code) if (settings.USE_GIS and zip_code) else None
     if settings.USE_GIS and user_point:
         queryset = queryset.annotate(distance=Distance("geo_point", user_point)).order_by(
+            F("is_verified").desc(),
             F("distance").asc(nulls_last=True),
             "name",
         )
     else:
-        queryset = queryset.order_by("name")
+        queryset = queryset.order_by("-is_verified", "name")
 
     page = request.GET.get('page', 1)
     try:

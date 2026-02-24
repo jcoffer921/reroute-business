@@ -35,10 +35,10 @@ class FeatureAdmin(admin.ModelAdmin):
 
 @admin.register(ResourceOrganization)
 class ResourceOrganizationAdmin(admin.ModelAdmin):
-    list_display = ("name", "slug", "zip_code", "phone", "is_active", "updated_at")
-    list_filter = ("is_active", "category")
+    list_display = ("name", "slug", "zip_code", "phone", "is_verified", "is_active", "updated_at")
+    list_filter = ("is_verified", "is_active", "category")
     search_fields = ("name", "slug", "neighborhood", "zip_code", "category", "features__label", "features__slug")
-    ordering = ("name",)
+    ordering = ("-is_verified", "name")
     filter_horizontal = ("features",)
 
 

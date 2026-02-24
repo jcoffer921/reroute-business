@@ -16,7 +16,12 @@
     </a>
 
     <header class="detail-header">
-      <h1>{{ resource.name }}</h1>
+      <h1>
+        {{ resource.name }}
+        {% if resource.is_verified_partner %}
+        <span class="directory-verified-pill">Verified</span>
+        {% endif %}
+      </h1>
       <div class="directory-tag-row">
         {% for category in resource.categories %}
         <span class="directory-tag directory-tag--category">{{ category }}</span>

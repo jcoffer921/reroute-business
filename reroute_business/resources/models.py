@@ -357,8 +357,6 @@ class ResourceOrganization(models.Model):
     neighborhood = models.CharField(max_length=255, blank=True)
     transit_line = models.CharField(max_length=255, blank=True)
     zip_code = models.CharField(max_length=5, blank=True)
-    if settings.USE_GIS:
-        geo_point = gis_models.PointField(geography=True, srid=4326, null=True, blank=True)
     hours = models.TextField(blank=True)
     phone = models.CharField(max_length=50, blank=True)
     phone_href = models.CharField(max_length=50, blank=True)
@@ -372,6 +370,7 @@ class ResourceOrganization(models.Model):
     languages_supported = models.JSONField(blank=True, default=list)
     cultural_competency = models.JSONField(blank=True, default=list)
     childcare_support = models.TextField(blank=True)
+    is_verified = models.BooleanField(default=False, db_index=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -385,5 +384,5 @@ class ResourceOrganization(models.Model):
         return self.name
     
     class Meta:
-        ordering = ("name",)
+        ordering = ("-is_verified", "name")
         indexes = [GistIndex(fields=["geo_point"])] if settings.USE_GIS else []

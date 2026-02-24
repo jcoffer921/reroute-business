@@ -38,7 +38,7 @@ class ReentryOrganization(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["name"]
+        ordering = ["-is_verified", "name"]
         indexes = [
             # Short index name to satisfy backends with 30-char identifier limits (e.g., Oracle)
             models.Index(fields=["is_verified", "category"], name="reorg_vrf_cat_idx"),

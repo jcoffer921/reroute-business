@@ -1,82 +1,62 @@
-{% load profile_extras %}
 {% if jobs %}
   {% for job in jobs %}
-    <div class="job-card">
-      <div class="job-header">
-        {% with emp=job.employer %}
-        {% with logo=emp|employer_logo_url %}
-          <a href="{{ emp|employer_public_url }}">
-            {% if logo %}
-              <img src="{{ logo }}" alt="{{ emp|employer_company }} logo" class="job-logo">
-            {% else %}
-              <svg class="job-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#e5e7eb">
-                <rect x="3" y="8" width="18" height="11" rx="2" fill="#f9fafb" stroke="#e5e7eb"/>
-                <path d="M9 8V7a3 3 0 0 1 6 0v1" stroke="#cbd5e1" fill="none"/>
-                <path d="M7 12h10" stroke="#cbd5e1"/>
-              </svg>
-            {% endif %}
-          </a>
-        {% endwith %}
-        {% endwith %}
-        <div class="job-info">
-          <h2 class="job-title">
-            <a href="{% url 'job_detail' job.id %}" class="job-title-link">{{ job.title }}</a>
-          </h2>
-          <p class="job-posted">Posted {{ job.created_at|date:"M d, Y" }} · {{ job.created_at|timesince }} ago</p>
-          <p class="job-company">
-            <a href="{{ job.employer|employer_public_url }}">{{ job.employer.username }}</a>
-            · {{ job.location }}
-          </p>
+    <article class="card rr-job-card">
+      <div class="rr-job-top">
+        <div>
+          <h3 class="rr-job-title"><a href="{% url 'job_detail' job.id %}">{{ job.title }}</a></h3>
+          <p class="rr-job-meta">{{ job.employer.username }} · {{ job.location|default:"Location flexible" }}</p>
+        </div>
+        <div class="rr-job-badges">
+          <span class="rr-badge rr-badge-muted">Verified Employer</span>
+          <span class="rr-badge rr-badge-accent">Fair Chance Employer</span>
         </div>
       </div>
 
-      <div class="job-meta">
-        <div class="tags-row">
-          {% if job.experience_level %}
-            <span class="tag">{{ job.get_experience_level_display }}</span>
-          {% endif %}
-          <span class="tag">{{ job.get_job_type_display }}</span>
-          {% if job.location %}
-            <span class="tag">{{ job.location }}</span>
-          {% endif %}
+      <div class="rr-job-tags" data-job-tags data-tags="{{ job.tags|default:'' }}"></div>
+
+      <p class="rr-job-description">{{ job.description|truncatechars:150 }}</p>
+
+      <div class="rr-match" data-job-score data-job-id="{{ job.id }}" data-tags="{{ job.tags|default:'' }}">
+        <div class="rr-match-head">
+          <span>Match Score: <strong data-job-score-label>72%</strong></span>
         </div>
-        <div class="pay-row">
-          <span class="pay-label">Pay</span>
-          <span class="pay-value">
-            {% if job.salary_type == 'hour' %}
-              ${{ job.hourly_min }} - ${{ job.hourly_max }} / hr
-            {% else %}
-              ${{ job.salary_min }}k - ${{ job.salary_max }}k / yr
-            {% endif %}
+        <div class="rr-match-track" role="presentation">
+          <span class="rr-match-fill" data-job-score-fill style="width:72%"></span>
+        </div>
+      </div>
+
+      <div class="rr-job-actions">
+        <form method="post" action="{% url 'apply_to_job' job.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn-primary">Quick Apply</button>
+        </form>
+        <button type="button" class="btn-outline save-job-btn {% if job.id in saved_job_ids %}saved{% endif %}" data-job-id="{{ job.id }}">
+          <span class="save-job-icon-wrapper">
+            <svg class="bookmark-icon {% if job.id in saved_job_ids %}filled{% endif %}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-4-7 4V5z" />
+            </svg>
           </span>
-        </div>
+          <span class="save-label">{% if job.id in saved_job_ids %}Saved{% else %}Save{% endif %}</span>
+        </button>
       </div>
 
-      <div class="job-footer">
-        <div class="actions-row">
-          <form method="post" action="{% url 'apply_to_job' job.id %}">
-            {% csrf_token %}
-            <button type="submit" class="btn-apply">Apply Now</button>
-          </form>
-          <button type="button"
-                  class="btn-save save-job-btn {% if job.id in saved_job_ids %}saved{% endif %}"
-                  data-job-id="{{ job.id }}">
-            <span class="save-job">
-              <span class="save-job-icon-wrapper">
-                <svg class="bookmark-icon {% if job.id in saved_job_ids %}filled{% endif %}" xmlns="http://www.w3.org/2000/svg"
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-4-7 4V5z" />
-                </svg>
-              </span>
-              <span class="save-label">{% if job.id in saved_job_ids %}Saved{% else %}Save Job{% endif %}</span>
-            </span>
-          </button>
+      <div class="rr-accordion">
+        <button type="button" class="text-link rr-accordion-toggle" aria-expanded="false">Why You Match</button>
+        <div class="rr-accordion-panel" hidden>
+          <ul>
+            <li>Matches your listed skills</li>
+            <li>Near your ZIP</li>
+            <li>No degree required</li>
+            <li>Fair chance friendly</li>
+          </ul>
         </div>
       </div>
-    </div>
+    </article>
   {% endfor %}
 {% else %}
-  <p class="no-jobs">No job postings available at this time.</p>
+  <section class="card rr-empty-state">
+    <h3>No jobs posted yet.</h3>
+    <p>We’re onboarding employers now.</p>
+    <button type="button" class="btn-primary">Get Notified</button>
+  </section>
 {% endif %}
-

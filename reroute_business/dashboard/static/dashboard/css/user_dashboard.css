@@ -591,6 +591,43 @@
   color: #d79b3f;
 }
 
+.jobs-tracker-grid {
+  margin-top: -2px;
+}
+
+.jobs-placeholder--left {
+  text-align: left;
+  justify-items: start;
+}
+
+.applied-job-list {
+  display: grid;
+  gap: 12px;
+}
+
+.applied-job-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eaf0f6;
+}
+
+.applied-job-item:last-child {
+  border-bottom: none;
+}
+
+.applied-job-item h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--rr-ink);
+}
+
+.applied-job-item p {
+  margin: 4px 0 0;
+}
+
 @media (max-width: 1024px) {
   .section-grid { grid-template-columns: 1fr; }
   .progress-body { grid-template-columns: 1fr; }

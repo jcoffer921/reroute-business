@@ -1,6 +1,19 @@
 # Generated manually for PostGIS user profile support.
-from django.contrib.gis.db.models import fields
 from django.db import migrations, models
+
+try:
+    from django.contrib.gis.db.models import fields as gis_fields
+except Exception:
+    class _PointField(models.TextField):
+        def __init__(self, *args, **kwargs):
+            kwargs.pop('geography', None)
+            kwargs.pop('srid', None)
+            super().__init__(*args, **kwargs)
+
+    class _GISFields:
+        PointField = _PointField
+
+    gis_fields = _GISFields()
 
 
 class Migration(migrations.Migration):
@@ -18,6 +31,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="userprofile",
             name="geo_point",
-            field=fields.PointField(blank=True, geography=True, null=True, srid=4326),
+            field=gis_fields.PointField(blank=True, geography=True, null=True, srid=4326),
         ),
     ]

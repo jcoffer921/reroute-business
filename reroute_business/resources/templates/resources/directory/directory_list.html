@@ -122,7 +122,12 @@
 
         <div class="directory-card-content">
           <div class="directory-card-title-row">
-            <h2 class="directory-card-title">{{ resource.name }}</h2>
+            <h2 class="directory-card-title">
+              {{ resource.name }}
+              {% if resource.is_verified_partner %}
+              <span class="directory-verified-pill">Verified</span>
+              {% endif %}
+            </h2>
             {% if resource.distance_miles is not None %}
             <span class="directory-distance-pill">
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">

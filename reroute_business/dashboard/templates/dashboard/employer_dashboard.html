@@ -68,6 +68,59 @@
   </article>
 </section>
 
+<section class="dashboard-grid employer-launch-grid">
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <h2>Your Listings</h2>
+        <p class="muted">A quick launch-prep view for posting workflows.</p>
+      </div>
+      <button type="button" class="btn-outline" disabled aria-disabled="true">Post a Job</button>
+    </div>
+    {% if jobs %}
+      <div class="applicant-list">
+        {% for job in jobs|slice:":3" %}
+        <div class="applicant-row">
+          <div class="avatar-circle">J</div>
+          <div class="applicant-info">
+            <p class="applicant-name">{{ job.title }}</p>
+            <p class="muted">{{ job.location|default:"Location flexible" }}</p>
+          </div>
+          <span class="stage-pill">{% if job.is_active %}Live{% else %}Paused{% endif %}</span>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <p>Your Listings is empty. Add your first role when onboarding opens.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <aside class="side-panel">
+    <div class="panel">
+      <h3>Verification Status</h3>
+      {% if employer_verified %}
+      <p class="muted">Verified and ready for full posting access.</p>
+      <span class="stage-pill">Verified</span>
+      {% else %}
+      <p class="muted">Pending verification. Complete company details to unlock posting.</p>
+      <span class="stage-pill">Pending</span>
+      {% endif %}
+    </div>
+    <div class="panel">
+      <h3>Applicants</h3>
+      {% if recent_applications %}
+        <p class="muted">{{ recent_applications|length }} recent applicant{{ recent_applications|length|pluralize }}.</p>
+      {% else %}
+        <div class="empty-state">
+          <p>No applicants yet.</p>
+        </div>
+      {% endif %}
+    </div>
+  </aside>
+</section>
+
 <section class="panel">
   <div class="panel-header">
     <div>

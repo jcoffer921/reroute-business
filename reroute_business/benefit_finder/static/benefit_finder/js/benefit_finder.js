@@ -6,13 +6,19 @@
       id: 'age_range',
       prompt: 'What is your age range?',
       type: 'single',
-      options: ['18–24', '25–34', '35–44', '45–54', '55–64', '65+']
+      options: ['18-24', '25-34', '35-44', '45-54', '55-64', '65+']
     },
     {
       id: 'zip_code',
       prompt: 'What is your Philadelphia zip code?',
       type: 'zip',
       helper: 'Use this to filter reentry organizations by distance and highlight "Near you" resources later.'
+    },
+    {
+      id: 'justice_impacted',
+      prompt: 'Have you been directly impacted by the criminal justice system?',
+      type: 'single',
+      options: ['Yes', 'No']
     },
     {
       id: 'recently_released',
@@ -34,7 +40,7 @@
     },
     {
       id: 'housing_status',
-      prompt: 'What is your current housing situation?',
+      prompt: 'What is your current housing status?',
       type: 'single',
       options: [
         'Stable housing',
@@ -58,10 +64,16 @@
       options: ['Yes, I need childcare', 'Yes, but no childcare needed', 'No']
     },
     {
-      id: 'transportation',
-      prompt: 'How do you get around?',
+      id: 'car_access',
+      prompt: 'Do you own or have access to a car?',
       type: 'single',
-      options: ['I have a car', 'Public transit (SEPTA)', 'Walk/bike', 'No reliable transportation']
+      options: ['Yes', 'No']
+    },
+    {
+      id: 'transportation',
+      prompt: 'How do you get around? (Select all that apply)',
+      type: 'multi',
+      options: ['A car', 'Public transit (SEPTA)', 'Walk/bike', 'No reliable transportation']
     },
     {
       id: 'language_preference',
@@ -743,7 +755,8 @@
       tags.add('family_support');
     }
 
-    if (answers.transportation === 'No reliable transportation') {
+    var transportationAnswers = Array.isArray(answers.transportation) ? answers.transportation : [];
+    if (answers.car_access === 'No' || transportationAnswers.indexOf('No reliable transportation') > -1) {
       tags.add('transit_assistance');
       tags.add('septa_support');
       tags.add('walkable_orgs');

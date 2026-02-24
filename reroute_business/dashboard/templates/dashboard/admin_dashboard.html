@@ -39,6 +39,34 @@
 
 <section class="admin-section">
   <div class="admin-section-header">
+    <div class="admin-section-title">Platform Insights (Coming Soon)</div>
+  </div>
+  <div class="admin-cards">
+    <article class="admin-card">
+      <h3>Jobs posted</h3>
+      <div class="stat">{{ jobs_pending_review|default:0 }}</div>
+      <div class="sub">Placeholder aggregate count</div>
+    </article>
+    <article class="admin-card">
+      <h3>Applications submitted</h3>
+      <div class="stat">{{ open_flags|default:0 }}</div>
+      <div class="sub">Placeholder aggregate count</div>
+    </article>
+    <article class="admin-card">
+      <h3>Top ZIPs</h3>
+      <div class="stat">19104</div>
+      <div class="sub">Placeholder geography ranking</div>
+    </article>
+    <article class="admin-card">
+      <h3>Coverage gaps</h3>
+      <div class="stat">North Philly</div>
+      <div class="sub">Placeholder underserved area</div>
+    </article>
+  </div>
+</section>
+
+<section class="admin-section">
+  <div class="admin-section-header">
     <div class="admin-section-title">Urgent Review Queue</div>
   </div>
   {% if review_queue %}

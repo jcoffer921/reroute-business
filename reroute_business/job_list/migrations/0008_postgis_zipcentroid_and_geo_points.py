@@ -1,6 +1,19 @@
 # Generated manually for PostGIS + geo matching support.
-from django.contrib.gis.db.models import fields
 from django.db import migrations, models
+
+try:
+    from django.contrib.gis.db.models import fields as gis_fields
+except Exception:
+    class _PointField(models.TextField):
+        def __init__(self, *args, **kwargs):
+            kwargs.pop('geography', None)
+            kwargs.pop('srid', None)
+            super().__init__(*args, **kwargs)
+
+    class _GISFields:
+        PointField = _PointField
+
+    gis_fields = _GISFields()
 
 
 class Migration(migrations.Migration):
@@ -17,14 +30,14 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="job",
             name="geo_point",
-            field=fields.PointField(blank=True, geography=True, null=True, srid=4326),
+            field=gis_fields.PointField(blank=True, geography=True, null=True, srid=4326),
         ),
         migrations.CreateModel(
             name="ZipCentroid",
             fields=[
                 ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("zip_code", models.CharField(max_length=10, unique=True)),
-                ("geo_point", fields.PointField(geography=True, srid=4326)),
+                ("geo_point", gis_fields.PointField(geography=True, srid=4326)),
             ],
         ),
         migrations.AddIndex(
