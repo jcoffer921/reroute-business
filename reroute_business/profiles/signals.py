@@ -4,6 +4,7 @@
 from django.db.models.signals import post_save
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from reroute_business.profiles.models import UserProfile, Subscription
@@ -38,6 +39,9 @@ def track_userprofile_change(sender, instance: UserProfile, created: bool, **kwa
 
 @receiver(pre_save, sender=UserProfile)
 def assign_user_geo(sender, instance: UserProfile, **kwargs):
+    if not settings.USE_GIS:
+        return
+
     zip_code = (instance.zip_code or "").strip()
     if not zip_code:
         return
@@ -55,6 +59,9 @@ def assign_user_geo(sender, instance: UserProfile, **kwargs):
 
 @receiver(pre_save, sender=Job)
 def assign_job_geo(sender, instance: Job, **kwargs):
+    if not settings.USE_GIS:
+        return
+
     zip_code = (instance.zip_code or "").strip()
     if not zip_code:
         return

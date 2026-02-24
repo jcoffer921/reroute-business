@@ -1,5 +1,6 @@
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.conf import settings
 
 from reroute_business.job_list.utils.location import zip_to_point
 from reroute_business.resources.models import ResourceOrganization
@@ -7,6 +8,9 @@ from reroute_business.resources.models import ResourceOrganization
 
 @receiver(pre_save, sender=ResourceOrganization)
 def assign_resource_geo_point(sender, instance: ResourceOrganization, **kwargs):
+    if not settings.USE_GIS:
+        return
+
     zip_code = (instance.zip_code or "").strip()
     if not zip_code:
         return
