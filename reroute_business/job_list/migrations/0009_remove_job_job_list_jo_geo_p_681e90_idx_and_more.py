@@ -4,6 +4,12 @@ import django.contrib.postgres.indexes
 from django.conf import settings
 from django.db import migrations, models
 
+GEO_INDEX = (
+    django.contrib.postgres.indexes.GistIndex
+    if bool(getattr(settings, "USE_GIS", False))
+    else models.Index
+)
+
 
 class Migration(migrations.Migration):
 
@@ -29,10 +35,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name='job',
-            index=django.contrib.postgres.indexes.GistIndex(fields=['geo_point'], name='job_list_jo_geo_poi_58626e_gist'),
+            index=GEO_INDEX(fields=['geo_point'], name='job_list_jo_geo_poi_58626e_gist'),
         ),
         migrations.AddIndex(
             model_name='zipcentroid',
-            index=django.contrib.postgres.indexes.GistIndex(fields=['geo_point'], name='job_list_zi_geo_poi_cd9010_gist'),
+            index=GEO_INDEX(fields=['geo_point'], name='job_list_zi_geo_poi_cd9010_gist'),
         ),
     ]

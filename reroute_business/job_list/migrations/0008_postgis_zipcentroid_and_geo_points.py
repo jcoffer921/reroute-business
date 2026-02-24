@@ -1,9 +1,16 @@
 # Generated manually for PostGIS + geo matching support.
+from django.conf import settings
 from django.db import migrations, models
 
-try:
-    from django.contrib.gis.db.models import fields as gis_fields
-except Exception:
+USE_GIS = bool(getattr(settings, "USE_GIS", False))
+
+if USE_GIS:
+    try:
+        from django.contrib.gis.db.models import fields as gis_fields
+    except Exception:
+        USE_GIS = False
+
+if not USE_GIS:
     class _PointField(models.TextField):
         def __init__(self, *args, **kwargs):
             kwargs.pop('geography', None)
@@ -15,6 +22,10 @@ except Exception:
 
     gis_fields = _GISFields()
 
+def _maybe_enable_postgis(apps, schema_editor):
+    if USE_GIS:
+        schema_editor.execute("CREATE EXTENSION IF NOT EXISTS postgis;")
+
 
 class Migration(migrations.Migration):
 
@@ -23,10 +34,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(
-            sql="CREATE EXTENSION IF NOT EXISTS postgis;",
-            reverse_sql=migrations.RunSQL.noop,
-        ),
+        migrations.RunPython(_maybe_enable_postgis, migrations.RunPython.noop),
         migrations.AddField(
             model_name="job",
             name="geo_point",

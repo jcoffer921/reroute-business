@@ -18,8 +18,18 @@ class Migration(migrations.Migration):
             model_name='reentryorganization',
             name='reentry_org_geo_poi_bdb4dd_gist',
         ),
-        migrations.RemoveField(
-            model_name='reentryorganization',
-            name='geo_point',
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunSQL(
+                    sql='ALTER TABLE "reentry_org_reentryorganization" DROP COLUMN IF EXISTS "geo_point";',
+                    reverse_sql=migrations.RunSQL.noop,
+                ),
+            ],
+            state_operations=[
+                migrations.RemoveField(
+                    model_name='reentryorganization',
+                    name='geo_point',
+                ),
+            ],
         ),
     ]

@@ -18,8 +18,18 @@ class Migration(migrations.Migration):
             model_name='resourceorganization',
             name='resources_r_geo_poi_60d854_gist',
         ),
-        migrations.RemoveField(
-            model_name='resourceorganization',
-            name='geo_point',
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunSQL(
+                    sql='ALTER TABLE "resources_resourceorganization" DROP COLUMN IF EXISTS "geo_point";',
+                    reverse_sql=migrations.RunSQL.noop,
+                ),
+            ],
+            state_operations=[
+                migrations.RemoveField(
+                    model_name='resourceorganization',
+                    name='geo_point',
+                ),
+            ],
         ),
     ]

@@ -1,9 +1,16 @@
 # Generated manually for PostGIS user profile support.
+from django.conf import settings
 from django.db import migrations, models
 
-try:
-    from django.contrib.gis.db.models import fields as gis_fields
-except Exception:
+USE_GIS = bool(getattr(settings, "USE_GIS", False))
+
+if USE_GIS:
+    try:
+        from django.contrib.gis.db.models import fields as gis_fields
+    except Exception:
+        USE_GIS = False
+
+if not USE_GIS:
     class _PointField(models.TextField):
         def __init__(self, *args, **kwargs):
             kwargs.pop('geography', None)
