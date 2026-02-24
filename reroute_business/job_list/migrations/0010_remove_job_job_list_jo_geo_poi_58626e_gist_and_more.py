@@ -18,12 +18,26 @@ class Migration(migrations.Migration):
             model_name='zipcentroid',
             name='job_list_zi_geo_poi_cd9010_gist',
         ),
-        migrations.RemoveField(
-            model_name='job',
-            name='geo_point',
-        ),
-        migrations.RemoveField(
-            model_name='zipcentroid',
-            name='geo_point',
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunSQL(
+                    sql='ALTER TABLE "job_list_job" DROP COLUMN IF EXISTS "geo_point";',
+                    reverse_sql=migrations.RunSQL.noop,
+                ),
+                migrations.RunSQL(
+                    sql='ALTER TABLE "job_list_zipcentroid" DROP COLUMN IF EXISTS "geo_point";',
+                    reverse_sql=migrations.RunSQL.noop,
+                ),
+            ],
+            state_operations=[
+                migrations.RemoveField(
+                    model_name='job',
+                    name='geo_point',
+                ),
+                migrations.RemoveField(
+                    model_name='zipcentroid',
+                    name='geo_point',
+                ),
+            ],
         ),
     ]
