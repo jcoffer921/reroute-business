@@ -89,8 +89,14 @@
       </div>
 
       <aside class="resource-directory-preview-wrap">
-        <article class="resource-directory-preview-card" aria-label="{% trans 'Directory preview card' %}">
-          <p class="resource-directory-preview-badge">{% trans "Listed Resource" %}</p>
+        <article class="resource-directory-preview-card{% if featured_resource and featured_resource.is_verified_partner %} resource-directory-preview-card--verified{% endif %}" aria-label="{% trans 'Directory preview card' %}">
+          <p class="resource-directory-preview-badge">
+            {% if featured_resource and featured_resource.is_verified_partner %}
+              {% trans "Verified Partner" %}
+            {% else %}
+              {% trans "Listed Resource" %}
+            {% endif %}
+          </p>
           <h3 class="resource-directory-preview-title">
             {% if featured_resource %}
               {{ featured_resource.name }}

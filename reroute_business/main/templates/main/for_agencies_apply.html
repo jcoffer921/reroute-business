@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "ReRoute | Agency Partnership Application" %}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/for_agencies.css' %}">
+
+<section class="agency-form-shell">
+  <div class="agency-container agency-container--narrow">
+    <div class="agency-stepper" role="status" aria-live="polite">
+      <ol class="agency-stepper-list" id="agencyStepperList">
+        <li class="agency-stepper-item is-active" data-step-index="1">
+          <span class="agency-stepper-circle">
+            <span class="agency-stepper-number">1</span>
+            <span class="agency-stepper-check" aria-hidden="true">&#10003;</span>
+          </span>
+          <span class="agency-stepper-label">{% trans "Organization" %}</span>
+        </li>
+        <li class="agency-stepper-item" data-step-index="2">
+          <span class="agency-stepper-circle">
+            <span class="agency-stepper-number">2</span>
+            <span class="agency-stepper-check" aria-hidden="true">&#10003;</span>
+          </span>
+          <span class="agency-stepper-label">{% trans "Services" %}</span>
+        </li>
+        <li class="agency-stepper-item" data-step-index="3">
+          <span class="agency-stepper-circle">
+            <span class="agency-stepper-number">3</span>
+            <span class="agency-stepper-check" aria-hidden="true">&#10003;</span>
+          </span>
+          <span class="agency-stepper-label">{% trans "Population" %}</span>
+        </li>
+        <li class="agency-stepper-item" data-step-index="4">
+          <span class="agency-stepper-circle">
+            <span class="agency-stepper-number">4</span>
+            <span class="agency-stepper-check" aria-hidden="true">&#10003;</span>
+          </span>
+          <span class="agency-stepper-label">{% trans "Operations" %}</span>
+        </li>
+        <li class="agency-stepper-item" data-step-index="5">
+          <span class="agency-stepper-circle">
+            <span class="agency-stepper-number">5</span>
+            <span class="agency-stepper-check" aria-hidden="true">&#10003;</span>
+          </span>
+          <span class="agency-stepper-label">{% trans "Alignment" %}</span>
+        </li>
+        <li class="agency-stepper-item" data-step-index="6">
+          <span class="agency-stepper-circle">
+            <span class="agency-stepper-number">6</span>
+            <span class="agency-stepper-check" aria-hidden="true">&#10003;</span>
+          </span>
+          <span class="agency-stepper-label">{% trans "Consent" %}</span>
+        </li>
+      </ol>
+    </div>
+
+    {% if form.non_field_errors %}
+    <div class="agency-form-errors" role="alert">
+      {{ form.non_field_errors }}
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="agencyApplicationForm" novalidate data-initial-step="{{ initial_step|default:1 }}">
+      {% csrf_token %}
+
+      <section class="agency-form-step" data-step="1">
+        <h2>{% trans "Organization Information" %}</h2>
+        <p class="agency-step-sub">{% trans "Tell us about your organization." %}</p>
+
+        <div class="agency-field agency-field--full">
+          <label for="{{ form.organization_name.id_for_label }}">{% trans "Organization Name" %} <span class="agency-required">*</span></label>
+          {{ form.organization_name }}{{ form.organization_name.errors }}
+        </div>
+
+        <div class="agency-field-grid agency-field-grid--two">
+          <div class="agency-field">
+            <label for="{{ form.primary_contact_name.id_for_label }}">{% trans "Primary Contact Name" %} <span class="agency-required">*</span></label>
+            {{ form.primary_contact_name }}{{ form.primary_contact_name.errors }}
+          </div>
+          <div class="agency-field">
+            <label for="{{ form.contact_email.id_for_label }}">{% trans "Contact Email" %} <span class="agency-required">*</span></label>
+            {{ form.contact_email }}{{ form.contact_email.errors }}
+          </div>
+          <div class="agency-field">
+            <label for="{{ form.contact_phone.id_for_label }}">{% trans "Contact Phone" %} <span class="agency-required">*</span></label>
+            {{ form.contact_phone }}{{ form.contact_phone.errors }}
+          </div>
+          <div class="agency-field">
+            <label for="{{ form.website.id_for_label }}">{% trans "Website" %}</label>
+            {{ form.website }}{{ form.website.errors }}
+          </div>
+          <div class="agency-field">
+            <label for="{{ form.service_area.id_for_label }}">{% trans "Service Area (City / ZIP coverage)" %} <span class="agency-required">*</span></label>
+            {{ form.service_area }}{{ form.service_area.errors }}
+          </div>
+          <div class="agency-field">
+            <label for="{{ form.year_founded.id_for_label }}">{% trans "Year Founded" %} <span class="agency-required">*</span></label>
+            {{ form.year_founded }}{{ form.year_founded.errors }}
+          </div>
+        </div>
+
+        <div class="agency-field agency-field--full">
+          <label for="{{ form.physical_address.id_for_label }}">{% trans "Physical Address" %} <span class="agency-required">*</span></label>
+          {{ form.physical_address }}{{ form.physical_address.errors }}
+        </div>
+
+        <div class="agency-field agency-field--full">
+          <label for="{{ form.organization_type.id_for_label }}">{% trans "Organization Type" %} <span class="agency-required">*</span></label>
+          {{ form.organization_type }}{{ form.organization_type.errors }}
+        </div>
+      </section>
+
+      <section class="agency-form-step" data-step="2" hidden>
+        <h2>{% trans "Services Offered" %}</h2>
+        <p class="agency-step-sub">{% trans "Select all services your organization provides." %}</p>
+
+        <div class="agency-service-grid">
+          {% for checkbox in form.services_offered %}
+          <label class="agency-service-option">
+            {{ checkbox.tag }}
+            <span class="agency-service-option-box" aria-hidden="true"></span>
+            <span class="agency-service-option-text">{{ checkbox.choice_label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        {{ form.services_offered.errors }}
+
+        <div class="agency-field agency-field--full agency-services-other">
+          <label for="{{ form.services_other.id_for_label }}">{% trans "Other Services" %}</label>
+          {{ form.services_other }}{{ form.services_other.errors }}
+        </div>
+      </section>
+
+      <section class="agency-form-step" data-step="3" hidden>
+        <h2>{% trans "Target Population" %}</h2>
+        <p class="agency-step-sub">{% trans "Who does your organization primarily serve?" %}</p>
+
+        <div class="agency-population-priority">
+          <label class="agency-toggle-row">
+            <span class="agency-toggle-copy">
+              <span class="agency-toggle-title">{% trans "Serve justice-impacted individuals?" %}</span>
+              <span class="agency-toggle-desc">{% trans "Individuals with prior criminal justice involvement" %}</span>
+            </span>
+            {{ form.supports_justice_impacted }}
+            <span class="agency-toggle-control" aria-hidden="true"></span>
+          </label>
+          {{ form.supports_justice_impacted.errors }}
+
+          <label class="agency-toggle-row">
+            <span class="agency-toggle-copy">
+              <span class="agency-toggle-title">{% trans "Serve recently released individuals?" %}</span>
+              <span class="agency-toggle-desc">{% trans "Within 6 months of release from incarceration" %}</span>
+            </span>
+            {{ form.supports_recently_released }}
+            <span class="agency-toggle-control" aria-hidden="true"></span>
+          </label>
+          {{ form.supports_recently_released.errors }}
+        </div>
+
+        <p class="agency-label agency-population-label">{% trans "Additional Populations Served" %}</p>
+        <div class="agency-population-grid">
+          {% for checkbox in form.target_population %}
+          <label class="agency-population-option">
+            {{ checkbox.tag }}
+            <span class="agency-population-option-box" aria-hidden="true"></span>
+            <span class="agency-population-option-text">{{ checkbox.choice_label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        {{ form.target_population.errors }}
+
+        <div class="agency-field agency-field--full agency-services-other">
+          <label for="{{ form.target_population_other.id_for_label }}">{% trans "Other Populations" %}</label>
+          {{ form.target_population_other }}{{ form.target_population_other.errors }}
+        </div>
+
+        <div class="agency-program-criteria">
+          <h3>{% trans "Program Criteria" %}</h3>
+          <p class="agency-program-criteria-sub">{% trans "Describe what individuals must meet before participating in your program." %}</p>
+
+          <div class="agency-program-criteria-flags">
+            <p class="agency-program-criteria-flags-title">{% trans "Common Eligibility Requirements (Optional)" %}</p>
+
+            <label class="agency-toggle-row">
+              <span class="agency-toggle-copy"><span class="agency-toggle-title">{% trans "Requires government-issued ID" %}</span></span>
+              {{ form.requires_government_id }}
+              <span class="agency-toggle-control" aria-hidden="true"></span>
+            </label>
+
+            <label class="agency-toggle-row">
+              <span class="agency-toggle-copy"><span class="agency-toggle-title">{% trans "Must be within X months of release" %}</span></span>
+              {{ form.requires_release_window }}
+              <span class="agency-toggle-control" aria-hidden="true"></span>
+            </label>
+
+            <label class="agency-toggle-row">
+              <span class="agency-toggle-copy"><span class="agency-toggle-title">{% trans "Requires orientation attendance" %}</span></span>
+              {{ form.requires_orientation_attendance }}
+              <span class="agency-toggle-control" aria-hidden="true"></span>
+            </label>
+
+            <label class="agency-toggle-row">
+              <span class="agency-toggle-copy"><span class="agency-toggle-title">{% trans "Requires intake assessment" %}</span></span>
+              {{ form.requires_intake_assessment }}
+              <span class="agency-toggle-control" aria-hidden="true"></span>
+            </label>
+
+            <label class="agency-toggle-row">
+              <span class="agency-toggle-copy"><span class="agency-toggle-title">{% trans "Must reside within service area" %}</span></span>
+              {{ form.requires_service_area_residency }}
+              <span class="agency-toggle-control" aria-hidden="true"></span>
+            </label>
+          </div>
+
+          <div class="agency-field agency-field--full agency-program-criteria-details">
+            <label for="{{ form.additional_eligibility_details.id_for_label }}">{% trans "Additional Eligibility Details" %}</label>
+            {{ form.additional_eligibility_details }}
+            {{ form.additional_eligibility_details.errors }}
+          </div>
+        </div>
+      </section>
+
+      <section class="agency-form-step" data-step="4" hidden>
+        <h2>{% trans "Capacity & Operations" %}</h2>
+        <p class="agency-step-sub">{% trans "Help us understand your operational capacity." %}</p>
+
+        <div class="agency-field agency-field--full">
+          <label for="{{ form.average_served_per_month.id_for_label }}">{% trans "Average Individuals Served Per Month" %} <span class="agency-required">*</span></label>
+          {{ form.average_served_per_month }}
+          {{ form.average_served_per_month.errors }}
+        </div>
+
+        <div class="agency-field agency-field--full">
+          <label for="{{ form.intake_process_description.id_for_label }}">{% trans "Intake Process Description" %} <span class="agency-required">*</span></label>
+          {{ form.intake_process_description }}
+          {{ form.intake_process_description.errors }}
+        </div>
+
+        <p class="agency-label agency-ops-section-label">{% trans "Preferred Referral Method" %} <span class="agency-required">*</span></p>
+        <div class="agency-referral-list">
+          {% for radio in form.referral_method_preference %}
+          <label class="agency-referral-card">
+            {{ radio.tag }}
+            <span class="agency-referral-radio" aria-hidden="true"></span>
+            <span class="agency-referral-copy">
+              <span class="agency-referral-title">{{ radio.choice_label }}</span>
+              <span class="agency-referral-desc">
+                {% if radio.data.value == "website_link" %}{% trans "We'll link directly to your intake page" %}
+                {% elif radio.data.value == "email_referral" %}{% trans "Receive referral details via email" %}
+                {% elif radio.data.value == "phone_referral" %}{% trans "Receive referral calls to a dedicated line" %}
+                {% else %}{% trans "Direct system-to-system referral pipeline" %}
+                {% endif %}
+              </span>
+            </span>
+          </label>
+          {% endfor %}
+        </div>
+        {{ form.referral_method_preference.errors }}
+
+        <div class="agency-operations-toggle-group">
+          <label class="agency-toggle-row">
+            <span class="agency-toggle-copy">
+              <span class="agency-toggle-title">{% trans "Do you track employment outcomes?" %}</span>
+            </span>
+            {{ form.tracks_employment_outcomes }}
+            <span class="agency-toggle-control" aria-hidden="true"></span>
+          </label>
+
+          <label class="agency-toggle-row">
+            <span class="agency-toggle-copy">
+              <span class="agency-toggle-title">{% trans "Open to referral tracking through ReRoute?" %}</span>
+            </span>
+            {{ form.open_to_referral_tracking }}
+            <span class="agency-toggle-control" aria-hidden="true"></span>
+          </label>
+        </div>
+        {{ form.tracks_employment_outcomes.errors }}
+        {{ form.open_to_referral_tracking.errors }}
+      </section>
+
+      <section class="agency-form-step" data-step="5" hidden>
+        <h2>{% trans "Partnership Alignment" %}</h2>
+        <p class="agency-step-sub">{% trans "Help us understand how we can work together." %}</p>
+
+        <div class="agency-field agency-field--full">
+          <label for="{{ form.partnership_reason.id_for_label }}">{% trans "Why do you want to partner with ReRoute?" %} <span class="agency-required">*</span></label>
+          {{ form.partnership_reason }}
+          {{ form.partnership_reason.errors }}
+        </div>
+
+        <div class="agency-field agency-field--full">
+          <label for="{{ form.reroute_support_needs.id_for_label }}">{% trans "How can ReRoute support your mission?" %} <span class="agency-required">*</span></label>
+          {{ form.reroute_support_needs }}
+          {{ form.reroute_support_needs.errors }}
+        </div>
+
+        <div class="agency-alignment-toggle-card">
+          <label class="agency-toggle-row">
+            <span class="agency-toggle-copy">
+              <span class="agency-toggle-title">{% trans "Interested in being a Featured Verified Organization?" %}</span>
+              <span class="agency-toggle-desc">{% trans "Featured organizations receive priority placement and enhanced visibility on the platform." %}</span>
+            </span>
+            {{ form.interested_in_featured_verified }}
+            <span class="agency-toggle-control" aria-hidden="true"></span>
+          </label>
+        </div>
+        {{ form.interested_in_featured_verified.errors }}
+      </section>
+
+      <section class="agency-form-step" data-step="6" hidden>
+        <h2>{% trans "Compliance & Consent" %}</h2>
+        <p class="agency-step-sub">{% trans "Review and confirm before submitting your application." %}</p>
+
+        <label class="agency-consent-card">
+          {{ form.accuracy_confirmation }}
+          <span class="agency-consent-check" aria-hidden="true"></span>
+          <span class="agency-consent-copy">
+            <span class="agency-consent-title">{% trans "Accuracy Confirmation" %} <span class="agency-required">*</span></span>
+            <span class="agency-consent-desc">{% trans "I confirm that all information provided in this application is accurate and complete to the best of my knowledge." %}</span>
+          </span>
+        </label>
+        {{ form.accuracy_confirmation.errors }}
+
+        <label class="agency-consent-card">
+          {{ form.terms_privacy_agreement }}
+          <span class="agency-consent-check" aria-hidden="true"></span>
+          <span class="agency-consent-copy">
+            <span class="agency-consent-title">{% trans "Terms & Privacy" %} <span class="agency-required">*</span></span>
+            <span class="agency-consent-desc">
+              {% blocktrans %}I agree to the <a href="{{ terms_url }}">Terms of Service</a> and <a href="{{ privacy_url }}">Privacy Policy</a>. I understand that this application will be reviewed and that inclusion on the platform is subject to approval.{% endblocktrans %}
+            </span>
+          </span>
+        </label>
+        {{ form.terms_privacy_agreement.errors }}
+
+        <div class="agency-field agency-field--full agency-logo-upload-wrap">
+          <label for="{{ form.logo.id_for_label }}">{% trans "Organization Logo (Optional)" %}</label>
+          {{ form.logo }}
+          <label class="agency-logo-dropzone" for="{{ form.logo.id_for_label }}">
+            <span class="agency-logo-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M8 15l3-3 2 2 3-4 2 3"></path></svg>
+            </span>
+            <span class="agency-logo-dropzone-title">{% trans "Click to upload logo" %}</span>
+            <span class="agency-logo-dropzone-sub">{% trans "PNG, JPG up to 5MB" %}</span>
+            <span class="agency-logo-file-name" id="agencyLogoFileName"></span>
+          </label>
+          {{ form.logo.errors }}
+        </div>
+      </section>
+
+      <div class="agency-form-actions">
+        <button type="button" id="agencyPrevStep" class="agency-btn agency-btn--secondary" disabled>{% trans "Previous" %}</button>
+        <div class="agency-form-actions-right">
+          <button type="button" id="agencyNextStep" class="agency-btn agency-btn--primary">{% trans "Continue" %} <span aria-hidden="true">&rarr;</span></button>
+          <button type="submit" name="submit_action" value="submit" id="agencySubmitBtn" class="agency-btn agency-btn--primary" hidden disabled><span aria-hidden="true">&#9993;</span> {% trans "Submit Application" %}</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/agency_application.js' %}" defer></script>
+{% endblock %}

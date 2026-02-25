@@ -41,15 +41,19 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.contrib.auth.password_validation import validate_password
 from django.core.cache import cache
+from django.core.mail import send_mail
 from django.core.paginator import Paginator
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from reroute_business.job_list.models import Application
 from reroute_business.main.forms import UserSignupForm
+from reroute_business.main.forms import AgencyPartnershipApplicationForm
+from reroute_business.reentry_org.models import ReentryOrgApplication
 from reroute_business.resumes.models import Resume
 from reroute_business.profiles.views import is_employer
 from reroute_business.core.utils.onboarding import log_onboarding_event
@@ -153,6 +157,223 @@ def home(request):
         'FEATURED_LIMIT': FEATURED_LIMIT,
         'RECENT_LIMIT': RECENT_LIMIT,
     })
+
+
+@require_GET
+def for_agencies(request):
+    """Landing page for workforce/reentry organizations interested in partnering."""
+    return render(request, "main/for_agencies.html")
+
+
+@require_http_methods(["GET", "POST"])
+def for_agencies_apply(request):
+    """
+    Workforce/reentry organization partnership application.
+    Supports draft saves and full submission.
+    """
+    submit_action = "submit"
+    initial_step = 1
+    if request.method == "POST":
+        submit_action = request.POST.get("submit_action", "submit")
+        is_draft = submit_action == "draft"
+        form = AgencyPartnershipApplicationForm(
+            request.POST,
+            request.FILES,
+            require_strict=not is_draft,
+        )
+        if form.is_valid():
+            cleaned = form.cleaned_data
+            if not _validate_minimum_reentry_requirements(form, cleaned):
+                initial_step = _agency_application_first_error_step(form)
+                return render(
+                    request,
+                    "main/for_agencies_apply.html",
+                    {
+                        "form": form,
+                        "submit_action": submit_action,
+                        "initial_step": initial_step,
+                        "terms_url": reverse("terms"),
+                        "privacy_url": reverse("privacy"),
+                    },
+                )
+
+            if is_draft:
+                messages.success(request, "Draft saved. You can return to finish later.")
+                return redirect("for_agencies_apply")
+
+            referral_map = {
+                "website_link": ReentryOrgApplication.REFERRAL_METHOD_WEBSITE,
+                "email_referral": ReentryOrgApplication.REFERRAL_METHOD_EMAIL,
+                "phone_referral": ReentryOrgApplication.REFERRAL_METHOD_PHONE,
+                "api_future": ReentryOrgApplication.REFERRAL_METHOD_API_FUTURE,
+            }
+
+            application = ReentryOrgApplication.objects.create(
+                org_name=cleaned.get("organization_name", ""),
+                primary_contact_name=cleaned.get("primary_contact_name", ""),
+                contact_email=cleaned.get("contact_email", ""),
+                contact_phone=cleaned.get("contact_phone", ""),
+                website=cleaned.get("website", ""),
+                physical_address=cleaned.get("physical_address", ""),
+                service_area=cleaned.get("service_area", ""),
+                year_founded=cleaned.get("year_founded"),
+                organization_type=cleaned.get("organization_type", ""),
+                services=cleaned.get("services_offered", []),
+                other_services=cleaned.get("services_other", ""),
+                serve_justice_impacted=bool(cleaned.get("supports_justice_impacted")),
+                serve_recently_released=bool(cleaned.get("supports_recently_released")),
+                additional_populations=cleaned.get("target_population", []),
+                other_populations=cleaned.get("target_population_other", ""),
+                program_criteria=cleaned.get("additional_eligibility_details", ""),
+                requires_id=bool(cleaned.get("requires_government_id")),
+                requires_orientation=bool(cleaned.get("requires_orientation_attendance")),
+                requires_intake_assessment=bool(cleaned.get("requires_intake_assessment")),
+                requires_residency_in_service_area=bool(cleaned.get("requires_service_area_residency")),
+                avg_served_per_month=cleaned.get("average_served_per_month"),
+                intake_process_description=cleaned.get("intake_process_description", ""),
+                preferred_referral_method=referral_map.get(
+                    cleaned.get("referral_method_preference", ""),
+                    ReentryOrgApplication.REFERRAL_METHOD_API_FUTURE,
+                ),
+                tracks_employment_outcomes=cleaned.get("tracks_employment_outcomes"),
+                open_to_referral_tracking=cleaned.get("open_to_referral_tracking"),
+                why_partner=cleaned.get("partnership_reason", ""),
+                how_reroute_can_support=cleaned.get("reroute_support_needs", ""),
+                interested_featured_verified=cleaned.get("interested_in_featured_verified"),
+                accuracy_confirmation=bool(cleaned.get("accuracy_confirmation")),
+                terms_privacy_agreement=bool(cleaned.get("terms_privacy_agreement")),
+                logo=cleaned.get("logo"),
+                status=ReentryOrgApplication.STATUS_PENDING,
+            )
+            _notify_agency_application_submitted(application)
+            return redirect("for_agencies_thank_you")
+        initial_step = _agency_application_first_error_step(form)
+    else:
+        form = AgencyPartnershipApplicationForm()
+
+    return render(
+        request,
+        "main/for_agencies_apply.html",
+        {
+            "form": form,
+            "submit_action": submit_action,
+            "initial_step": initial_step,
+            "terms_url": reverse("terms"),
+            "privacy_url": reverse("privacy"),
+        },
+    )
+
+
+@require_GET
+def for_agencies_thank_you(request):
+    return render(request, "main/for_agencies_thank_you.html")
+
+
+def _notify_agency_application_submitted(application):
+    """
+    Send internal + applicant confirmation emails for submitted applications.
+    Non-blocking: failures are logged and do not interrupt submission.
+    """
+    recipient = getattr(settings, "CONTACT_RECEIVER_EMAIL", "") or getattr(settings, "DEFAULT_FROM_EMAIL", "")
+    org_name = getattr(application, "organization_name", None) or getattr(application, "org_name", "")
+    primary_contact_name = getattr(application, "primary_contact_name", "")
+    contact_email = getattr(application, "contact_email", "")
+    contact_phone = getattr(application, "contact_phone", "")
+    status = getattr(application, "status", "")
+
+    if recipient:
+        try:
+            send_mail(
+                subject=f"New ReRoute Agency Partnership Application: {org_name}",
+                message=(
+                    "A new organization partnership application was submitted.\n\n"
+                    f"Organization: {org_name}\n"
+                    f"Primary contact: {primary_contact_name}\n"
+                    f"Email: {contact_email}\n"
+                    f"Phone: {contact_phone}\n"
+                    f"Status: {status}\n"
+                ),
+                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
+                recipient_list=[recipient],
+                fail_silently=True,
+            )
+        except Exception:
+            logger.exception("Failed to send internal agency application email.")
+
+    if contact_email:
+        try:
+            send_mail(
+                subject="ReRoute Partnership Application Received",
+                message=(
+                    "Thank you for applying to become a Verified ReRoute Partner.\n\n"
+                    "Our team will review your application and reach out within 3–5 business days."
+                ),
+                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
+                recipient_list=[contact_email],
+                fail_silently=True,
+            )
+        except Exception:
+            logger.exception("Failed to send applicant confirmation email.")
+
+
+def _validate_minimum_reentry_requirements(form, cleaned):
+    """
+    Final submit minimum constraints:
+    - org_name / primary_contact_name / contact_email
+    - at least one service
+    - required consent confirmations
+    """
+    valid = True
+    if not cleaned.get("organization_name"):
+        form.add_error("organization_name", "Organization name is required.")
+        valid = False
+    if not cleaned.get("primary_contact_name"):
+        form.add_error("primary_contact_name", "Primary contact name is required.")
+        valid = False
+    if not cleaned.get("contact_email"):
+        form.add_error("contact_email", "Contact email is required.")
+        valid = False
+    if not cleaned.get("services_offered"):
+        form.add_error("services_offered", "Select at least one service.")
+        valid = False
+    if not cleaned.get("accuracy_confirmation"):
+        form.add_error("accuracy_confirmation", "You must confirm application accuracy.")
+        valid = False
+    if not cleaned.get("terms_privacy_agreement"):
+        form.add_error("terms_privacy_agreement", "You must agree to terms and privacy.")
+        valid = False
+    return valid
+
+
+def _agency_application_first_error_step(form):
+    """
+    Return the first step index (1-6) containing a field error so
+    invalid submits return users to the right section.
+    """
+    step_fields = {
+        1: {
+            "organization_name", "primary_contact_name", "contact_email", "contact_phone",
+            "website", "physical_address", "service_area", "year_founded", "organization_type",
+        },
+        2: {"services_offered", "services_other"},
+        3: {
+            "target_population", "target_population_other", "supports_justice_impacted",
+            "supports_recently_released", "requires_government_id", "requires_release_window",
+            "requires_orientation_attendance", "requires_intake_assessment",
+            "requires_service_area_residency", "additional_eligibility_details",
+        },
+        4: {
+            "average_served_per_month", "intake_process_description",
+            "referral_method_preference", "tracks_employment_outcomes", "open_to_referral_tracking",
+        },
+        5: {"partnership_reason", "reroute_support_needs", "interested_in_featured_verified"},
+        6: {"accuracy_confirmation", "terms_privacy_agreement", "logo"},
+    }
+    error_fields = set(form.errors.keys())
+    for step in range(1, 7):
+        if step_fields[step].intersection(error_fields):
+            return step
+    return 1
 
 
 @require_GET

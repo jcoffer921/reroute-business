@@ -100,3 +100,113 @@ class YouTubeVideo(models.Model):
         return val
 
 
+class AgencyPartnershipApplication(models.Model):
+    ORGANIZATION_TYPE_NONPROFIT = "nonprofit"
+    ORGANIZATION_TYPE_FOR_PROFIT = "for_profit"
+    ORGANIZATION_TYPE_GOVERNMENT = "government"
+    ORGANIZATION_TYPE_CHOICES = [
+        (ORGANIZATION_TYPE_NONPROFIT, "Nonprofit"),
+        (ORGANIZATION_TYPE_FOR_PROFIT, "For-Profit"),
+        (ORGANIZATION_TYPE_GOVERNMENT, "Government"),
+    ]
+
+    REFERRAL_METHOD_WEBSITE = "website_link"
+    REFERRAL_METHOD_EMAIL = "email_referral"
+    REFERRAL_METHOD_PHONE = "phone_referral"
+    REFERRAL_METHOD_API = "api_future"
+    REFERRAL_METHOD_CHOICES = [
+        (REFERRAL_METHOD_WEBSITE, "Direct website link"),
+        (REFERRAL_METHOD_EMAIL, "Email referral"),
+        (REFERRAL_METHOD_PHONE, "Phone referral"),
+        (REFERRAL_METHOD_API, "API integration (future)"),
+    ]
+
+    STATUS_DRAFT = "draft"
+    STATUS_SUBMITTED = "submitted"
+    STATUS_IN_REVIEW = "in_review"
+    STATUS_APPROVED = "approved"
+    STATUS_REJECTED = "rejected"
+    STATUS_CHOICES = [
+        (STATUS_DRAFT, "Draft"),
+        (STATUS_SUBMITTED, "Submitted"),
+        (STATUS_IN_REVIEW, "In Review"),
+        (STATUS_APPROVED, "Approved"),
+        (STATUS_REJECTED, "Rejected"),
+    ]
+
+    organization_name = models.CharField(max_length=255, blank=True)
+    primary_contact_name = models.CharField(max_length=255, blank=True)
+    contact_email = models.EmailField(blank=True)
+    contact_phone = models.CharField(max_length=50, blank=True)
+    website = models.URLField(blank=True)
+    physical_address = models.CharField(max_length=255, blank=True)
+    service_area = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="City / ZIP coverage",
+    )
+    year_founded = models.PositiveIntegerField(null=True, blank=True)
+    organization_type = models.CharField(
+        max_length=32,
+        choices=ORGANIZATION_TYPE_CHOICES,
+        blank=True,
+    )
+
+    services_offered = models.JSONField(default=list, blank=True)
+    services_other = models.CharField(max_length=255, blank=True)
+
+    target_population = models.JSONField(default=list, blank=True)
+    target_population_other = models.CharField(max_length=255, blank=True)
+    supports_justice_impacted = models.BooleanField(default=False)
+    supports_recently_released = models.BooleanField(default=False)
+    requires_government_id = models.BooleanField(default=False)
+    requires_release_window = models.BooleanField(default=False)
+    requires_orientation_attendance = models.BooleanField(default=False)
+    requires_intake_assessment = models.BooleanField(default=False)
+    requires_service_area_residency = models.BooleanField(default=False)
+    additional_eligibility_details = models.TextField(blank=True)
+
+    average_served_per_month = models.PositiveIntegerField(null=True, blank=True)
+    intake_process_description = models.TextField(blank=True)
+    referral_method_preference = models.CharField(
+        max_length=32,
+        choices=REFERRAL_METHOD_CHOICES,
+        blank=True,
+    )
+    tracks_employment_outcomes = models.BooleanField(null=True, blank=True)
+    open_to_referral_tracking = models.BooleanField(null=True, blank=True)
+
+    partnership_reason = models.TextField(blank=True)
+    reroute_support_needs = models.TextField(blank=True)
+    interested_in_featured_verified = models.BooleanField(null=True, blank=True)
+
+    accuracy_confirmation = models.BooleanField(default=False)
+    terms_privacy_agreement = models.BooleanField(default=False)
+    logo = models.ImageField(upload_to="partner_logos/", null=True, blank=True)
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_DRAFT,
+        db_index=True,
+    )
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    reviewed_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="reviewed_agency_applications",
+    )
+    internal_notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return self.organization_name or f"Agency Application #{self.pk}"
+
+

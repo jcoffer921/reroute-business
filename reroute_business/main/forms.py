@@ -14,6 +14,7 @@ from django.core.exceptions import ValidationError
 from reroute_business.profiles.models import UserProfile
 from django.contrib.auth.forms import PasswordChangeForm
 from reroute_business.profiles.constants import USER_STATUS_CHOICES
+from reroute_business.main.models import AgencyPartnershipApplication
 
 
 class UserSignupForm(forms.ModelForm):
@@ -295,3 +296,189 @@ class Step4Form(forms.Form):
         ],
         widget=forms.Select(attrs={"class": "input"})
     )
+
+
+class AgencyPartnershipApplicationForm(forms.ModelForm):
+    SERVICE_CHOICES = [
+        ("workforce_development", "Workforce Development"),
+        ("job_placement", "Job Placement"),
+        ("resume_assistance", "Resume Assistance"),
+        ("ged_education", "GED / Education"),
+        ("mental_health_support", "Mental Health Support"),
+        ("housing_assistance", "Housing Assistance"),
+        ("legal_services", "Legal Services"),
+        ("id_assistance", "ID Assistance"),
+        ("benefits_navigation", "Benefits Navigation"),
+        ("mentorship", "Mentorship"),
+        ("other", "Other"),
+    ]
+
+    TARGET_POPULATION_CHOICES = [
+        ("youth", "Youth"),
+        ("veterans", "Veterans"),
+        ("returning_citizens", "Returning citizens"),
+        ("general_workforce", "General workforce"),
+    ]
+
+    BOOLEAN_CHOICES = [
+        (True, "Yes"),
+        (False, "No"),
+    ]
+
+    services_offered = forms.MultipleChoiceField(
+        choices=SERVICE_CHOICES,
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
+    target_population = forms.MultipleChoiceField(
+        choices=TARGET_POPULATION_CHOICES,
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
+    supports_justice_impacted = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput,
+    )
+    supports_recently_released = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput,
+    )
+    requires_government_id = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput,
+    )
+    requires_release_window = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput,
+    )
+    requires_orientation_attendance = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput,
+    )
+    requires_intake_assessment = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput,
+    )
+    requires_service_area_residency = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput,
+    )
+    referral_method_preference = forms.ChoiceField(
+        choices=AgencyPartnershipApplication.REFERRAL_METHOD_CHOICES,
+        required=False,
+        widget=forms.RadioSelect,
+    )
+    tracks_employment_outcomes = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput,
+    )
+    open_to_referral_tracking = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput,
+    )
+    interested_in_featured_verified = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput,
+    )
+
+    class Meta:
+        model = AgencyPartnershipApplication
+        fields = [
+            "organization_name",
+            "primary_contact_name",
+            "contact_email",
+            "contact_phone",
+            "website",
+            "physical_address",
+            "service_area",
+            "year_founded",
+            "organization_type",
+            "services_offered",
+            "services_other",
+            "target_population",
+            "target_population_other",
+            "supports_justice_impacted",
+            "supports_recently_released",
+            "requires_government_id",
+            "requires_release_window",
+            "requires_orientation_attendance",
+            "requires_intake_assessment",
+            "requires_service_area_residency",
+            "additional_eligibility_details",
+            "average_served_per_month",
+            "intake_process_description",
+            "referral_method_preference",
+            "tracks_employment_outcomes",
+            "open_to_referral_tracking",
+            "partnership_reason",
+            "reroute_support_needs",
+            "interested_in_featured_verified",
+            "accuracy_confirmation",
+            "terms_privacy_agreement",
+            "logo",
+        ]
+        widgets = {
+            "organization_name": forms.TextInput(attrs={"class": "input", "placeholder": "Organization name"}),
+            "primary_contact_name": forms.TextInput(attrs={"class": "input", "placeholder": "Primary contact name"}),
+            "contact_email": forms.EmailInput(attrs={"class": "input", "placeholder": "name@organization.org"}),
+            "contact_phone": forms.TextInput(attrs={"class": "input", "placeholder": "(555) 555-5555"}),
+            "website": forms.URLInput(attrs={"class": "input", "placeholder": "https://"}),
+            "physical_address": forms.TextInput(attrs={"class": "input", "placeholder": "Street, City, State"}),
+            "service_area": forms.TextInput(attrs={"class": "input", "placeholder": "City / ZIP coverage"}),
+            "year_founded": forms.NumberInput(attrs={"class": "input", "placeholder": "YYYY", "min": "1800", "max": "2100"}),
+            "organization_type": forms.Select(attrs={"class": "input"}),
+            "services_other": forms.TextInput(attrs={"class": "input", "placeholder": "Other service (if applicable)"}),
+            "target_population_other": forms.TextInput(attrs={"class": "input", "placeholder": "Other population (if applicable)"}),
+            "additional_eligibility_details": forms.Textarea(attrs={
+                "class": "textarea",
+                "rows": 5,
+                "placeholder": "Describe any additional requirements such as documentation, age restrictions, parole status, employment readiness level, or other prerequisites.",
+            }),
+            "average_served_per_month": forms.NumberInput(attrs={"class": "input", "placeholder": "e.g., 120", "min": "0"}),
+            "intake_process_description": forms.Textarea(attrs={"class": "textarea", "rows": 4, "placeholder": "Describe your intake process"}),
+            "partnership_reason": forms.Textarea(attrs={"class": "textarea", "rows": 4, "placeholder": "Why do you want to partner with ReRoute?"}),
+            "reroute_support_needs": forms.Textarea(attrs={"class": "textarea", "rows": 4, "placeholder": "How can ReRoute support your mission?"}),
+            "logo": forms.ClearableFileInput(attrs={"class": "input"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.require_strict = kwargs.pop("require_strict", True)
+        super().__init__(*args, **kwargs)
+        if not self.require_strict:
+            for field in self.fields.values():
+                field.required = False
+            self.fields["accuracy_confirmation"].required = False
+            self.fields["terms_privacy_agreement"].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not self.require_strict:
+            return cleaned_data
+
+        required_fields = [
+            "organization_name",
+            "primary_contact_name",
+            "contact_email",
+            "contact_phone",
+            "physical_address",
+            "service_area",
+            "year_founded",
+            "organization_type",
+            "average_served_per_month",
+            "intake_process_description",
+            "referral_method_preference",
+            "partnership_reason",
+            "reroute_support_needs",
+        ]
+        for field_name in required_fields:
+            value = cleaned_data.get(field_name)
+            if value in (None, "", []):
+                self.add_error(field_name, "This field is required.")
+
+        if not cleaned_data.get("services_offered"):
+            self.add_error("services_offered", "Select at least one service.")
+        if not cleaned_data.get("accuracy_confirmation"):
+            self.add_error("accuracy_confirmation", "You must confirm application accuracy.")
+        if not cleaned_data.get("terms_privacy_agreement"):
+            self.add_error("terms_privacy_agreement", "You must agree to terms and privacy.")
+        return cleaned_data
