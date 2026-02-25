@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.postgres.indexes import GistIndex
 from django.conf import settings
 from django.contrib.auth import get_user_model
+import uuid
 
 if settings.USE_GIS:
     from django.contrib.gis.db import models as gis_models
@@ -96,6 +97,8 @@ class ReentryOrgApplication(models.Model):
         (STATUS_REJECTED, "Rejected"),
     ]
 
+    application_id = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
+
     # Step 1: Organization Information
     org_name = models.CharField(max_length=255, db_index=True)
     primary_contact_name = models.CharField(max_length=255)
@@ -158,3 +161,7 @@ class ReentryOrgApplication(models.Model):
 
     def __str__(self):
         return self.org_name
+
+    @property
+    def public_application_id(self):
+        return f"RR-ORG-{str(self.application_id).split('-')[0].upper()}"

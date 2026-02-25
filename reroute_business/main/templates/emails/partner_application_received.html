@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+  <body style="margin:0;padding:0;background:#f3f6fb;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f3f6fb;">
+      <tr>
+        <td align="center" style="padding:28px 12px;">
+          <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:600px;max-width:600px;background:#ffffff;border-radius:12px;box-shadow:0 2px 12px rgba(15,23,42,0.08);overflow:hidden;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
+            <tr>
+              <td style="padding:18px 24px;background:#0b4a9f;color:#ffffff;font-size:18px;font-weight:700;letter-spacing:0.2px;">
+                ReRoute
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:24px;">
+                <h1 style="margin:0 0 12px 0;font-size:28px;line-height:1.2;color:#0f172a;">Partnership Application Received</h1>
+                <p style="margin:0 0 12px 0;font-size:15px;line-height:1.6;color:#334155;">
+                  Thank you for applying to become a Verified ReRoute Partner.
+                </p>
+                <p style="margin:0 0 18px 0;font-size:15px;line-height:1.6;color:#334155;">
+                  ReRoute reviews each application for mission alignment, trust, and safety before approval.
+                </p>
+
+                <div style="border:1px solid #dbe4f0;border-radius:10px;background:#f8fbff;padding:14px 16px;margin:0 0 18px 0;">
+                  <p style="margin:0 0 8px 0;font-size:13px;line-height:1.4;color:#0b4a9f;font-weight:700;">Application Summary</p>
+                  <p style="margin:0 0 6px 0;font-size:14px;line-height:1.5;color:#1f2937;"><strong>Organization Name:</strong> {{ organization_name|default:"-" }}</p>
+                  <p style="margin:0 0 6px 0;font-size:14px;line-height:1.5;color:#1f2937;"><strong>Primary Contact Name:</strong> {{ primary_contact_name|default:"-" }}</p>
+                  <p style="margin:0 0 6px 0;font-size:14px;line-height:1.5;color:#1f2937;"><strong>Email:</strong> {{ contact_email }}</p>
+                  <p style="margin:0 0 6px 0;font-size:14px;line-height:1.5;color:#1f2937;"><strong>Submitted On:</strong> {{ submitted_on|date:"M d, Y \a\t g:i A T" }}</p>
+                  <p style="margin:0;font-size:14px;line-height:1.5;color:#1f2937;"><strong>Application ID:</strong> {{ application_reference }}</p>
+                </div>
+
+                <p style="margin:0 0 8px 0;font-size:16px;line-height:1.4;color:#0f172a;font-weight:700;">What happens next</p>
+                <ul style="margin:0 0 20px 20px;padding:0;color:#334155;font-size:14px;line-height:1.6;">
+                  <li>Review mission and services.</li>
+                  <li>Verify alignment and quality standards.</li>
+                  <li>Follow up if clarification is needed.</li>
+                  <li>Send a decision by email.</li>
+                  <li>Timeline: within 3–5 business days.</li>
+                </ul>
+
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 20px 0;">
+                  <tr>
+                    <td style="border-radius:8px;background:#0b4a9f;">
+                      <a href="{{ partner_overview_url }}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:12px 18px;color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;">Explore Partner Overview</a>
+                    </td>
+                  </tr>
+                </table>
+
+                <hr style="border:none;border-top:1px solid #e5eaf2;margin:0 0 14px 0;">
+                <p style="margin:0 0 6px 0;font-size:12px;line-height:1.6;color:#64748b;">
+                  ReRoute supports coordinated, trusted pathways to opportunity for justice-impacted communities.
+                </p>
+                <p style="margin:0 0 6px 0;font-size:12px;line-height:1.6;color:#64748b;">
+                  Support: <a href="mailto:{{ support_email }}" style="color:#0b4a9f;text-decoration:none;">{{ support_email }}</a>
+                </p>
+                <p style="margin:0;font-size:12px;line-height:1.6;color:#64748b;">
+                  You received this email because you submitted a partnership application at reroutejobs.com.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

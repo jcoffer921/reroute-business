@@ -42,6 +42,7 @@ from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.contrib.auth.password_validation import validate_password
 from django.core.cache import cache
 from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
 from django.core.paginator import Paginator
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
@@ -49,6 +50,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils import timezone
 from django.utils.translation import gettext as _
+from django.template.loader import render_to_string
 
 from reroute_business.job_list.models import Application
 from reroute_business.main.forms import UserSignupForm
@@ -274,46 +276,84 @@ def _notify_agency_application_submitted(application):
     Send internal + applicant confirmation emails for submitted applications.
     Non-blocking: failures are logged and do not interrupt submission.
     """
+    _send_internal_partner_application_notification(application)
+    send_partner_application_received_email(application)
+
+
+def send_partner_application_received_email(application):
+    """Send branded HTML + plain text confirmation email to applicant."""
+    contact_email = getattr(application, "contact_email", "")
+    if not contact_email:
+        return
+
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", None)
+    support_email = getattr(settings, "CONTACT_RECEIVER_EMAIL", "") or "support@reroutejobs.com"
+    submitted_on = timezone.localtime(getattr(application, "submitted_at", None) or timezone.now())
+    partner_overview_url = getattr(
+        settings,
+        "PARTNER_OVERVIEW_URL",
+        "https://reroutejobs.com/partners/overview/",
+    )
+    application_reference = getattr(application, "public_application_id", "") or str(
+        getattr(application, "application_id", "")
+    )
+    context = {
+        "organization_name": getattr(application, "org_name", ""),
+        "primary_contact_name": getattr(application, "primary_contact_name", ""),
+        "contact_email": contact_email,
+        "submitted_on": submitted_on,
+        "application_reference": application_reference,
+        "partner_overview_url": partner_overview_url,
+        "support_email": support_email,
+    }
+
+    text_body = render_to_string("emails/partner_application_received.txt", context)
+    html_body = render_to_string("emails/partner_application_received.html", context)
+
+    try:
+        message = EmailMultiAlternatives(
+            subject="ReRoute Partnership Application Received",
+            body=text_body,
+            from_email=from_email,
+            to=[contact_email],
+        )
+        message.attach_alternative(html_body, "text/html")
+        message.send(fail_silently=True)
+    except Exception:
+        logger.exception("Failed to send partner application received email.")
+
+
+def _send_internal_partner_application_notification(application):
     recipient = getattr(settings, "CONTACT_RECEIVER_EMAIL", "") or getattr(settings, "DEFAULT_FROM_EMAIL", "")
-    org_name = getattr(application, "organization_name", None) or getattr(application, "org_name", "")
+    if not recipient:
+        return
+
+    org_name = getattr(application, "org_name", "")
     primary_contact_name = getattr(application, "primary_contact_name", "")
     contact_email = getattr(application, "contact_email", "")
     contact_phone = getattr(application, "contact_phone", "")
     status = getattr(application, "status", "")
-
-    if recipient:
-        try:
-            send_mail(
-                subject=f"New ReRoute Agency Partnership Application: {org_name}",
-                message=(
-                    "A new organization partnership application was submitted.\n\n"
-                    f"Organization: {org_name}\n"
-                    f"Primary contact: {primary_contact_name}\n"
-                    f"Email: {contact_email}\n"
-                    f"Phone: {contact_phone}\n"
-                    f"Status: {status}\n"
-                ),
-                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
-                recipient_list=[recipient],
-                fail_silently=True,
-            )
-        except Exception:
-            logger.exception("Failed to send internal agency application email.")
-
-    if contact_email:
-        try:
-            send_mail(
-                subject="ReRoute Partnership Application Received",
-                message=(
-                    "Thank you for applying to become a Verified ReRoute Partner.\n\n"
-                    "Our team will review your application and reach out within 3–5 business days."
-                ),
-                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
-                recipient_list=[contact_email],
-                fail_silently=True,
-            )
-        except Exception:
-            logger.exception("Failed to send applicant confirmation email.")
+    application_reference = getattr(application, "public_application_id", "") or str(
+        getattr(application, "application_id", "")
+    )
+    try:
+        send_mail(
+            subject=f"New ReRoute Agency Partnership Application: {org_name}",
+            message=(
+                "A new organization partnership application was submitted.\n\n"
+                f"Application ID: {application_reference}\n"
+                f"Organization: {org_name}\n"
+                f"Primary contact: {primary_contact_name}\n"
+                f"Email: {contact_email}\n"
+                f"Phone: {contact_phone}\n"
+                f"Status: {status}\n"
+            ),
+            from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
+            recipient_list=[recipient],
+            fail_silently=True,
+        )
+    except Exception:
+        logger.exception("Failed to send internal agency application email.")
 
 
 def _validate_minimum_reentry_requirements(form, cleaned):

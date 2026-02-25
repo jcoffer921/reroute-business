@@ -25,6 +25,7 @@ class SavedOrganizationAdmin(admin.ModelAdmin):
 @admin.register(ReentryOrgApplication)
 class ReentryOrgApplicationAdmin(admin.ModelAdmin):
     list_display = (
+        "public_application_id",
         "org_name",
         "contact_email",
         "status",
@@ -33,11 +34,11 @@ class ReentryOrgApplicationAdmin(admin.ModelAdmin):
     )
     list_filter = ("status", "organization_type", "submitted_at")
     search_fields = ("org_name", "contact_email", "service_area", "primary_contact_name")
-    readonly_fields = ("submitted_at", "reviewed_at", "download_pdf_detail_link")
+    readonly_fields = ("application_id", "submitted_at", "reviewed_at", "download_pdf_detail_link")
     actions = ("mark_approved", "mark_rejected")
 
     fieldsets = (
-        ("Admin", {"fields": ("status", "reviewed_by", "reviewed_at", "submitted_at", "download_pdf_detail_link")}),
+        ("Admin", {"fields": ("application_id", "status", "reviewed_by", "reviewed_at", "submitted_at", "download_pdf_detail_link")}),
         ("Step 1 — Organization Information", {"fields": (
             "org_name", "primary_contact_name", "contact_email", "contact_phone",
             "website", "physical_address", "service_area", "year_founded", "organization_type",
@@ -64,6 +65,10 @@ class ReentryOrgApplicationAdmin(admin.ModelAdmin):
     def download_pdf_link(self, obj):
         url = reverse("reentry_org:application_pdf", args=[obj.pk])
         return format_html('<a class="button" href="{}">Download PDF</a>', url)
+
+    @admin.display(description="Application ID")
+    def public_application_id(self, obj):
+        return obj.public_application_id
 
     @admin.display(description="Download PDF")
     def download_pdf_detail_link(self, obj):

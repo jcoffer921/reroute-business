@@ -1,0 +1,26 @@
+ReRoute Partnership Application Received
+
+Thank you for applying to become a Verified ReRoute Partner.
+ReRoute reviews each application for mission alignment, trust, and safety before approval.
+
+Application Summary
+- Organization Name: {{ organization_name|default:"-" }}
+- Primary Contact Name: {{ primary_contact_name|default:"-" }}
+- Email: {{ contact_email }}
+- Submitted On: {{ submitted_on|date:"M d, Y \a\t g:i A T" }}
+- Application ID: {{ application_reference }}
+
+What happens next
+- Review mission and services.
+- Verify alignment and quality standards.
+- Follow up if clarification is needed.
+- Send a decision by email.
+- Timeline: within 3-5 business days.
+
+Explore Partner Overview:
+{{ partner_overview_url }}
+
+ReRoute supports coordinated, trusted pathways to opportunity for justice-impacted communities.
+Support: {{ support_email }}
+
+You received this email because you submitted a partnership application at reroutejobs.com.
