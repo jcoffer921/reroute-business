@@ -249,7 +249,12 @@ def resource_list(request):
     """
     modules = Module.objects.all().order_by('-created_at')
     lessons = Lesson.objects.filter(is_active=True).order_by('-created_at')
-    featured_resource_obj = ResourceOrganization.objects.filter(is_active=True).order_by("name").first()
+    featured_resource_obj = (
+        ResourceOrganization.objects
+        .filter(is_active=True, is_verified=True)
+        .order_by("name")
+        .first()
+    )
     featured_resource = _resource_to_payload(featured_resource_obj) if featured_resource_obj else None
     return render(request, 'resources/resource_list.html', {
         'modules': modules,

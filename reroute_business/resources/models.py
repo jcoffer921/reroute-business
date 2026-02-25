@@ -34,17 +34,6 @@ class Module(models.Model):
     AJAX quiz endpoints.
     """
 
-    CATEGORY_WORKFORCE = "workforce"
-    CATEGORY_DIGITAL = "digital"
-    CATEGORY_REENTRY = "reentry"
-    CATEGORY_LIFE = "life"
-
-    CATEGORY_CHOICES = [
-        (CATEGORY_WORKFORCE, "Workforce Readiness"),
-        (CATEGORY_DIGITAL, "Digital Skills"),
-        (CATEGORY_REENTRY, "Reentry Support"),
-        (CATEGORY_LIFE, "Life Skills"),
-    ]
     GALLERY_CATEGORY_IDS_DOCUMENTS = "ids_documents"
     GALLERY_CATEGORY_JOBS_INTERVIEWS = "jobs_interviews"
     GALLERY_CATEGORY_HOUSING = "housing"
@@ -62,6 +51,15 @@ class Module(models.Model):
         (GALLERY_CATEGORY_HEALTH_MENTAL_HEALTH, "Health & Mental Health"),
         (GALLERY_CATEGORY_FINANCIAL_BASICS, "Financial Basics"),
     ]
+
+    # Backward-compat aliases kept for existing tests/seed code.
+    CATEGORY_WORKFORCE = GALLERY_CATEGORY_JOBS_INTERVIEWS
+    CATEGORY_DIGITAL = GALLERY_CATEGORY_FINANCIAL_BASICS
+    CATEGORY_REENTRY = GALLERY_CATEGORY_IDS_DOCUMENTS
+    CATEGORY_LIFE = GALLERY_CATEGORY_HEALTH_MENTAL_HEALTH
+
+    # Keep category choices aligned with gallery categories.
+    CATEGORY_CHOICES = GALLERY_CATEGORY_CHOICES
 
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)

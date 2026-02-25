@@ -490,15 +490,9 @@ html { scroll-behavior: smooth; }
 }
 
 .resource-directory-preview-card--verified {
-  border-color: rgba(16, 185, 129, 0.44);
-  box-shadow: 0 16px 36px rgba(5, 150, 105, 0.2);
-  background: linear-gradient(180deg, #ffffff 0%, rgba(236, 253, 245, 0.9) 100%);
-}
-
-.resource-directory-preview-card--verified .resource-directory-preview-badge {
-  color: #065f46;
-  background: rgba(16, 185, 129, 0.16);
-  border-color: rgba(16, 185, 129, 0.42);
+  border-color: rgba(8, 168, 207, 0.32);
+  box-shadow: 0 16px 36px rgba(8, 168, 207, 0.16);
+  background: linear-gradient(180deg, #ffffff 0%, rgba(238, 248, 253, 0.92) 100%);
 }
 
 .resource-directory-feature:hover .resource-directory-icon-badge {
@@ -507,14 +501,25 @@ html { scroll-behavior: smooth; }
 
 .resource-directory-preview-badge {
   margin: 0 0 0.75rem;
-  display: inline-block;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #1e3a5f;
-  background: rgba(77, 168, 218, 0.12);
-  border: 1px solid rgba(77, 168, 218, 0.34);
-  border-radius: 999px;
-  padding: 0.2rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #08a8cf;
+  background: #eef8fd;
+  border: 1px solid #c9e8f7;
+  border-radius: 8px;
+  padding: 3px 9px;
+  line-height: 1;
+}
+
+.resource-directory-preview-badge svg {
+  width: 14px !important;
+  height: 14px !important;
+  max-width: none !important;
+  flex: 0 0 14px;
+  display: block;
 }
 
 .resource-directory-preview-title {

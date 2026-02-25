@@ -91,17 +91,17 @@
       <aside class="resource-directory-preview-wrap">
         <article class="resource-directory-preview-card{% if featured_resource and featured_resource.is_verified_partner %} resource-directory-preview-card--verified{% endif %}" aria-label="{% trans 'Directory preview card' %}">
           <p class="resource-directory-preview-badge">
-            {% if featured_resource and featured_resource.is_verified_partner %}
-              {% trans "Verified Partner" %}
-            {% else %}
-              {% trans "Listed Resource" %}
-            {% endif %}
+            <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="9" fill="currentColor"></circle>
+              <path d="M9 12.2 11 14.2 15 10.2" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <span>{% trans "Verified" %}</span>
           </p>
           <h3 class="resource-directory-preview-title">
             {% if featured_resource %}
               {{ featured_resource.name }}
             {% else %}
-              {% trans "Northwest Reentry Collective" %}
+              {% trans "No verified partners yet" %}
             {% endif %}
           </h3>
           <div class="resource-directory-preview-meta">
@@ -109,14 +109,14 @@
               {% if featured_resource.neighborhood %}
                 {{ featured_resource.neighborhood }}
               {% else %}
-                {% trans "Germantown" %}
+              {% trans "Philadelphia" %}
               {% endif %}
             </span>
             <span class="resource-directory-tag">
               {% if featured_resource.categories %}
                 {{ featured_resource.categories.0 }}
               {% else %}
-                {% trans "Workforce Development" %}
+                {% trans "Verified Partner" %}
               {% endif %}
             </span>
           </div>

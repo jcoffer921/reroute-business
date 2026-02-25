@@ -346,16 +346,27 @@
 
 .directory-verified-pill {
   display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
   margin-left: 8px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: #e7f9ee;
-  border: 1px solid #9ee0b4;
-  color: #0f7a33;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.01em;
+  padding: 3px 9px;
+  border-radius: 8px;
+  background: #eef8fd;
+  border: 1px solid #c9e8f7;
+  color: #08a8cf;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0;
   vertical-align: middle;
+  line-height: 1;
+}
+
+.directory-verified-pill svg {
+  width: 14px !important;
+  height: 14px !important;
+  max-width: none !important;
+  flex: 0 0 14px;
+  display: block;
 }
 
 .directory-card-title-row {
