@@ -77,7 +77,7 @@
     },
     {
       id: 'language_preference',
-      prompt: 'What language do you prefer for services?',
+      prompt: 'What language do you prefer for zservices?',
       type: 'single',
       options: ['English', 'Spanish', 'Other']
     },

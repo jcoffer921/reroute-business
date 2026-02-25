@@ -17,8 +17,8 @@
   --neutral-gray: #F3F4F6;
 
   /* NEW: Navbar dimensions */
-  --nav-h: 72px;     /* desktop navbar height */
-  --nav-h-sm: 60px;  /* mobile navbar height */
+  --nav-h: 112px;    /* desktop navbar height */
+  --nav-h-sm: 92px;  /* mobile navbar height */
   --mobile-safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
@@ -38,14 +38,14 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
 
 /* ========== BODY BASE STYLES ========== */
 .site-footer {
-  background: #111;
+  background: #000;
   color: #fff;
   padding: 2rem;
 }
 
 /* Constrain footer logo size across breakpoints */
-.site-footer .footer-logo-img { height: 36px; max-height: 36px; width: auto; object-fit: contain; }
-@media (min-width: 768px){ .site-footer .footer-logo-img { height: 44px; max-height: 44px; } }
+.site-footer .footer-logo-img { height: 428px; max-height: 428px; width: auto; object-fit: contain; display: block; }
+@media (min-width: 768px){ .site-footer .footer-logo-img { height: 120px; max-height: 120px; } }
 
 
 /* ========== NAVBAR ========== */
@@ -54,7 +54,7 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
   height: var(--nav-h);
   z-index: 1000;
   display: flex; align-items: center; gap: 1rem;
-  background: #111; color: #fff;
+  background: #000; color: #fff;
   padding: 0 1rem; /* tighter, consistent padding */
   border-bottom: 1px solid rgba(255,255,255,0.06);
   transition: transform 0.28s ease, box-shadow 0.22s ease;
@@ -71,7 +71,7 @@ body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; background:
 }
 
 .navbar-logo { display: flex; align-items: center; flex-shrink: 0; }
-.navbar-logo img, .brand-logo { height: 54px; max-height: 54px; width: auto; object-fit: contain; }
+.navbar-logo img, .brand-logo { height: 88px; max-height: 88px; width: auto; object-fit: contain; }
 
 .navbar-links-container {
   display: grid;
@@ -430,7 +430,7 @@ iframe { max-width: 100%; border: 0; }
 @media (max-width: 768px) {
   /* Navbar compresses on mobile */
   .navbar { height: var(--nav-h-sm); padding: 0 .75rem; }
-  .navbar-logo img { height: 48px; }
+  .navbar-logo img, .brand-logo { height: 72px; max-height: 72px; }
   .brand-wordmark { font-size: 1rem; }
 
   /* Hide desktop nav + desktop profile controls */
@@ -897,7 +897,7 @@ a:hover {
 a:focus-visible, button:focus-visible { outline: 2px solid #6495ED; outline-offset: 2px; border-radius: 4px; }
 
 /* ========== FOOTER (unchanged, made responsive-friendly) ========== */
-.site-footer { background: #1a1a1a; color: #f2f2f2; padding: 2rem 1rem; margin-top: 4rem; font-size: .9rem; }
+.site-footer { background: #000; color: #f2f2f2; padding: 2rem 1rem; margin-top: 4rem; font-size: .9rem; }
 .footer-container { display: flex; flex-wrap: wrap; justify-content: space-between; max-width: 1200px; margin: 0 auto; gap: 1rem; }
 .footer-column { flex: 1 1 250px; }
 .footer-column ul { list-style: none; }

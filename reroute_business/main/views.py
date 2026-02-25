@@ -292,7 +292,7 @@ def send_partner_application_received_email(application):
     partner_overview_url = getattr(
         settings,
         "PARTNER_OVERVIEW_URL",
-        "https://reroutejobs.com/partners/overview/",
+        "https://reroutejobs.com/for-agencies/",
     )
     application_reference = getattr(application, "public_application_id", "") or str(
         getattr(application, "application_id", "")
