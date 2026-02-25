@@ -27,7 +27,7 @@ from django.contrib import messages
 from django.contrib.auth import (
     authenticate, login, logout, views as auth_views, update_session_auth_hash
 )
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
@@ -40,7 +40,6 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.contrib.auth.password_validation import validate_password
-from django.core.cache import cache
 from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
 from django.core.paginator import Paginator
@@ -909,201 +908,274 @@ def logout_view(request):
 # ===============================
 @ensure_csrf_cookie
 def video_gallery(request):
-    allowed_cats = {'module', 'quick', 'lecture', 'webinar', 'other'}
-    req_cat = (request.GET.get('cat') or '').strip().lower()
-    if req_cat and req_cat not in allowed_cats:
-        req_cat = ''
+    q = (request.GET.get("q") or "").strip()
+    active_duration = (request.GET.get("duration") or "").strip().lower()
+    active_language = (request.GET.get("language") or "").strip()
+    active_category = (request.GET.get("category") or "all").strip().lower()
+    category_config = [
+        {"slug": "all", "title": "All Modules", "icon": "all", "pill": "All"},
+        {"slug": "ids_documents", "title": "IDs & Documents", "icon": "ids_documents"},
+        {"slug": "jobs_interviews", "title": "Jobs & Interviews", "icon": "jobs_interviews"},
+        {"slug": "housing", "title": "Housing", "icon": "housing"},
+        {"slug": "benefits", "title": "Benefits", "icon": "benefits"},
+        {"slug": "transportation", "title": "Transportation", "icon": "transportation"},
+        {"slug": "health_mental_health", "title": "Health & Mental Health", "icon": "health_mental_health"},
+        {"slug": "financial_basics", "title": "Financial Basics", "icon": "financial_basics"},
+    ]
+    allowed_category_slugs = {item["slug"] for item in category_config}
+    if active_category not in allowed_category_slugs:
+        active_category = "all"
 
-    try:
-        page_number = int(request.GET.get('page') or 1)
-    except Exception:
-        page_number = 1
-    if page_number < 1:
-        page_number = 1
+    if Module is None:
+        empty_category_cards = [
+            {
+                "slug": item["slug"],
+                "title": item["title"],
+                "icon": item["icon"],
+                "pill": item.get("pill", ""),
+                "count_label": "0 modules",
+                "is_active": item["slug"] == active_category,
+            }
+            for item in category_config
+        ]
+        return render(request, "main/video_gallery.html", {
+            "modules": [],
+            "total_count": 0,
+            "active_query": q,
+            "active_duration": active_duration or "any",
+            "active_language": active_language,
+            "duration_options": [
+                ("any", "Any Duration"),
+                ("under-5", "Under 5 min"),
+                ("5-10", "5-10 min"),
+                ("10-20", "10-20 min"),
+                ("20-plus", "20+ min"),
+            ],
+            "language_options": [("English", "English")],
+            "active_category": active_category,
+            "category_cards": empty_category_cards,
+            "first_module_url": "",
+        })
 
-    per_page = 12
-
-    videos = list(YouTubeVideo.objects.all().only(
-        'id', 'title', 'video_url', 'category', 'tags', 'mp4_static_path', 'poster', 'created_at'
-    ).order_by('-created_at'))
-
-    # Helper to extract YouTube ID from various URL formats
-    def extract_vid(url: str) -> str:
-        from urllib.parse import urlparse, parse_qs
-        u = urlparse(url or '')
-        host = (u.netloc or '').lower()
-        path = u.path or ''
-        qs = parse_qs(u.query or '')
-        if 'youtube.com/embed/' in (url or '') or 'youtube-nocookie.com/embed/' in (url or ''):
-            try:
-                return path.rstrip('/').split('/')[-1]
-            except Exception:
-                return ''
-        if host.endswith('youtu.be'):
-            return path.lstrip('/').split('/')[0]
-        if host.endswith('youtube.com') and path.startswith('/watch'):
-            return (qs.get('v') or [''])[0]
-        if '/shorts/' in path:
-            parts = [p for p in path.split('/') if p]
-            try:
-                i = parts.index('shorts')
-                return parts[i + 1]
-            except Exception:
-                return ''
-        return ''
-
-    # Collect YouTube IDs once to avoid repeated parsing (cached briefly)
-    youtube_ids = {}
-    for v in videos:
-        yid_cache_key = f"video_yid:{v.id}:{getattr(v, 'video_url', '')}"
-        vid = cache.get(yid_cache_key)
-        if vid is None:
-            try:
-                embed = v.embed_url()
-            except Exception:
-                embed = ''
-            vid = extract_vid(embed)
-            cache.set(yid_cache_key, vid, 600)
-        if vid:
-            youtube_ids[v.id] = vid
-            setattr(v, 'youtube_id2', vid)
-
-    # Attach a related interactive lesson slug when available by matching YouTube IDs
-    lesson_map = {}
-    if Lesson and youtube_ids:
-        lessons = Lesson.objects.filter(youtube_video_id__in=list(youtube_ids.values())).only('slug', 'youtube_video_id')
-        lesson_map = {ls.youtube_video_id: ls.slug for ls in lessons}
-        for v in videos:
-            vid = youtube_ids.get(v.id)
-            if vid and vid in lesson_map:
-                setattr(v, 'lesson_slug', lesson_map[vid])
-
-    # Attach a Module id when a module has the same YouTube ID or a unique slugified title
-    mod_map = {}
-    title_map = {}
-    if Module:
+    def _has_field(model_cls, field_name: str) -> bool:
         try:
-            modules = list(Module.objects.all().only('id', 'video_url', 'title'))
-            for m in modules:
-                vid = extract_vid(getattr(m, 'video_url', '') or '')
-                if vid:
-                    mod_map[vid] = m.id
-
-            # Build a unique title slug map (skip collisions to avoid mis-attachments)
-            from django.utils.text import slugify
-            title_map = {}
-            collisions = set()
-            for m in modules:
-                slug = slugify(getattr(m, 'title', '') or '')
-                if not slug:
-                    continue
-                if slug in title_map:
-                    collisions.add(slug)
-                    continue
-                title_map[slug] = m.id
-            for slug in collisions:
-                title_map.pop(slug, None)
-
+            model_cls._meta.get_field(field_name)
+            return True
         except Exception:
-            pass
+            return False
 
-    def _hydrate_video(video_obj):
-        """
-        Attach derived metadata to the video and use a short-lived cache to avoid
-        recomputing on every request.
-        """
-        cache_version = f"{video_obj.id}:{getattr(video_obj, 'video_url', '')}:{getattr(video_obj, 'category', '')}:{getattr(video_obj, 'tags', '')}:{getattr(video_obj, 'mp4_static_path', '')}:{getattr(video_obj, 'poster', '')}"
-        cache_key = f"video_meta:{cache_version}"
-        cached = cache.get(cache_key)
-        if cached:
-            for key, val in cached.items():
-                setattr(video_obj, key, val)
-            return cached
+    has_duration = _has_field(Module, "duration_minutes")
+    has_video_duration = _has_field(YouTubeVideo, "duration_minutes")
+    has_language = _has_field(Module, "language")
+    has_gallery_category = _has_field(Module, "gallery_category")
 
-        # Module/Lesson mapping
-        vid = getattr(video_obj, 'youtube_id2', None) or youtube_ids.get(getattr(video_obj, 'id', None))
-        module_id = mod_map.get(vid) if vid else None
-        lesson_slug = lesson_map.get(vid) if vid else None
+    modules_base_qs = (
+        Module.objects
+        .filter(is_archived=False)
+        .annotate(lesson_count=Count("questions"))
+        .order_by("-created_at")
+    )
+    modules_qs = modules_base_qs
 
-        if not module_id:
-            try:
-                vt = slugify(getattr(video_obj, 'title', '') or '')
-                module_id = title_map.get(vt)
-            except Exception:
-                module_id = None
-
-        eff = (getattr(video_obj, 'category', '') or '').strip().lower()
-        if eff not in allowed_cats:
-            if module_id or lesson_slug:
-                eff = 'module'
-            elif getattr(video_obj, 'mp4_static_path', ''):
-                eff = 'quick'
-            else:
-                eff = 'other'
-
-        def _auto_thumbnail(video_inner):
-            import hashlib
-            import html
-            from urllib.parse import quote
-
-            v_id = getattr(video_inner, 'youtube_id2', None) or youtube_ids.get(getattr(video_inner, 'id', None))
-            if v_id:
-                setattr(video_inner, 'youtube_id2', v_id)
-                return f"https://i.ytimg.com/vi/{v_id}/hqdefault.jpg"
-
-            static_thumb = getattr(video_inner, 'thumbnail_static_path', '') or getattr(video_inner, 'poster', '')
-            if static_thumb:
-                return static_thumb
-
-            palette = ['#0ea5e9', '#6366f1', '#14b8a6', '#22c55e', '#f59e0b', '#ec4899']
-            title = (getattr(video_inner, 'title', '') or 'Learning Video').strip() or 'Learning Video'
-            seed = f"{getattr(video_inner, 'id', '')}{title}"
-            digest = hashlib.md5(seed.encode('utf-8', 'ignore')).hexdigest()
-            color = palette[int(digest[:2], 16) % len(palette)]
-            short_title = html.escape(title[:36])
-            svg = (
-                '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270">'
-                '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
-                f'<stop offset="0%" stop-color="{color}"/><stop offset="100%" stop-color="#0b1120"/>'
-                '</linearGradient></defs>'
-                '<rect width="480" height="270" rx="20" fill="url(#g)"/>'
-                '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" '
-                'fill="#e5e7eb" font-family="Arial, sans-serif" font-size="30" font-weight="700">'
-                f'{short_title}'
-                '</text>'
-                '</svg>'
-            )
-            return f"data:image/svg+xml;utf8,{quote(svg)}"
-
-        thumbnail_url = _auto_thumbnail(video_obj)
-
-        payload = {
-            'youtube_id2': vid,
-            'module_id': module_id,
-            'lesson_slug': lesson_slug,
-            'effective_category': eff,
-            'effective_tags': (getattr(video_obj, 'tags', '') or '').lower(),
-            'thumbnail_url': thumbnail_url,
+    def _gallery_category_from_tags(raw_tags: str) -> str:
+        tags = {
+            part.strip().lower().replace("-", "_").replace("&", "and")
+            for part in (raw_tags or "").split(",")
+            if part.strip()
         }
-        for key, val in payload.items():
-            setattr(video_obj, key, val)
-        cache.set(cache_key, payload, 600)
-        return payload
+        tag_aliases = {
+            "ids_documents": {"ids_documents", "ids_and_documents", "id_documents", "documents", "ids"},
+            "jobs_interviews": {"jobs_interviews", "jobs_and_interviews", "job_interview", "job_interviews"},
+            "housing": {"housing"},
+            "benefits": {"benefits"},
+            "transportation": {"transportation", "transport"},
+            "health_mental_health": {"health_mental_health", "health_and_mental_health", "mental_health"},
+            "financial_basics": {"financial_basics", "finance_basics", "financial"},
+        }
+        for slug, aliases in tag_aliases.items():
+            if tags.intersection(aliases):
+                return slug
+        return ""
 
-    # Attach computed metadata and optional server-side filter
-    for v in videos:
-        _hydrate_video(v)
+    videos_qs = YouTubeVideo.objects.all().order_by("-created_at")
 
-    if req_cat:
-        videos = [v for v in videos if getattr(v, 'effective_category', '') == req_cat]
+    if q:
+        modules_qs = modules_qs.filter(Q(title__icontains=q) | Q(description__icontains=q))
+        videos_qs = videos_qs.filter(
+            Q(title__icontains=q) | Q(description__icontains=q) | Q(tags__icontains=q)
+        )
 
-    paginator = Paginator(videos, per_page)
-    page_obj = paginator.get_page(page_number)
+    if has_duration and active_duration and active_duration != "any":
+        if active_duration == "under-5":
+            modules_qs = modules_qs.filter(duration_minutes__lt=5)
+        elif active_duration == "5-10":
+            modules_qs = modules_qs.filter(duration_minutes__gte=5, duration_minutes__lt=10)
+        elif active_duration == "10-20":
+            modules_qs = modules_qs.filter(duration_minutes__gte=10, duration_minutes__lt=20)
+        elif active_duration == "20-plus":
+            modules_qs = modules_qs.filter(duration_minutes__gte=20)
+    if has_video_duration and active_duration and active_duration != "any":
+        if active_duration == "under-5":
+            videos_qs = videos_qs.filter(duration_minutes__lt=5)
+        elif active_duration == "5-10":
+            videos_qs = videos_qs.filter(duration_minutes__gte=5, duration_minutes__lt=10)
+        elif active_duration == "10-20":
+            videos_qs = videos_qs.filter(duration_minutes__gte=10, duration_minutes__lt=20)
+        elif active_duration == "20-plus":
+            videos_qs = videos_qs.filter(duration_minutes__gte=20)
 
-    return render(request, 'main/video_gallery.html', {
-        'videos': list(page_obj.object_list),
-        'page_obj': page_obj,
-        'active_cat': req_cat,
+    language_options = [("English", "English")]
+    if has_language:
+        langs = [lang for lang in Module.objects.values_list("language", flat=True).distinct() if lang]
+        langs = sorted(set(langs), key=lambda value: value.lower())
+        language_options = [(lang, lang) for lang in langs] or [("English", "English")]
+        if active_language and active_language in {lang for lang, _ in language_options}:
+            modules_qs = modules_qs.filter(language=active_language)
+    else:
+        # Placeholder fallback when no language field exists on Module.
+        # We keep "Any Language" selectable and expose "English" as the only option.
+        pass
+
+    duration_options = [
+        ("any", "Any Duration"),
+        ("under-5", "Under 5 min"),
+        ("5-10", "5-10 min"),
+        ("10-20", "10-20 min"),
+        ("20-plus", "20+ min"),
+    ]
+
+    category_labels = {}
+    if has_gallery_category:
+        category_labels = dict(getattr(Module, "GALLERY_CATEGORY_CHOICES", []))
+
+    all_items = []
+    category_title_by_slug = {item["slug"]: item["title"] for item in category_config}
+
+    for module in modules_qs:
+        category_key = getattr(module, "gallery_category", "") if has_gallery_category else ""
+        category_name = (
+            category_labels.get(category_key)
+            or (module.get_category_display() if hasattr(module, "get_category_display") else "General")
+            or "General"
+        )
+
+        duration_value = getattr(module, "duration_minutes", None) if has_duration else None
+        if duration_value is None:
+            duration_label = "— min"
+        else:
+            try:
+                duration_label = f"{int(round(float(duration_value)))} min"
+            except Exception:
+                duration_label = "— min"
+
+        lesson_count = getattr(module, "quiz_lesson_count", None)
+        if lesson_count in (None, ""):
+            lesson_count = int(getattr(module, "lesson_count", 0) or 0)
+        else:
+            lesson_count = int(lesson_count)
+        lesson_label = f"{lesson_count} lesson" if lesson_count == 1 else f"{lesson_count} lessons"
+
+        all_items.append({
+            "kind": "module",
+            "obj": module,
+            "title": module.title,
+            "href": reverse("module_detail", args=[module.id]),
+            "category_key": category_key,
+            "category_name": category_name,
+            "duration_label": duration_label,
+            "lesson_label": lesson_label,
+            "description": (module.description or "").strip(),
+            "created_at": module.created_at,
+        })
+
+    for video in videos_qs:
+        video_category_key = _gallery_category_from_tags(getattr(video, "tags", "") or "")
+
+        video_href = reverse("video_watch", args=[video.id])
+        if getattr(video, "mp4_static_path", ""):
+            video_href = video.mp4_static_path
+
+        video_duration = getattr(video, "duration_minutes", None)
+        if video_duration in (None, ""):
+            video_duration_label = "— min"
+        else:
+            try:
+                video_duration_label = f"{int(round(float(video_duration)))} min"
+            except Exception:
+                video_duration_label = "— min"
+
+        video_lesson_count = getattr(video, "quiz_lesson_count", None)
+        if video_lesson_count in (None, ""):
+            video_lesson_count = 0
+        else:
+            video_lesson_count = int(video_lesson_count)
+        video_lesson_label = (
+            f"{video_lesson_count} lesson"
+            if video_lesson_count == 1
+            else f"{video_lesson_count} lessons"
+        )
+
+        all_items.append({
+            "kind": "video",
+            "obj": video,
+            "title": video.title,
+            "href": video_href,
+            "category_key": video_category_key,
+            "category_name": category_title_by_slug.get(video_category_key, "General"),
+            "duration_label": video_duration_label,
+            "lesson_label": video_lesson_label,
+            "description": (video.description or "").strip(),
+            "created_at": video.created_at,
+        })
+
+    all_items.sort(key=lambda item: item.get("created_at") or timezone.now(), reverse=True)
+    total_count = len(all_items)
+
+    category_counts = {"all": total_count}
+    for slug in allowed_category_slugs:
+        if slug == "all":
+            continue
+        category_counts[slug] = sum(1 for item in all_items if item.get("category_key") == slug)
+
+    if active_category == "all":
+        modules = list(all_items)
+    else:
+        modules = [item for item in all_items if item.get("category_key") == active_category]
+
+    category_cards = []
+    for item in category_config:
+        slug = item["slug"]
+        count = category_counts.get(slug, 0)
+        suffix = "module" if count == 1 else "modules"
+        category_cards.append({
+            "slug": slug,
+            "title": item["title"],
+            "icon": item["icon"],
+            "pill": item.get("pill", ""),
+            "count_label": f"{count} {suffix}",
+            "is_active": slug == active_category,
+        })
+
+    first_module_url = ""
+    for item in modules:
+        if item.get("kind") == "module":
+            try:
+                first_module_url = reverse("module_detail", args=[item["obj"].id])
+            except Exception:
+                first_module_url = ""
+            break
+
+    return render(request, "main/video_gallery.html", {
+        "modules": modules,
+        "total_count": total_count,
+        "active_query": q,
+        "active_duration": active_duration or "any",
+        "active_language": active_language,
+        "duration_options": duration_options,
+        "language_options": language_options,
+        "active_category": active_category,
+        "category_cards": category_cards,
+        "first_module_url": first_module_url,
     })
 
 

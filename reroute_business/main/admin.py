@@ -7,6 +7,18 @@ from reroute_business.resumes.models import Application
 from reroute_business.profiles.models import UserProfile, EmployerProfile
 from .models import YouTubeVideo
 
+GALLERY_CATEGORY_CHOICES = [
+    ("", "---------"),
+    ("ids_documents", "IDs & Documents"),
+    ("jobs_interviews", "Jobs & Interviews"),
+    ("housing", "Housing"),
+    ("benefits", "Benefits"),
+    ("transportation", "Transportation"),
+    ("health_mental_health", "Health & Mental Health"),
+    ("financial_basics", "Financial Basics"),
+]
+GALLERY_CATEGORY_SLUGS = {slug for slug, _ in GALLERY_CATEGORY_CHOICES if slug}
+
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
@@ -118,15 +130,64 @@ except admin.sites.NotRegistered:
 admin.site.register(User, UserAdmin)
 
 
+class YouTubeVideoAdminForm(forms.ModelForm):
+    gallery_category_tag = forms.ChoiceField(
+        label="Browse by Category tag",
+        required=False,
+        choices=GALLERY_CATEGORY_CHOICES,
+        help_text="Adds/removes the gallery category tag in Tags automatically.",
+    )
+
+    class Meta:
+        model = YouTubeVideo
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        tags_raw = getattr(self.instance, "tags", "") if self.instance and self.instance.pk else ""
+        tags = {part.strip().lower() for part in (tags_raw or "").split(",") if part.strip()}
+        initial = ""
+        for slug in GALLERY_CATEGORY_SLUGS:
+            if slug in tags:
+                initial = slug
+                break
+        self.fields["gallery_category_tag"].initial = initial
+
+
 @admin.register(YouTubeVideo)
 class YouTubeVideoAdmin(admin.ModelAdmin):
-    list_display = ("title", "category", "created_at")
+    form = YouTubeVideoAdminForm
+    list_display = ("title", "category", "duration_minutes", "quiz_lesson_count", "created_at")
     list_filter = ("category",)
     search_fields = ("title", "description", "video_url", "tags")
     readonly_fields = ("created_at",)
-    fields = ("title", "video_url", "mp4_static_path", "poster", "category", "tags", "description", "created_at")
+    fields = (
+        "title",
+        "video_url",
+        "mp4_static_path",
+        "poster",
+        "category",
+        "duration_minutes",
+        "quiz_lesson_count",
+        "gallery_category_tag",
+        "tags",
+        "description",
+        "created_at",
+    )
 
     def save_model(self, request, obj, form, change):
+        selected_gallery_tag = (form.cleaned_data.get("gallery_category_tag") or "").strip().lower()
+        current_tags = [part.strip() for part in (obj.tags or "").split(",") if part.strip()]
+        cleaned_tags = []
+        for tag in current_tags:
+            normalized = tag.strip().lower()
+            if normalized in GALLERY_CATEGORY_SLUGS:
+                continue
+            cleaned_tags.append(tag)
+        if selected_gallery_tag:
+            cleaned_tags.append(selected_gallery_tag)
+        obj.tags = ",".join(cleaned_tags)
+
         # Normalize URL into embed form before saving
         # Normalize YouTube URL if present
         obj.video_url = obj.embed_url()

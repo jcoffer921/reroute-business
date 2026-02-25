@@ -48,16 +48,22 @@ class ModuleAdmin(admin.ModelAdmin):
     Manage learning modules along with their quiz questions and answers.
     """
 
-    list_display = ("title", "category", "video_url", "created_at")
-    list_filter = ("category",)
+    list_display = ("title", "category", "gallery_category", "duration_minutes", "quiz_lesson_count", "video_url", "created_at")
+    list_filter = ("category", "gallery_category")
     search_fields = ("title", "description", "video_url")
     ordering = ("-created_at",)
     fieldsets = (
-        (None, {"fields": ("title", "description", "category", "key_takeaways")}),
+        (None, {"fields": ("title", "description", "category", "gallery_category", "duration_minutes", "quiz_lesson_count", "key_takeaways")}),
         ("Media", {"fields": ("video_url", "embed_html", "poster_image")}),
         ("Content", {"fields": ("internal_content",)}),
     )
     inlines = [QuizQuestionInline]
+
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+        field = super().formfield_for_choice_field(db_field, request, **kwargs)
+        if db_field.name == "gallery_category":
+            field.help_text = "Shows this module under Browse by Category on the gallery page."
+        return field
 
     def save_model(self, request, obj, form, change):
         if obj.video_url:

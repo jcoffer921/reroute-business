@@ -45,10 +45,42 @@ class Module(models.Model):
         (CATEGORY_REENTRY, "Reentry Support"),
         (CATEGORY_LIFE, "Life Skills"),
     ]
+    GALLERY_CATEGORY_IDS_DOCUMENTS = "ids_documents"
+    GALLERY_CATEGORY_JOBS_INTERVIEWS = "jobs_interviews"
+    GALLERY_CATEGORY_HOUSING = "housing"
+    GALLERY_CATEGORY_BENEFITS = "benefits"
+    GALLERY_CATEGORY_TRANSPORTATION = "transportation"
+    GALLERY_CATEGORY_HEALTH_MENTAL_HEALTH = "health_mental_health"
+    GALLERY_CATEGORY_FINANCIAL_BASICS = "financial_basics"
+
+    GALLERY_CATEGORY_CHOICES = [
+        (GALLERY_CATEGORY_IDS_DOCUMENTS, "IDs & Documents"),
+        (GALLERY_CATEGORY_JOBS_INTERVIEWS, "Jobs & Interviews"),
+        (GALLERY_CATEGORY_HOUSING, "Housing"),
+        (GALLERY_CATEGORY_BENEFITS, "Benefits"),
+        (GALLERY_CATEGORY_TRANSPORTATION, "Transportation"),
+        (GALLERY_CATEGORY_HEALTH_MENTAL_HEALTH, "Health & Mental Health"),
+        (GALLERY_CATEGORY_FINANCIAL_BASICS, "Financial Basics"),
+    ]
 
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    gallery_category = models.CharField(
+        max_length=50,
+        choices=GALLERY_CATEGORY_CHOICES,
+        default=GALLERY_CATEGORY_JOBS_INTERVIEWS,
+    )
+    duration_minutes = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Optional: duration shown on module cards (minutes).",
+    )
+    quiz_lesson_count = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Optional: card lesson/quiz count override.",
+    )
     video_url = models.CharField(max_length=500, blank=True, null=True)
     embed_html = models.TextField(blank=True, null=True)
     internal_content = models.TextField(blank=True, null=True)

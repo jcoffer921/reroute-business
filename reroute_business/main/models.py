@@ -20,6 +20,16 @@ class YouTubeVideo(models.Model):
         ("other", "Other"),
     ]
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, blank=True, default="")
+    duration_minutes = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Optional: duration shown on modules cards (minutes).",
+    )
+    quiz_lesson_count = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Optional: lesson/quiz count shown on cards.",
+    )
     tags = models.CharField(max_length=200, blank=True, help_text="Comma-separated tags, e.g., resume,interview,soft-skills")
     mp4_static_path = models.CharField(
         max_length=500, blank=True, default="",

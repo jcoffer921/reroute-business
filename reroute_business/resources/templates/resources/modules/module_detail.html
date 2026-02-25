@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="module-shell">
+<div class="module-shell" data-module-watch-page data-current-module-url="{{ request.get_full_path }}">
   <nav class="module-crumbs" aria-label="Breadcrumb">
     <a href="{% url 'home' %}">Home</a>
     <span aria-hidden="true">›</span>
@@ -239,5 +239,6 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'resources/js/modules_gallery.js' %}" defer></script>
 <script src="{% static 'resources/js/module_quiz_csp.js' %}" defer></script>
 {% endblock %}
