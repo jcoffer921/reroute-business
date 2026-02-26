@@ -2,8 +2,10 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
+from django.contrib import messages
 
 from .models import ReentryOrganization, SavedOrganization, ReentryOrgApplication
+from .services import upsert_resource_org_from_application
 
 
 @admin.register(ReentryOrganization)
@@ -29,16 +31,17 @@ class ReentryOrgApplicationAdmin(admin.ModelAdmin):
         "org_name",
         "contact_email",
         "status",
+        "resource_org_link",
         "submitted_at",
         "download_pdf_link",
     )
     list_filter = ("status", "organization_type", "submitted_at")
     search_fields = ("org_name", "contact_email", "service_area", "primary_contact_name")
-    readonly_fields = ("application_id", "submitted_at", "reviewed_at", "download_pdf_detail_link")
+    readonly_fields = ("application_id", "submitted_at", "reviewed_at", "download_pdf_detail_link", "resource_org_link")
     actions = ("mark_approved", "mark_rejected")
 
     fieldsets = (
-        ("Admin", {"fields": ("application_id", "status", "reviewed_by", "reviewed_at", "submitted_at", "download_pdf_detail_link")}),
+        ("Admin", {"fields": ("application_id", "status", "reviewed_by", "reviewed_at", "submitted_at", "resource_organization", "resource_org_link", "download_pdf_detail_link")}),
         ("Step 1 — Organization Information", {"fields": (
             "org_name", "primary_contact_name", "contact_email", "contact_phone",
             "website", "physical_address", "service_area", "year_founded", "organization_type",
@@ -77,18 +80,40 @@ class ReentryOrgApplicationAdmin(admin.ModelAdmin):
         url = reverse("reentry_org:application_pdf", args=[obj.pk])
         return format_html('<a class="button" href="{}">Download PDF</a>', url)
 
-    @admin.action(description="Mark selected applications as approved")
+    @admin.display(description="Resource Org")
+    def resource_org_link(self, obj):
+        if not obj or not obj.resource_organization_id:
+            return "-"
+        url = reverse("admin:resources_resourceorganization_change", args=[obj.resource_organization_id])
+        return format_html('<a href="{}">{}</a>', url, obj.resource_organization.name)
+
+    @admin.action(description="Mark selected applications as approved and sync Resource Org")
     def mark_approved(self, request, queryset):
-        queryset.update(
-            status=ReentryOrgApplication.STATUS_APPROVED,
-            reviewed_by=request.user,
-            reviewed_at=timezone.now(),
+        approved = 0
+        synced = 0
+        reviewed_at = timezone.now()
+        for application in queryset:
+            application.status = ReentryOrgApplication.STATUS_APPROVED
+            application.reviewed_by = request.user
+            application.reviewed_at = reviewed_at
+            application.save(update_fields=["status", "reviewed_by", "reviewed_at"])
+            approved += 1
+            try:
+                upsert_resource_org_from_application(application)
+                synced += 1
+            except Exception:
+                continue
+        self.message_user(
+            request,
+            f"Approved {approved} application(s). Synced {synced} Resource Organization record(s).",
+            level=messages.SUCCESS,
         )
 
     @admin.action(description="Mark selected applications as rejected")
     def mark_rejected(self, request, queryset):
-        queryset.update(
+        count = queryset.update(
             status=ReentryOrgApplication.STATUS_REJECTED,
             reviewed_by=request.user,
             reviewed_at=timezone.now(),
         )
+        self.message_user(request, f"Rejected {count} application(s).", level=messages.SUCCESS)

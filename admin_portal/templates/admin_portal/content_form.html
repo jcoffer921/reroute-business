@@ -2,14 +2,81 @@
 
 {% block admin_content %}
 <section class="admin-section">
-  <div class="admin-section-header">
-    <div class="admin-section-title">{% if object %}Edit Module{% else %}New Module{% endif %}</div>
+  <div class="admin-section-header module-form__header">
+    <div>
+      <div class="admin-section-title">{% if object %}Edit Module{% else %}New Module{% endif %}</div>
+      <h1 class="module-form__title">{% if object %}{{ object.title }}{% else %}Create learning module{% endif %}</h1>
+    </div>
     <a class="admin-btn ghost" href="{% url 'admin_portal:content_list' %}">Back</a>
   </div>
-  <form method="post" enctype="multipart/form-data">
+
+  <form method="post" enctype="multipart/form-data" class="module-form">
     {% csrf_token %}
-    {{ form.as_p }}
-    <div style="margin-top:12px;">
+
+    {% if form.non_field_errors %}
+    <div class="module-form__errors">
+      {{ form.non_field_errors }}
+    </div>
+    {% endif %}
+
+    <div class="module-form__grid">
+      <div class="module-form__panel">
+        <h3>Basics</h3>
+        <div class="module-form__field">
+          <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+          {{ form.title }}
+          {{ form.title.errors }}
+        </div>
+        <div class="module-form__field">
+          <label for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>
+          {{ form.category }}
+          {{ form.category.errors }}
+        </div>
+        <div class="module-form__field">
+          <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+          {{ form.description }}
+          {{ form.description.errors }}
+        </div>
+      </div>
+
+      <div class="module-form__panel">
+        <h3>Media</h3>
+        <div class="module-form__field">
+          <label for="{{ form.video_url.id_for_label }}">{{ form.video_url.label }}</label>
+          {{ form.video_url }}
+          {{ form.video_url.errors }}
+        </div>
+        <div class="module-form__field">
+          <label for="{{ form.poster_image.id_for_label }}">{{ form.poster_image.label }}</label>
+          {{ form.poster_image }}
+          {{ form.poster_image.errors }}
+        </div>
+        <div class="module-form__field module-form__checkbox">
+          <label for="{{ form.is_archived.id_for_label }}">{{ form.is_archived }} {{ form.is_archived.label }}</label>
+          {{ form.is_archived.errors }}
+        </div>
+      </div>
+    </div>
+
+    <div class="module-form__panel">
+      <h3>Embed HTML</h3>
+      <div class="module-form__field">
+        <label for="{{ form.embed_html.id_for_label }}">{{ form.embed_html.label }}</label>
+        {{ form.embed_html }}
+        {{ form.embed_html.errors }}
+      </div>
+    </div>
+
+    <div class="module-form__panel">
+      <h3>Internal Content</h3>
+      <div class="module-form__field">
+        <label for="{{ form.internal_content.id_for_label }}">{{ form.internal_content.label }}</label>
+        {{ form.internal_content }}
+        {{ form.internal_content.errors }}
+      </div>
+    </div>
+
+    <div class="module-form__actions">
       <button type="submit" class="admin-btn primary">Save</button>
       <a class="admin-btn ghost" href="{% url 'admin_portal:content_list' %}">Cancel</a>
     </div>

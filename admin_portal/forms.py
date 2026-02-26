@@ -1,8 +1,7 @@
 from django import forms
 from reroute_business.job_list.models import Job
 from reroute_business.profiles.models import EmployerProfile
-from reroute_business.reentry_org.models import ReentryOrganization
-from reroute_business.resources.models import Module
+from reroute_business.resources.models import Module, ResourceOrganization
 
 
 class UserNoteForm(forms.Form):
@@ -75,21 +74,23 @@ class JobForm(forms.ModelForm):
         }
 
 
-class ReentryOrganizationForm(forms.ModelForm):
+class ResourceOrganizationForm(forms.ModelForm):
     class Meta:
-        model = ReentryOrganization
+        model = ResourceOrganization
         fields = [
             "name",
             "category",
             "is_verified",
+            "is_active",
             "website",
-            "description",
-            "city",
-            "state",
+            "overview",
+            "address_line",
+            "neighborhood",
             "zip_code",
+            "phone",
         ]
         widgets = {
-            "description": forms.Textarea(attrs={"rows": 4, "class": "admin-textarea"}),
+            "overview": forms.Textarea(attrs={"rows": 4, "class": "admin-textarea"}),
         }
 
 

@@ -14,6 +14,7 @@ from .views import (
 urlpatterns = [
     # ================= Core Pages =================
     path('', views.home, name='home'),
+    path('welcome/', views.welcome, name='welcome'),
     path('for-agencies/', views.for_agencies, name='for_agencies'),
     path('for-agencies/apply/', views.for_agencies_apply, name='for_agencies_apply'),
     path('for-agencies/thank-you/', views.for_agencies_thank_you, name='for_agencies_thank_you'),

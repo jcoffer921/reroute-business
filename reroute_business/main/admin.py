@@ -3,7 +3,6 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django import forms
 
-from reroute_business.resumes.models import Application
 from reroute_business.profiles.models import UserProfile, EmployerProfile
 from .models import YouTubeVideo
 
@@ -20,13 +19,7 @@ GALLERY_CATEGORY_CHOICES = [
 GALLERY_CATEGORY_SLUGS = {slug for slug, _ in GALLERY_CATEGORY_CHOICES if slug}
 
 
-@admin.register(Application)
-class ApplicationAdmin(admin.ModelAdmin):
-    list_display = ("job", "applicant", "status")
-    list_filter = ("status",)
-    search_fields = ("job__title", "applicant__username")
-
-# Resume admin is managed in the 'resumes' app admin.
+# Application admin is managed in the 'job_list' app admin.
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):

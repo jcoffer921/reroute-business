@@ -19,8 +19,9 @@ from django.contrib import messages
 
 from reroute_business.job_list.models import Job, Application
 from reroute_business.profiles.models import EmployerProfile, UserProfile
-from reroute_business.reentry_org.models import ReentryOrganization
-from reroute_business.resources.models import Module
+from reroute_business.reentry_org.models import ReentryOrgApplication
+from reroute_business.reentry_org.services import upsert_resource_org_from_application
+from reroute_business.resources.models import Module, ResourceOrganization
 
 from .forms import (
     EmployerNotesForm,
@@ -28,7 +29,7 @@ from .forms import (
     JobForm,
     JobReviewForm,
     ModuleForm,
-    ReentryOrganizationForm,
+    ResourceOrganizationForm,
     UserNoteForm,
 )
 from .models import AuditLog
@@ -79,7 +80,7 @@ def _zip_employer_counts():
 def _coverage_dataset():
     users_by_zip = _zip_counts_from_values(UserProfile.objects.values_list("zip_code", flat=True))
     jobs_by_zip = _zip_counts_from_values(Job.objects.filter(is_active=True).values_list("zip_code", flat=True))
-    resources_by_zip = _zip_counts_from_values(ReentryOrganization.objects.values_list("zip_code", flat=True))
+    resources_by_zip = _zip_counts_from_values(ResourceOrganization.objects.values_list("zip_code", flat=True))
 
     zip_rows = []
     all_zips = sorted(set(users_by_zip) | set(jobs_by_zip) | set(resources_by_zip))
@@ -153,7 +154,7 @@ def _analytics_context(active_tab):
     pending_employers = EmployerProfile.objects.filter(verified=False).count()
     total_users = User.objects.count()
     total_applications = Application.objects.count()
-    active_orgs = ReentryOrganization.objects.count()
+    active_orgs = ResourceOrganization.objects.filter(is_active=True).count()
 
     tab_definitions = {
         "user-location": {
@@ -525,6 +526,7 @@ class AdminDashboardView(StaffRequiredMixin, View):
         active_users_7 = User.objects.filter(last_login__gte=seven_days_ago).count()
         jobs_pending_review = Job.objects.filter(is_flagged=True).count()
         employers_pending = EmployerProfile.objects.filter(verified=False).count()
+        org_apps_pending = ReentryOrgApplication.objects.filter(status=ReentryOrgApplication.STATUS_PENDING).count()
         open_flags = jobs_pending_review
         site_views_7 = 0
 
@@ -545,6 +547,14 @@ class AdminDashboardView(StaffRequiredMixin, View):
                 "timestamp": employer.user.date_joined,
                 "severity": "medium",
                 "url": reverse("admin_portal:employer_detail", args=[employer.id]),
+            })
+        for org_app in ReentryOrgApplication.objects.filter(status=ReentryOrgApplication.STATUS_PENDING).order_by("-submitted_at")[:6]:
+            review_queue.append({
+                "title": org_app.org_name,
+                "reason": "Pending reentry organization application",
+                "timestamp": org_app.submitted_at,
+                "severity": "medium",
+                "url": reverse("admin_portal:org_application_list") + f"?q={org_app.public_application_id}",
             })
 
         review_queue = sorted(review_queue, key=lambda item: item["timestamp"] or timezone.now(), reverse=True)[:8]
@@ -568,6 +578,7 @@ class AdminDashboardView(StaffRequiredMixin, View):
             "active_users_7": active_users_7,
             "jobs_pending_review": jobs_pending_review,
             "employers_pending": employers_pending,
+            "org_apps_pending": org_apps_pending,
             "open_flags": open_flags,
             "site_views_7": site_views_7,
             "review_queue": review_queue,
@@ -1055,22 +1066,93 @@ def job_reject(request, pk):
     return redirect("admin_portal:job_detail", pk=pk)
 
 
+class ReentryOrgApplicationListView(StaffRequiredMixin, ListView):
+    model = ReentryOrgApplication
+    template_name = "admin_portal/reentry_org_applications_list.html"
+    context_object_name = "org_applications"
+    paginate_by = 20
+
+    def get_queryset(self):
+        qs = ReentryOrgApplication.objects.select_related("reviewed_by", "resource_organization").all().order_by("-submitted_at")
+        q = (self.request.GET.get("q") or "").strip()
+        status = (self.request.GET.get("status") or "").strip().lower()
+        if q:
+            qs = qs.filter(
+                Q(org_name__icontains=q)
+                | Q(contact_email__icontains=q)
+                | Q(primary_contact_name__icontains=q)
+                | Q(application_id__icontains=q)
+            )
+        if status in {
+            ReentryOrgApplication.STATUS_PENDING,
+            ReentryOrgApplication.STATUS_APPROVED,
+            ReentryOrgApplication.STATUS_REJECTED,
+        }:
+            qs = qs.filter(status=status)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["q"] = self.request.GET.get("q", "")
+        context["status"] = self.request.GET.get("status", "")
+        context["status_choices"] = ReentryOrgApplication.STATUS_CHOICES
+        return context
+
+
+@login_required
+@staff_member_required
+def org_application_approve(request, pk):
+    if request.method != "POST":
+        return HttpResponseForbidden()
+    app = get_object_or_404(ReentryOrgApplication, pk=pk)
+    app.status = ReentryOrgApplication.STATUS_APPROVED
+    app.reviewed_by = request.user
+    app.reviewed_at = timezone.now()
+    app.save(update_fields=["status", "reviewed_by", "reviewed_at"])
+    resource_org = upsert_resource_org_from_application(app)
+    _log_action(request.user, "approve", app, {"resource_organization_id": resource_org.id})
+    messages.success(request, f"Approved {app.org_name} and synced Resource Organization.")
+    return redirect("admin_portal:org_application_list")
+
+
+@login_required
+@staff_member_required
+def org_application_reject(request, pk):
+    if request.method != "POST":
+        return HttpResponseForbidden()
+    app = get_object_or_404(ReentryOrgApplication, pk=pk)
+    app.status = ReentryOrgApplication.STATUS_REJECTED
+    app.reviewed_by = request.user
+    app.reviewed_at = timezone.now()
+    app.save(update_fields=["status", "reviewed_by", "reviewed_at"])
+    _log_action(request.user, "reject", app)
+    messages.success(request, f"Rejected {app.org_name}.")
+    return redirect("admin_portal:org_application_list")
+
+
 class OrganizationListView(StaffRequiredMixin, ListView):
-    model = ReentryOrganization
+    model = ResourceOrganization
     template_name = "admin_portal/orgs_list.html"
     context_object_name = "orgs"
     paginate_by = 20
 
     def get_queryset(self):
-        qs = ReentryOrganization.objects.all().order_by("name")
+        qs = ResourceOrganization.objects.all().order_by("name")
         q = (self.request.GET.get("q") or "").strip()
         status = (self.request.GET.get("status") or "").strip().lower()
         if q:
-            qs = qs.filter(Q(name__icontains=q) | Q(city__icontains=q) | Q(state__icontains=q))
+            qs = qs.filter(
+                Q(name__icontains=q)
+                | Q(neighborhood__icontains=q)
+                | Q(zip_code__icontains=q)
+                | Q(address_line__icontains=q)
+            )
         if status == "verified":
-            qs = qs.filter(is_verified=True)
+            qs = qs.filter(is_verified=True, is_active=True)
         elif status == "pending":
-            qs = qs.filter(is_verified=False)
+            qs = qs.filter(is_verified=False, is_active=True)
+        elif status == "inactive":
+            qs = qs.filter(is_active=False)
         sort = self.request.GET.get("sort")
         if sort in {"name", "created_at"}:
             qs = qs.order_by(sort)
@@ -1085,21 +1167,21 @@ class OrganizationListView(StaffRequiredMixin, ListView):
 
 
 class OrganizationDetailView(StaffRequiredMixin, DetailView):
-    model = ReentryOrganization
+    model = ResourceOrganization
     template_name = "admin_portal/orgs_detail.html"
     context_object_name = "org"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["audit_logs"] = AuditLog.objects.filter(
-            object_type="ReentryOrganization", object_id=str(self.object.id)
+            object_type=self.object.__class__.__name__, object_id=str(self.object.id)
         )[:20]
         return context
 
 
 class OrganizationCreateView(StaffRequiredMixin, CreateView):
-    model = ReentryOrganization
-    form_class = ReentryOrganizationForm
+    model = ResourceOrganization
+    form_class = ResourceOrganizationForm
     template_name = "admin_portal/orgs_form.html"
 
     def form_valid(self, form):
@@ -1112,8 +1194,8 @@ class OrganizationCreateView(StaffRequiredMixin, CreateView):
 
 
 class OrganizationUpdateView(StaffRequiredMixin, UpdateView):
-    model = ReentryOrganization
-    form_class = ReentryOrganizationForm
+    model = ResourceOrganization
+    form_class = ResourceOrganizationForm
     template_name = "admin_portal/orgs_form.html"
 
     def form_valid(self, form):
@@ -1126,7 +1208,7 @@ class OrganizationUpdateView(StaffRequiredMixin, UpdateView):
 
 
 class OrganizationDeleteView(StaffRequiredMixin, DeleteView):
-    model = ReentryOrganization
+    model = ResourceOrganization
     template_name = "admin_portal/orgs_confirm_delete.html"
     success_url = reverse_lazy("admin_portal:org_list")
 

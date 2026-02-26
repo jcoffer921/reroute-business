@@ -54,11 +54,17 @@
         </span>
         Applications
       </a>
+      <a class="admin-nav-link {% if active == 'org_application_list' or active == 'org_application_approve' or active == 'org_application_reject' %}active{% endif %}" href="{% url 'admin_portal:org_application_list' %}">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h8M8 17h4"/></svg>
+        </span>
+        Org Applications
+      </a>
       <a class="admin-nav-link {% if active == 'org_list' or active == 'org_detail' or active == 'org_create' or active == 'org_edit' or active == 'org_delete' %}active{% endif %}" href="{% url 'admin_portal:org_list' %}">
         <span class="nav-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M6 21V5a2 2 0 0 1 2-2h6l4 4v14"/><path d="M14 3v4h4"/></svg>
         </span>
-        Reentry Organizations
+        Resource Organizations
       </a>
       <a class="admin-nav-link {% if active == 'content_list' or active == 'content_create' or active == 'content_edit' or active == 'content_detail' or active == 'content_delete' or active == 'content_archive' %}active{% endif %}" href="{% url 'admin_portal:content_list' %}">
         <span class="nav-icon" aria-hidden="true">

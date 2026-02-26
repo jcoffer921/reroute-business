@@ -1,0 +1,258 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReRoute | Welcome</title>
+  <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+  <link rel="stylesheet" href="{% static 'css/welcome.css' %}">
+</head>
+<body>
+  <header class="welcome-topbar">
+    <a class="welcome-brand" href="{% url 'welcome' %}" aria-label="ReRoute welcome page">
+      <img src="{% static 'images/new-reroute-logo-with-tag-transparent.png' %}" alt="ReRoute" class="welcome-brand__logo">
+    </a>
+    <nav class="welcome-topbar__links" aria-label="Welcome page links">
+      <a href="{% url 'login' %}">Log in</a>
+      <a class="welcome-topbar__org-link" href="#partner-section">For Organizations</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="welcome-hero" id="top">
+      <div class="welcome-wrap welcome-hero__grid">
+        <div class="welcome-hero__copy">
+          <h1>A Clear Path Forward.</h1>
+          <p>
+            ReRoute helps returning citizens prepare for employment and connect to trusted reentry support.
+          </p>
+          <div class="welcome-hero__actions">
+            <a class="welcome-btn welcome-btn--primary" href="{{ signup_url }}" data-track="hero-signup">Get Started (Free)</a>
+          </div>
+          <p class="welcome-hero__trust">Free to join • Built with reentry partners • Mobile-friendly</p>
+        </div>
+
+        <aside class="pathway-card" aria-label="ReRoute pathway">
+          <h2>Your pathway</h2>
+          <ol>
+            <li>
+              <span class="pathway-icon" aria-hidden="true">1</span>
+              <div>
+                <strong>Create profile</strong>
+                <p>Add your skills, goals, and priorities.</p>
+              </div>
+            </li>
+            <li>
+              <span class="pathway-icon" aria-hidden="true">2</span>
+              <div>
+                <strong>Get matched to opportunities</strong>
+                <p>View programs and support that fit your path.</p>
+              </div>
+            </li>
+            <li>
+              <span class="pathway-icon" aria-hidden="true">3</span>
+              <div>
+                <strong>Apply + build stability</strong>
+                <p>Take clear next steps with less friction.</p>
+              </div>
+            </li>
+          </ol>
+        </aside>
+      </div>
+    </section>
+
+    <section class="mission-strip">
+      <p>We believe everyone deserves more than a second chance. They deserve a clear path forward.</p>
+    </section>
+
+    <section class="welcome-section how-it-works" id="how-it-works">
+      <div class="welcome-wrap">
+        <h2>How It Works</h2>
+        <div class="how-grid">
+          <article class="how-card">
+            <div class="how-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+            </div>
+            <h3>Create Your Profile</h3>
+            <p>Share your skills and goals.</p>
+          </article>
+          <article class="how-card">
+            <div class="how-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M8 10h8M8 14h6"/></svg>
+            </div>
+            <h3>Explore Programs &amp; Resources</h3>
+            <p>Find services that support your next step.</p>
+          </article>
+          <article class="how-card">
+            <div class="how-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="m5 12 4 4 10-10"/></svg>
+            </div>
+            <h3>Be Ready for Opportunities</h3>
+            <p>Build confidence before you apply.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="welcome-section modules-preview" id="modules-preview">
+      <div class="welcome-wrap">
+        <h2>Workforce Modules that prepare you for the workplace</h2>
+        <div class="module-preview-grid">
+          {% if module_previews %}
+          {% for module in module_previews %}
+          <article class="module-preview-card">
+            <h3>{{ module.title }}</h3>
+            <span class="duration-pill">{{ module.duration_label }}</span>
+            <p>{{ module.description }}</p>
+            <div class="module-progress" aria-hidden="true"><span style="width:{{ module.progress_percent }}%"></span></div>
+          </article>
+          {% endfor %}
+          {% else %}
+          <article class="module-preview-card">
+            <h3>No modules yet</h3>
+            <span class="duration-pill">— min</span>
+            <p>We are adding workforce modules now. Check back shortly.</p>
+            <div class="module-progress" aria-hidden="true"><span style="width:10%"></span></div>
+          </article>
+          {% endif %}
+        </div>
+        <a class="module-link" href="{{ modules_url }}" data-track="modules-explore">Explore Workforce Modules</a>
+      </div>
+    </section>
+
+    <section class="welcome-section resources-preview" id="resources-support">
+      <div class="welcome-wrap resources-system">
+        <h2>Real Support. All in One Place.</h2>
+        <p class="resources-system__subhead">Housing, ID help, food, training, legal aid, and mental health resources — organized and easy to access.</p>
+
+        <div class="resources-system__grid">
+          <article class="resource-system-card">
+            <span class="resource-system-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3.5 10.2 12 3.5l8.5 6.7v9.3a1 1 0 0 1-1 1H4.5a1 1 0 0 1-1-1z"/><path d="M9.2 20.5v-5.8h5.6v5.8"/></svg></span>
+            <h3>Housing</h3>
+            <p>Find shelters and transitional housing options.</p>
+          </article>
+          <article class="resource-system-card">
+            <span class="resource-system-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.2" width="17" height="13.6" rx="2"/><path d="M8 10.3h8M8 13.7h4.5"/></svg></span>
+            <h3>ID &amp; Documents</h3>
+            <p>Get help replacing lost identification.</p>
+          </article>
+          <article class="resource-system-card">
+            <span class="resource-system-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 8.5h15v8.8a1.3 1.3 0 0 1-1.3 1.3H5.8a1.3 1.3 0 0 1-1.3-1.3z"/><path d="M7.5 6.2h9"/></svg></span>
+            <h3>Food Assistance</h3>
+            <p>Locate food banks and meal programs.</p>
+          </article>
+          <article class="resource-system-card">
+            <span class="resource-system-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4.2h14v15.6H5z"/><path d="M8.3 8.2h7.4M8.3 11.9h7.4M8.3 15.6h4.5"/></svg></span>
+            <h3>Training</h3>
+            <p>Explore workforce development programs.</p>
+          </article>
+          <article class="resource-system-card">
+            <span class="resource-system-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4.2v15.6"/><path d="M6.2 7.6h11.6"/><path d="M8 16.4a4.2 4.2 0 0 0 8 0"/></svg></span>
+            <h3>Legal Aid</h3>
+            <p>Access legal guidance and advocacy.</p>
+          </article>
+          <article class="resource-system-card">
+            <span class="resource-system-card__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20s-6.8-4-6.8-8.8a3.8 3.8 0 0 1 6.8-2.4 3.8 3.8 0 0 1 6.8 2.4C18.8 16 12 20 12 20Z"/></svg></span>
+            <h3>Mental Health</h3>
+            <p>Connect to counseling and support services.</p>
+          </article>
+        </div>
+
+        <p class="resources-system__trust-line">
+          <span class="verified-mini" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 5 6v6c0 4.7 3 7.8 7 9 4-1.2 7-4.3 7-9V6z"/><path d="m9.2 12 2 2 3.6-3.8"/></svg></span>
+          We’re expanding our verified partner network across Philadelphia &amp; Camden.
+        </p>
+
+        <a class="welcome-btn welcome-btn--primary resources-system__cta" href="{% url 'resource_list' %}" data-track="resource-directory-cta">Explore the Resource Directory</a>
+      </div>
+    </section>
+
+    <section class="trust-band" id="trust-safety">
+      <div class="welcome-wrap">
+        <h2>Trust &amp; Safety</h2>
+        <div class="trust-grid">
+          <article>
+            <span class="trust-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 3 5 6v6c0 4.7 3 7.8 7 9 4-1.2 7-4.3 7-9V6z" fill="none"/><path d="m9.2 12 2 2 3.6-3.8" fill="none"/></svg></span>
+            <p>Your data stays private.</p>
+          </article>
+          <article>
+            <span class="trust-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 3 5 6v6c0 4.7 3 7.8 7 9 4-1.2 7-4.3 7-9V6z" fill="none"/><path d="m9.2 12 2 2 3.6-3.8" fill="none"/></svg></span>
+            <p>We do not sell your information.</p>
+          </article>
+          <article>
+            <span class="trust-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 3 5 6v6c0 4.7 3 7.8 7 9 4-1.2 7-4.3 7-9V6z" fill="none"/><path d="m9.2 12 2 2 3.6-3.8" fill="none"/></svg></span>
+            <p>You control what you share.</p>
+          </article>
+          <article>
+            <span class="trust-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 3 5 6v6c0 4.7 3 7.8 7 9 4-1.2 7-4.3 7-9V6z" fill="none"/><path d="m9.2 12 2 2 3.6-3.8" fill="none"/></svg></span>
+            <p>We review listings carefully.</p>
+          </article>
+        </div>
+        <p class="trust-band__note">We’re onboarding early members as we expand employer partnerships.</p>
+      </div>
+    </section>
+
+    <section class="welcome-section partner-section" id="partner-section">
+      <div class="welcome-wrap">
+        <h2>Partner With ReRoute.</h2>
+        <p class="partner-section__subhead">Expand access to opportunity. Build measurable impact.</p>
+        <div class="partner-grid">
+          <article class="partner-card partner-card--org">
+            <span class="partner-card__badge">Free Early Access</span>
+            <h3>For Reentry Organizations</h3>
+            <p>Connect your programs with people actively preparing for work and stability.</p>
+            <ul class="partner-card__benefits">
+              <li>Increase program visibility</li>
+              <li>Reach motivated participants</li>
+              <li>Track engagement insights</li>
+            </ul>
+            <div class="partner-card__actions">
+              <a class="welcome-btn welcome-btn--primary" href="{% url 'for_agencies' %}" data-track="partner-talk">Talk to Us</a>
+              <a class="welcome-btn welcome-btn--outline" href="{% url 'for_agencies_apply' %}" data-track="partner-apply-org">Apply to Partner</a>
+            </div>
+          </article>
+          <article class="partner-card">
+            <span class="partner-card__badge">Founding Partner Opportunity</span>
+            <h3>For Fair-Chance Employers</h3>
+            <p>Reach motivated candidates and share opportunities with a mission-aligned audience.</p>
+            <ul class="partner-card__benefits">
+              <li>Access prepared candidates</li>
+              <li>Post fair-chance roles</li>
+              <li>Strengthen community impact</li>
+            </ul>
+            <div class="partner-card__actions">
+              <a class="welcome-btn welcome-btn--primary" href="{% url 'contact' %}" data-track="partner-talk-employer">Talk to Us</a>
+              <a class="welcome-btn welcome-btn--outline" href="{% url 'employer_signup' %}" data-track="partner-apply">Apply to Partner</a>
+            </div>
+          </article>
+        </div>
+        <p class="partner-section__proof">Currently onboarding early partners across Philadelphia.</p>
+      </div>
+    </section>
+
+    <section class="final-cta">
+      <div class="welcome-wrap final-cta__inner">
+        <h2>Start building stability today.</h2>
+        <a class="welcome-btn welcome-btn--final" href="{{ signup_url }}" data-track="footer-signup">Create Free Account</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="welcome-footer">
+    <div class="welcome-wrap welcome-footer__inner">
+      <p><a href="{% url 'terms' %}">Terms</a> | <a href="{% url 'privacy' %}">Privacy</a></p>
+      <p>Contact: support@reroutejobs.com</p>
+      <p>&copy; 2026 ReRoute. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="{% static 'js/welcome.js' %}" defer></script>
+  <script>
+    window.REROUTE_WELCOME = {
+      source: "{{ active_source|default:''|escapejs }}",
+      signupUrl: "{{ signup_url|escapejs }}"
+    };
+  </script>
+</body>
+</html>

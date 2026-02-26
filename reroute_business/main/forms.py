@@ -14,7 +14,6 @@ from django.core.exceptions import ValidationError
 from reroute_business.profiles.models import UserProfile
 from django.contrib.auth.forms import PasswordChangeForm
 from reroute_business.profiles.constants import USER_STATUS_CHOICES
-from reroute_business.main.models import AgencyPartnershipApplication
 
 
 class UserSignupForm(forms.ModelForm):
@@ -298,7 +297,7 @@ class Step4Form(forms.Form):
     )
 
 
-class AgencyPartnershipApplicationForm(forms.ModelForm):
+class AgencyPartnershipApplicationForm(forms.Form):
     SERVICE_CHOICES = [
         ("workforce_development", "Workforce Development"),
         ("job_placement", "Job Placement"),
@@ -363,8 +362,83 @@ class AgencyPartnershipApplicationForm(forms.ModelForm):
         required=False,
         widget=forms.CheckboxInput,
     )
+    REFERRAL_METHOD_CHOICES = [
+        ("website_link", "Direct website link"),
+        ("email_referral", "Email referral"),
+        ("phone_referral", "Phone referral"),
+        ("api_future", "API integration (future)"),
+    ]
+
+    organization_name = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={"class": "input", "placeholder": "Organization name"}),
+    )
+    primary_contact_name = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={"class": "input", "placeholder": "Primary contact name"}),
+    )
+    contact_email = forms.EmailField(
+        required=False,
+        widget=forms.EmailInput(attrs={"class": "input", "placeholder": "name@organization.org"}),
+    )
+    contact_phone = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={"class": "input", "placeholder": "(555) 555-5555"}),
+    )
+    website = forms.URLField(
+        required=False,
+        widget=forms.URLInput(attrs={"class": "input", "placeholder": "https://"}),
+    )
+    physical_address = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={"class": "input", "placeholder": "Street, City, State"}),
+    )
+    service_area = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={"class": "input", "placeholder": "City / ZIP coverage"}),
+    )
+    year_founded = forms.IntegerField(
+        required=False,
+        widget=forms.NumberInput(attrs={"class": "input", "placeholder": "YYYY", "min": "1800", "max": "2100"}),
+    )
+    organization_type = forms.ChoiceField(
+        choices=[
+            ("", "---------"),
+            ("nonprofit", "Nonprofit"),
+            ("for_profit", "For-Profit"),
+            ("government", "Government"),
+        ],
+        required=False,
+        widget=forms.Select(attrs={"class": "input"}),
+    )
+    services_other = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={"class": "input", "placeholder": "Other service (if applicable)"}),
+    )
+    target_population_other = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={"class": "input", "placeholder": "Other population (if applicable)"}),
+    )
+    additional_eligibility_details = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "class": "textarea",
+                "rows": 5,
+                "placeholder": "Describe any additional requirements such as documentation, age restrictions, parole status, employment readiness level, or other prerequisites.",
+            }
+        ),
+    )
+    average_served_per_month = forms.IntegerField(
+        required=False,
+        widget=forms.NumberInput(attrs={"class": "input", "placeholder": "e.g., 120", "min": "0"}),
+    )
+    intake_process_description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={"class": "textarea", "rows": 4, "placeholder": "Describe your intake process"}),
+    )
     referral_method_preference = forms.ChoiceField(
-        choices=AgencyPartnershipApplication.REFERRAL_METHOD_CHOICES,
+        choices=REFERRAL_METHOD_CHOICES,
         required=False,
         widget=forms.RadioSelect,
     )
@@ -380,66 +454,17 @@ class AgencyPartnershipApplicationForm(forms.ModelForm):
         required=False,
         widget=forms.CheckboxInput,
     )
-
-    class Meta:
-        model = AgencyPartnershipApplication
-        fields = [
-            "organization_name",
-            "primary_contact_name",
-            "contact_email",
-            "contact_phone",
-            "website",
-            "physical_address",
-            "service_area",
-            "year_founded",
-            "organization_type",
-            "services_offered",
-            "services_other",
-            "target_population",
-            "target_population_other",
-            "supports_justice_impacted",
-            "supports_recently_released",
-            "requires_government_id",
-            "requires_release_window",
-            "requires_orientation_attendance",
-            "requires_intake_assessment",
-            "requires_service_area_residency",
-            "additional_eligibility_details",
-            "average_served_per_month",
-            "intake_process_description",
-            "referral_method_preference",
-            "tracks_employment_outcomes",
-            "open_to_referral_tracking",
-            "partnership_reason",
-            "reroute_support_needs",
-            "interested_in_featured_verified",
-            "accuracy_confirmation",
-            "terms_privacy_agreement",
-            "logo",
-        ]
-        widgets = {
-            "organization_name": forms.TextInput(attrs={"class": "input", "placeholder": "Organization name"}),
-            "primary_contact_name": forms.TextInput(attrs={"class": "input", "placeholder": "Primary contact name"}),
-            "contact_email": forms.EmailInput(attrs={"class": "input", "placeholder": "name@organization.org"}),
-            "contact_phone": forms.TextInput(attrs={"class": "input", "placeholder": "(555) 555-5555"}),
-            "website": forms.URLInput(attrs={"class": "input", "placeholder": "https://"}),
-            "physical_address": forms.TextInput(attrs={"class": "input", "placeholder": "Street, City, State"}),
-            "service_area": forms.TextInput(attrs={"class": "input", "placeholder": "City / ZIP coverage"}),
-            "year_founded": forms.NumberInput(attrs={"class": "input", "placeholder": "YYYY", "min": "1800", "max": "2100"}),
-            "organization_type": forms.Select(attrs={"class": "input"}),
-            "services_other": forms.TextInput(attrs={"class": "input", "placeholder": "Other service (if applicable)"}),
-            "target_population_other": forms.TextInput(attrs={"class": "input", "placeholder": "Other population (if applicable)"}),
-            "additional_eligibility_details": forms.Textarea(attrs={
-                "class": "textarea",
-                "rows": 5,
-                "placeholder": "Describe any additional requirements such as documentation, age restrictions, parole status, employment readiness level, or other prerequisites.",
-            }),
-            "average_served_per_month": forms.NumberInput(attrs={"class": "input", "placeholder": "e.g., 120", "min": "0"}),
-            "intake_process_description": forms.Textarea(attrs={"class": "textarea", "rows": 4, "placeholder": "Describe your intake process"}),
-            "partnership_reason": forms.Textarea(attrs={"class": "textarea", "rows": 4, "placeholder": "Why do you want to partner with ReRoute?"}),
-            "reroute_support_needs": forms.Textarea(attrs={"class": "textarea", "rows": 4, "placeholder": "How can ReRoute support your mission?"}),
-            "logo": forms.ClearableFileInput(attrs={"class": "input"}),
-        }
+    partnership_reason = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={"class": "textarea", "rows": 4, "placeholder": "Why do you want to partner with ReRoute?"}),
+    )
+    reroute_support_needs = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={"class": "textarea", "rows": 4, "placeholder": "How can ReRoute support your mission?"}),
+    )
+    accuracy_confirmation = forms.BooleanField(required=False, widget=forms.CheckboxInput)
+    terms_privacy_agreement = forms.BooleanField(required=False, widget=forms.CheckboxInput)
+    logo = forms.ImageField(required=False, widget=forms.ClearableFileInput(attrs={"class": "input"}))
 
     def __init__(self, *args, **kwargs):
         self.require_strict = kwargs.pop("require_strict", True)

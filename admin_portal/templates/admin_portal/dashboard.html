@@ -27,6 +27,11 @@
     <div class="stat">{{ open_flags|default:0 }}</div>
     <div class="sub">Reports &amp; trust issues</div>
   </a>
+  <a class="admin-card" href="{% url 'admin_portal:org_application_list' %}?status=pending">
+    <h3>Org applications pending</h3>
+    <div class="stat">{{ org_apps_pending|default:0 }}</div>
+    <div class="sub">Submitted partner applications</div>
+  </a>
   <a class="admin-card" href="{% url 'admin_portal:audit_log' %}">
     <h3>Site views</h3>
     <div class="stat">{{ site_views_7|default:0 }}</div>

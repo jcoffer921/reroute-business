@@ -153,6 +153,14 @@ class ReentryOrgApplication(models.Model):
         blank=True,
         related_name="reviewed_reentry_org_applications",
     )
+    resource_organization = models.ForeignKey(
+        "resources.ResourceOrganization",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="source_applications",
+        help_text="Linked Resource Organization record created/updated from this application.",
+    )
 
     class Meta:
         ordering = ("-submitted_at", "-id")

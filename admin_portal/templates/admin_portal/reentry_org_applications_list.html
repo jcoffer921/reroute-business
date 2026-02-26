@@ -1,0 +1,89 @@
+{% extends "admin_portal/base.html" %}
+
+{% block admin_content %}
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Organization Applications</div>
+  </div>
+
+  <form method="get" class="admin-filter-row">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search org name, contact, application ID" class="admin-input" />
+    <select name="status" class="admin-select">
+      <option value="">All statuses</option>
+      {% for value, label in status_choices %}
+      <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="admin-btn primary">Filter</button>
+  </form>
+
+  <div class="table-responsive">
+    <table class="admin-table">
+      <tr>
+        <th>Application</th>
+        <th>Organization</th>
+        <th>Contact</th>
+        <th>Status</th>
+        <th>Submitted</th>
+        <th>Resource Org</th>
+        <th>Actions</th>
+      </tr>
+      {% for app in org_applications %}
+      <tr>
+        <td>{{ app.public_application_id }}</td>
+        <td>{{ app.org_name }}</td>
+        <td>
+          {{ app.primary_contact_name }}<br>
+          <span class="admin-subtitle">{{ app.contact_email }}</span>
+        </td>
+        <td>
+          {% if app.status == 'approved' %}
+            <span class="status-pill success">Approved</span>
+          {% elif app.status == 'rejected' %}
+            <span class="status-pill danger">Rejected</span>
+          {% else %}
+            <span class="status-pill warning">Pending</span>
+          {% endif %}
+        </td>
+        <td>{{ app.submitted_at|date:"M d, Y" }}</td>
+        <td>
+          {% if app.resource_organization %}
+            <a class="link-button" href="{% url 'admin_portal:org_detail' app.resource_organization.id %}">{{ app.resource_organization.name }}</a>
+          {% else %}
+            —
+          {% endif %}
+        </td>
+        <td>
+          {% if app.status == 'pending' %}
+          <form method="post" action="{% url 'admin_portal:org_application_approve' app.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="link-button">Approve</button>
+          </form>
+          <form method="post" action="{% url 'admin_portal:org_application_reject' app.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="link-button">Reject</button>
+          </form>
+          {% else %}
+            —
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7">No organization applications found.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  {% if is_paginated %}
+    <div class="admin-subtitle">
+      {% if page_obj.has_previous %}
+        <a class="link-button" href="?q={{ q }}&status={{ status }}&page={{ page_obj.previous_page_number }}">Prev</a>
+      {% endif %}
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      {% if page_obj.has_next %}
+        <a class="link-button" href="?q={{ q }}&status={{ status }}&page={{ page_obj.next_page_number }}">Next</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -34,7 +34,7 @@ from reroute_business.core.utils.onboarding import log_onboarding_event
 from reroute_business.resumes.models import Education, Experience, Resume  # your resumes app owns these
 from PIL import Image, UnidentifiedImageError
 from reroute_business.resources.models import Module
-from reroute_business.reentry_org.models import ReentryOrganization, SavedOrganization
+from reroute_business.reentry_org.models import ReentryOrganization, ReentryOrgApplication, SavedOrganization
 from reroute_business.main.models import YouTubeVideo
 
 
@@ -1834,6 +1834,9 @@ def admin_dashboard(request):
         employers_pending = EmployerProfile.objects.filter(verified=False).count()
     except Exception:
         employers_pending = 0
+    pending_org_applications = ReentryOrgApplication.objects.filter(
+        status=ReentryOrgApplication.STATUS_PENDING
+    ).count()
 
     jobs_pending_review = len(flagged_jobs)
     open_flags = len(flagged_jobs)
@@ -1862,6 +1865,17 @@ def admin_dashboard(request):
             })
     except Exception:
         pass
+    for org_application in ReentryOrgApplication.objects.filter(
+        status=ReentryOrgApplication.STATUS_PENDING
+    ).order_by("-submitted_at")[:6]:
+        review_queue.append({
+            "title": org_application.org_name,
+            "reason": "Pending reentry organization application",
+            "timestamp": org_application.submitted_at,
+            "severity": "medium",
+            "url": reverse("admin_portal:org_application_list") + f"?q={org_application.public_application_id}",
+            "kind": "org_application",
+        })
     review_queue = sorted(review_queue, key=lambda item: item["timestamp"] or now(), reverse=True)[:8]
 
     activity_items = []
@@ -1899,6 +1913,7 @@ def admin_dashboard(request):
         "active_users_7": active_users_7,
         "jobs_pending_review": jobs_pending_review,
         "employers_pending": employers_pending,
+        "pending_org_applications": pending_org_applications,
         "open_flags": open_flags,
         "site_views_7": site_views_7,
         "review_queue": review_queue,

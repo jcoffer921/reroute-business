@@ -2,18 +2,33 @@
 
 {% block admin_content %}
 <section class="admin-section">
-  <div class="admin-section-header">
-    <div class="admin-section-title">Module Details</div>
+  <div class="admin-section-header module-detail__header">
+    <div>
+      <div class="admin-section-title">Module Details</div>
+      <h1 class="module-detail__title">{{ module.title }}</h1>
+    </div>
     <a class="admin-btn ghost" href="{% url 'admin_portal:content_list' %}">Back to Learning</a>
   </div>
-  <table class="admin-table">
-    <tr><th>Title</th><td>{{ module.title }}</td></tr>
-    <tr><th>Category</th><td>{{ module.get_category_display }}</td></tr>
-    <tr><th>Status</th><td>{% if module.is_archived %}Archived{% elif module.video_url or module.embed_html or module.internal_content %}Published{% else %}Draft{% endif %}</td></tr>
-    <tr><th>Updated</th><td>{{ module.created_at|date:"M d, Y" }}</td></tr>
-  </table>
 
-  <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
+  <div class="module-detail__meta">
+    <span class="status-pill neutral">{{ module.get_category_display }}</span>
+    {% if module.is_archived %}
+      <span class="status-pill neutral">Archived</span>
+    {% elif module.video_url or module.embed_html or module.internal_content %}
+      <span class="status-pill success">Published</span>
+    {% else %}
+      <span class="status-pill warning">Draft</span>
+    {% endif %}
+    {% if module.duration_minutes %}
+      <span class="status-pill neutral">{{ module.duration_minutes }} min</span>
+    {% endif %}
+    {% if module.quiz_lesson_count %}
+      <span class="status-pill neutral">{{ module.quiz_lesson_count }} lesson{{ module.quiz_lesson_count|pluralize }}</span>
+    {% endif %}
+    <span class="module-detail__muted">Created {{ module.created_at|date:"M d, Y" }}</span>
+  </div>
+
+  <div class="module-detail__actions">
     <a class="admin-btn primary" href="{% url 'admin_portal:content_edit' module.id %}">Edit</a>
     {% if not module.is_archived %}
     <form method="post" action="{% url 'admin_portal:content_archive' module.id %}" class="js-confirm" data-message="Archive this module?">
@@ -25,11 +40,57 @@
   </div>
 </section>
 
+<section class="module-detail-grid">
+  <div class="admin-section">
+    <div class="admin-section-header">
+      <div class="admin-section-title">Description</div>
+    </div>
+    <div class="module-detail__panel-body">
+      {% if module.description %}
+      <p class="module-detail__text">{{ module.description|linebreaksbr }}</p>
+      {% else %}
+      <p class="admin-subtitle">No description provided.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="admin-section">
+    <div class="admin-section-header">
+      <div class="admin-section-title">Delivery</div>
+    </div>
+    <div class="module-detail__panel-body">
+      <div class="module-detail__field">
+        <h4>Video URL</h4>
+        {% if module.video_url %}
+        <a href="{{ module.video_url }}" target="_blank" rel="noopener noreferrer">{{ module.video_url }}</a>
+        {% else %}
+        <p class="admin-subtitle">No video URL</p>
+        {% endif %}
+      </div>
+      <div class="module-detail__field">
+        <h4>Poster Image</h4>
+        {% if module.poster_image %}
+        <a href="{{ module.poster_image.url }}" target="_blank" rel="noopener noreferrer">Open poster</a>
+        {% else %}
+        <p class="admin-subtitle">No poster image</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="admin-section">
   <div class="admin-section-header">
-    <div class="admin-section-title">Content</div>
+    <div class="admin-section-title">Rich Embed HTML</div>
   </div>
-  <p class="admin-subtitle">{{ module.description|default:"No description provided." }}</p>
+  <div class="module-detail__code-block">{{ module.embed_html|default:"No embed HTML." }}</div>
+</section>
+
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Internal Content</div>
+  </div>
+  <div class="module-detail__code-block">{{ module.internal_content|default:"No internal content." }}</div>
 </section>
 
 <section class="admin-section">

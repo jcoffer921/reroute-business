@@ -3,15 +3,16 @@
 {% block admin_content %}
 <section class="admin-section">
   <div class="admin-section-header">
-    <div class="admin-section-title">Reentry Organizations</div>
+    <div class="admin-section-title">Resource Organizations</div>
     <a class="admin-btn primary" href="{% url 'admin_portal:org_create' %}">Add Organization</a>
   </div>
   <form method="get" class="admin-filter-row">
-    <input type="text" name="q" value="{{ q }}" placeholder="Search name, city, state" class="admin-input" />
+    <input type="text" name="q" value="{{ q }}" placeholder="Search name, address, neighborhood, ZIP" class="admin-input" />
     <select name="status" class="admin-select">
       <option value="">All</option>
       <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
       <option value="verified" {% if status == 'verified' %}selected{% endif %}>Verified</option>
+      <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option>
     </select>
     <select name="sort" class="admin-select">
       <option value="">Sort</option>
@@ -35,13 +36,15 @@
         <td>{{ org.name }}</td>
         <td>{{ org.get_category_display }}</td>
         <td>
-          {% if org.is_verified %}
+          {% if not org.is_active %}
+            <span class="status-pill">Inactive</span>
+          {% elif org.is_verified %}
             <span class="status-pill success">Verified</span>
           {% else %}
             <span class="status-pill warning">Pending</span>
           {% endif %}
         </td>
-        <td>{{ org.city }}{% if org.city and org.state %}, {% endif %}{{ org.state }}</td>
+        <td>{{ org.address_line }}{% if org.zip_code %} ({{ org.zip_code }}){% endif %}</td>
         <td>
           <a class="link-button" href="{% url 'admin_portal:org_detail' org.id %}">View</a>
         </td>

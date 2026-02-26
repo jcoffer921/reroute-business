@@ -9,9 +9,24 @@
   <table class="admin-table">
     <tr><th>Name</th><td>{{ org.name }}</td></tr>
     <tr><th>Category</th><td>{{ org.get_category_display }}</td></tr>
-    <tr><th>Status</th><td>{% if org.is_verified %}Verified{% else %}Pending{% endif %}</td></tr>
-    <tr><th>Location</th><td>{{ org.city }}{% if org.city and org.state %}, {% endif %}{{ org.state }} {{ org.zip_code }}</td></tr>
+    <tr>
+      <th>Status</th>
+      <td>
+        {% if not org.is_active %}
+          Inactive
+        {% elif org.is_verified %}
+          Verified
+        {% else %}
+          Pending
+        {% endif %}
+      </td>
+    </tr>
+    <tr><th>Address</th><td>{{ org.address_line }}</td></tr>
+    <tr><th>Neighborhood</th><td>{{ org.neighborhood|default:"—" }}</td></tr>
+    <tr><th>ZIP</th><td>{{ org.zip_code|default:"—" }}</td></tr>
+    <tr><th>Phone</th><td>{{ org.phone|default:"—" }}</td></tr>
     <tr><th>Website</th><td>{{ org.website|default:"—" }}</td></tr>
+    <tr><th>Overview</th><td>{{ org.overview|default:"—" }}</td></tr>
   </table>
 
   <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">

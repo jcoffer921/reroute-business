@@ -20,7 +20,7 @@ import json
 import logging
 import re
 import traceback
-from urllib.parse import quote
+from urllib.parse import parse_qs, quote, urlparse
 
 from django.conf import settings
 from django.contrib import messages
@@ -158,6 +158,62 @@ def home(request):
         'FEATURED_LIMIT': FEATURED_LIMIT,
         'RECENT_LIMIT': RECENT_LIMIT,
     })
+
+
+@require_GET
+def welcome(request):
+    source = (request.GET.get("src") or "").strip().lower()
+    allowed_sources = {"flyer", "org"}
+    if source in allowed_sources:
+        request.session["welcome_src"] = source
+
+    active_source = (request.session.get("welcome_src") or "").strip().lower()
+    if active_source not in allowed_sources:
+        active_source = ""
+
+    signup_url = reverse("signup")
+    if active_source:
+        signup_url = f"{signup_url}?src={quote(active_source)}"
+
+    module_previews = []
+    if Module is not None:
+        try:
+            preview_qs = Module.objects.filter(is_archived=False).order_by("-created_at")[:4]
+            for item in preview_qs:
+                duration_value = getattr(item, "duration_minutes", None)
+                if duration_value in (None, ""):
+                    duration_label = "— min"
+                else:
+                    try:
+                        duration_label = f"{int(round(float(duration_value)))} min"
+                    except Exception:
+                        duration_label = "— min"
+
+                description = (item.description or "").strip()
+                if not description:
+                    description = "Practical guidance to help you move forward with confidence."
+
+                module_previews.append(
+                    {
+                        "title": item.title,
+                        "description": description,
+                        "duration_label": duration_label,
+                        "progress_percent": 35,
+                    }
+                )
+        except Exception:
+            module_previews = []
+
+    return render(
+        request,
+        "main/welcome.html",
+        {
+            "signup_url": signup_url,
+            "active_source": active_source,
+            "modules_url": reverse("video_gallery"),
+            "module_previews": module_previews,
+        },
+    )
 
 
 @require_GET
@@ -997,6 +1053,33 @@ def video_gallery(request):
                 return slug
         return ""
 
+    def _youtube_id_from_url(raw_url: str) -> str:
+        value = (raw_url or "").strip()
+        if not value:
+            return ""
+        try:
+            parsed = urlparse(value)
+        except Exception:
+            return ""
+
+        host = (parsed.netloc or "").lower()
+        path = (parsed.path or "").strip("/")
+        query = parse_qs(parsed.query or "")
+
+        if "youtu.be" in host and path:
+            return path.split("/")[0]
+        if "youtube" in host:
+            if path.startswith("watch"):
+                return (query.get("v") or [""])[0].strip()
+            if "embed/" in path:
+                return path.split("embed/", 1)[1].split("/")[0].strip()
+            if "shorts/" in path:
+                return path.split("shorts/", 1)[1].split("/")[0].strip()
+        return ""
+
+    def _normalize_text(value: str) -> str:
+        return " ".join(str(value or "").strip().lower().split())
+
     videos_qs = YouTubeVideo.objects.all().order_by("-created_at")
 
     if q:
@@ -1049,6 +1132,7 @@ def video_gallery(request):
         category_labels = dict(getattr(Module, "GALLERY_CATEGORY_CHOICES", []))
 
     all_items = []
+    seen_dedupe_keys = set()
     category_title_by_slug = {item["slug"]: item["title"] for item in category_config}
 
     for module in modules_qs:
@@ -1075,6 +1159,20 @@ def video_gallery(request):
             lesson_count = int(lesson_count)
         lesson_label = f"{lesson_count} lesson" if lesson_count == 1 else f"{lesson_count} lessons"
 
+        module_desc = (module.description or "").strip()
+        module_youtube_id = _youtube_id_from_url(getattr(module, "video_url", "") or "")
+        module_path = _normalize_text(getattr(module, "video_url", "") or "")
+        module_signature = f"sig:{_normalize_text(module.title)}|{_normalize_text(module_desc)}"
+        module_dedupe_keys = {module_signature}
+        if module_youtube_id:
+            module_dedupe_keys.add(f"yt:{module_youtube_id}")
+        if module_path:
+            module_dedupe_keys.add(f"path:{module_path}")
+
+        if module_dedupe_keys.intersection(seen_dedupe_keys):
+            continue
+        seen_dedupe_keys.update(module_dedupe_keys)
+
         all_items.append({
             "kind": "module",
             "obj": module,
@@ -1084,7 +1182,7 @@ def video_gallery(request):
             "category_name": category_name,
             "duration_label": duration_label,
             "lesson_label": lesson_label,
-            "description": (module.description or "").strip(),
+            "description": module_desc,
             "created_at": module.created_at,
         })
 
@@ -1115,6 +1213,21 @@ def video_gallery(request):
             else f"{video_lesson_count} lessons"
         )
 
+        video_desc = (video.description or "").strip()
+        video_youtube_id = _youtube_id_from_url(getattr(video, "video_url", "") or "")
+        video_path = _normalize_text(getattr(video, "mp4_static_path", "") or "")
+        video_signature = f"sig:{_normalize_text(video.title)}|{_normalize_text(video_desc)}"
+        video_dedupe_keys = {video_signature}
+        if video_youtube_id:
+            video_dedupe_keys.add(f"yt:{video_youtube_id}")
+        if video_path:
+            video_dedupe_keys.add(f"path:{video_path}")
+
+        # Keep first-seen item (modules are added first), drop duplicates from merged sources.
+        if video_dedupe_keys.intersection(seen_dedupe_keys):
+            continue
+        seen_dedupe_keys.update(video_dedupe_keys)
+
         all_items.append({
             "kind": "video",
             "obj": video,
@@ -1124,7 +1237,7 @@ def video_gallery(request):
             "category_name": category_title_by_slug.get(video_category_key, "General"),
             "duration_label": video_duration_label,
             "lesson_label": video_lesson_label,
-            "description": (video.description or "").strip(),
+            "description": video_desc,
             "created_at": video.created_at,
         })
 
