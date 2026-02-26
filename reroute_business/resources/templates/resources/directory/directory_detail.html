@@ -99,6 +99,32 @@
       <p>{{ resource.how_to_apply }}</p>
     </article>
 
+    {% if resource.additional_locations %}
+    <article class="detail-section-card">
+      <h2>
+        <svg class="detail-location-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" fill="none"></path>
+          <circle cx="12" cy="10" r="2.8" fill="none"></circle>
+        </svg>
+        Additional locations
+      </h2>
+      <ul class="detail-location-list">
+        {% for location in resource.additional_locations %}
+        <li>
+          <div>
+            <strong>{{ location.name }}</strong>
+            <p>{{ location.address_line }}{% if location.zip_code %} ({{ location.zip_code }}){% endif %}</p>
+            {% if location.phone %}
+            <p class="detail-muted">{{ location.phone }}</p>
+            {% endif %}
+          </div>
+          <a class="detail-location-link" href="{% url 'resource_directory_detail' location.slug %}">View</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </article>
+    {% endif %}
+
     <article class="detail-section-card">
       <h2>
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="4" width="14" height="14" rx="2"></rect><path d="M8 18v2M16 18v2M5 9h14M9 13h2M13 13h2"></path></svg>

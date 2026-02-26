@@ -400,6 +400,13 @@ class ResourceOrganization(models.Model):
     languages_supported = models.JSONField(blank=True, default=list)
     cultural_competency = models.JSONField(blank=True, default=list)
     childcare_support = models.TextField(blank=True)
+    additional_locations = models.ManyToManyField(
+        "self",
+        blank=True,
+        symmetrical=False,
+        related_name="location_references",
+        help_text="Optional: related org/service locations to show on detail pages.",
+    )
     is_verified = models.BooleanField(default=False, db_index=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

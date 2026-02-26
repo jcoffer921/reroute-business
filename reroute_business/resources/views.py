@@ -158,6 +158,19 @@ def _resource_to_payload(resource: ResourceOrganization) -> dict:
             distance_miles = None
 
     is_verified_partner = bool(getattr(resource, "is_verified", False))
+    additional_locations = []
+    try:
+        location_qs = resource.additional_locations.filter(is_active=True).exclude(pk=resource.pk).order_by("name")
+        for location in location_qs:
+            additional_locations.append({
+                "name": location.name,
+                "slug": location.slug,
+                "address_line": location.address_line,
+                "zip_code": location.zip_code,
+                "phone": location.phone,
+            })
+    except Exception:
+        additional_locations = []
 
     return {
         "slug": resource.slug,
@@ -186,6 +199,7 @@ def _resource_to_payload(resource: ResourceOrganization) -> dict:
         "hidden_tag_count": hidden_tag_count,
         "distance_miles": distance_miles,
         "is_verified_partner": is_verified_partner,
+        "additional_locations": additional_locations,
     }
 
 

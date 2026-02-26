@@ -39,7 +39,7 @@ class ResourceOrganizationAdmin(admin.ModelAdmin):
     list_filter = ("is_verified", "is_active", "category")
     search_fields = ("name", "slug", "neighborhood", "zip_code", "category", "features__label", "features__slug")
     ordering = ("-is_verified", "name")
-    filter_horizontal = ("features",)
+    filter_horizontal = ("features", "additional_locations")
 
 
 @admin.register(Module)
