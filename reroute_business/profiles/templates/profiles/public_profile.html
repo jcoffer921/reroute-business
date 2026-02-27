@@ -176,7 +176,7 @@
           <div class="timeline-item">
             <div class="timeline-marker"></div>
             <div class="timeline-content">
-              <div class="timeline-title">{{ exp.title|default:exp.job_title }}</div>
+              <div class="timeline-title">{% firstof exp.title exp.job_title "Work Experience" %}</div>
               <div class="timeline-meta">
                 {% if exp.company %}<span class="timeline-company">{{ exp.company }}</span>{% endif %}
                 {% if exp.start_year or exp.start_date or exp.end_year or exp.end_date %}
