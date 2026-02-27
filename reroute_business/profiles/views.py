@@ -271,6 +271,12 @@ def employer_public_profile_view(request, username: str):
     except Exception:
         jobs, total_jobs = [], 0
 
+    # Show verified badge only when employer is verified and has a live/approved job.
+    has_approved_job = bool(
+        getattr(employer_profile, "verified", False)
+        and total_jobs > 0
+    )
+
     # Build a "View All Jobs" link that filters by employer on the opportunities page
     from django.urls import reverse
     view_all_url = None
@@ -289,6 +295,7 @@ def employer_public_profile_view(request, username: str):
             "jobs": jobs,
             "total_jobs": total_jobs,
             "view_all_url": view_all_url,
+            "has_approved_job": has_approved_job,
         },
     )
 
