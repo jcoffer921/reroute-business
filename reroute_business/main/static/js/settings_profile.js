@@ -9,6 +9,23 @@
 
   const qs = (sel, root = document) => root.querySelector(sel);
   const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const DEFAULT_SKILL_SUGGESTIONS = [
+    'Communication',
+    'Teamwork',
+    'Problem Solving',
+    'Time Management',
+    'Customer Service',
+    'Reliability',
+    'Conflict Resolution',
+    'Forklift Operation',
+    'Warehouse Safety',
+    'Inventory Management',
+    'Data Entry',
+    'Cash Handling',
+    'Interview Preparation',
+    'Resume Writing',
+    'Computer Literacy',
+  ];
 
   const setHidden = (input, value) => {
     if (!input) return;
@@ -52,11 +69,61 @@
     }
   };
 
-  const initSkillSection = (section) => {
+  const loadSkillSuggestions = async () => {
+    const merged = new Set(DEFAULT_SKILL_SUGGESTIONS.map((value) => value.trim()).filter(Boolean));
+    qsa('[data-skill-list] .pill-chip', form).forEach((chip) => {
+      const value = (chip.dataset.value || chip.textContent || '').replace('×', '').trim();
+      if (value) merged.add(value);
+    });
+
+    try {
+      const response = await fetch('/api/skills/', {
+        method: 'GET',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      });
+      if (response.ok) {
+        const payload = await response.json();
+        if (Array.isArray(payload)) {
+          payload.forEach((item) => {
+            const value = String(item || '').trim();
+            if (value) merged.add(value);
+          });
+        }
+      }
+    } catch (_) {
+      // Use fallback skills only when API fetch fails.
+    }
+
+    return Array.from(merged).sort((a, b) => a.localeCompare(b));
+  };
+
+  const attachSkillDatalist = (input, listId, suggestions) => {
+    if (!input) return;
+    let datalist = document.getElementById(listId);
+    if (!datalist) {
+      datalist = document.createElement('datalist');
+      datalist.id = listId;
+      form.appendChild(datalist);
+    }
+    datalist.innerHTML = '';
+    suggestions.forEach((skill) => {
+      const option = document.createElement('option');
+      option.value = skill;
+      datalist.appendChild(option);
+    });
+    input.setAttribute('list', listId);
+    input.setAttribute('autocomplete', 'off');
+    input.setAttribute('autocapitalize', 'words');
+    input.setAttribute('spellcheck', 'false');
+  };
+
+  const initSkillSection = (section, datalistId, suggestions) => {
     if (!section) return;
     const list = qs('[data-skill-list]', section);
     const input = qs('[data-skill-input]', section);
     const addBtn = qs('[data-skill-add]', section);
+
+    attachSkillDatalist(input, datalistId, suggestions);
 
     qsa('.pill-chip', list).forEach((chip) => {
       if (!chip.dataset.value) {
@@ -91,13 +158,36 @@
       if (e.key === 'Enter') {
         e.preventDefault();
         addChip();
+        return;
+      }
+      if (e.key === ',' || e.key === 'Tab') {
+        const value = (input.value || '').trim();
+        if (value) {
+          if (e.key === ',') {
+            e.preventDefault();
+          }
+          addChip();
+        }
+      }
+    });
+
+    input?.addEventListener('change', () => {
+      const value = (input.value || '').trim();
+      if (!value) return;
+      const matchesSuggestion = suggestions.some((entry) => entry.toLowerCase() === value.toLowerCase());
+      if (matchesSuggestion) {
+        addChip();
       }
     });
   };
 
-  initSkillSection(qs('[data-skill-section="core"]', form));
-  initSkillSection(qs('[data-skill-section="soft"]', form));
-  syncSkills();
+  const boot = async () => {
+    const suggestions = await loadSkillSuggestions();
+    initSkillSection(qs('[data-skill-section="core"]', form), 'coreSkillSuggestions', suggestions);
+    initSkillSection(qs('[data-skill-section="soft"]', form), 'softSkillSuggestions', suggestions);
+    syncSkills();
+  };
+  boot();
 
   // Profile photo preview (visual only until Save Profile is submitted)
   const photoInput = document.getElementById('profile_photo');

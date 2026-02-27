@@ -1,49 +1,24 @@
 /* Public Profile — redesigned */
 
 .public-profile {
-  background: #f5f7fb;
+  background: #ffffff;
   color: #0f172a;
   padding-bottom: 3.5rem;
 }
 
 .public-profile .profile-hero {
   position: relative;
-  padding: 0 1.75rem 2.3rem;
+  width: 100%;
+  padding: 80px 0 112px;
+  background: linear-gradient(to bottom, #0b1f3a 0%, #142d4c 40%, rgba(255, 255, 255, 0) 100%);
 }
 
-.public-profile .profile-hero::before {
-  content: "";
-  position: absolute;
-  left: 1.75rem;
-  right: 1.75rem;
-  top: 0.9rem;
-  height: 190px;
-  border-radius: 24px;
-  background: linear-gradient(118deg, #0f1b30 0%, #2f3c52 84%);
-}
-
-.public-profile .profile-hero::after {
-  content: "";
-  position: absolute;
-  left: 1.75rem;
-  right: 1.75rem;
-  top: 145px;
-  height: 58px;
-  border-radius: 0 0 24px 24px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #ffffff 100%);
-}
-
-.public-profile .profile-hero-card {
+.public-profile .profile-hero-content {
   position: relative;
   z-index: 1;
-  max-width: 940px;
+  max-width: 1120px;
   margin: 0 auto;
-  margin-top: 98px;
-  background: #ffffff;
-  border-radius: 22px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.12);
-  padding: 1.95rem 1.9rem 1.75rem;
+  padding: 0 2rem;
 }
 
 .public-profile .hero-top {
@@ -63,7 +38,7 @@
 .public-profile .profile-avatar {
   width: 128px;
   height: 128px;
-  margin-top: -48px;
+  margin-top: 0;
   border-radius: 18px;
   background: linear-gradient(180deg, #1e293b, #334155);
   overflow: hidden;
@@ -119,14 +94,14 @@
   font-weight: 800;
   line-height: 1.07;
   margin: 0;
-  color: #0b1835;
+  color: #ffffff;
 }
 
 .public-profile .profile-headline {
   margin: 0;
   font-size: clamp(0.95rem, 1.2vw, 1.05rem);
   line-height: 1.35;
-  color: #556d8f;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .public-profile .hero-status-row {
@@ -160,7 +135,7 @@
 }
 
 .public-profile .location-item {
-  color: #5f718d;
+  color: rgba(255, 255, 255, 0.82);
   font-size: 0.95rem;
   font-weight: 500;
   display: inline-flex;
@@ -174,7 +149,7 @@
 }
 
 .public-profile .joined-item {
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.78);
   font-size: 0.92rem;
   font-weight: 500;
   display: inline-flex;
@@ -223,10 +198,10 @@
 }
 
 .public-profile .btn-outline {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.96);
   color: #0f172a;
-  border-color: #c5d0df;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+  border-color: rgba(255, 255, 255, 0.92);
+  box-shadow: none;
 }
 
 .public-profile .btn-outline svg {
@@ -247,12 +222,12 @@
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  border: 1px solid #dbe4ee;
-  background: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.96);
   display: grid;
   place-items: center;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+  box-shadow: none;
   transition: all 0.2s ease;
 }
 
@@ -288,7 +263,7 @@
 
 .public-profile .metric-label {
   font-size: 0.95rem;
-  color: #61728c;
+  color: rgba(255, 255, 255, 0.8);
   font-weight: 500;
 }
 
@@ -297,14 +272,14 @@
   font-size: clamp(1.35rem, 1.9vw, 1.8rem);
   line-height: 1.05;
   font-weight: 800;
-  color: #071b45;
+  color: #ffffff;
 }
 
 .public-profile .metric-icon {
   width: 34px;
   height: 34px;
   border-radius: 12px;
-  color: #8c9cb3;
+  color: rgba(255, 255, 255, 0.78);
   display: grid;
   place-items: center;
 }
@@ -319,14 +294,14 @@
 
 .public-profile .hero-divider {
   height: 1px;
-  background: #dce6f2;
+  background: rgba(255, 255, 255, 0.26);
   margin: 1.5rem 0 0.65rem;
 }
 
 .public-profile .profile-sections {
-  max-width: 940px;
-  margin: -1.5rem auto 0;
-  padding: 0 1.5rem;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 2rem;
   display: grid;
   gap: 1.6rem;
 }
@@ -680,26 +655,11 @@
 
 @media (max-width: 900px) {
   .public-profile .profile-hero {
-    padding: 0 1.2rem 2.2rem;
+    padding: 74px 0 102px;
   }
 
-  .public-profile .profile-hero::before,
-  .public-profile .profile-hero::after {
-    left: 1.2rem;
-    right: 1.2rem;
-  }
-
-  .public-profile .profile-hero::before {
-    height: 176px;
-  }
-
-  .public-profile .profile-hero::after {
-    top: 136px;
-  }
-
-  .public-profile .profile-hero-card {
-    margin-top: 88px;
-    padding: 1.45rem 1.2rem;
+  .public-profile .profile-hero-content {
+    padding: 0 1.4rem;
   }
 
   .public-profile .hero-top {
@@ -716,7 +676,7 @@
   .public-profile .profile-avatar {
     width: 108px;
     height: 108px;
-    margin-top: -36px;
+    margin-top: 0;
   }
 
   .public-profile .hero-right {
@@ -730,30 +690,11 @@
 
 @media (max-width: 640px) {
   .public-profile .profile-hero {
-    padding: 0 1rem 2.1rem;
+    padding: 70px 0 94px;
   }
 
-  .public-profile .profile-hero::before,
-  .public-profile .profile-hero::after {
-    left: 1rem;
-    right: 1rem;
-    border-radius: 24px;
-  }
-
-  .public-profile .profile-hero::before {
-    height: 164px;
-  }
-
-  .public-profile .profile-hero::after {
-    top: 130px;
-    height: 52px;
-    border-radius: 0 0 24px 24px;
-  }
-
-  .public-profile .profile-hero-card {
-    margin-top: 82px;
-    border-radius: 18px;
-    padding: 1.2rem 0.95rem 1.1rem;
+  .public-profile .profile-hero-content {
+    padding: 0 1rem;
   }
 
   .public-profile .hero-left {
@@ -764,11 +705,10 @@
   .public-profile .profile-avatar {
     width: 94px;
     height: 94px;
-    margin-top: -30px;
+    margin-top: 0;
   }
 
   .public-profile .profile-sections {
-    margin-top: -1.5rem;
     padding: 0 1rem;
   }
 
