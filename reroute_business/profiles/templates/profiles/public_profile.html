@@ -13,7 +13,7 @@
         <div class="hero-left">
           <div class="profile-avatar">
             {% if profile.profile_picture %}
-              <img src="{{ profile.profile_picture.url }}" alt="{{ display_name }} profile photo">
+              <img src="{{ profile.profile_picture.url }}?v={{ profile.profile_picture.name|urlencode }}" alt="{{ display_name }} profile photo">
             {% else %}
               <span class="profile-avatar__initials" aria-hidden="true">
                 {% if display_first or display_last %}
@@ -301,7 +301,9 @@
   if (bookmarkBtn && bookmarkUrl) {
     const csrfToken = (() => {
       const match = document.cookie.match(/csrftoken=([^;]+)/);
-      return match ? match[1] : '';
+      if (match) return match[1];
+      const hidden = document.querySelector('input[name="csrfmiddlewaretoken"]');
+      return hidden ? hidden.value : '';
     })();
 
     bookmarkBtn.addEventListener('click', async () => {
@@ -309,10 +311,15 @@
       try {
         const res = await fetch(bookmarkUrl, {
           method: 'POST',
-          headers: { 'X-CSRFToken': csrfToken },
+          headers: {
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+          },
         });
-        const data = await res.json();
-        if (!res.ok || !data.ok) throw new Error('Bookmark failed');
+        const contentType = (res.headers.get('content-type') || '').toLowerCase();
+        const data = contentType.includes('application/json') ? await res.json() : { ok: false };
+        if (!res.ok || !data.ok) throw new Error((data && data.error) || 'Bookmark failed');
         bookmarkBtn.classList.toggle('is-saved', !!data.saved);
         bookmarkBtn.setAttribute('aria-pressed', data.saved ? 'true' : 'false');
         if (toast) {

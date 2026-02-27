@@ -1,8 +1,13 @@
 /* === Container === */
 .job-post {
   max-width: 1100px;
-  margin: 2rem auto;
-  padding: 5rem 1.25rem 5rem; /* bottom space for sticky actions */
+  margin: 1.5rem auto;
+  padding: 2rem 1.25rem 5rem; /* bottom space for sticky actions */
+}
+
+.jp-warning {
+  margin: 0 0 1rem;
+  border-radius: 12px;
 }
 
 /* === Header === */
@@ -10,14 +15,24 @@
   display: flex;
   gap: 1rem;
   align-items: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
 }
 .jp-icon {
   width: 44px; height: 44px;
   display: grid; place-items: center;
   border-radius: 12px;
   background: #eef2ff;
-  font-size: 1.25rem;
+  color: #223a73;
+}
+
+.jp-icon svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .jp-title {
   margin: 0;
@@ -29,13 +44,58 @@
   color: #6b7280;
 }
 
+.jp-guide {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: flex-start;
+  border: 1px solid #dbe8f7;
+  background: #f6faff;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.jp-guide-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #e3eeff;
+  color: #2453a6;
+  display: grid;
+  place-items: center;
+  flex: 0 0 28px;
+}
+
+.jp-guide-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.jp-guide-title {
+  margin: 0;
+  font-weight: 700;
+  color: #10223f;
+}
+
+.jp-guide-text {
+  margin: 0.2rem 0 0;
+  color: #4b5d79;
+  font-size: 0.93rem;
+}
+
 /* === Form === */
 .jp-form {
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 14px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,.04);
+  padding: 1.75rem;
+  box-shadow: 0 8px 20px rgba(2, 6, 23, 0.06);
 }
 
 .jp-grid {
@@ -47,7 +107,26 @@
 .jp-col { display: flex; flex-direction: column; gap: 1rem; }
 
 .jp-field { display: flex; flex-direction: column; gap: .5rem; }
-.jp-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.jp-field-row,
+.form-group-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.jp-panel {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fbfdff;
+  padding: 1rem;
+}
+
+.jp-panel-title {
+  margin: 0 0 0.8rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
 
 .jp-field label {
   font-weight: 600;
@@ -60,7 +139,10 @@
 
 .jp-field input,
 .jp-field textarea,
-.jp-field select {
+.jp-field select,
+.form-group input,
+.form-group textarea,
+.form-group select {
   width: 100%;
   padding: .8rem .9rem;
   border: 1px solid #d1d5db;
@@ -72,11 +154,39 @@
 
 .jp-field input:focus,
 .jp-field textarea:focus,
-.jp-field select:focus {
+.jp-field select:focus,
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
   outline: none;
   border-color: #2563eb;
   background: #fff;
   box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+}
+
+.jp-field.has-error input,
+.jp-field.has-error textarea,
+.jp-field.has-error select {
+  border-color: #dc2626;
+  background: #fff7f7;
+}
+
+.jp-field.has-error .jp-chips {
+  border-color: #dc2626;
+  background: #fff7f7;
+}
+
+.jp-field.has-error input:focus,
+.jp-field.has-error textarea:focus,
+.jp-field.has-error select:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.jp-error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.84rem;
+  font-weight: 600;
 }
 
 /* === Chips (Tags) === */
@@ -144,11 +254,28 @@
   border: 1px solid transparent;
   cursor: pointer;
 }
+
+.btn svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .btn-primary {
   background: #2563eb;
   color: #fff;
 }
 .btn-primary:hover { background: #1e40af; }
+.btn-primary:disabled,
+.btn-primary[aria-disabled="true"] {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
 .btn-secondary {
   background: #f3f4f6;
   color: #111827;
@@ -156,9 +283,21 @@
 }
 .btn-secondary:hover { background: #e5e7eb; }
 
+.btn-primary svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 /* === Responsive === */
 @media (max-width: 960px) {
   .jp-grid { grid-template-columns: 1fr; }
+  .jp-field-row,
+  .form-group-row { grid-template-columns: 1fr; }
   .jp-actions { justify-content: stretch; gap: .5rem; }
   .btn { flex: 1; justify-content: center; }
 }

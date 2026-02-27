@@ -7,17 +7,34 @@
 <link rel="stylesheet" href="{% static 'employers/css/create_job.css' %}">
 
 <div class="job-post">
-  {% if employer_verified is not defined or not employer_verified %}
-  <div class="alert warning" role="status" style="margin:12px 0;">
+  {% if not employer_verified %}
+  <div class="alert warning jp-warning" role="status">
     <strong>Pending verification:</strong> Your employer account must be verified by ReRoute before you can post jobs. Please complete your company profile; we’ll notify you when approved.
   </div>
   {% endif %}
   <!-- Header: icon + title -->
   <div class="jp-header">
-    <div class="jp-icon" aria-hidden="true">🧾</div>
+    <div class="jp-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" focusable="false">
+        <rect x="4" y="3" width="16" height="18" rx="2"></rect>
+        <path d="M8 8h8M8 12h8M8 16h5"></path>
+      </svg>
+    </div>
     <div>
       <h1 class="jp-title">Post a New Job</h1>
       <p class="jp-subtitle">Share a short, clear description. You can edit later.</p>
+    </div>
+  </div>
+  <div class="jp-guide" aria-label="Job post guidance">
+    <span class="jp-guide-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" focusable="false">
+        <path d="M12 3 5 6v6c0 5 3.4 7.8 7 9 3.6-1.2 7-4 7-9V6Z"></path>
+        <path d="M9 12.2 11 14.2 15 10.2"></path>
+      </svg>
+    </span>
+    <div class="jp-guide-copy">
+      <p class="jp-guide-title">A clear post attracts stronger matches.</p>
+      <p class="jp-guide-text">Use plain language, include must-have requirements, and provide a realistic pay range.</p>
     </div>
   </div>
 
@@ -28,106 +45,143 @@
     <div class="jp-grid">
       <!-- LEFT COLUMN -->
       <div class="jp-col">
-        <!-- Job Title -->
-        <div class="jp-field">
-          <label for="title">Job Title</label>
-          <input id="title" name="title" type="text" required
-                 placeholder="e.g., Warehouse Associate">
-          <small class="jp-help">Keep it specific. Avoid ALL CAPS.</small>
-        </div>
-
-        <!-- Description -->
-        <div class="jp-field">
-          <label for="description">Description</label>
-          <textarea id="description" name="description" rows="6" required
-                    data-max="1200"
-                    placeholder="Role overview, day-to-day, mission…"></textarea>
-          <div class="jp-meta"><small><span id="descCount">0</span>/1200</small></div>
-        </div>
-
-        <!-- Tags (chips) -->
-        <div class="jp-field">
-          <label for="tags">Tags</label>
-          <!-- Hidden input stores the comma-separated value we submit -->
-          <input id="tags" name="tags" type="hidden">
-          <div class="jp-chips" id="chips" data-input="tags" aria-label="Job tags input">
-            <input class="chip-input" type="text" placeholder="Type a tag and press Enter">
+        <section class="jp-panel" aria-label="Job basics">
+          <h2 class="jp-panel-title">Job Basics</h2>
+          <div class="jp-field{% if form_errors.title %} has-error{% endif %}">
+            <label for="title">Job Title</label>
+            <input id="title" name="title" type="text" required
+                   placeholder="e.g., Warehouse Associate"
+                   aria-invalid="{% if form_errors.title %}true{% else %}false{% endif %}"
+                   value="{{ form_data.title|default:'' }}">
+            <small class="jp-help">Keep it specific. Avoid ALL CAPS.</small>
+            {% if form_errors.title %}<p class="jp-error">{{ form_errors.title }}</p>{% endif %}
           </div>
-          <small class="jp-help">Examples: forklift, night shift, entry-level</small>
-        </div>
+          <div class="jp-field{% if form_errors.description %} has-error{% endif %}">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="6" required
+                      data-max="1200"
+                      aria-invalid="{% if form_errors.description %}true{% else %}false{% endif %}"
+                      placeholder="Role overview, day-to-day, team culture, and impact">{{ form_data.description|default:'' }}</textarea>
+            <div class="jp-meta"><small><span id="descCount">0</span>/1200</small></div>
+            {% if form_errors.description %}<p class="jp-error">{{ form_errors.description }}</p>{% endif %}
+          </div>
+        </section>
+        <section class="jp-panel" aria-label="Listing details">
+          <h2 class="jp-panel-title">Listing Details</h2>
+          <div class="jp-field{% if form_errors.tags %} has-error{% endif %}" id="tagsField">
+            <label for="tags">Tags</label>
+            <!-- Hidden input stores the comma-separated value we submit -->
+            <input id="tags" name="tags" type="hidden" value="{{ form_data.tags|default:'' }}">
+            <div class="jp-chips" id="chips" data-input="tags" aria-label="Job tags input">
+              <input class="chip-input" type="text" placeholder="Type a tag and press Enter">
+            </div>
+            <small class="jp-help">Examples: forklift, night shift, entry-level (max 5 tags)</small>
+            {% if form_errors.tags %}
+            <p class="jp-error" id="tagsError">{{ form_errors.tags }}</p>
+            {% else %}
+            <p class="jp-error" id="tagsError" hidden></p>
+            {% endif %}
+          </div>
+        </section>
       </div>
 
       <!-- RIGHT COLUMN -->
-      <div class="form-column">
-        <div class="form-group">
-          <label for="location">Location</label>
-          <input id="location" name="location" type="text" required placeholder="City, ST or Remote">
-        </div>
-
-        <div class="form-group">
-          <label for="experience_level">Experience</label>
-          <select id="experience_level" name="experience_level">
-            <option value="">Select level</option>
-            <option value="entry">Entry-level</option>
-            <option value="junior">Junior</option>
-            <option value="mid">Mid</option>
-            <option value="senior">Senior</option>
-            <option value="lead">Lead</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="job_type">Job Type</label>
-          <select id="job_type" name="job_type">
-            <option value="full_time">Full-Time</option>
-            <option value="part_time">Part-Time</option>
-            <option value="contract">Contract</option>
-            <option value="internship">Internship</option>
-            <option value="temporary">Temporary</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="salary_type">Pay Type</label>
-          <select id="salary_type" name="salary_type" onchange="togglePayFields(this.value)">
-            <option value="hour">Per Hour</option>
-            <option value="year">Per Year</option>
-          </select>
-        </div>
-
-        <div id="hourly_fields" class="form-group-row">
-          <div class="form-group">
-            <label for="hourly_min">Hourly Min ($)</label>
-            <input id="hourly_min" name="hourly_min" type="number" step="0.01" placeholder="18.50">
+      <div class="jp-col jp-col--right">
+        <section class="jp-panel" aria-label="Role details">
+          <h2 class="jp-panel-title">Role Details</h2>
+          <div class="jp-field-row">
+            <div class="jp-field{% if form_errors.location %} has-error{% endif %}">
+              <label for="location">Location</label>
+              <input id="location" name="location" type="text" required placeholder="City, ST or Remote" aria-invalid="{% if form_errors.location %}true{% else %}false{% endif %}" value="{{ form_data.location|default:'' }}">
+              {% if form_errors.location %}<p class="jp-error">{{ form_errors.location }}</p>{% endif %}
+            </div>
+            <div class="jp-field{% if form_errors.zip_code %} has-error{% endif %}">
+              <label for="zip_code">ZIP Code</label>
+              <input id="zip_code" name="zip_code" type="text" inputmode="numeric" maxlength="5" aria-invalid="{% if form_errors.zip_code %}true{% else %}false{% endif %}" placeholder="e.g., 19104" value="{{ form_data.zip_code|default:'' }}">
+              {% if form_errors.zip_code %}<p class="jp-error">{{ form_errors.zip_code }}</p>{% endif %}
+            </div>
           </div>
-          <div class="form-group">
-            <label for="hourly_max">Hourly Max ($)</label>
-            <input id="hourly_max" name="hourly_max" type="number" step="0.01" placeholder="24.00">
+          <div class="jp-field-row">
+            <div class="jp-field">
+              <label for="experience_level">Experience</label>
+              <select id="experience_level" name="experience_level">
+                <option value="" {% if not form_data.experience_level %}selected{% endif %}>Select level</option>
+                <option value="entry" {% if form_data.experience_level == 'entry' %}selected{% endif %}>Entry-level</option>
+                <option value="junior" {% if form_data.experience_level == 'junior' %}selected{% endif %}>Junior</option>
+                <option value="mid" {% if form_data.experience_level == 'mid' %}selected{% endif %}>Mid</option>
+                <option value="senior" {% if form_data.experience_level == 'senior' %}selected{% endif %}>Senior</option>
+                <option value="lead" {% if form_data.experience_level == 'lead' %}selected{% endif %}>Lead</option>
+              </select>
+            </div>
+            <div class="jp-field">
+              <label for="job_type">Job Type</label>
+              <select id="job_type" name="job_type">
+                <option value="full_time" {% if form_data.job_type == 'full_time' %}selected{% endif %}>Full-Time</option>
+                <option value="part_time" {% if form_data.job_type == 'part_time' %}selected{% endif %}>Part-Time</option>
+                <option value="contract" {% if form_data.job_type == 'contract' %}selected{% endif %}>Contract</option>
+                <option value="internship" {% if form_data.job_type == 'internship' %}selected{% endif %}>Internship</option>
+                <option value="temporary" {% if form_data.job_type == 'temporary' %}selected{% endif %}>Temporary</option>
+              </select>
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div id="yearly_fields" class="form-group-row" style="display:none">
-          <div class="form-group">
-            <label for="salary_min">Yearly Min (in thousands)</label>
-            <input id="salary_min" name="salary_min" type="number" placeholder="57 = $57k">
+        <section class="jp-panel" aria-label="Compensation">
+          <h2 class="jp-panel-title">Compensation</h2>
+          <div class="jp-field">
+            <label for="salary_type">Pay Type</label>
+            <select id="salary_type" name="salary_type" onchange="togglePayFields(this.value)">
+              <option value="hour" {% if form_data.salary_type != 'year' %}selected{% endif %}>Per Hour</option>
+              <option value="year" {% if form_data.salary_type == 'year' %}selected{% endif %}>Per Year</option>
+            </select>
           </div>
-          <div class="form-group">
-            <label for="salary_max">Yearly Max (in thousands)</label>
-            <input id="salary_max" name="salary_max" type="number" placeholder="62 = $62k">
-          </div>
-        </div>
 
-        <div class="form-group">
-          <label for="requirements">Requirements</label>
-          <textarea id="requirements" name="requirements" rows="6" required></textarea>
-        </div>
+          <div id="hourly_fields" class="form-group-row">
+            <div class="jp-field{% if form_errors.hourly_max %} has-error{% endif %}">
+              <label for="hourly_min">Hourly Min ($)</label>
+              <input id="hourly_min" name="hourly_min" type="number" step="0.01" placeholder="18.50" value="{{ form_data.hourly_min|default:'' }}">
+            </div>
+            <div class="jp-field{% if form_errors.hourly_max %} has-error{% endif %}">
+              <label for="hourly_max">Hourly Max ($)</label>
+              <input id="hourly_max" name="hourly_max" type="number" step="0.01" aria-invalid="{% if form_errors.hourly_max %}true{% else %}false{% endif %}" placeholder="24.00" value="{{ form_data.hourly_max|default:'' }}">
+              {% if form_errors.hourly_max %}<p class="jp-error">{{ form_errors.hourly_max }}</p>{% endif %}
+            </div>
+          </div>
+
+          <div id="yearly_fields" class="form-group-row" hidden>
+            <div class="jp-field{% if form_errors.salary_max %} has-error{% endif %}">
+              <label for="salary_min">Yearly Min (in thousands)</label>
+              <input id="salary_min" name="salary_min" type="number" placeholder="57 = $57k" value="{{ form_data.salary_min|default:'' }}">
+            </div>
+            <div class="jp-field{% if form_errors.salary_max %} has-error{% endif %}">
+              <label for="salary_max">Yearly Max (in thousands)</label>
+              <input id="salary_max" name="salary_max" type="number" aria-invalid="{% if form_errors.salary_max %}true{% else %}false{% endif %}" placeholder="62 = $62k" value="{{ form_data.salary_max|default:'' }}">
+              {% if form_errors.salary_max %}<p class="jp-error">{{ form_errors.salary_max }}</p>{% endif %}
+            </div>
+          </div>
+        </section>
+
+        <section class="jp-panel" aria-label="Candidate requirements">
+          <h2 class="jp-panel-title">Candidate Requirements</h2>
+          <div class="jp-field{% if form_errors.requirements %} has-error{% endif %}">
+            <label for="requirements">Requirements</label>
+            <textarea id="requirements" name="requirements" rows="6" required data-max="1200" aria-invalid="{% if form_errors.requirements %}true{% else %}false{% endif %}" placeholder="Required skills, certifications, schedule, and must-haves">{{ form_data.requirements|default:'' }}</textarea>
+            <div class="jp-meta"><small><span id="reqCount">0</span>/1200</small></div>
+            {% if form_errors.requirements %}<p class="jp-error">{{ form_errors.requirements }}</p>{% endif %}
+          </div>
+        </section>
       </div>
     </div>
 
     <!-- Sticky Actions -->
     <div class="jp-actions">
       <a href="{% url 'employer_dashboard' %}" class="btn btn-secondary">Cancel</a>
-      <button type="submit" class="btn btn-primary">Post Job</button>
+      <button type="submit" class="btn btn-primary" {% if not employer_verified %}disabled aria-disabled="true"{% endif %}>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M5 12h14M13 6l6 6-6 6"></path>
+        </svg>
+        Post Job
+      </button>
     </div>
   </form>
 </div>

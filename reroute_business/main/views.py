@@ -1772,6 +1772,19 @@ def settings_view(request):
     Template: main/settings.html
     """
     password_form = PasswordForm(request.user)
+    # Prevent overlap: employers should manage profile data in company profile,
+    # not the seeker profile editor panel.
+    requested_panel = (request.GET.get("panel") or request.POST.get("panel") or "").strip().lower()
+    if is_employer(request.user):
+        is_seeker_profile_edit = (
+            requested_panel == "profile"
+            or request.POST.get("profile_form") == "1"
+            or "save_profile" in request.POST
+        )
+        if is_seeker_profile_edit:
+            messages.info(request, "Employer profiles are managed in Company Profile.")
+            return redirect("dashboard:employer_company_profile")
+
     # Ensure profile exists for preferences section
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
@@ -1868,9 +1881,29 @@ def settings_view(request):
             profile.soft_skills = soft_items
 
             avatar = request.FILES.get('profile_photo')
+            profile_update_fields = [
+                "headline",
+                "location",
+                "status",
+                "bio",
+                "is_public",
+                "ready_to_discuss_background",
+                "core_skills",
+                "soft_skills",
+            ]
             if avatar:
-                profile.profile_picture = avatar
-            profile.save()
+                # Replace existing avatar to avoid stale files and ensure the new file is persisted.
+                if profile.profile_picture:
+                    try:
+                        profile.profile_picture.delete(save=False)
+                    except Exception:
+                        pass
+                profile.profile_picture.save(avatar.name, avatar, save=False)
+                profile_update_fields.append("profile_picture")
+            try:
+                profile.save(update_fields=profile_update_fields)
+            except Exception:
+                profile.save()
 
             if Resume and resume:
                 try:
@@ -1924,8 +1957,11 @@ def settings_view(request):
                     order=idx,
                 )
 
-            messages.success(request, "Profile updated.")
-            return redirect('settings')
+            if avatar:
+                messages.success(request, "Profile and photo updated.")
+            else:
+                messages.success(request, "Profile updated.")
+            return redirect(f"{reverse('settings')}?panel=profile")
 
         # Change Password
         if 'change_password' in request.POST:

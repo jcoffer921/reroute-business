@@ -22,6 +22,12 @@
           <option value="{{ key }}" {% if active_category == key %}selected{% endif %}>{{ label }}</option>
         {% endfor %}
       </select>
+      {% if request.user.is_authenticated %}
+      <label class="saved-only-toggle" for="saved_only_toggle">
+        <input id="saved_only_toggle" type="checkbox" name="saved" value="1" {% if saved_only %}checked{% endif %}>
+        <span>Saved only</span>
+      </label>
+      {% endif %}
       <button class="btn-primary" type="submit">Search</button>
     </div>
   </form>
@@ -61,11 +67,11 @@
     {% if orgs.paginator.num_pages > 1 %}
     <div class="pagination">
       {% if orgs.has_previous %}
-        <a class="page-link" href="?page={{ orgs.previous_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if active_category %}&category={{ active_category }}{% endif %}{% if selected_zip %}&zip={{ selected_zip }}{% endif %}">Previous</a>
+        <a class="page-link" href="?page={{ orgs.previous_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if active_category %}&category={{ active_category }}{% endif %}{% if selected_zip %}&zip={{ selected_zip }}{% endif %}{% if saved_only %}&saved=1{% endif %}">Previous</a>
       {% endif %}
       <span class="page-status">Page {{ orgs.number }} of {{ orgs.paginator.num_pages }}</span>
       {% if orgs.has_next %}
-        <a class="page-link" href="?page={{ orgs.next_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if active_category %}&category={{ active_category }}{% endif %}{% if selected_zip %}&zip={{ selected_zip }}{% endif %}">Next</a>
+        <a class="page-link" href="?page={{ orgs.next_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if active_category %}&category={{ active_category }}{% endif %}{% if selected_zip %}&zip={{ selected_zip }}{% endif %}{% if saved_only %}&saved=1{% endif %}">Next</a>
       {% endif %}
     </div>
     {% endif %}

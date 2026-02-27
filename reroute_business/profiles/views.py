@@ -8,6 +8,7 @@ from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 
 from .models import (
@@ -58,6 +59,7 @@ def is_reentry_org(user) -> bool:
 
 # ----------------------------- Public profile ---------------------------
 @login_required
+@ensure_csrf_cookie
 def public_profile_view(request, username: str):
     allowed_gradients = {key for key, _label in PROFILE_GRADIENT_CHOICES}
 
@@ -66,6 +68,10 @@ def public_profile_view(request, username: str):
         user__username=username,
     )
     target_user = profile.user
+    # Keep seeker and employer public profiles separate.
+    if is_employer(target_user):
+        return redirect("employer_public_profile", username=target_user.username)
+
     is_owner = request.user == target_user
     viewer_is_employer = is_employer(request.user)
     viewer_is_reentry = is_reentry_org(request.user)
@@ -312,7 +318,10 @@ def toggle_candidate_bookmark(request, username: str):
         existing.delete()
         return JsonResponse({"ok": True, "saved": False})
 
-    SavedCandidate.objects.create(saved_by=request.user, candidate=candidate)
+    try:
+        SavedCandidate.objects.get_or_create(saved_by=request.user, candidate=candidate)
+    except Exception:
+        return JsonResponse({"ok": False, "error": "Unable to save candidate right now."}, status=500)
     return JsonResponse({"ok": True, "saved": True})
 
 

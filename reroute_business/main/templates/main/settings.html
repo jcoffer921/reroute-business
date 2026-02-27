@@ -111,7 +111,7 @@
               <div class="profile-photo-block">
                 <div class="profile-photo-shell">
                   {% if profile_details.profile_picture %}
-                    <img src="{{ profile_details.profile_picture.url }}" alt="{{ profile_first_name }} profile photo">
+                    <img src="{{ profile_details.profile_picture.url }}?v={{ profile_details.profile_picture.name|urlencode }}" alt="{{ profile_first_name }} profile photo">
                   {% else %}
                     <div class="profile-photo-initials">
                       {% with fn=profile_first_name|default:'' ln=profile_last_name|default:'' %}

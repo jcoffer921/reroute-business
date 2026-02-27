@@ -206,6 +206,33 @@
     <section class="card">
       <div class="section-header">
         <div class="section-title">
+          <span class="section-icon green">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M6 21V5a2 2 0 0 1 2-2h6l4 4v14" />
+              <path d="M14 3v4h4" />
+            </svg>
+          </span>
+          <h2>{% trans "Saved Organizations" %}</h2>
+        </div>
+      </div>
+      {% if organizations_saved_count %}
+      <div class="jobs-placeholder jobs-placeholder--left">
+        <h3>{% blocktrans with count=organizations_saved_count %}You have {{ count }} saved organization{{ count|pluralize }}.{% endblocktrans %}</h3>
+        <p>{% trans "Revisit support providers you saved to compare options and next steps." %}</p>
+        <a class="btn-outline" href="{% url 'reentry_org:organization_catalog' %}?saved=1">{% trans "View Saved Organizations" %}</a>
+      </div>
+      {% else %}
+      <div class="jobs-placeholder jobs-placeholder--left">
+        <h3>{% trans "No saved organizations yet." %}</h3>
+        <p>{% trans "Save organizations to build your personal support list." %}</p>
+        <a class="btn-outline" href="{% url 'reentry_org:organization_catalog' %}">{% trans "Browse organizations" %}</a>
+      </div>
+      {% endif %}
+    </section>
+
+    <section class="card">
+      <div class="section-header">
+        <div class="section-title">
           <span class="section-icon amber">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <rect x="4" y="4" width="16" height="16" rx="2" />
@@ -240,47 +267,6 @@
       </div>
       {% endif %}
     </section>
-  </section>
-
-  <section class="card">
-    <div class="section-header">
-      <div class="section-title">
-        <span class="section-icon green">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M3 7h18v13H3z" />
-            <path d="M8 7V5h8v2" />
-          </svg>
-        </span>
-        <h2>{% trans "Suggested Jobs (Coming Soon)" %}</h2>
-      </div>
-      <span class="section-pill">{% trans "Preview" %}</span>
-    </div>
-    <p class="muted">{% trans "Will be personalized by ZIP and skills." %}</p>
-    <div class="module-card-grid">
-      {% for item in suggested_cards|slice:":3" %}
-      <article class="module-reco-card">
-        <h3>{{ item.job.title }}</h3>
-        <p class="muted">{{ item.job.employer.username }} · {{ item.job.location|default:"Location flexible" }}</p>
-        <span class="org-pill">{% trans "Suggestion" %}</span>
-      </article>
-      {% empty %}
-      <article class="module-reco-card">
-        <h3>{% trans "Warehouse Associate" %}</h3>
-        <p class="muted">{% trans "Philadelphia · Placeholder role" %}</p>
-        <span class="org-pill">{% trans "Suggestion" %}</span>
-      </article>
-      <article class="module-reco-card">
-        <h3>{% trans "Driver Helper" %}</h3>
-        <p class="muted">{% trans "West Philly · Placeholder role" %}</p>
-        <span class="org-pill">{% trans "Suggestion" %}</span>
-      </article>
-      <article class="module-reco-card">
-        <h3>{% trans "Facilities Support" %}</h3>
-        <p class="muted">{% trans "Center City · Placeholder role" %}</p>
-        <span class="org-pill">{% trans "Suggestion" %}</span>
-      </article>
-      {% endfor %}
-    </div>
   </section>
 
   <section class="card orgs-card">

@@ -434,13 +434,13 @@ def user_dashboard(request):
         {
             "label": "Learning module started",
             "subtext": f"{modules_completed} of 3 completed" if modules_completed else "Start your first module",
-            "url": f"{reverse('resource_list')}#modules",
+            "url": reverse("video_gallery"),
             "done": modules_started,
         },
         {
             "label": "Organizations saved",
             "subtext": "Find support near you",
-            "url": reverse("reentry_org:organization_catalog"),
+            "url": f"{reverse('reentry_org:organization_catalog')}?saved=1",
             "done": organizations_saved_count > 0,
         },
     ]

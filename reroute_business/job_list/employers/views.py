@@ -11,6 +11,8 @@ from reroute_business.core.models import Skill
 from reroute_business.core.utils.analytics import track_event
 from reroute_business.profiles.models import EmployerProfile
 
+MAX_TAGS = 5
+
 # Show jobs posted by this employer
 @login_required
 def dashboard_view(request):
@@ -52,11 +54,34 @@ def create_job(request):
         employer_profile = None
         employer_verified = False
 
+    def _default_form_data():
+        return {
+            "title": "",
+            "description": "",
+            "requirements": "",
+            "location": "",
+            "tags": "",
+            "zip_code": "",
+            "job_type": "full_time",
+            "experience_level": "",
+            "salary_type": "hour",
+            "hourly_min": "",
+            "hourly_max": "",
+            "salary_min": "",
+            "salary_max": "",
+        }
+
+    def _render_form(form_data=None, form_errors=None, status=200):
+        context = {
+            "employer_verified": employer_verified,
+            "form_data": form_data or _default_form_data(),
+            "form_errors": form_errors or {},
+        }
+        return render(request, 'job_list/employers/create_job.html', context, status=status)
+
     if not employer_profile or not employer_verified:
         messages.error(request, "Your employer account is pending verification. Please complete your profile and wait for approval before posting jobs.")
-        return render(request, 'job_list/employers/create_job.html', {
-            'employer_verified': employer_verified,
-        })
+        return _render_form()
 
     if request.method == 'POST':
         # Required
@@ -85,19 +110,57 @@ def create_job(request):
         hourly_max = to_decimal(request.POST.get('hourly_max'))
         salary_min = to_int(request.POST.get('salary_min'))   # "57" for $57k
         salary_max = to_int(request.POST.get('salary_max'))
+        cleaned_tags = []
+        seen_tag_keys = set()
+        for part in tags.split(","):
+            tag = " ".join(part.split()).strip()
+            if not tag:
+                continue
+            tag_key = tag.lower()
+            if tag_key not in seen_tag_keys:
+                seen_tag_keys.add(tag_key)
+                cleaned_tags.append(tag)
+        tags = ", ".join(cleaned_tags)
 
-        # Basic validation
-        if not all([title, description, requirements, location]):
-            messages.error(request, "Title, description, requirements and location are required.")
-            return render(request, 'job_list/employers/create_job.html')
+        form_data = {
+            "title": title,
+            "description": description,
+            "requirements": requirements,
+            "location": location,
+            "tags": tags,
+            "zip_code": zip_code,
+            "job_type": job_type,
+            "experience_level": experience_level,
+            "salary_type": salary_type,
+            "hourly_min": request.POST.get("hourly_min") or "",
+            "hourly_max": request.POST.get("hourly_max") or "",
+            "salary_min": request.POST.get("salary_min") or "",
+            "salary_max": request.POST.get("salary_max") or "",
+        }
+
+        form_errors = {}
+        if not title:
+            form_errors["title"] = "Job title is required."
+        if not description:
+            form_errors["description"] = "Description is required."
+        if not requirements:
+            form_errors["requirements"] = "Requirements are required."
+        if not location:
+            form_errors["location"] = "Location is required."
+        if zip_code and (not zip_code.isdigit() or len(zip_code) != 5):
+            form_errors["zip_code"] = "ZIP code must be 5 digits."
+        if len(cleaned_tags) > MAX_TAGS:
+            form_errors["tags"] = f"You can add up to {MAX_TAGS} tags."
 
         if salary_type == 'hour' and hourly_min and hourly_max and hourly_min > hourly_max:
-            messages.error(request, "Hourly min cannot be greater than hourly max.")
-            return render(request, 'job_list/employers/create_job.html')
+            form_errors["hourly_max"] = "Hourly max must be greater than or equal to hourly min."
 
         if salary_type == 'year' and salary_min and salary_max and salary_min > salary_max:
-            messages.error(request, "Salary min cannot be greater than salary max.")
-            return render(request, 'job_list/employers/create_job.html')
+            form_errors["salary_max"] = "Yearly max must be greater than or equal to yearly min."
+
+        if form_errors:
+            messages.error(request, "Please fix the highlighted fields and try again.")
+            return _render_form(form_data=form_data, form_errors=form_errors, status=400)
 
         # Create job
         job = Job.objects.create(
@@ -135,6 +198,4 @@ def create_job(request):
         messages.success(request, "Job posted successfully.")
         return redirect('employer_dashboard')
 
-    return render(request, 'job_list/employers/create_job.html', {
-        'employer_verified': employer_verified,
-    })
+    return _render_form()

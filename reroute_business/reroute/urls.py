@@ -39,9 +39,10 @@ urlpatterns = [
     path('admin-portal/', include(('admin_portal.urls', 'admin_portal'), namespace='admin_portal')),
 ]
 
-# Serve static/media locally when not on Render (even if DEBUG is false in env).
-# Render should serve files via its deployment/static pipeline.
+# Serve static locally when not on Render (even if DEBUG is false in env).
 if settings.DEBUG or not getattr(settings, "RENDER", False):
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Media uploads (profile photos, etc.) need a URL route in app deployments.
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     

@@ -20,10 +20,16 @@ def organization_catalog(request):
     q = (request.GET.get('q') or '').strip()
     category = (request.GET.get('category') or '').strip()
     zip_code = (request.GET.get('zip') or '').strip()
+    saved_only = (request.GET.get('saved') or '').strip().lower() in {"1", "true", "yes", "on"}
     if not zip_code.isdigit() or len(zip_code) != 5:
         zip_code = ''
 
     queryset = ReentryOrganization.objects.all()
+    if saved_only:
+        if request.user.is_authenticated:
+            queryset = queryset.filter(saves__user=request.user).distinct()
+        else:
+            queryset = queryset.none()
     if q:
         queryset = queryset.filter(Q(name__icontains=q) | Q(description__icontains=q))
     if category:
@@ -51,6 +57,7 @@ def organization_catalog(request):
         'q': q,
         'active_category': category,
         'selected_zip': zip_code,
+        'saved_only': saved_only,
         'categories': ReentryOrganization.CATEGORIES,
     }
     return render(request, 'reentry_org/catalog.html', context)
