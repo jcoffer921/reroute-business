@@ -7,104 +7,202 @@
 <link rel="stylesheet" href="{% static 'css/settings.css' %}">
 <link rel="stylesheet" href="{% static 'css/pricing.css' %}">
 
-<section class="settings-hero">
-  <div class="settings-hero-content">
-    <h1>Pricing</h1>
-    <p>Aligned to support justice-impacted job seekers and their community partners.</p>
-  </div>
-  <div class="settings-mini-nav">
-    <a class="mini-link" href="{% url 'settings' %}">Back to Settings</a>
+<section class="pricing-hero">
+  <div class="pricing-hero__inner">
+    <h1 class="pricing-hero__title">
+      <span class="pricing-hero__dark">Simple. Fair.</span>
+      <span class="pricing-hero__blue">Impact-<br>Driven</span>
+      <span class="pricing-hero__dark">Pricing.</span>
+    </h1>
+    <p class="pricing-hero__lead">
+      ReRoute keeps access free for justice-impacted individuals while building
+      sustainable partnerships with employers and reentry organizations.
+    </p>
+    <p class="pricing-hero__kicker">OUR MODEL IS DESIGNED TO REDUCE BARRIERS - NOT CREATE THEM.</p>
+    <div class="pricing-hero__actions">
+      <a href="{% url 'signup' %}" class="pricing-hero__btn pricing-hero__btn--primary">Get Started (Free)</a>
+      <a href="{% url 'for_agencies' %}" class="pricing-hero__btn pricing-hero__btn--secondary">Become a Partner</a>
+    </div>
   </div>
 </section>
 
-<div class="settings-container pricing-container">
-  <div class="settings-section pricing-wrap">
-    <div class="settings-card pricing-card">
-      <div class="settings-card__head pricing-head">
-        <div>
-          <h3 class="settings-card__title pricing-title">Choose Your Path</h3>
-          <p class="pricing-sub">Clear, transparent pricing based on our October 2025 model.</p>
+<section class="pricing-showcase">
+  <div class="pricing-showcase__inner">
+    <div class="pricing-tier-grid">
+      <article class="tier-card tier-card--blue">
+        <div class="tier-top">
+          <span class="tier-chip tier-chip--soft-blue">Job Seekers</span>
+          <span class="tier-chip tier-chip--outline-blue">Returning Citizens</span>
         </div>
-      </div>
-
-      <!-- Three primary customer segments -->
-      <div class="pricing-grid">
-        <!-- Job Seekers -->
-        <div class="price-card">
-          <div class="plan-name">Job Seekers</div>
-          <div class="plan-underline"></div>
-          <div class="price">$0</div>
-          <div class="price-sub">Free Access</div>
-          <hr class="plan-divider">
-          <ul class="plan-features">
-            <li>Full access to tools and resources</li>
-            <li>Resume builder and uploads</li>
-            <li>Verified jobs matched to your profile</li>
-            <li>Guides, reentry help, and support</li>
-          </ul>
-          <div class="settings-card__actions settings-card__actions--footer">
-            <a href="{% url 'signup' %}" class="btn btn-primary btn-pill">Get Started</a>
-          </div>
-        </div>
-
-        <!-- Reentry Organizations -->
-        <div class="price-card">
-          <div class="plan-name">Reentry Organizations</div>
-          <div class="plan-underline"></div>
-          <div class="price">$400</div>
-          <div class="price-sub">Per Month + $100/participant referral</div>
-          <hr class="plan-divider">
-          <ul class="plan-features">
-            <li>Organization dashboard for participant progress</li>
-            <li>Centralized referrals and outcomes tracking</li>
-            <li>Priority listings for partner-ready candidates</li>
-            <li>Reports for grants, compliance, and impact</li>
-          </ul>
-          <div class="settings-card__actions settings-card__actions--footer">
-            <a href="{% url 'contact' %}" class="btn btn-secondary btn-pill">Partner with Us</a>
-          </div>
-        </div>
-
-        <!-- Employers -->
-        <div class="price-card">
-          <div class="plan-name">Employers</div>
-          <div class="plan-underline"></div>
-          <div class="price">$400</div>
-          <div class="price-sub">Per Month + $200/successful hire</div>
-          <hr class="plan-divider">
-          <ul class="plan-features">
-            <li>Unlimited postings to verified job seekers</li>
-            <li>Candidate outreach and interview coordination</li>
-            <li>Performance and conversion insights</li>
-            <li>Dedicated support for inclusive hiring</li>
-          </ul>
-          <div class="settings-card__actions settings-card__actions--footer">
-            <a href="{% url 'employer_signup' %}" class="btn btn-primary btn-pill">Hire Through ReRoute</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Add-On Features -->
-      <div class="info-section" style="margin-top:28px;">
-        <h3 class="section-heading">Add-On Features</h3>
-        <ul class="plan-features">
-          <li>Sponsored listings: $50–$100 per job</li>
-          <li>Featured badges: $250 per month</li>
-          <li>Workforce analytics dashboards: emerging premium feature</li>
+        <h2 class="tier-main-free">FREE</h2>
+        <p class="tier-tagline">Always Free. No Hidden Fees.</p>
+        <ul class="tier-list tier-list--blue">
+          <li>Free profile creation</li>
+          <li>Resume builder &amp; uploads</li>
+          <li>Access to core modules (Workplace 101, etc.)</li>
+          <li>Access to partnered reentry organizations</li>
+          <li>Access to fair-chance job listings</li>
+          <li>ZIP-code based opportunity matching</li>
+          <li>Dashboard to track applications</li>
         </ul>
-      </div>
+        <p class="tier-note tier-note--blue">ReRoute will never charge job seekers.</p>
+        <a href="{% url 'signup' %}" class="tier-cta tier-cta--blue">Create Free Account</a>
+      </article>
 
-      <!-- Why Choose ReRoute? -->
-      <div class="info-section" style="margin-top:18px;">
-        <h3 class="section-heading">Why Choose ReRoute?</h3>
-        <ul class="plan-features">
-          <li>Transparent pricing aligned with outcomes</li>
-          <li>Verified jobs and trusted partners</li>
-          <li>Data-driven results to improve placement and retention</li>
+      <article class="tier-card tier-card--green">
+        <div class="tier-top">
+          <span class="tier-chip tier-chip--soft-green">Reentry Organizations</span>
+          <span class="tier-chip tier-chip--outline-green">MVP Phase</span>
+        </div>
+        <h2 class="tier-main-title">Community Partner</h2>
+        <p class="tier-main-price">Free <span>(Early Access)</span></p>
+        <p class="tier-chip-inline">Free During MVP</p>
+        <ul class="tier-list tier-list--green">
+          <li>Organization listing in directory</li>
+          <li>Program visibility to users</li>
+          <li>Referral intake from ReRoute</li>
+          <li>Admin dashboard access</li>
+          <li>Ability to update services &amp; criteria</li>
+          <li>Data insights (coming soon)</li>
         </ul>
-      </div>
+        <p class="tier-footnote">Future tiers may include enhanced analytics &amp; featured placement.</p>
+        <a href="{% url 'for_agencies' %}" class="tier-cta tier-cta--green">Apply to Become a Partner</a>
+      </article>
 
+      <article class="tier-card tier-card--purple">
+        <div class="tier-top tier-top--single">
+          <span class="tier-chip tier-chip--soft-purple">Employers</span>
+        </div>
+        <h3 class="tier-plan-head">Starter Plan <span class="tier-mini-chip">Founding Rate</span></h3>
+        <p class="tier-money"><strong>$49</strong> /mo</p>
+        <ul class="tier-list tier-list--purple">
+          <li>Post fair-chance job listings</li>
+          <li>Access to pre-qualified candidates</li>
+          <li>Dashboard &amp; basic match filtering</li>
+        </ul>
+        <hr class="tier-divider">
+        <h3 class="tier-plan-head">Growth Plan</h3>
+        <p class="tier-money"><strong>$199</strong> /mo</p>
+        <ul class="tier-list tier-list--purple tier-list--tight">
+          <li><strong>Everything in Starter, plus:</strong></li>
+          <li>Featured job placement</li>
+          <li>Priority candidate matching</li>
+          <li>Employer brand page &amp; Data insights</li>
+        </ul>
+        <a href="{% url 'employer_signup' %}" class="tier-cta tier-cta--purple">Join as Employer Partner</a>
+      </article>
     </div>
   </div>
-</div>
+</section>
+
+<section class="model-works">
+  <div class="model-works__inner">
+    <h2 class="model-works__title">Why Our Model Works</h2>
+    <div class="model-works__grid">
+      <article class="model-item">
+        <div class="model-item__icon model-item__icon--blue" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22">
+            <path d="M7 11v-1a2 2 0 1 1 4 0v1m-4 0h4m2 0v-2a2 2 0 1 1 4 0v2m-4 0h4M4 12h16v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <p>Individuals never pay.</p>
+      </article>
+      <article class="model-item">
+        <div class="model-item__icon model-item__icon--green" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22">
+            <path d="M4 20h16M5 20V7l7-3 7 3v13M9 20v-5h6v5M9 10h2m4 0h2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <p>Organizations gain visibility.</p>
+      </article>
+      <article class="model-item">
+        <div class="model-item__icon model-item__icon--purple" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22">
+            <path d="M12 21s-7-4.6-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.4-7 10-7 10z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <p>Employers access prepared talent.</p>
+      </article>
+      <article class="model-item">
+        <div class="model-item__icon model-item__icon--gold" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22">
+            <path d="M12 20v-6m0 0a4 4 0 1 0-4-4m4 4a4 4 0 1 1 4-4M6 20h12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <p>Revenue sustains the ecosystem.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="pricing-callout">
+  <div class="pricing-callout__card">
+    <h2>Not Ready to Commit?</h2>
+    <p>
+      Whether you're a reentry organization looking to integrate, or an employer
+      exploring fair-chance hiring, we're here to help.
+    </p>
+    <a href="https://doodle.com/bp/jasoncoffer/reroute-partnership-discovery-call" class="pricing-callout__btn">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <path d="M8 3v3M16 3v3M4 8h16M6 5h12a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Schedule a 30-Minute Partnership Call</span>
+    </a>
+  </div>
+</section>
+
+<section class="pricing-faq">
+  <div class="pricing-faq__inner">
+    <h2 class="pricing-faq__title">Frequently Asked Questions</h2>
+
+    <details class="faq-item" name="pricing-faq">
+      <summary>
+        <span>Why are job seekers free?</span>
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </summary>
+      <div class="faq-item__content">
+        Because access to opportunity should never have a paywall. Our mission is to reduce barriers for justice-impacted individuals, not create new ones.
+      </div>
+    </details>
+
+    <details class="faq-item" name="pricing-faq">
+      <summary>
+        <span>Are organizations charged?</span>
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </summary>
+      <div class="faq-item__content">
+        Not during our MVP phase. We are focused on building a strong community of partners. Future tiers may include optional premium features for enhanced analytics and featured placement.
+      </div>
+    </details>
+
+    <details class="faq-item" name="pricing-faq">
+      <summary>
+        <span>What makes ReRoute different from Indeed?</span>
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </summary>
+      <div class="faq-item__content">
+        We provide pre-qualified users, a dedicated reentry ecosystem, and localized impact tracking. Our platform is built specifically around the needs of fair-chance hiring.
+      </div>
+    </details>
+
+    <details class="faq-item" name="pricing-faq">
+      <summary>
+        <span>When will pricing change?</span>
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </summary>
+      <div class="faq-item__content">
+        Pricing may evolve after our MVP validation and as employer onboarding scales. However, early employer partners lock in the "Founding Rate."
+      </div>
+    </details>
+  </div>
+</section>
+
 {% endblock %}

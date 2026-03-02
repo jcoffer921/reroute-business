@@ -353,13 +353,14 @@
 }
 .vision-right--jay {
   background-image: url('/static/images/jaycoffer.jpg');
-  background-position: 52% 78%;
+  background-position: 52% 24%;
 }
 
 /* Mobile/Tablet responsiveness */
 @media (max-width: 900px) {
   .vision-inner { grid-template-columns: 1fr; }
   .vision-right { position: relative; inset: auto; height: 40vh; min-height: 260px; }
+  .vision-right--jay { background-position: 52% 18%; }
   .vision-left { color: #0f172a; }
   .vision-left p { color: #334155; }
   .vision-btn { background: var(--primary-blue, #006da0); color: #fff; }

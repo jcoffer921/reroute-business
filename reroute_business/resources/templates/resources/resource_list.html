@@ -365,14 +365,30 @@
   {# Learning Modules Section (new) - placed directly under Quick Job-Ready Videos #}
   {# Learning Modules section removed by request #}
 
-  <div class="resource-quote">
-    <blockquote>{% trans "“Don't worry about what other people think of you. Just be sure you think correctly about yourself. - Jason Coffer”" %}</blockquote>
-  </div>
+  <section class="resource-bottom-modern" aria-labelledby="resourceBottomTitle">
+    <div class="resource-bottom-modern__inner">
+      <article class="resource-quote-card">
+        <span class="resource-quote-card__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22">
+            <path d="M9 7H6a1 1 0 0 0-1 1v3a4 4 0 0 0 4 4h1V7Zm10 0h-3a1 1 0 0 0-1 1v3a4 4 0 0 0 4 4h1V7Z" fill="currentColor"/>
+          </svg>
+        </span>
+        <blockquote>{% trans "Don't worry about what other people think of you. Just be sure you think correctly about yourself." %}</blockquote>
+        <p class="resource-quote-card__author">{% trans "Jason Coffer" %}</p>
+      </article>
 
-  <div class="resource-footer-cta">
-    <p>{% trans "Can't find what you need?" %}</p>
-    <a href="{% url 'contact' %}" class="btn-secondary">{% trans "Get in Touch" %}</a>
-  </div>
+      <article class="resource-contact-card">
+        <h3 id="resourceBottomTitle">{% trans "Can't find what you need?" %}</h3>
+        <p>{% trans "Tell us what support you are looking for and we will point you to the right next step." %}</p>
+        <a href="{% url 'contact' %}" class="resource-contact-card__cta">
+          <span>{% trans "Get in Touch" %}</span>
+          <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true">
+            <path d="M7 5.5 11.5 10 7 14.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </article>
+    </div>
+  </section>
 
 {% endblock %}
 
