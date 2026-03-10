@@ -27,6 +27,7 @@ urlpatterns = [
     path('settings/', views.settings_view, name='settings'),
     path('settings/accessibility/', views.accessibility_settings_view, name='settings_accessibility'),
     path('resources/', views.resources_view, name='resources'),
+    path('get-support/', views.get_support, name='get_support'),
     path('pricing/', views.pricing, name='pricing'),
     path('pricing/checkout/', views.pricing_checkout, name='checkout'),
     path('faq/', views.faq_view, name='faq'),

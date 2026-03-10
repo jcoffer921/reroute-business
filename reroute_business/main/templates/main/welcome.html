@@ -28,7 +28,7 @@
             ReRoute helps returning citizens prepare for employment and connect to trusted reentry support.
           </p>
           <div class="welcome-hero__actions">
-            <a class="welcome-btn welcome-btn--primary" href="{{ signup_url }}" data-track="hero-signup">Get Started (Free)</a>
+            <a class="welcome-btn welcome-btn--primary" href="{% url 'get_support' %}" data-track="hero-signup">Get Support</a>
           </div>
           <p class="welcome-hero__trust">Free to join • Built with reentry partners • Mobile-friendly</p>
         </div>
@@ -39,15 +39,15 @@
             <li>
               <span class="pathway-icon" aria-hidden="true">1</span>
               <div>
-                <strong>Create profile</strong>
-                <p>Add your skills, goals, and priorities.</p>
+                <strong>Connect with ReRoute</strong>
+                <p>Share your goals and what support you need.</p>
               </div>
             </li>
             <li>
               <span class="pathway-icon" aria-hidden="true">2</span>
               <div>
                 <strong>Get matched to opportunities</strong>
-                <p>View programs and support that fit your path.</p>
+                <p>Discover programs and services that fit your path.</p>
               </div>
             </li>
             <li>

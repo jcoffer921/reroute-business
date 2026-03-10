@@ -1,0 +1,13 @@
+Hi {{ first_name }},
+
+Thank you for reaching out to ReRoute.
+
+We received your support request and a member of our team will contact you within 24-48 hours to help guide you toward the right opportunities.
+
+{% if support_needs %}What you asked for:
+{% for need in support_needs %}- {{ need }}
+{% endfor %}
+{% endif %}If you need to add anything else before we follow up, reply to this email and our team will help.
+
+ReRoute Support Team
+support@reroutejobs.com

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReRoute Support Confirmation</title>
+  </head>
+  <body style="margin:0;padding:0;background:#f3f7ff;font-family:Arial,sans-serif;color:#0f172a;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#f3f7ff;padding:28px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width:640px;background:#ffffff;border:1px solid #dbe4f5;border-radius:16px;overflow:hidden;">
+            <tr>
+              <td style="background:linear-gradient(135deg,#1d4ed8,#6495ed);padding:22px 24px;color:#ffffff;">
+                <h1 style="margin:0;font-size:24px;line-height:1.2;font-weight:800;">You're on the right path with ReRoute</h1>
+                <p style="margin:8px 0 0;font-size:14px;line-height:1.5;opacity:0.95;">We received your support request and our team is already reviewing it.</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:24px;">
+                <p style="margin:0 0 12px;font-size:16px;line-height:1.6;">Hi {{ first_name }},</p>
+                <p style="margin:0 0 12px;font-size:15px;line-height:1.7;color:#334155;">
+                  Thank you for reaching out to ReRoute. A member of our team will contact you within <strong>24-48 hours</strong>
+                  to help guide you toward the right opportunities.
+                </p>
+
+                {% if support_needs %}
+                  <p style="margin:0 0 8px;font-size:14px;line-height:1.5;color:#1e293b;font-weight:700;">What you asked for:</p>
+                  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:0 0 14px;border-collapse:separate;border-spacing:0 8px;">
+                    {% for need in support_needs %}
+                      <tr>
+                        <td style="background:#eef4ff;border:1px solid #d6e3ff;border-radius:999px;padding:8px 12px;font-size:13px;color:#1e3a8a;display:inline-block;">
+                          {{ need }}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </table>
+                {% endif %}
+
+                <p style="margin:0 0 18px;font-size:14px;line-height:1.7;color:#475569;">
+                  If you need to add anything else before we follow up, just reply to this email and our support team will help.
+                </p>
+
+                <a href="https://reroutejobs.com/resources/"
+                   style="display:inline-block;background:linear-gradient(135deg,#3f80ea,#2563eb);color:#ffffff;text-decoration:none;font-weight:700;font-size:14px;padding:11px 16px;border-radius:999px;">
+                  Explore ReRoute Resources
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 24px;background:#f8fafc;border-top:1px solid #e2e8f0;">
+                <p style="margin:0;font-size:12px;line-height:1.6;color:#64748b;">
+                  ReRoute Support Team · support@reroutejobs.com
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

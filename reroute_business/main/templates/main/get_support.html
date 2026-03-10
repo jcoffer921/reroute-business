@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ReRoute | Get Support{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/get_support.css' %}">
+
+<section class="support-intake">
+  <div class="support-intake__wrap">
+    <header class="support-intake__header">
+      <h1>Start Your ReRoute Journey</h1>
+      <p>
+        ReRoute connects justice-impacted individuals with job training programs,
+        trusted reentry organizations, and fair-chance employment opportunities.
+      </p>
+      <p>
+        Tell us a little about what you need and our team will help guide you forward.
+      </p>
+    </header>
+
+    <div class="support-intake__card">
+      {% if submitted %}
+        <div class="support-intake__confirmation" role="status" aria-live="polite">
+          <h2>Thank you for reaching out to ReRoute.</h2>
+          <p>
+            A member of our team will review your request and contact you within
+            24-48 hours to help guide you toward the right opportunities.
+          </p>
+        </div>
+      {% else %}
+        <form method="post" class="support-form">
+          {% csrf_token %}
+
+          {% if error %}
+            <p class="support-form__error">{{ error }}</p>
+          {% endif %}
+
+          <div class="support-form__grid">
+            <div class="support-field">
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" required>
+            </div>
+
+            <div class="support-field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" required>
+            </div>
+
+            <div class="support-field">
+              <label for="phone">Phone (optional)</label>
+              <input id="phone" name="phone" type="tel">
+            </div>
+
+            <div class="support-field">
+              <label for="city">City</label>
+              <input id="city" name="city" type="text" required>
+            </div>
+
+            <div class="support-field support-field--full">
+              <label for="zip_code">Zip Code</label>
+              <input id="zip_code" name="zip_code" type="text" required>
+            </div>
+          </div>
+
+          <fieldset class="support-needs">
+            <legend>What support are you looking for?</legend>
+            <div class="support-needs__grid">
+              <label><input type="checkbox" name="support_needs" value="job_opportunities"> Job opportunities</label>
+              <label><input type="checkbox" name="support_needs" value="job_training"> Job training programs</label>
+              <label><input type="checkbox" name="support_needs" value="resume_help"> Resume help</label>
+              <label><input type="checkbox" name="support_needs" value="interview_prep"> Interview preparation</label>
+              <label><input type="checkbox" name="support_needs" value="housing_resources"> Housing resources</label>
+              <label><input type="checkbox" name="support_needs" value="mental_health_support"> Mental health support</label>
+              <label><input type="checkbox" name="support_needs" value="other"> Other</label>
+            </div>
+          </fieldset>
+
+          <button type="submit" class="support-form__submit">Request Support</button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

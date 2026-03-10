@@ -499,6 +499,82 @@ def resources_view(request):
     return resources_landing(request)
 
 
+@require_http_methods(["GET", "POST"])
+def get_support(request):
+    context = {"submitted": False}
+
+    if request.method == "POST":
+        name = (request.POST.get("name") or "").strip()
+        email = (request.POST.get("email") or "").strip()
+        phone = (request.POST.get("phone") or "").strip()
+        city = (request.POST.get("city") or "").strip()
+        zip_code = (request.POST.get("zip_code") or "").strip()
+        support_needs_raw = request.POST.getlist("support_needs")
+
+        support_needs = [
+            item.replace("_", " ").strip().title()
+            for item in support_needs_raw
+            if item.strip()
+        ]
+        support_needs_text = ", ".join(support_needs) if support_needs else "None selected"
+        first_name = (name.split()[0] if name else "there")
+
+        subject = f"New ReRoute Support Intake - {name or 'No Name Provided'}"
+        message = (
+            "A new support intake form was submitted on ReRoute.\n\n"
+            f"Name: {name or 'Not provided'}\n"
+            f"Email: {email or 'Not provided'}\n"
+            f"Phone: {phone or 'Not provided'}\n"
+            f"City: {city or 'Not provided'}\n"
+            f"Zip Code: {zip_code or 'Not provided'}\n"
+            f"Support Needs: {support_needs_text}\n"
+        )
+
+        from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@reroutejobs.com")
+
+        try:
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=from_email,
+                recipient_list=["support@reroutejobs.com"],
+                fail_silently=False,
+            )
+
+            confirmation_context = {
+                "first_name": first_name,
+                "support_needs": support_needs,
+            }
+            confirmation_subject = "We received your ReRoute support request"
+            confirmation_text = render_to_string(
+                "main/emails/get_support_confirmation.txt",
+                confirmation_context,
+            )
+            confirmation_html = render_to_string(
+                "main/emails/get_support_confirmation.html",
+                confirmation_context,
+            )
+            confirmation_email = EmailMultiAlternatives(
+                subject=confirmation_subject,
+                body=confirmation_text,
+                from_email=from_email,
+                to=[email],
+                reply_to=["support@reroutejobs.com"],
+            )
+            confirmation_email.attach_alternative(confirmation_html, "text/html")
+            confirmation_email.send(fail_silently=False)
+
+            context["submitted"] = True
+        except Exception:
+            logger.exception("Failed to send support intake email.")
+            context["error"] = (
+                "We could not submit your request right now. "
+                "Please email support@reroutejobs.com directly."
+            )
+
+    return render(request, "main/get_support.html", context)
+
+
 @require_GET
 def pricing(request):
     """
