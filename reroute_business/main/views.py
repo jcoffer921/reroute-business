@@ -519,26 +519,18 @@ def get_support(request):
         support_needs_text = ", ".join(support_needs) if support_needs else "None selected"
         first_name = (name.split()[0] if name else "there")
 
-        subject = f"New ReRoute Support Intake - {name or 'No Name Provided'}"
-        message = (
-            "A new support intake form was submitted on ReRoute.\n\n"
-            f"Name: {name or 'Not provided'}\n"
-            f"Email: {email or 'Not provided'}\n"
-            f"Phone: {phone or 'Not provided'}\n"
-            f"City: {city or 'Not provided'}\n"
-            f"Zip Code: {zip_code or 'Not provided'}\n"
-            f"Support Needs: {support_needs_text}\n"
-        )
-
         from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@reroutejobs.com")
 
         try:
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=from_email,
-                recipient_list=["support@reroutejobs.com"],
-                fail_silently=False,
+            send_support_intake_notification_email(
+                request=request,
+                name=name,
+                email=email,
+                phone=phone,
+                city=city,
+                zip_code=zip_code,
+                support_needs=support_needs,
+                support_needs_text=support_needs_text,
             )
 
             confirmation_context = {
@@ -767,6 +759,107 @@ def contact_view(request):
 # Auth: USER Signup/Login/Logout
 # =========================================================================
 
+def send_support_intake_notification_email(
+    request,
+    name,
+    email,
+    phone,
+    city,
+    zip_code,
+    support_needs,
+    support_needs_text,
+):
+    """Send branded internal email to support for new support intake submissions."""
+    support_recipient = getattr(settings, "CONTACT_RECEIVER_EMAIL", "") or "support@reroutejobs.com"
+    submitted_on = timezone.localtime(timezone.now())
+
+    context = {
+        "name": name or "Not provided",
+        "email": email or "Not provided",
+        "phone": phone or "Not provided",
+        "city": city or "Not provided",
+        "zip_code": zip_code or "Not provided",
+        "support_needs": support_needs,
+        "support_needs_text": support_needs_text,
+        "submitted_on": submitted_on,
+        "submitted_from": request.build_absolute_uri("/get-support/"),
+    }
+
+    text_body = render_to_string("emails/support_intake_notification.txt", context)
+    html_body = render_to_string("emails/support_intake_notification.html", context)
+
+    message = EmailMultiAlternatives(
+        subject=f"New ReRoute Support Intake - {context['name']}",
+        body=text_body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[support_recipient],
+        reply_to=[email] if email else None,
+    )
+    message.attach_alternative(html_body, "text/html")
+    message.send(fail_silently=False)
+
+
+def send_internal_signup_notification(request, user):
+    """Send branded internal email to support for new user signups."""
+    support_recipient = getattr(settings, "CONTACT_RECEIVER_EMAIL", "") or "support@reroutejobs.com"
+    submitted_on = timezone.localtime(getattr(user, "date_joined", None) or timezone.now())
+    full_name = f"{(user.first_name or '').strip()} {(user.last_name or '').strip()}".strip() or "Not provided"
+
+    try:
+        dashboard_url = request.build_absolute_uri(reverse('dashboard'))
+    except NoReverseMatch:
+        dashboard_url = request.build_absolute_uri(reverse('dashboard:user'))
+
+    context = {
+        "username": user.username,
+        "email": user.email or "Not provided",
+        "full_name": full_name,
+        "submitted_on": submitted_on,
+        "dashboard_url": dashboard_url,
+    }
+
+    text_body = render_to_string("emails/new_user_signup_notification.txt", context)
+    html_body = render_to_string("emails/new_user_signup_notification.html", context)
+
+    message = EmailMultiAlternatives(
+        subject=f"New ReRoute User Signup - {user.username}",
+        body=text_body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[support_recipient],
+        reply_to=[user.email] if user.email else None,
+    )
+    message.attach_alternative(html_body, "text/html")
+    message.send(fail_silently=False)
+
+
+def send_welcome_email(request, user):
+    """Send branded welcome email immediately after account creation."""
+    if not getattr(user, "email", ""):
+        return
+
+    try:
+        dashboard_url = request.build_absolute_uri(reverse('dashboard'))
+    except NoReverseMatch:
+        dashboard_url = request.build_absolute_uri(reverse('dashboard:user'))
+    context = {
+        "first_name": (getattr(user, "first_name", "") or "").strip() or "there",
+        "dashboard_url": dashboard_url,
+    }
+
+    subject = "Welcome to ReRoute – Your Path Forward Starts Here"
+    text_body = render_to_string("emails/welcome_email.txt", context)
+    html_body = render_to_string("emails/welcome_email.html", context)
+
+    email_message = EmailMultiAlternatives(
+        subject=subject,
+        body=text_body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[user.email],
+    )
+    email_message.attach_alternative(html_body, "text/html")
+    email_message.send(fail_silently=False)
+
+
 def signup_view(request):
     """
     Regular user signup.
@@ -806,6 +899,14 @@ def signup_view(request):
             if user_form.is_valid():
                 # Create the user account
                 user = user_form.save()
+                try:
+                    send_welcome_email(request, user)
+                except Exception:
+                    logger.exception("Failed to send welcome email for user signup")
+                try:
+                    send_internal_signup_notification(request, user)
+                except Exception:
+                    logger.exception("Failed to send internal signup notification email")
 
                 try:
                     log_onboarding_event(user, "signup_completed")

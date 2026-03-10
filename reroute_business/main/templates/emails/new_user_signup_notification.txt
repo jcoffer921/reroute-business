@@ -1,0 +1,10 @@
+New User Signup
+Created on: {{ submitted_on|date:"M d, Y g:i A" }}
+
+Username: {{ username }}
+Full Name: {{ full_name }}
+Email: {{ email }}
+
+Open Dashboard: {{ dashboard_url }}
+
+ReRoute Internal Notification • support@reroutejobs.com

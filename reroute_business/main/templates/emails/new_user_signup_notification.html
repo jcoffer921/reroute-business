@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New ReRoute User Signup</title>
+  </head>
+  <body style="margin:0;padding:0;background:#eef4ff;font-family:Arial,sans-serif;color:#0f172a;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="padding:26px 12px;background:#eef4ff;">
+      <tr>
+        <td align="center">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width:700px;background:#ffffff;border:1px solid #dbe5f6;border-radius:16px;overflow:hidden;">
+            <tr>
+              <td style="padding:20px 22px;background:linear-gradient(135deg,#0f1f4a,#2f63e4);color:#ffffff;">
+                <h1 style="margin:0;font-size:22px;line-height:1.25;font-weight:800;">New User Signup</h1>
+                <p style="margin:8px 0 0;font-size:13px;line-height:1.5;color:#dbeafe;">Created on {{ submitted_on|date:"M d, Y g:i A" }}</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:18px 22px;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse:collapse;">
+                  <tr><td style="padding:7px 0;color:#64748b;font-size:13px;width:140px;">Username</td><td style="padding:7px 0;color:#0f172a;font-size:14px;font-weight:700;">{{ username }}</td></tr>
+                  <tr><td style="padding:7px 0;color:#64748b;font-size:13px;">Full Name</td><td style="padding:7px 0;color:#0f172a;font-size:14px;">{{ full_name }}</td></tr>
+                  <tr><td style="padding:7px 0;color:#64748b;font-size:13px;">Email</td><td style="padding:7px 0;color:#0f172a;font-size:14px;">{{ email }}</td></tr>
+                </table>
+
+                <a href="{{ dashboard_url }}"
+                   style="margin-top:14px;display:inline-block;padding:10px 14px;border-radius:999px;background:linear-gradient(135deg,#2563eb,#3f80ea);color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;">
+                  Open Dashboard
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:14px 22px;background:#f8fafc;border-top:1px solid #e2e8f0;">
+                <p style="margin:0;font-size:12px;color:#64748b;">ReRoute Internal Notification • support@reroutejobs.com</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

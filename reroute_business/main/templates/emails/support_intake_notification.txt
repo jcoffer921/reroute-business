@@ -1,0 +1,14 @@
+New Support Intake Submitted
+Submitted on: {{ submitted_on|date:"M d, Y g:i A" }}
+
+Name: {{ name }}
+Email: {{ email }}
+Phone: {{ phone }}
+City: {{ city }}
+Zip Code: {{ zip_code }}
+
+Support Needs: {{ support_needs_text }}
+
+Form URL: {{ submitted_from }}
+
+ReRoute Internal Notification • support@reroutejobs.com

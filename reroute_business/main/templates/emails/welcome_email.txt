@@ -1,0 +1,21 @@
+Welcome to ReRoute
+A Clear Path Forward Starts Here
+
+Hi {{ first_name }},
+
+ReRoute helps justice-impacted individuals access:
+- job training programs
+- trusted organizations
+- fair-chance employment opportunities
+
+ReRoute is currently in its MVP / early access phase, and we are onboarding users intentionally to ensure we connect each person with the right opportunities.
+
+What Happens Next
+1. Complete your profile
+2. Explore opportunities and programs
+3. Move forward with support
+
+Go to Dashboard:
+{{ dashboard_url }}
+
+ReRoute • Built to simplify access to opportunity
