@@ -35,7 +35,7 @@
 .lesson-quiz-question h3 { margin: 0 0 10px; font-size: 18px; border-left: 6px solid #1b3b82; padding-left: 10px; }
 .lesson-quiz-choices { display: grid; gap: 8px; }
 .lesson-quiz-actions-bar { display: flex; gap: 12px; justify-content: center; }
-.lesson-quiz-result { text-align: center; font-weight: 600; color: #1b3b82; }
+.lesson-quiz-result { text-align: left; font-weight: 600; color: #1b3b82; white-space: pre-line; }
 
 /* CSP-safe utility classes to replace inline styles */
 .yt-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; background: #000; max-height: 65vh; }

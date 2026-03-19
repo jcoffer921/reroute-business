@@ -1,158 +1,328 @@
-// Simplified lesson flow: show quiz after video ends (no timestamps)
+// Lesson flow with persisted progress and resume support
 (function(){
-  const $ = (sel) => document.querySelector(sel);
-  var endpoints = window.__LESSON_ENDPOINTS__ || {};
-  // Allow CSP-safe data attributes instead of inline JS globals
-  (function(){
-    if (endpoints && endpoints.schema) return; // already provided
-    var root = document.getElementById('lessonRoot');
-    if (!root) return;
-    var schemaUrl = root.getAttribute('data-schema-url');
-    var attemptUrl = root.getAttribute('data-attempt-url');
-    var ytId = root.getAttribute('data-yt-id');
-    if (!endpoints) endpoints = {};
-    if (schemaUrl) endpoints.schema = schemaUrl;
-    if (attemptUrl) endpoints.attempt = attemptUrl;
-    if (ytId) { window.__LESSON_YT_ID__ = ytId; }
-  })();
-  const csrfToken = getCookie('csrftoken');
+  var root = document.getElementById('lessonRoot');
+  if (!root) return;
 
-  const quizContainer = $('#lessonQuizContainer');
-  const submitBtn = document.querySelector('#lessonQuizSubmit');
-  const resultEl = document.querySelector('#lessonQuizResult');
+  var schemaUrl = root.getAttribute('data-schema-url');
+  var attemptUrl = root.getAttribute('data-attempt-url');
+  var progressUrl = root.getAttribute('data-progress-url');
+  var inlineYtId = root.getAttribute('data-yt-id');
+  var quizContainer = document.getElementById('lessonQuizContainer');
+  var submitBtn = document.getElementById('lessonQuizSubmit');
+  var resultEl = document.getElementById('lessonQuizResult');
+  var lessonVideo = document.getElementById('lessonVideo');
+  var player = null;
+  var progressTimer = null;
+  var state = {
+    schema: null,
+    answers: {},
+    lastAnsweredOrder: 0,
+    lastVideoTime: 0,
+  };
 
-  let schema = null;
-  let useYouTube = false;
-  let player = null;
-  let ytEndPoll = null;
+  function getCookie(name){
+    var value = null;
+    if (!document.cookie) return value;
+    document.cookie.split(';').forEach(function(part){
+      var item = part.trim();
+      if (item.substring(0, name.length + 1) === (name + '=')){
+        value = decodeURIComponent(item.substring(name.length + 1));
+      }
+    });
+    return value;
+  }
 
-  if (!endpoints || !endpoints.schema) return; // nothing to do
-  fetch(endpoints.schema, { credentials: 'same-origin' })
-    .then(r => r.json())
-    .then(data => {
-      schema = data || {};
-      useYouTube = !!(schema && schema.lesson && schema.lesson.youtube_video_id);
-      if (useYouTube) bootYouTube(schema.lesson.youtube_video_id);
-      else bootHTML5();
-      // Immediately render quiz in sidebar
-      renderQuiz();
-    })
-    .catch(()=>{});
+  function postJSON(url, body){
+    var headers = { 'Content-Type': 'application/json' };
+    var csrf = getCookie('csrftoken');
+    if (csrf){
+      headers['X-CSRFToken'] = csrf;
+    }
+    return fetch(url, {
+      method: 'POST',
+      headers: headers,
+      credentials: 'same-origin',
+      body: JSON.stringify(body || {}),
+    }).then(function(response){
+      if (!response.ok){
+        throw new Error('Bad response');
+      }
+      return response.json();
+    });
+  }
 
-  function bootHTML5(){
-    const video = $('#lessonVideo');
-    if (!video) return;
-    try { video.addEventListener('ended', onVideoEnded); } catch(_){ }
-    // Fallback: detect near-end via timeupdate if 'ended' doesn't fire reliably
+  function getCurrentVideoTime(){
     try {
-      let endedOnce = false;
-      video.addEventListener('timeupdate', () => {
-        if (endedOnce) return;
-        const dur = Number(video.duration || 0);
-        if (dur && (dur - video.currentTime) <= 0.3) { endedOnce = true; onVideoEnded(); }
+      if (player && typeof player.getCurrentTime === 'function'){
+        return Number(player.getCurrentTime() || 0);
+      }
+      if (lessonVideo){
+        return Number(lessonVideo.currentTime || 0);
+      }
+    } catch (err){}
+    return 0;
+  }
+
+  function scheduleProgressSave(completed){
+    if (!progressUrl) return;
+    if (progressTimer){
+      clearTimeout(progressTimer);
+    }
+    progressTimer = setTimeout(function(){
+      saveProgress(!!completed).catch(function(){});
+    }, 300);
+  }
+
+  function saveProgress(completed){
+    if (!progressUrl) return Promise.resolve(null);
+    state.lastVideoTime = getCurrentVideoTime();
+    return postJSON(progressUrl, {
+      last_video_time: state.lastVideoTime,
+      last_answered_question_order: state.lastAnsweredOrder,
+      completed: completed === true,
+      raw_state: {
+        answers: state.answers,
+      },
+    });
+  }
+
+  function restoreProgress(progress){
+    if (!progress) return;
+    state.lastVideoTime = Number(progress.last_video_time || 0);
+    state.lastAnsweredOrder = Number(progress.last_answered_question_order || 0);
+    if (progress.raw_state && progress.raw_state.answers){
+      state.answers = progress.raw_state.answers;
+    }
+  }
+
+  function restoreVideoPosition(){
+    if (!state.lastVideoTime) return;
+    if (lessonVideo){
+      lessonVideo.currentTime = state.lastVideoTime;
+      return;
+    }
+    if (player && typeof player.seekTo === 'function'){
+      player.seekTo(state.lastVideoTime, true);
+    }
+  }
+
+  function bindVideoTracking(){
+    if (lessonVideo){
+      lessonVideo.addEventListener('timeupdate', function(){
+        state.lastVideoTime = Number(lessonVideo.currentTime || 0);
       });
-    } catch(_){ }
+      lessonVideo.addEventListener('pause', function(){ scheduleProgressSave(false); });
+      lessonVideo.addEventListener('ended', function(){ saveProgress(true).catch(function(){}); });
+    }
+    setInterval(function(){
+      saveProgress(false).catch(function(){});
+    }, 15000);
+  }
+
+  function loadYouTubeAPI(cb){
+    if (window.YT && window.YT.Player){
+      cb();
+      return;
+    }
+    var tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    var prior = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = function(){
+      if (typeof prior === 'function'){
+        try { prior(); } catch (err){}
+      }
+      cb();
+    };
   }
 
   function bootYouTube(videoId){
-    const YT_ID = videoId || window.__LESSON_YT_ID__;
-    if (!YT_ID) return;
-    loadYouTubeAPI(() => {
-      // eslint-disable-next-line no-undef
+    if (!videoId) return;
+    loadYouTubeAPI(function(){
       player = new YT.Player('ytPlayer', {
-        videoId: YT_ID,
-        playerVars: { playsinline:1, rel:0, modestbranding:1, origin: window.location.origin },
+        videoId: videoId,
+        playerVars: { playsinline: 1, rel: 0, modestbranding: 1, origin: window.location.origin },
         events: {
-          onStateChange: (ev) => {
-            try { if (typeof YT !== 'undefined' && ev.data === YT.PlayerState.ENDED) onVideoEnded(); } catch(_){ }
-            // Fallback: start/stop near-end poll
+          onReady: function(){
+            restoreVideoPosition();
+          },
+          onStateChange: function(event){
             try {
-              if (typeof YT !== 'undefined' && ev.data === YT.PlayerState.PLAYING) {
-                if (ytEndPoll) clearInterval(ytEndPoll);
-                ytEndPoll = setInterval(() => {
-                  try {
-                    const dur = typeof player.getDuration === 'function' ? player.getDuration() : 0;
-                    const cur = typeof player.getCurrentTime === 'function' ? player.getCurrentTime() : 0;
-                    if (dur && (dur - cur) <= 0.35) { clearInterval(ytEndPoll); ytEndPoll = null; onVideoEnded(); }
-                  } catch(_){ }
-                }, 500);
-              } else if (typeof YT !== 'undefined' && ev.data === YT.PlayerState.PAUSED) {
-                // keep polling during pause as user might be at the end
-              } else {
-                if (ytEndPoll) { clearInterval(ytEndPoll); ytEndPoll = null; }
+              if (event.data === YT.PlayerState.ENDED){
+                saveProgress(true).catch(function(){});
               }
-            } catch(_){ }
-          }
-        }
+            } catch (err){}
+          },
+        },
       });
     });
   }
 
-  function onVideoEnded(){ /* no-op: quiz is available anytime */ }
+  function setSavedAnswer(qid, payload){
+    state.answers[String(qid)] = payload;
+  }
+
+  function getSavedAnswer(qid){
+    return state.answers[String(qid)] || null;
+  }
 
   function renderQuiz(){
-    if (!quizContainer || !schema) return;
+    if (!quizContainer || !state.schema) return;
     quizContainer.innerHTML = '';
-    const qs = (schema.questions || []);
-    qs.forEach(q => {
-      const box = document.createElement('div');
+
+    (state.schema.questions || []).forEach(function(question){
+      var box = document.createElement('div');
       box.className = 'lesson-quiz-question';
-      const h = document.createElement('h3'); h.textContent = q.prompt || '';
-      box.appendChild(h);
-      if (q.qtype === 'MULTIPLE_CHOICE'){
-        const list = document.createElement('div'); list.className='lesson-quiz-choices';
-        (q.choices||[]).forEach(ch => {
-          const id = `q${q.id}_${ch.id}`;
-          const label = document.createElement('label'); label.setAttribute('for', id); label.classList.add('rr-flex-row-8');
-          const inp = document.createElement('input'); inp.type='radio'; inp.name=`q_${q.id}`; inp.value = ch.id; inp.id = id;
-          label.appendChild(inp);
-          const span = document.createElement('span'); span.textContent = `${(ch.label||'').toUpperCase()}) ${ch.text||''}`; label.appendChild(span);
+
+      var heading = document.createElement('h3');
+      heading.textContent = question.prompt || '';
+      box.appendChild(heading);
+
+      var saved = getSavedAnswer(question.id);
+      if (question.qtype === 'MULTIPLE_CHOICE'){
+        var list = document.createElement('div');
+        list.className = 'lesson-quiz-choices';
+        (question.choices || []).forEach(function(choice){
+          var id = 'q' + question.id + '_' + choice.id;
+          var label = document.createElement('label');
+          label.setAttribute('for', id);
+          var input = document.createElement('input');
+          input.type = 'radio';
+          input.name = 'q_' + question.id;
+          input.id = id;
+          input.value = choice.id;
+          if (saved && String(saved.selected_choice_id) === String(choice.id)){
+            input.checked = true;
+          }
+          input.addEventListener('change', function(){
+            setSavedAnswer(question.id, { selected_choice_id: choice.id });
+            state.lastAnsweredOrder = Math.max(state.lastAnsweredOrder, Number(question.order || 0));
+            scheduleProgressSave(false);
+          });
+          label.appendChild(input);
+          var text = document.createElement('span');
+          text.textContent = (choice.label || '').toUpperCase() + ') ' + (choice.text || '');
+          label.appendChild(text);
           list.appendChild(label);
         });
         box.appendChild(list);
       } else {
-        const ta = document.createElement('textarea'); ta.rows=3; ta.name=`t_${q.id}`; ta.placeholder='Type your answer...'; ta.classList.add('rr-w-100');
-        box.appendChild(ta);
+        var textarea = document.createElement('textarea');
+        textarea.rows = 3;
+        textarea.name = 't_' + question.id;
+        textarea.placeholder = 'Type your answer...';
+        textarea.classList.add('rr-w-100');
+        if (saved && saved.open_text){
+          textarea.value = saved.open_text;
+        }
+        textarea.addEventListener('input', function(){
+          setSavedAnswer(question.id, { open_text: textarea.value });
+          state.lastAnsweredOrder = Math.max(state.lastAnsweredOrder, Number(question.order || 0));
+          scheduleProgressSave(false);
+        });
+        box.appendChild(textarea);
       }
+
       quizContainer.appendChild(box);
     });
-
-    // Use existing sidebar action controls
-    if (quizContainer) { quizContainer.hidden = false; }
-    if (submitBtn) {
-      // Prevent duplicate bindings on hot reloads
-      submitBtn.onclick = () => submitQuiz(qs, resultEl);
-    }
   }
 
-  function submitQuiz(qs, resultEl){
-    const tasks = [];
-    let scoredTotal = 0; let correctCount = 0;
-    qs.forEach(q => {
-      if (q.qtype === 'MULTIPLE_CHOICE'){
-        const sel = document.querySelector(`input[name="q_${q.id}"]:checked`);
-        if (!sel) return; // unanswered -> ignore
-        if (q.is_scored) scoredTotal++;
-        tasks.push(postJSON(endpoints.attempt, { question_id: q.id, selected_choice_id: sel.value })
-          .then(resp => { if (q.is_scored && resp && resp.is_correct) correctCount++; })
-          .catch(()=>{}));
+  function submitQuiz(){
+    if (!state.schema) return;
+    var tasks = [];
+    var scoredTotal = 0;
+    var correctCount = 0;
+    var feedbackItems = [];
+
+    (state.schema.questions || []).forEach(function(question){
+      if (question.qtype === 'MULTIPLE_CHOICE'){
+        var selected = document.querySelector('input[name="q_' + question.id + '"]:checked');
+        if (!selected) return;
+        setSavedAnswer(question.id, { selected_choice_id: selected.value });
+        if (question.is_scored) scoredTotal += 1;
+        tasks.push(
+          postJSON(attemptUrl, {
+            question_id: question.id,
+            selected_choice_id: selected.value,
+            current_time: getCurrentVideoTime(),
+          }).then(function(response){
+            state.lastAnsweredOrder = Math.max(state.lastAnsweredOrder, Number(question.order || 0));
+            if (question.is_scored && response && response.is_correct){
+              correctCount += 1;
+            }
+            feedbackItems.push({
+              prompt: question.prompt,
+              explanation: response && response.explanation ? response.explanation : '',
+              isCorrect: !!(response && response.is_correct),
+            });
+          }).catch(function(){})
+        );
       } else {
-        const ta = document.querySelector(`textarea[name="t_${q.id}"]`);
-        const text = (ta && ta.value || '').trim(); if (!text) return;
-        tasks.push(postJSON(endpoints.attempt, { question_id: q.id, open_text: text }).catch(()=>{}));
+        var textarea = document.querySelector('textarea[name="t_' + question.id + '"]');
+        var text = textarea ? textarea.value.trim() : '';
+        if (!text) return;
+        setSavedAnswer(question.id, { open_text: text });
+        tasks.push(
+          postJSON(attemptUrl, {
+            question_id: question.id,
+            open_text: text,
+            current_time: getCurrentVideoTime(),
+          }).then(function(){
+            state.lastAnsweredOrder = Math.max(state.lastAnsweredOrder, Number(question.order || 0));
+            feedbackItems.push({
+              prompt: question.prompt,
+              explanation: question.explanation || '',
+              isCorrect: null,
+            });
+          }).catch(function(){})
+        );
       }
     });
-    Promise.all(tasks).then(() => {
-      if (resultEl) resultEl.textContent = `You answered ${correctCount} of ${scoredTotal} correctly.`;
+
+    Promise.all(tasks).then(function(){
+      if (resultEl){
+        var summary = 'You answered ' + correctCount + ' of ' + scoredTotal + ' correctly.';
+        if (feedbackItems.length){
+          summary += '\n\n' + feedbackItems.map(function(item){
+            if (item.explanation){
+              if (item.isCorrect === null){
+                return item.prompt + ': ' + item.explanation;
+              }
+              return item.prompt + ': ' + (item.isCorrect ? 'Correct. ' : 'Review this. ') + item.explanation;
+            }
+            return item.prompt;
+          }).join('\n');
+        }
+        resultEl.textContent = summary;
+      }
+      saveProgress(false).catch(function(){});
     });
   }
 
-  function postJSON(url, body){
-    return fetch(url, { method:'POST', headers:{ 'Content-Type':'application/json', 'X-CSRFToken': csrfToken }, credentials:'same-origin', body: JSON.stringify(body||{}) })
-      .then(r => { if (!r.ok) throw new Error('Bad response'); return r.json(); });
+  if (submitBtn){
+    submitBtn.addEventListener('click', submitQuiz);
   }
 
-  function getCookie(name){ let v=null; if(document.cookie&&document.cookie!==''){ const cookies=document.cookie.split(';'); for(let i=0;i<cookies.length;i++){ const c=cookies[i].trim(); if(c.substring(0,name.length+1)===(name+'=')){ v=decodeURIComponent(c.substring(name.length+1)); break; } } } return v; }
+  window.addEventListener('beforeunload', function(){
+    if (progressTimer){
+      clearTimeout(progressTimer);
+    }
+    saveProgress(false).catch(function(){});
+  });
 
-  function loadYouTubeAPI(cb){ if (window.YT && window.YT.Player){ cb(); return; } const tag=document.createElement('script'); tag.src='https://www.youtube.com/iframe_api'; const first=document.getElementsByTagName('script')[0]; first.parentNode.insertBefore(tag, first); const prev=window.onYouTubeIframeAPIReady; window.onYouTubeIframeAPIReady=function(){ if (typeof prev==='function') { try{ prev(); } catch(_){ } } cb(); } }
+  fetch(schemaUrl, { credentials: 'same-origin' })
+    .then(function(response){ return response.json(); })
+    .then(function(data){
+      state.schema = data || {};
+      restoreProgress(state.schema.progress);
+      renderQuiz();
+      bindVideoTracking();
+      if (state.schema.lesson && state.schema.lesson.youtube_video_id){
+        bootYouTube(state.schema.lesson.youtube_video_id || inlineYtId);
+      } else {
+        restoreVideoPosition();
+      }
+    })
+    .catch(function(){});
 })();

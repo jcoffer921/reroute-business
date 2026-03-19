@@ -20,6 +20,7 @@ urlpatterns = [
     path("learning/<int:pk>/edit/", views.ModuleUpdateView.as_view(), name="content_edit"),
     path("learning/<int:pk>/delete/", views.ModuleDeleteView.as_view(), name="content_delete"),
     path("learning/<int:pk>/archive/", views.module_archive, name="content_archive"),
+    path("learning/<int:pk>/convert-legacy-quiz/", views.module_convert_legacy_quiz, name="content_convert_legacy_quiz"),
     path("users/", views.UserListView.as_view(), name="user_list"),
     path("users/<int:pk>/", views.UserDetailView.as_view(), name="user_detail"),
     path("users/<int:pk>/toggle/", views.user_toggle_active, name="user_toggle"),

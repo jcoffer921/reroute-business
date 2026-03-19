@@ -10,6 +10,7 @@ urlpatterns = [
     path('modules/<int:pk>/', views.module_detail),  # legacy alias
     path('module/<int:pk>/quiz/schema/', views.module_quiz_schema, name='module_quiz_schema'),
     path('module/<int:pk>/quiz/submit/', views.module_quiz_submit, name='module_quiz_submit'),
+    path('module/<int:pk>/progress/', views.module_progress, name='module_progress'),
     path('api/modules/<int:pk>/quiz/', views.module_quiz_schema),  # legacy API alias
 
     # Job tools resources

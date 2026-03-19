@@ -1,6 +1,5 @@
 # resources/views.py
 import json
-from datetime import datetime
 from urllib.parse import quote, urlparse, parse_qs, urlencode, urlunparse
 
 from django.conf import settings
@@ -10,6 +9,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
+from django.utils import timezone
 from django.utils.translation import gettext as _
 from reroute_business.blog.models import BlogPost
 from reroute_business.job_list.utils.location import zip_to_point
@@ -18,8 +18,11 @@ from .models import (
     Feature,
     ResourceOrganization,
     Module,
+    ModuleAttempt,
+    ModuleProgress,
     ModuleQuizScore,
     ModuleQuizOpenResponse,
+    ModuleResponse,
     QuizQuestion,
     Lesson,
     LessonQuestion,
@@ -203,7 +206,7 @@ def _resource_to_payload(resource: ResourceOrganization) -> dict:
     }
 
 
-def _inline_quiz_questions(module):
+def _inline_quiz_questions(module, include_correctness=False):
     """
     Backwards compatibility helper: normalize Module.quiz_data->questions into the
     same structure returned by relational QuizQuestion/QuizAnswer objects.
@@ -237,8 +240,9 @@ def _inline_quiz_questions(module):
             norm_choices.append({
                 'id': str(choice_id),
                 'text': text,
-                'is_correct': bool(choice.get('is_correct') or choice.get('correct')),
             })
+            if include_correctness:
+                norm_choices[-1]['is_correct'] = bool(choice.get('is_correct') or choice.get('correct'))
         if not norm_choices:
             continue
 
@@ -253,6 +257,138 @@ def _inline_quiz_questions(module):
             'choices': norm_choices,
         })
     return questions
+
+
+def _ensure_session(request):
+    if not request.session.session_key:
+        request.session.save()
+    return request.session.session_key
+
+
+def _module_progress_qs(module, request):
+    qs = ModuleProgress.objects.filter(module=module)
+    if request.user.is_authenticated:
+        return qs.filter(user=request.user)
+    session_key = _ensure_session(request)
+    return qs.filter(session_key=session_key)
+
+
+def _module_progress_payload(progress):
+    if not progress:
+        return None
+    return {
+        "completed_at": progress.completed_at.isoformat() if progress.completed_at else None,
+        "last_question_order": progress.last_question_order,
+        "score_percent": progress.score_percent,
+        "raw_state": progress.raw_state,
+        "updated_at": progress.updated_at.isoformat(),
+    }
+
+
+def _module_support_links(module):
+    category = getattr(module, "gallery_category", "") or getattr(module, "category", "")
+    mapping = {
+        Module.GALLERY_CATEGORY_JOBS_INTERVIEWS: [
+            {
+                "title": "Interview Prep",
+                "description": "Practice common questions and tighten your talking points.",
+                "href": reverse("interview_prep"),
+                "label": "Practice",
+            },
+            {
+                "title": "Email Guidance",
+                "description": "Use cleaner outreach and follow-up messages with employers.",
+                "href": reverse("email_guidance"),
+                "label": "Open",
+            },
+        ],
+        Module.GALLERY_CATEGORY_IDS_DOCUMENTS: [
+            {
+                "title": "Resource Directory",
+                "description": "Find organizations that can help with IDs, benefits, and paperwork.",
+                "href": reverse("resource_directory"),
+                "label": "Browse",
+            },
+            {
+                "title": "Legal Aid",
+                "description": "Review reentry-focused legal support options and guidance.",
+                "href": reverse("legal_aid"),
+                "label": "Explore",
+            },
+        ],
+        Module.GALLERY_CATEGORY_HOUSING: [
+            {
+                "title": "Housing Support",
+                "description": "See housing-focused resources and related next steps.",
+                "href": reverse("housing"),
+                "label": "Open",
+            },
+            {
+                "title": "Resource Directory",
+                "description": "Filter local organizations by need and location.",
+                "href": reverse("resource_directory"),
+                "label": "Search",
+            },
+        ],
+        Module.GALLERY_CATEGORY_BENEFITS: [
+            {
+                "title": "Benefit Finder",
+                "description": "Answer a few questions to narrow down benefits and programs.",
+                "href": reverse("benefit_finder:start"),
+                "label": "Start",
+            },
+            {
+                "title": "Resource Directory",
+                "description": "Compare verified organizations by service type.",
+                "href": reverse("resource_directory"),
+                "label": "Browse",
+            },
+        ],
+        Module.GALLERY_CATEGORY_TRANSPORTATION: [
+            {
+                "title": "Resource Directory",
+                "description": "Look for local agencies that can help with transit and mobility support.",
+                "href": reverse("resource_directory"),
+                "label": "Browse",
+            },
+        ],
+        Module.GALLERY_CATEGORY_HEALTH_MENTAL_HEALTH: [
+            {
+                "title": "Counseling Support",
+                "description": "Explore mental health and counseling resources.",
+                "href": reverse("counseling"),
+                "label": "Open",
+            },
+            {
+                "title": "Resource Directory",
+                "description": "Find verified organizations offering support services.",
+                "href": reverse("resource_directory"),
+                "label": "Browse",
+            },
+        ],
+        Module.GALLERY_CATEGORY_FINANCIAL_BASICS: [
+            {
+                "title": "Tech Courses",
+                "description": "Build practical skills that help with digital and financial literacy.",
+                "href": reverse("tech_courses"),
+                "label": "Explore",
+            },
+            {
+                "title": "Resource Directory",
+                "description": "Look for agencies offering benefits and financial support.",
+                "href": reverse("resource_directory"),
+                "label": "Browse",
+            },
+        ],
+    }
+    return mapping.get(category, [
+        {
+            "title": "Resource Directory",
+            "description": "Browse organizations and services related to this topic.",
+            "href": reverse("resource_directory"),
+            "label": "Browse",
+        }
+    ])
 
 
 def resource_list(request):
@@ -443,17 +579,41 @@ def module_detail(request, pk: int):
     user_score = None
     if request.user.is_authenticated:
         user_score = ModuleQuizScore.objects.filter(module=module, user=request.user).first()
+    module_progress = _module_progress_qs(module, request).first()
     question_count = module.questions.count()
     if not question_count:
         question_count = len(_inline_quiz_questions(module))
     estimated_minutes = max(3, int(question_count or 3))
-    progress_percent = 0
+    accuracy_percent = 0
     if user_score and user_score.total_questions:
         try:
             ratio = user_score.score / max(user_score.total_questions, 1)
-            progress_percent = max(0, min(100, round(ratio * 100)))
+            accuracy_percent = max(0, min(100, round(ratio * 100)))
         except Exception:
-            progress_percent = 0
+            accuracy_percent = 0
+    completion_percent = 100 if module_progress and module_progress.completed_at else 0
+    if not completion_percent and question_count and module_progress and module_progress.last_question_order:
+        completion_percent = max(
+            0,
+            min(100, round((module_progress.last_question_order / question_count) * 100)),
+        )
+    related_modules = list(
+        Module.objects.filter(
+            is_archived=False,
+            gallery_category=module.gallery_category,
+        )
+        .exclude(pk=module.pk)
+        .order_by("-created_at")[:3]
+    )
+    recommendation_heading = "Keep going with this topic"
+    recommendation_subtitle = "Choose another module in the same track or jump into a related resource."
+    if module_progress and module_progress.completed_at:
+        recommendation_heading = "You're ready for the next module"
+        recommendation_subtitle = "Keep momentum going with a related lesson or support resource."
+    elif accuracy_percent and accuracy_percent < 70:
+        recommendation_heading = "Reinforce this skill"
+        recommendation_subtitle = "Try another module in the same category or review a support resource before retaking the quiz."
+    support_links = _module_support_links(module)
     return render(request, 'resources/modules/module_detail.html', {
         'module': module,
         'yt_id': yt_id,
@@ -465,7 +625,13 @@ def module_detail(request, pk: int):
         'user_score': user_score,
         'can_submit_quiz': request.user.is_authenticated,
         'question_count': question_count,
-        'progress_percent': progress_percent,
+        'accuracy_percent': accuracy_percent,
+        'completion_percent': completion_percent,
+        'module_progress': module_progress,
+        'related_modules': related_modules,
+        'recommendation_heading': recommendation_heading,
+        'recommendation_subtitle': recommendation_subtitle,
+        'support_links': support_links,
     })
 
 
@@ -482,7 +648,6 @@ def module_quiz_schema(request, pk: int):
                 choices.append({
                     'id': str(choice.id),
                     'text': choice.text,
-                    'is_correct': choice.is_correct,
                 })
             questions_payload.append({
                 'id': str(question.id),
@@ -508,6 +673,9 @@ def module_quiz_schema(request, pk: int):
                 'total_questions': existing.total_questions,
                 'updated_at': existing.updated_at.isoformat(),
             }
+
+    progress = _module_progress_qs(module, request).first()
+    payload["progress"] = _module_progress_payload(progress)
 
     return JsonResponse(payload)
 
@@ -559,10 +727,11 @@ def module_quiz_submit(request, pk: int):
         graded_questions = [q for q in questions if q.qtype != QuizQuestion.QTYPE_OPEN]
         total_questions = len(graded_questions)
     else:
-        questions = _inline_quiz_questions(module)
+        questions = _inline_quiz_questions(module, include_correctness=True)
         total_questions = len(questions)
     attempted = 0
     correct = 0
+    evaluation = {}
 
     for question in questions:
         if has_relational_questions:
@@ -589,6 +758,11 @@ def module_quiz_submit(request, pk: int):
                     question=question,
                     user=request.user,
                 ).delete()
+            evaluation[str(key)] = {
+                "question_id": str(key),
+                "question_type": QuizQuestion.QTYPE_OPEN,
+                "saved": bool(text_answer),
+            }
             continue
 
         selected_id = record.get('answer_id')
@@ -597,19 +771,101 @@ def module_quiz_submit(request, pk: int):
         attempted += 1
         if has_relational_questions:
             choice = next((choice for choice in question.answers.all() if choice.id == selected_id), None)
+            correct_choice = next((choice for choice in question.answers.all() if choice.is_correct), None)
             if choice and choice.is_correct:
                 correct += 1
+            evaluation[str(key)] = {
+                "question_id": str(key),
+                "question_type": qtype,
+                "selected_choice_id": str(selected_id),
+                "correct_choice_id": str(correct_choice.id) if correct_choice else "",
+                "correct_text": correct_choice.text if correct_choice else "",
+                "is_user_correct": bool(choice and choice.is_correct),
+                "explanation": question.explanation,
+            }
         else:
             choices = question.get('choices') or []
             match = next((choice for choice in choices if str(choice.get('id')) == selected_id), None)
+            correct_choice = next((choice for choice in choices if choice.get('is_correct')), None)
             if match and match.get('is_correct'):
                 correct += 1
+            evaluation[str(key)] = {
+                "question_id": str(key),
+                "question_type": qtype,
+                "selected_choice_id": str(selected_id),
+                "correct_choice_id": str(correct_choice.get('id')) if correct_choice else "",
+                "correct_text": correct_choice.get('text', '') if correct_choice else "",
+                "is_user_correct": bool(match and match.get('is_correct')),
+                "explanation": question.get('explanation', ''),
+            }
 
     score_obj, _ = ModuleQuizScore.objects.update_or_create(
         module=module,
         user=request.user,
         defaults={'score': correct, 'total_questions': total_questions},
     )
+    session_key = _ensure_session(request)
+    module_attempt = ModuleAttempt.objects.create(
+        module=module,
+        user=request.user if request.user.is_authenticated else None,
+        session_key="" if request.user.is_authenticated else session_key,
+        score=correct,
+        total_questions=total_questions,
+    )
+    serialized_answers = {}
+    for question in questions:
+        if has_relational_questions:
+            key = question.id
+            qtype = question.qtype
+            question_obj = question
+        else:
+            key = str(question['id'])
+            qtype = QuizQuestion.QTYPE_MULTIPLE_CHOICE
+            question_obj = None
+        record = submitted.get(key) or {}
+        serialized_answers[str(key)] = {
+            "qtype": qtype,
+            "value": str(record.get("answer_id") or record.get("text_answer") or ""),
+        }
+        selected_answer = None
+        if has_relational_questions and qtype != QuizQuestion.QTYPE_OPEN:
+            selected_answer = next(
+                (choice for choice in question.answers.all() if choice.id == record.get("answer_id")),
+                None,
+            )
+        ModuleResponse.objects.create(
+            attempt=module_attempt,
+            question=question_obj,
+            question_identifier=str(key),
+            selected_answer=selected_answer,
+            text_answer=str(record.get("text_answer") or ""),
+            is_correct=bool(evaluation.get(str(key), {}).get("is_user_correct")),
+        )
+    score_percent = round((correct / total_questions) * 100) if total_questions else 0
+    progress_defaults = {
+        "last_question_order": len(questions),
+        "score_percent": score_percent,
+        "raw_state": {
+            "submitted": True,
+            "current": max(len(questions) - 1, 0),
+            "answers": serialized_answers,
+            "evaluation": evaluation,
+        },
+    }
+    if not _module_progress_qs(module, request).filter(completed_at__isnull=False).exists():
+        progress_defaults["completed_at"] = timezone.now()
+    if request.user.is_authenticated:
+        module_progress, _ = ModuleProgress.objects.update_or_create(
+            module=module,
+            user=request.user,
+            defaults=progress_defaults,
+        )
+    else:
+        module_progress, _ = ModuleProgress.objects.update_or_create(
+            module=module,
+            session_key=session_key,
+            defaults=progress_defaults,
+        )
 
     payload = {
         'message': 'Score saved.',
@@ -618,8 +874,54 @@ def module_quiz_submit(request, pk: int):
         'attempted': attempted,
         'percent': round((correct / total_questions) * 100, 2) if total_questions else 0.0,
         'updated_at': score_obj.updated_at.isoformat(),
+        'evaluation': evaluation,
+        'progress': _module_progress_payload(module_progress),
     }
     return JsonResponse(payload)
+
+
+@require_POST
+@csrf_protect
+def module_progress(request, pk: int):
+    module = get_object_or_404(Module, pk=pk)
+    try:
+        data = json.loads(request.body.decode("utf-8")) if request.body else request.POST
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON payload."}, status=400)
+
+    last_question_order = int(data.get("last_question_order") or 0)
+    score_percent = int(data.get("score_percent") or 0)
+    raw_state = data.get("raw_state")
+    completed = bool(data.get("completed") or False)
+
+    defaults = {
+        "last_question_order": max(0, last_question_order),
+        "score_percent": max(0, min(100, score_percent)),
+    }
+    if raw_state is not None:
+        defaults["raw_state"] = raw_state
+
+    session_key = _ensure_session(request)
+    if request.user.is_authenticated:
+        progress, _ = ModuleProgress.objects.update_or_create(
+            module=module,
+            user=request.user,
+            defaults=defaults,
+        )
+    else:
+        progress, _ = ModuleProgress.objects.update_or_create(
+            module=module,
+            session_key=session_key,
+            defaults=defaults,
+        )
+    if completed and not progress.completed_at:
+        progress.completed_at = timezone.now()
+        progress.save(update_fields=["completed_at", "updated_at"])
+
+    return JsonResponse({
+        "ok": True,
+        "progress": _module_progress_payload(progress),
+    })
 
 
 def interview_prep(request):
@@ -655,11 +957,6 @@ def resources_verification(request):
 
 # ------------------ Interactive Lessons ------------------
 
-def _ensure_session(request):
-    if not request.session.session_key:
-        request.session.save()
-    return request.session.session_key
-
 
 @ensure_csrf_cookie
 def lesson_detail(request, slug):
@@ -681,6 +978,7 @@ def lesson_schema(request, slug):
             'order': q.order,
             'timestamp_seconds': q.timestamp_seconds,
             'prompt': q.prompt,
+            'explanation': q.explanation,
             'qtype': q.qtype,
             'is_required': q.is_required,
             'is_scored': q.is_scored,
@@ -712,6 +1010,7 @@ def lesson_schema(request, slug):
             'last_video_time': prog.last_video_time,
             'last_answered_question_order': prog.last_answered_question_order,
             'completed_at': prog.completed_at.isoformat() if prog.completed_at else None,
+            'raw_state': prog.raw_state,
         }
 
     payload = {
@@ -817,6 +1116,9 @@ def lesson_attempt(request, slug):
     return JsonResponse({
         'attempt_id': attempt.id,
         'is_correct': is_correct,
+        'explanation': question.explanation,
+        'question_id': question.id,
+        'question_order': question.order,
         'correct_count': correct_count,
         'scored_count': prog.scored_count,
         'accuracy_percent': accuracy,
@@ -857,7 +1159,7 @@ def lesson_progress(request, slug):
     if raw_state is not None:
         prog.raw_state = raw_state
     if completed and not prog.completed_at:
-        prog.completed_at = datetime.utcnow()
+        prog.completed_at = timezone.now()
     prog.save()
 
     return JsonResponse({

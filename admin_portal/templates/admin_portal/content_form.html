@@ -33,6 +33,11 @@
           {{ form.category.errors }}
         </div>
         <div class="module-form__field">
+          <label for="{{ form.gallery_category.id_for_label }}">{{ form.gallery_category.label }}</label>
+          {{ form.gallery_category }}
+          {{ form.gallery_category.errors }}
+        </div>
+        <div class="module-form__field">
           <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
           {{ form.description }}
           {{ form.description.errors }}
@@ -41,6 +46,16 @@
 
       <div class="module-form__panel">
         <h3>Media</h3>
+        <div class="module-form__field">
+          <label for="{{ form.duration_minutes.id_for_label }}">{{ form.duration_minutes.label }}</label>
+          {{ form.duration_minutes }}
+          {{ form.duration_minutes.errors }}
+        </div>
+        <div class="module-form__field">
+          <label for="{{ form.quiz_lesson_count.id_for_label }}">{{ form.quiz_lesson_count.label }}</label>
+          {{ form.quiz_lesson_count }}
+          {{ form.quiz_lesson_count.errors }}
+        </div>
         <div class="module-form__field">
           <label for="{{ form.video_url.id_for_label }}">{{ form.video_url.label }}</label>
           {{ form.video_url }}
@@ -55,6 +70,16 @@
           <label for="{{ form.is_archived.id_for_label }}">{{ form.is_archived }} {{ form.is_archived.label }}</label>
           {{ form.is_archived.errors }}
         </div>
+      </div>
+    </div>
+
+    <div class="module-form__panel">
+      <h3>Takeaways</h3>
+      <div class="module-form__field">
+        <label for="{{ form.key_takeaways.id_for_label }}">{{ form.key_takeaways.label }}</label>
+        {{ form.key_takeaways }}
+        {% if form.key_takeaways.help_text %}<p class="admin-subtitle">{{ form.key_takeaways.help_text }}</p>{% endif %}
+        {{ form.key_takeaways.errors }}
       </div>
     </div>
 

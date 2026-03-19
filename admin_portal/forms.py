@@ -95,12 +95,22 @@ class ResourceOrganizationForm(forms.ModelForm):
 
 
 class ModuleForm(forms.ModelForm):
+    key_takeaways = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 4, "class": "admin-textarea"}),
+        help_text="One takeaway per line.",
+    )
+
     class Meta:
         model = Module
         fields = [
             "title",
             "description",
             "category",
+            "gallery_category",
+            "duration_minutes",
+            "quiz_lesson_count",
+            "key_takeaways",
             "video_url",
             "embed_html",
             "internal_content",
@@ -112,3 +122,13 @@ class ModuleForm(forms.ModelForm):
             "embed_html": forms.Textarea(attrs={"rows": 4, "class": "admin-textarea"}),
             "internal_content": forms.Textarea(attrs={"rows": 4, "class": "admin-textarea"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        takeaways = getattr(self.instance, "key_takeaways", None)
+        if takeaways:
+            self.initial["key_takeaways"] = "\n".join(str(item).strip() for item in takeaways if str(item).strip())
+
+    def clean_key_takeaways(self):
+        raw = (self.cleaned_data.get("key_takeaways") or "").splitlines()
+        return [line.strip() for line in raw if line.strip()]

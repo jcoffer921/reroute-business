@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.db.models import Count
+from django.db.models import Avg
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -21,7 +22,14 @@ from reroute_business.job_list.models import Job, Application
 from reroute_business.profiles.models import EmployerProfile, UserProfile
 from reroute_business.reentry_org.models import ReentryOrgApplication
 from reroute_business.reentry_org.services import upsert_resource_org_from_application
-from reroute_business.resources.models import Module, ResourceOrganization
+from reroute_business.resources.legacy_quiz import convert_module_legacy_quiz
+from reroute_business.resources.models import (
+    Module,
+    ModuleAttempt,
+    ModuleResponse,
+    QuizQuestion,
+    ResourceOrganization,
+)
 
 from .forms import (
     EmployerNotesForm,
@@ -694,7 +702,21 @@ class ModuleListView(StaffRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        qs = Module.objects.all().order_by("-created_at")
+        qs = (
+            Module.objects.all()
+            .annotate(
+                question_count=Count("questions", distinct=True),
+                attempt_count=Count("attempts", distinct=True),
+                completion_count=Count(
+                    "progress_records",
+                    filter=Q(progress_records__completed_at__isnull=False),
+                    distinct=True,
+                ),
+                avg_attempt_score=Avg("attempts__score"),
+                avg_attempt_total=Avg("attempts__total_questions"),
+            )
+            .order_by("-created_at")
+        )
         q = (self.request.GET.get("q") or "").strip()
         status = (self.request.GET.get("status") or "").strip().lower()
         if q:
@@ -716,6 +738,11 @@ class ModuleListView(StaffRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        for module in context["modules"]:
+            if module.avg_attempt_score is not None and module.avg_attempt_total:
+                module.avg_attempt_accuracy_percent = round((module.avg_attempt_score / module.avg_attempt_total) * 100)
+            else:
+                module.avg_attempt_accuracy_percent = None
         context["q"] = self.request.GET.get("q", "")
         context["status"] = self.request.GET.get("status", "")
         return context
@@ -756,9 +783,40 @@ class ModuleDetailView(StaffRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        module = self.object
+        score_stats = module.scores.aggregate(avg_score=Avg("score"), avg_total=Avg("total_questions"))
+        attempt_stats = module.attempts.aggregate(avg_score=Avg("score"), avg_total=Avg("total_questions"))
         context["audit_logs"] = AuditLog.objects.filter(
             object_type="Module", object_id=str(self.object.id)
         )[:20]
+        context["question_count"] = module.questions.count()
+        context["score_count"] = module.scores.count()
+        context["attempt_count"] = module.attempts.count()
+        context["completion_count"] = module.progress_records.filter(completed_at__isnull=False).count()
+        context["open_response_count"] = module.open_responses.count()
+        avg_score = score_stats.get("avg_score")
+        avg_total = score_stats.get("avg_total")
+        if avg_score is not None and avg_total:
+            context["avg_accuracy_percent"] = round((avg_score / avg_total) * 100)
+        else:
+            context["avg_accuracy_percent"] = None
+        attempt_avg_score = attempt_stats.get("avg_score")
+        attempt_avg_total = attempt_stats.get("avg_total")
+        if attempt_avg_score is not None and attempt_avg_total:
+            context["avg_attempt_accuracy_percent"] = round((attempt_avg_score / attempt_avg_total) * 100)
+        else:
+            context["avg_attempt_accuracy_percent"] = None
+        context["questions"] = module.questions.prefetch_related("answers").order_by("order", "id")
+        context["uses_legacy_quiz_data"] = not module.questions.exists() and bool(module.quiz_data)
+        missed_responses = (
+            ModuleResponse.objects.filter(attempt__module=module, is_correct=False)
+            .exclude(question__isnull=True)
+            .values("question__id", "question__order", "question__prompt")
+            .annotate(miss_count=Count("id"))
+            .order_by("-miss_count", "question__order")[:5]
+        )
+        context["hardest_questions"] = missed_responses
+        context["django_admin_change_url"] = reverse("admin:resources_module_change", args=[module.id])
         return context
 
 
@@ -784,6 +842,27 @@ def module_archive(request, pk):
     module.save(update_fields=["is_archived"])
     _log_action(request.user, "update", module, {"is_archived": True})
     messages.success(request, "Module archived.")
+    return redirect("admin_portal:content_detail", pk=module.id)
+
+
+@login_required
+@staff_member_required
+def module_convert_legacy_quiz(request, pk):
+    if request.method != "POST":
+        return HttpResponseForbidden()
+    module = get_object_or_404(Module, pk=pk)
+    if module.questions.exists():
+        messages.info(request, "This module already uses relational quiz questions.")
+        return redirect("admin_portal:content_detail", pk=module.id)
+    quiz_data = module.quiz_data or {}
+    raw_questions = quiz_data.get("questions") if isinstance(quiz_data, dict) else None
+    if not isinstance(raw_questions, list) or not raw_questions:
+        messages.error(request, "No legacy quiz_data questions were found to convert.")
+        return redirect("admin_portal:content_detail", pk=module.id)
+
+    created_count = convert_module_legacy_quiz(module)
+    _log_action(request.user, "update", module, {"legacy_quiz_converted": created_count})
+    messages.success(request, f"Converted {created_count} legacy quiz questions into relational records.")
     return redirect("admin_portal:content_detail", pk=module.id)
 
 

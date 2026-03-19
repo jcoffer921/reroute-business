@@ -30,6 +30,14 @@
 
   <div class="module-detail__actions">
     <a class="admin-btn primary" href="{% url 'admin_portal:content_edit' module.id %}">Edit</a>
+    <a class="admin-btn ghost" href="{{ django_admin_change_url }}">Quiz Builder</a>
+    <a class="admin-btn ghost" href="{% url 'module_detail' module.id %}" target="_blank" rel="noopener noreferrer">Preview</a>
+    {% if uses_legacy_quiz_data %}
+    <form method="post" action="{% url 'admin_portal:content_convert_legacy_quiz' module.id %}" class="js-confirm" data-message="Convert legacy quiz_data into relational quiz questions?">
+      {% csrf_token %}
+      <button type="submit" class="admin-btn ghost">Convert Legacy Quiz</button>
+    </form>
+    {% endif %}
     {% if not module.is_archived %}
     <form method="post" action="{% url 'admin_portal:content_archive' module.id %}" class="js-confirm" data-message="Archive this module?">
       {% csrf_token %}
@@ -41,6 +49,45 @@
 </section>
 
 <section class="module-detail-grid">
+  {% if uses_legacy_quiz_data %}
+  <div class="admin-section">
+    <div class="admin-section-header">
+      <div class="admin-section-title">Authoring Notice</div>
+    </div>
+    <div class="module-detail__panel-body">
+      <p class="admin-subtitle">This module still uses legacy `quiz_data` JSON fallback. Move it into relational quiz questions in the Quiz Builder to unlock full validation, analytics, and attempt tracking.</p>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="admin-section">
+    <div class="admin-section-header">
+      <div class="admin-section-title">Learning Stats</div>
+    </div>
+    <div class="module-detail__panel-body">
+      <div class="module-detail__field">
+        <h4>Questions</h4>
+        <p>{{ question_count }}</p>
+      </div>
+      <div class="module-detail__field">
+        <h4>Quiz Attempts Saved</h4>
+        <p>{{ attempt_count }}</p>
+      </div>
+      <div class="module-detail__field">
+        <h4>Completions</h4>
+        <p>{{ completion_count }}</p>
+      </div>
+      <div class="module-detail__field">
+        <h4>Average Accuracy</h4>
+        <p>{% if avg_attempt_accuracy_percent is not None %}{{ avg_attempt_accuracy_percent }}%{% else %}No attempt data yet{% endif %}</p>
+      </div>
+      <div class="module-detail__field">
+        <h4>Open Responses</h4>
+        <p>{{ open_response_count }}</p>
+      </div>
+    </div>
+  </div>
+
   <div class="admin-section">
     <div class="admin-section-header">
       <div class="admin-section-title">Description</div>
@@ -75,7 +122,89 @@
         <p class="admin-subtitle">No poster image</p>
         {% endif %}
       </div>
+      <div class="module-detail__field">
+        <h4>Gallery Category</h4>
+        <p>{{ module.get_gallery_category_display }}</p>
+      </div>
+      <div class="module-detail__field">
+        <h4>Duration</h4>
+        <p>{% if module.duration_minutes %}{{ module.duration_minutes }} min{% else %}Not set{% endif %}</p>
+      </div>
+      <div class="module-detail__field">
+        <h4>Lesson Count Override</h4>
+        <p>{% if module.quiz_lesson_count %}{{ module.quiz_lesson_count }}{% else %}Not set{% endif %}</p>
+      </div>
     </div>
+  </div>
+</section>
+
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Hardest Questions</div>
+  </div>
+  {% if hardest_questions %}
+    <div class="admin-feed">
+      {% for item in hardest_questions %}
+        <div class="admin-feed-item">
+          <div>
+            <strong>Q{{ item.question__order }}</strong>
+            <p>{{ item.question__prompt }}</p>
+          </div>
+          <span class="admin-list-time">{{ item.miss_count }} misses</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="admin-subtitle">No incorrect responses recorded yet.</p>
+  {% endif %}
+</section>
+
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Quiz Questions</div>
+  </div>
+  {% if questions %}
+    <div class="admin-feed">
+      {% for question in questions %}
+        <div class="admin-feed-item">
+          <div>
+            <strong>Q{{ question.order }} · {{ question.get_qtype_display }}</strong>
+            <p>{{ question.prompt }}</p>
+            {% if question.explanation %}
+              <p><em>{{ question.explanation }}</em></p>
+            {% endif %}
+            {% if question.qtype == 'mc' %}
+              <p>
+                {% for answer in question.answers.all %}
+                  {% if answer.is_correct %}[Correct] {% endif %}{{ answer.text }}{% if not forloop.last %} · {% endif %}
+                {% endfor %}
+              </p>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="admin-subtitle">No relational quiz questions configured yet.</p>
+  {% endif %}
+</section>
+
+<section class="admin-section">
+  <div class="admin-section-header">
+    <div class="admin-section-title">Key Takeaways</div>
+  </div>
+  <div class="module-detail__panel-body">
+    {% with takeaways=module.key_takeaways_list %}
+      {% if takeaways %}
+        <ul>
+          {% for takeaway in takeaways %}
+            <li>{{ takeaway }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="admin-subtitle">No key takeaways configured.</p>
+      {% endif %}
+    {% endwith %}
   </div>
 </section>
 

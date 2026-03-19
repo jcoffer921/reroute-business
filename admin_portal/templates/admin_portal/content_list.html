@@ -36,6 +36,10 @@
         <th>Title</th>
         <th>Type</th>
         <th>Category</th>
+        <th>Questions</th>
+        <th>Attempts</th>
+        <th>Completions</th>
+        <th>Avg Accuracy</th>
         <th>Status</th>
         <th>Updated</th>
         <th></th>
@@ -45,6 +49,10 @@
         <td class="user-name"><a class="link-button" href="{% url 'admin_portal:content_detail' module.id %}">{{ module.title }}</a></td>
         <td>Module</td>
         <td>{{ module.get_category_display }}</td>
+        <td>{{ module.question_count }}</td>
+        <td>{{ module.attempt_count }}</td>
+        <td>{{ module.completion_count }}</td>
+        <td>{% if module.avg_attempt_accuracy_percent is not None %}{{ module.avg_attempt_accuracy_percent }}%{% else %}--{% endif %}</td>
         <td>
           {% if module.is_archived %}
             <span class="status-pill neutral">Archived</span>
@@ -58,7 +66,7 @@
         <td><a class="link-button" href="{% url 'admin_portal:content_detail' module.id %}">View</a></td>
       </tr>
       {% empty %}
-      <tr><td colspan="6">No modules found.</td></tr>
+      <tr><td colspan="10">No modules found.</td></tr>
       {% endfor %}
     </table>
   </div>

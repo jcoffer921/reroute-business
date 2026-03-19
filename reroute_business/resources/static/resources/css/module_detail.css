@@ -300,6 +300,11 @@
   margin: .4rem 0 1rem;
 }
 
+.resources-header p {
+  margin: -.35rem 0 1rem;
+  color: var(--module-subtext);
+}
+
 .resources-pill {
   display: inline-flex;
   padding: .25rem .75rem;
@@ -554,6 +559,12 @@
 
 .quiz-feedback-line.is-incorrect {
   color: #f97316;
+}
+
+.quiz-feedback-explainer {
+  margin: .55rem 0 0;
+  color: var(--module-subtext);
+  line-height: 1.6;
 }
 
 .module-btn.is-complete {

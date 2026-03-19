@@ -10,6 +10,7 @@
 <section class="lesson-layout" id="lessonRoot"
          data-schema-url="{% url 'lesson_schema' lesson.slug %}"
          data-attempt-url="{% url 'lesson_attempt' lesson.slug %}"
+         data-progress-url="{% url 'lesson_progress' lesson.slug %}"
          data-yt-id="{{ lesson.youtube_video_id|default_if_none:'' }}">
   <aside class="lesson-side">
     <div class="quiz-panel">

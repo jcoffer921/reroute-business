@@ -21,7 +21,13 @@
     <div class="module-hero-card__eyebrow">{{ module.get_category_display|default:"Learning Module" }}</div>
     <h1 class="module-hero-card__title">{{ module.title }}</h1>
     <p class="module-hero-card__subtitle">
-      Build confidence with bite-sized lessons, then put it into practice right away.
+      {% if module_progress and module_progress.completed_at %}
+        You finished this module. Review your takeaways, revisit the quiz, or move into the next lesson.
+      {% elif module_progress and module_progress.last_question_order %}
+        Pick up where you left off and finish the guided quiz with your saved progress.
+      {% else %}
+        Build confidence with bite-sized lessons, then put it into practice right away.
+      {% endif %}
     </p>
     <div class="module-hero-card__meta">
       <span>{{ module.get_category_display|default:"Workforce Readiness" }}</span>
@@ -38,7 +44,11 @@
           <p class="sidebar-pill">Knowledge Check</p>
           <h2>Keep your progress on track</h2>
           <p class="sidebar-text">
-            {% if user_score %}
+            {% if module_progress and module_progress.completed_at %}
+              Completed{% if module_progress.completed_at %} on {{ module_progress.completed_at|date:"M j, Y" }}{% endif %}. You can still retake the quiz anytime.
+            {% elif module_progress and module_progress.last_question_order %}
+              Resume at question {{ module_progress.last_question_order }} and keep building on your saved progress.
+            {% elif user_score %}
               Last score: {{ user_score.score }} / {{ user_score.total_questions }} on {{ user_score.updated_at|date:"M j, Y" }}.
             {% elif not can_submit_quiz %}
               Log in to take the quiz and save your results.
@@ -56,18 +66,20 @@
             <dd>{{ question_count|default:0 }} question{% if question_count|default:0 != 1 %}s{% endif %}</dd>
           </div>
           <div>
-            <dt>Your progress</dt>
-            <dd id="sidebarProgressValue">{{ progress_percent }}%</dd>
+            <dt>Your completion</dt>
+            <dd id="sidebarProgressValue">{{ completion_percent }}%</dd>
           </div>
         </dl>
 
-        <div class="module-progress" aria-label="Quiz completion {{ progress_percent }} percent">
+        <div class="module-progress" aria-label="Module completion {{ completion_percent }} percent">
           <div class="module-progress__track">
-            <span id="sidebarProgressFill" class="module-progress__fill" style="--progress-value: {{ progress_percent }}%;"></span>
+            <span id="sidebarProgressFill" class="module-progress__fill" style="--progress-value: {{ completion_percent }}%;"></span>
           </div>
           <p class="module-progress__meta" id="sidebarProgressMeta">
             {% if user_score %}
-              {{ user_score.score }} of {{ user_score.total_questions }} answered correctly
+              {{ accuracy_percent }}% quiz accuracy{% if module_progress and module_progress.completed_at %} · Completed {{ module_progress.completed_at|date:"M j, Y" }}{% endif %}
+            {% elif module_progress %}
+              In progress{% if module_progress.updated_at %} · Updated {{ module_progress.updated_at|date:"M j, Y" }}{% endif %}
             {% else %}
               Start the quiz to begin tracking
             {% endif %}
@@ -149,30 +161,28 @@
       <section class="module-card module-card--resources">
         <div class="resources-header">
           <p class="resources-pill">Resources</p>
-          <h3>Keep learning after the lesson</h3>
+          <h3>{{ recommendation_heading }}</h3>
+          <p>{{ recommendation_subtitle }}</p>
         </div>
         <ul class="resources-list">
-          <li>
-            <div>
-              <strong>Resume Templates</strong>
-              <p>Use proven layouts to highlight your experience.</p>
-            </div>
-            <a href="{% url 'resource_list' %}#resumes" class="resource-link">Open</a>
-          </li>
-          <li>
-            <div>
-              <strong>Interview Practice</strong>
-              <p>Prep with mock questions and employer insights.</p>
-            </div>
-            <a href="{% url 'resource_list' %}#interview" class="resource-link">Explore</a>
-          </li>
-          <li>
-            <div>
-              <strong>Career Coaching</strong>
-              <p>Connect with experts for personalized feedback.</p>
-            </div>
-            <a href="{% url 'contact' %}" class="resource-link">Contact</a>
-          </li>
+          {% for item in related_modules %}
+            <li>
+              <div>
+                <strong>{{ item.title }}</strong>
+                <p>{{ item.description|default:"Continue learning with another module in this track." }}</p>
+              </div>
+              <a href="{% url 'module_detail' item.id %}" class="resource-link">Open Module</a>
+            </li>
+          {% endfor %}
+          {% for link in support_links %}
+            <li>
+              <div>
+                <strong>{{ link.title }}</strong>
+                <p>{{ link.description }}</p>
+              </div>
+              <a href="{{ link.href }}" class="resource-link">{{ link.label }}</a>
+            </li>
+          {% endfor %}
         </ul>
       </section>
 
@@ -190,6 +200,7 @@
           class="quiz-flow quiz-flow--locked"
           data-quiz-url="{% url 'module_quiz_schema' module.id %}"
           data-submit-url="{% url 'module_quiz_submit' module.id %}"
+          data-progress-url="{% url 'module_progress' module.id %}"
           data-can-submit="{{ can_submit_quiz|yesno:'true,false' }}"
           data-module-id="{{ module.id }}"
           data-state="locked"

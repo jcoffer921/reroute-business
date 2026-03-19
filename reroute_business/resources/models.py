@@ -1,7 +1,9 @@
 # resources/models.py
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.postgres.indexes import GistIndex
 from django.conf import settings
+from django.db.models import Q
 from django.utils.text import slugify
 
 if settings.USE_GIS:
@@ -125,6 +127,7 @@ class QuizQuestion(models.Model):
 
     module = models.ForeignKey(Module, related_name="questions", on_delete=models.CASCADE)
     prompt = models.TextField()
+    explanation = models.TextField(blank=True)
     order = models.PositiveIntegerField(default=1)
     qtype = models.CharField(max_length=10, choices=QTYPE_CHOICES, default=QTYPE_MULTIPLE_CHOICE)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -132,6 +135,15 @@ class QuizQuestion(models.Model):
 
     class Meta:
         ordering = ("order", "id")
+
+    def clean(self):
+        super().clean()
+        if self.qtype == self.QTYPE_OPEN and self.answers.exists():
+            raise ValidationError("Open-ended questions cannot have answer choices.")
+        if self.qtype == self.QTYPE_MULTIPLE_CHOICE and self.pk:
+            correct_count = self.answers.filter(is_correct=True).count()
+            if correct_count != 1:
+                raise ValidationError("Multiple choice questions must have exactly one correct answer.")
 
     def __str__(self):
         return f"{self.module.title}: Q{self.order}"
@@ -173,6 +185,86 @@ class ModuleQuizScore(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.module} ({self.score}/{self.total_questions})"
+
+
+class ModuleProgress(models.Model):
+    module = models.ForeignKey(Module, related_name="progress_records", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="module_progress_records",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    session_key = models.CharField(max_length=64, blank=True, db_index=True)
+    started_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    last_question_order = models.PositiveIntegerField(default=0)
+    score_percent = models.PositiveIntegerField(default=0)
+    raw_state = models.JSONField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("module", "user"),
+                condition=Q(user__isnull=False),
+                name="unique_module_progress_user",
+            ),
+            models.UniqueConstraint(
+                fields=("module", "session_key"),
+                condition=Q(session_key__gt=""),
+                name="unique_module_progress_session",
+            ),
+        ]
+
+    def __str__(self):
+        who = self.user.username if self.user_id else (self.session_key or "guest")
+        return f"{self.module.title} progress for {who}"
+
+
+class ModuleAttempt(models.Model):
+    module = models.ForeignKey(Module, related_name="attempts", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="module_attempts",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    session_key = models.CharField(max_length=64, blank=True, db_index=True)
+    score = models.PositiveIntegerField(default=0)
+    total_questions = models.PositiveIntegerField(default=0)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("-submitted_at",)
+
+    def __str__(self):
+        who = self.user.username if self.user_id else (self.session_key or "guest")
+        return f"{self.module.title} attempt for {who}"
+
+
+class ModuleResponse(models.Model):
+    attempt = models.ForeignKey(ModuleAttempt, related_name="responses", on_delete=models.CASCADE)
+    question = models.ForeignKey(QuizQuestion, related_name="module_responses", on_delete=models.CASCADE, null=True, blank=True)
+    question_identifier = models.CharField(max_length=64, blank=True)
+    selected_answer = models.ForeignKey(
+        "QuizAnswer",
+        related_name="module_responses",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    text_answer = models.TextField(blank=True)
+    is_correct = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("id",)
+
+    def __str__(self):
+        return f"Response for attempt {self.attempt_id}"
 
 
 class ModuleQuizOpenResponse(models.Model):
@@ -238,6 +330,7 @@ class LessonQuestion(models.Model):
     order = models.PositiveIntegerField(default=1)
     timestamp_seconds = models.FloatField(help_text="Time in seconds when the question should appear")
     prompt = models.TextField()
+    explanation = models.TextField(blank=True)
     qtype = models.CharField(max_length=32, choices=TYPE_CHOICES, default=TYPE_MULTIPLE_CHOICE)
     is_required = models.BooleanField(default=True)
     is_scored = models.BooleanField(default=True)
@@ -245,6 +338,15 @@ class LessonQuestion(models.Model):
 
     class Meta:
         ordering = ("order",)
+
+    def clean(self):
+        super().clean()
+        if self.qtype == self.TYPE_OPEN_ENDED and self.choices.exists():
+            raise ValidationError("Open-ended lesson questions cannot have choices.")
+        if self.qtype == self.TYPE_MULTIPLE_CHOICE and self.pk:
+            correct_count = self.choices.filter(is_correct=True).count()
+            if correct_count != 1:
+                raise ValidationError("Multiple choice lesson questions must have exactly one correct choice.")
 
     def __str__(self):
         return f"{self.lesson.title} Q{self.order}: {self.prompt[:40]}..."
