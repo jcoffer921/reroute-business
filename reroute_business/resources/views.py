@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 from django.db.models import F, Q
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
 from django.utils import timezone
